@@ -1,0 +1,3 @@
+
+Matrix classes, used to do the heavy lifting, we essentially have a 
+wrapper class to work with differen math libraries

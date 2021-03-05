@@ -4,18 +4,22 @@ enable_language(CXX)
 
 project(panacea VERSION "0.0.0")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(ENABLE_TESTING "Build and enable unit testing" OFF)
+option(ENABLE_TESTING "Build and enable unit testing" ON)
 
 ########################################################
 # Compiler Flags                                       #
 ########################################################
 
+# Public includes
 include_directories(include/panacea)
+
+# Private includes
+include_directories(src/libpanacea)
 
 ########################
 # Catch2 Configuration #
@@ -45,7 +49,10 @@ endif()
 # Grab source files and set the directory where they will be installed #
 ########################################################################
 
-file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp )
+file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp 
+  ${panacea_SOURCE_DIR}/src/libpanacea/kernels/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/descriptors/*)
+
 add_library(libpanacea ${SOURCES})
 set_target_properties(libpanacea PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -56,10 +63,6 @@ include(cmake/PanaceaInstall.cmake)
 ###############################
 if(ENABLE_TESTING)
   enable_testing()
-  IF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
-    message("Cannot build unit tests with release mode")  
-  ELSE(CMAKE_BUILD_TYPE MATCHES "RELEASE")
-    add_subdirectory(tst)
-  ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
+  add_subdirectory(tst)
 endif(ENABLE_TESTING)
 

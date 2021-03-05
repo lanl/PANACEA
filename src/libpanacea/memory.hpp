@@ -1,0 +1,161 @@
+
+#ifndef PANACEA_PRIVATE_MEMORY_H
+#define PANACEA_PRIVATE_MEMORY_H
+#pragma once
+
+// Local private PANACEA includes
+#include "error.hpp"
+
+// Standard includes
+#include <any>
+#include <cassert>
+#include <iostream>
+#include <memory>
+#include <vector>
+
+namespace panacea {
+
+  class BaseMemoryNode {
+    protected:
+      const bool own_ = false;
+      std::string name_;
+    public:
+      BaseMemoryNode(const bool own, const std::string & name = "") : own_(own), name_(name) {};
+      virtual ~BaseMemoryNode() = default;
+      const bool own() const noexcept { return own_; }
+      virtual std::any getRawDataPointer() const noexcept = 0;
+      const std::string & getName() const noexcept { return name_; };
+  };
+
+  template<class T >
+  class MemoryNode : public BaseMemoryNode {
+    private:
+      T * data_ptr_;
+    public:
+      MemoryNode(T * data, const bool own = false, const std::string & name = "") : data_ptr_(data), BaseMemoryNode(own, name) {};
+      std::any getRawDataPointer() const noexcept final {
+        std::cout << "Returning pointer 1" << std::endl; 
+        return data_ptr_; }
+  };
+
+  template<class T >
+  class MemoryNodeUnique : public BaseMemoryNode {
+    private:
+      std::unique_ptr<T> data_ptr_;
+    public:
+      MemoryNodeUnique(std::unique_ptr<T> data, const bool own = false, const std::string & name) : data_ptr_(std::move(data)), BaseMemoryNode(own, name) {};
+      std::any getRawDataPointer() const noexcept final {
+        std::cout << "Returning pointer 1" << std::endl; 
+        return data_ptr_.get(); }
+  };
+/*
+  template<>
+  class MemoryNode<class T*> : public BaseMemoryNode  {
+    private:
+      T * data_ptr_;
+    public:
+      MemoryNode(T * data_ptr, const bool own = false) : data_ptr_(data_ptr), BaseMemoryNode(own) {};
+      std::any getRawDataPointer() const noexcept final { 
+        std::cout << "Returning pointer 2" << std::endl; return data_ptr_; }
+  };*/
+
+  /*
+   * Class is responsible for managing the memory of objects used in panacea, particulalry
+   * objects that might be passed around between several objects. 
+   *
+   * It also keeps track of whether the objects memory is actually mananaged by panacea or
+   * externally
+   */
+  class MemoryManager {
+    // Each of the below should be specefic to a distribution 
+    // Covariance Matrix
+    // Normalization Coefficients
+    // Normalized Covariance Matrix
+    // Reduced Covariance Matrix
+    // Pointer to descriptors, with bool if memory is managed by panacea
+    // Pointer to kernels, with bool if memory is managed by panacea
+ 
+    private: 
+      std::vector<std::unique_ptr<BaseMemoryNode>> memories_;
+      std::unordered_map<std::string name, int> name_to_index_;
+    public:
+
+      size_t size() const noexcept { return memories_.size(); }
+
+      /// Here it is assumed the data in the node is not owned by the memory manager
+      /// returns the id in the vector
+      template<class T> 
+        size_t addNode(T & data, const std::string & name = ""){
+
+            if(name_to_index_.count(name)) {
+              PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+            }
+
+            T * data_ptr = &data;
+            memories_.push_back(std::make_unique<MemoryNode<T>>(MemoryNode<T>(data_ptr,false,name)));
+            name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      template<class T> 
+        size_t addNode(T * data, const std::string & name = ""){
+
+          if(name_to_index_.count(name)) {
+            PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+          }
+          memories_.push_back(std::make_unique<MemoryNode<T>>(data,false,name));
+          name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      /// The data passed in will now be owned by the memory manager
+      /// returns the id in the vector
+      template<class T> 
+        size_t createNode(T & data, const std::string & name = ""){
+          if(name_to_index_.count(name)) {
+            PANACEA_FAIL("Cannot createNode name of memory has already been assigned.");
+          }
+          auto unique_val = std::make_unique<T>(data);
+          auto mem_node = MemoryNodeUnique<T>(std::move(unique_val),true,name);
+          memories_.push_back(std::make_unique<MemoryNodeUnique<T>>(std::move(mem_node)));
+          name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      template<class T> 
+        size_t createNode(std::unique_ptr<T> && data, const std::string & name = ""){
+          PANACEA_FAIL("Cannot use createNode with data that is already stored in a unique_ptr, consider using addNode instead.");
+          return -1;
+        }
+
+        BaseMemoryNode & getMemory(const int index) {
+          assert(index < memories_.size() && index >= 0 );
+          return memories_.at(index)
+        }
+
+         BaseMemoryNode & getMemory(const std::string & name) {
+          if(name_to_index_.count(name) == 0) {
+            PANACEA_FAIL("Cannot getMemory name of memory is not known.");
+          }
+          return memories_.at(name_to_index_[name])
+        }
+
+      template<class T>
+        T  getRawPointer(int index) {
+          assert(index < memories_.size() );
+          return std::any_cast<T>(memories_.at(index)->getRawDataPointer()); 
+        }
+
+      template<class T>
+        T  getRawPointer(const std::string & name) {
+          if(name_to_index_.count(name) == 0) {
+            PANACEA_FAIL("Cannot getRawPointer name of memory is not known.");
+          }
+          assert(index < memories_.size() );
+          return std::any_cast<T>(memories_.at(name_to_index_[name])->getRawDataPointer()); 
+        }
+
+    };
+
+}
+#endif // PANACEA_PRIVATE_MEMORY_H
