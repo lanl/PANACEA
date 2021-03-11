@@ -1,6 +1,7 @@
 
 // Local private includes
 #include "descriptors/descriptor_wrapper.hpp"
+#include "helper.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -21,12 +22,8 @@ TEST_CASE("Testing:descriptor_wrapper_constructor1","[unit,panacea]"){
 
 TEST_CASE("Testing:descriptor_wrapper_constructor2","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data;
-
-  std::vector<double> values = {1.0, 2.0, 3.0};
-  data.push_back(values);
-  data.push_back(values);
-
+  std::vector<std::vector<double>> data = test::generateVecData(); 
+  
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2, 3);
   REQUIRE(dwrapper.rows() == 2);
   REQUIRE(dwrapper.cols() == 3);
@@ -37,11 +34,7 @@ TEST_CASE("Testing:descriptor_wrapper_constructor2","[unit,panacea]"){
 
 TEST_CASE("Testing:descriptor_wrapper_access","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data;
-
-  std::vector<double> values = {1.0, 2.0, 3.0};
-  data.push_back(values);
-  data.push_back(values);
+  std::vector<std::vector<double>> data = test::generateVecData(); 
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
 
@@ -57,11 +50,8 @@ TEST_CASE("Testing:descriptor_wrapper_access","[unit,panacea]"){
 
 TEST_CASE("Testing:descriptor_arrangements","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data;
 
-  std::vector<double> values = {1.0, 2.0, 3.0};
-  data.push_back(values);
-  data.push_back(values);
+  std::vector<std::vector<double>> data = test::generateVecData(); 
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
 
@@ -87,19 +77,10 @@ TEST_CASE("Testing:descriptor_arrangements","[unit,panacea]"){
 }
 
 TEST_CASE("Testing:descriptor_different_template_type","[unit,panacea]"){
-  double ** data;
-  data = new double*[2];
-  data[0] = new double[3]; 
-  data[1] = new double[3]; 
 
-  data[0][0] = 1.0; 
-  data[1][0] = 1.0; 
-  data[0][1] = 2.0; 
-  data[1][1] = 2.0; 
-  data[0][2] = 3.0; 
-  data[1][2] = 3.0; 
+  test::ArrayData array_data;
 
-  DescriptorWrapper<double ***> dwrapper(&data,2,3);
+  DescriptorWrapper<double ***> dwrapper(&array_data.data,2,3);
 
   // Rows and columns don't change
   REQUIRE(dwrapper.rows() == 2);
@@ -118,18 +99,11 @@ TEST_CASE("Testing:descriptor_different_template_type","[unit,panacea]"){
   REQUIRE(dwrapper(0,2) == 3.0);
   REQUIRE(dwrapper(1,2) == 3.0);
 
-  delete[] data[0];
-  delete[] data[1];
-  delete[] data;
 }
 
 TEST_CASE("Testing:descriptor_reduced_dimensions","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data;
-
-  std::vector<double> values = {1.0, 2.0, 3.0};
-  data.push_back(values);
-  data.push_back(values);
+  std::vector<std::vector<double>> data = test::generateVecData(); 
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
 

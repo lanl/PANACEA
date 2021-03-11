@@ -45,6 +45,12 @@ namespace panacea {
           number_dimensions_(cols),
           number_points_(rows) {};
 
+        /*
+         * Allows the user to change how the rows and columns
+         * are interpreted by default, assumes that the points
+         * are located along the rows and the dimensions along
+         * the columns.
+         */
         void set(const Arrangement arrangement);
 
         /*

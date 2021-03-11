@@ -9,17 +9,17 @@
 // Third party includes
 #include <Eigen/Dense>
 
+// Standard includes
+#include <memory>
+
 namespace panacea {
 
-  /**
-   * Here the underlying matrix is owned by the memory manager so we only have a pointer
-   * here.
-   */
   class MatrixEigen : public Matrix {
     private: 
-      Eigen::MatrixXd * matrix_;
+      std::unique_ptr<Eigen::MatrixXd> matrix_;
     public:
-      MatrixEigen(Eigen::MatrixXd * matrix) : matrix_(matrix) {};
+      MatrixEigen();
+      virtual ~MatrixEigen() final {};
 
       virtual double& operator()(const int row, const int col) final;
       virtual double operator()(const int row, const int col) const final;
@@ -29,6 +29,9 @@ namespace panacea {
       virtual void resize(const int rows, const int cols) final;
 
       virtual void setZero() final;
+
+      virtual int rows() const final;
+      virtual int cols() const final;
   };
 }
 

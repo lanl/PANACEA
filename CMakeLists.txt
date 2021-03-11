@@ -16,10 +16,10 @@ option(ENABLE_TESTING "Build and enable unit testing" ON)
 ########################################################
 
 # Public includes
-include_directories(include/panacea)
+include_directories(${panacea_SOURCE_DIR}/include)
 
 # Private includes
-include_directories(src/libpanacea)
+include_directories(${panacea_SOURCE_DIR}/src/libpanacea)
 
 ########################
 # Catch2 Configuration #
@@ -50,11 +50,23 @@ endif()
 ########################################################################
 
 file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp 
+  ${panacea_SOURCE_DIR}/src/libpanacea/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/attributes/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/attribute_manipulators/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/descriptors/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/distribution/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/entropy/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/io/*
   ${panacea_SOURCE_DIR}/src/libpanacea/kernels/*
-  ${panacea_SOURCE_DIR}/src/libpanacea/descriptors/*)
+  ${panacea_SOURCE_DIR}/src/libpanacea/matrix/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/primitives/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/tasks/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/vector/*
+  )
 
 add_library(libpanacea ${SOURCES})
 set_target_properties(libpanacea PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(libpanacea Eigen3::Eigen)
 
 include(cmake/PanaceaInstall.cmake)
 

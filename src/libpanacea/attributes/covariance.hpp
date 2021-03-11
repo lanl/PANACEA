@@ -3,12 +3,12 @@
 #define PANACEA_PRIVATE_COVARIANCE_H
 #pragma once
 
-// Third party includes
-#include <Eigen/Dense>
-
 // Local PANACEA includes
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
+
+// Standard includes
+#include <memory>
 
 namespace panacea {
 
@@ -20,16 +20,16 @@ namespace panacea {
   class Covariance {
     private:
       /// The covariance matrix
-      Matrix matrix_;
+      std::unique_ptr<Matrix> matrix_;
       
       /// A is used for updating the covariance matrix
-      Matrix A_;
+      std::unique_ptr<Matrix> A_;
 
       /// B is used for updating the covariance matrix
-      Vector B_;
+      std::unique_ptr<Vector> B_;
 
       /// Mean of the values used to create the covariance matrix
-      Vector mean_;
+      std::unique_ptr<Vector> mean_;
 
       /// Total number of data points used in the creation of the covariance matrix and in updating it
       int total_number_data_pts_ = 0;
@@ -37,6 +37,6 @@ namespace panacea {
       Covariance(BaseDescriptorWrapper * desc_wrap);
       /// Designed to update the covariance matrix
       void update(BaseDescriptorWrapper * desc_wrap);
-  }
+  };
 }
-#define PANACEA_PRIVATE_COVARIANCE_H
+#endif // PANACEA_PRIVATE_COVARIANCE_H

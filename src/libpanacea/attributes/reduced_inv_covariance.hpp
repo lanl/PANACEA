@@ -3,11 +3,19 @@
 #define PANACEA_PRIVATE_REDUCEDINVCOVARIANCE_H
 #pragma once
 
+// Local public includes
+#include "panacea/matrix.hpp"
+
+// Standard includes
+#include <memory>
+
 namespace panacea {
 
   class ReducedInvCovariance {
     private:
-      Matrix matrix_;
+      std::unique_ptr<Matrix> matrix_;
+    public:
+      double operator()(const int row, const int col) const;
   };
 }
 

@@ -10,8 +10,11 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
+  enum class EquationSetting;
+  enum class GradSetting;
 
   class Primitive {
+   
     public:
       virtual ~Primitive() = default;
 
@@ -20,15 +23,15 @@ namespace panacea {
        * reset the inverse covariance matrix 
        * reset the prefactor value
        */
-      virtual void reset(const & PrimitiveAttributes) const = 0;
+      // Do not make const reference
+      virtual void reset(PrimitiveAttributes) = 0;
 
       /*
        * Computes the density
        */
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          const int sample_ind,
-          const int kernel_ind) const = 0;
+          const int sample_ind) const = 0;
 
       /*
        * Computes the gradient of the density
@@ -40,9 +43,10 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
-          const int kernel_ind,
-          const int point_target) const = 0; 
-  }
+          const int point_target, 
+          std::vector<EquationSetting> prim_settings, 
+          GradSetting grad_setting) const = 0; 
+  };
 }
 
 #endif // PANACEA_PRIVATE_PRIMITIVE_H

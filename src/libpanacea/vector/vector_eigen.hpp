@@ -9,6 +9,9 @@
 // Third party includes
 #include <Eigen/Dense>
 
+// Third party includes
+#include <memory>
+
 namespace panacea {
 
   /**
@@ -17,13 +20,14 @@ namespace panacea {
    */
   class VectorEigen : public Vector {
     private: 
-      Eigen::VectorXd * vector_;
+      std::unique_ptr<Eigen::VectorXd> vector_;
     public:
-      VectorEigen(Eigen::VectorXd * vector) : vector_(vector) {};
-
+      VectorEigen();
+      virtual ~VectorEigen() final {};
       virtual double& operator()(const int row) final;
       virtual double operator()(const int row) const final;
       virtual void resize(const int rows) final;
+      virtual int rows() const final;
   };
 }
 

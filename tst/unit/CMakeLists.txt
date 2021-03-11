@@ -2,12 +2,15 @@
 list( APPEND TEST_SOURCES
     catch_main.cpp
     test_descriptor_wrappers.cpp
+    test_gaussian_uncorrelated.cpp
     test_kernel_wrappers.cpp
     test_memory_manager.cpp
     )
 
+include_directories(../helper)
 add_executable(unit_tests ${TEST_SOURCES})
-target_link_libraries(unit_tests PUBLIC libpanacea Catch2::Catch2)
+add_dependencies(unit_tests libhelper libpanacea)
+target_link_libraries(unit_tests PUBLIC libpanacea libhelper Catch2::Catch2)
 ParseAndAddCatchTests(unit_tests)
 
 get_property(ALL_TESTS DIRECTORY . PROPERTY TESTS)

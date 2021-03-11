@@ -6,16 +6,18 @@
 namespace panacea {
   
   class Matrix;
-  class Vector
+  class Vector;
   class BaseKernelWrapper;
+  class ReducedCovariance;
+  class ReducedInvCovariance;
   /*
    * Class provides a generic means of passing in common attributes needed by the primitives
    */
   class PrimitiveAttributes {
     public:
-      BaseKernelWrapper * kernel_wrapper;
-      ReducedInvCovariance * reduced_inv_covariance;       
-      double determinant;
+      BaseKernelWrapper * kernel_wrapper = nullptr;
+      ReducedCovariance * reduced_covariance = nullptr;
+      ReducedInvCovariance * reduced_inv_covariance = nullptr;       
   };
 }
 

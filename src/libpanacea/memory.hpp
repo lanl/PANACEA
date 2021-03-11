@@ -11,6 +11,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace panacea {
@@ -43,21 +44,11 @@ namespace panacea {
     private:
       std::unique_ptr<T> data_ptr_;
     public:
-      MemoryNodeUnique(std::unique_ptr<T> data, const bool own = false, const std::string & name) : data_ptr_(std::move(data)), BaseMemoryNode(own, name) {};
+      MemoryNodeUnique(std::unique_ptr<T> data, const bool own = false, const std::string & name = "") : data_ptr_(std::move(data)), BaseMemoryNode(own, name) {};
       std::any getRawDataPointer() const noexcept final {
         std::cout << "Returning pointer 1" << std::endl; 
         return data_ptr_.get(); }
   };
-/*
-  template<>
-  class MemoryNode<class T*> : public BaseMemoryNode  {
-    private:
-      T * data_ptr_;
-    public:
-      MemoryNode(T * data_ptr, const bool own = false) : data_ptr_(data_ptr), BaseMemoryNode(own) {};
-      std::any getRawDataPointer() const noexcept final { 
-        std::cout << "Returning pointer 2" << std::endl; return data_ptr_; }
-  };*/
 
   /*
    * Class is responsible for managing the memory of objects used in panacea, particulalry
@@ -77,7 +68,7 @@ namespace panacea {
  
     private: 
       std::vector<std::unique_ptr<BaseMemoryNode>> memories_;
-      std::unordered_map<std::string name, int> name_to_index_;
+      std::unordered_map<std::string, int> name_to_index_;
     public:
 
       size_t size() const noexcept { return memories_.size(); }
@@ -128,16 +119,16 @@ namespace panacea {
           return -1;
         }
 
-        BaseMemoryNode & getMemory(const int index) {
+        BaseMemoryNode * getMemory(const int index) {
           assert(index < memories_.size() && index >= 0 );
-          return memories_.at(index)
+          return memories_.at(index).get();
         }
 
-         BaseMemoryNode & getMemory(const std::string & name) {
+         BaseMemoryNode * getMemory(const std::string & name) {
           if(name_to_index_.count(name) == 0) {
             PANACEA_FAIL("Cannot getMemory name of memory is not known.");
           }
-          return memories_.at(name_to_index_[name])
+          return memories_.at(name_to_index_[name]).get();
         }
 
       template<class T>
@@ -151,7 +142,6 @@ namespace panacea {
           if(name_to_index_.count(name) == 0) {
             PANACEA_FAIL("Cannot getRawPointer name of memory is not known.");
           }
-          assert(index < memories_.size() );
           return std::any_cast<T>(memories_.at(name_to_index_[name])->getRawDataPointer()); 
         }
 
