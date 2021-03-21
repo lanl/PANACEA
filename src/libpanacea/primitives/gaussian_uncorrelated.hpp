@@ -24,7 +24,7 @@ namespace panacea {
       PrimitiveAttributes attributes_; 
       double pre_factor_;
     public:
-      GaussUncorrelated(const int & kernel_index) : kernel_index_(kernel_index) {};
+      explicit GaussUncorrelated(const int & kernel_index) : kernel_index_(kernel_index) {};
       GaussUncorrelated(const PrimitiveAttributes & prim_att, const int & kernel_index) : kernel_index_(kernel_index) {};
 
       // Do not make const reference
