@@ -14,7 +14,7 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:covariance creation","[unit,panacea]"){
+TEST_CASE("Testing:covariance test trivial constructor","[unit,panacea]"){
 
   // 3 points 2 dimensions
   std::vector<std::vector<double>> data{
@@ -33,6 +33,13 @@ TEST_CASE("Testing:covariance creation","[unit,panacea]"){
   REQUIRE(cov.getMean(1) == Approx(5.0));
 
   REQUIRE(cov.getCummulativeDescPoints() == 3);
+
+  REQUIRE( cov(0,0) == Approx(1.0) );
+  REQUIRE( cov(0,1) == Approx(1.0) );
+  REQUIRE( cov(1,0) == Approx(1.0) );
+  REQUIRE( cov(1,1) == Approx(1.0) );
+
+  REQUIRE( cov.getDeterminant() == Approx(0,0) );
 }
 
 
