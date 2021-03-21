@@ -34,9 +34,22 @@ namespace panacea {
       /// Total number of data points used in the creation of the covariance matrix and in updating it
       int total_number_data_pts_ = 0;
     public:
-      Covariance(BaseDescriptorWrapper * desc_wrap);
+      explicit Covariance(BaseDescriptorWrapper * desc_wrap);
       /// Designed to update the covariance matrix
       void update(BaseDescriptorWrapper * desc_wrap);
+
+      /// Don't want to allow for the matrix to be arbitrarily changed but do want to
+      /// provide access to the actual covariance matrix elements
+      double operator()(const int row, const int col) const;
+
+      int rows() const;
+      int cols() const;
+
+      double getDeterminant() const;
+
+      double getMean(const int index) const;
+
+      int getCummulativeDescPoints() const;
   };
 }
 #endif // PANACEA_PRIVATE_COVARIANCE_H

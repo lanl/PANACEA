@@ -11,6 +11,7 @@
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
 
+#include <iostream>
 namespace panacea {
 
   namespace correlated {
@@ -39,7 +40,7 @@ namespace panacea {
           }
           (*A)(dim,dim) = sum;
         } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim) { // account for off diagonal elements
+        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
@@ -91,7 +92,7 @@ namespace panacea {
               static_cast<double>(total_num_pts)*(*mean)(dim)*(*mean)(dim));
 
         } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim) { // account for off diagonal elements
+        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           (*covariance)(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
           (*covariance)(dim,dim2) *= ((*A)(dim,dim2) - (*mean)(dim)*(*B)(dim2) - (*mean)(dim2) * (*B)(dim) +
               static_cast<double>(total_num_pts)*(*mean)(dim) * (*mean)(dim2));
@@ -154,6 +155,7 @@ namespace panacea {
 
   Covariance::Covariance(BaseDescriptorWrapper * desc_wrap) {
     // Resize the covariance matrix based on the number of descriptor dimensions
+    assert(desc_wrap != nullptr);
     const int num_dims = desc_wrap->getNumberDimensions();
     matrix_ = createMatrix(num_dims, num_dims);
     mean_ = createVector(num_dims);
@@ -181,5 +183,29 @@ namespace panacea {
     correlated::updateCovariance(matrix_.get(), A_.get(), B_.get(), mean_.get(), total_number_data_pts_, desc_wrap);
     total_number_data_pts_ += desc_wrap->getNumberPoints();
    
+  }
+
+  double Covariance::operator()(const int row, const int col) const {
+    return matrix_->operator()(row,col);
+  }
+
+  int Covariance::rows() const {
+    return matrix_->rows();
+  }
+
+  int Covariance::cols() const {
+    return matrix_->cols();
+  }
+
+  double Covariance::getDeterminant() const {
+    return matrix_->getDeterminant();
+  }
+
+  double Covariance::getMean(const int index) const {
+    return mean_->operator()(index);
+  }
+
+  int Covariance::getCummulativeDescPoints() const {
+    return total_number_data_pts_;
   }
 }
