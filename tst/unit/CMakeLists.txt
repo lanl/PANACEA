@@ -1,6 +1,7 @@
 
 list( APPEND TEST_SOURCES
     catch_main.cpp
+    test_covariance.cpp
     test_descriptor_wrappers.cpp
     test_gaussian_uncorrelated.cpp
     test_kernel_wrappers.cpp
