@@ -16,6 +16,9 @@ namespace panacea {
       std::unique_ptr<Matrix> matrix_;
     public:
       ReducedCovariance();
+      ReducedCovariance(std::unique_ptr<Matrix> matrix) :
+        matrix_(std::move(matrix)) {};
+
       double getDeterminant() const;
       int getNumberDimensions() const;
   };

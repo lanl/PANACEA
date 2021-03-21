@@ -76,48 +76,23 @@ namespace panacea {
       /// Here it is assumed the data in the node is not owned by the memory manager
       /// returns the id in the vector
       template<class T> 
-        size_t addNode(T & data, const std::string & name = ""){
-
-            if(name_to_index_.count(name)) {
-              PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
-            }
-
-            T * data_ptr = &data;
-            memories_.push_back(std::make_unique<MemoryNode<T>>(MemoryNode<T>(data_ptr,false,name)));
-            name_to_index_[name] = memories_.size() - 1;
-          return memories_.size() - 1;
-        }
+        size_t managePointer(T & data, const std::string & name = "");
 
       template<class T> 
-        size_t addNode(T * data, const std::string & name = ""){
-
-          if(name_to_index_.count(name)) {
-            PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
-          }
-          memories_.push_back(std::make_unique<MemoryNode<T>>(data,false,name));
-          name_to_index_[name] = memories_.size() - 1;
-          return memories_.size() - 1;
-        }
+        size_t managePointer(T * data, const std::string & name = "");
 
       /// The data passed in will now be owned by the memory manager
       /// returns the id in the vector
+      /// This is actually very unsame, a reference does not indicated ownership
+      /// of the object, if we are are going to create a Node and assume ownership
+      /// it has to aready be in a unique pointer
+      /// E.g. it is non-trivial to convert a nested array of heap allocated pointers
+      /// to a unique pointer, or what if an object on the stack is passed in
       template<class T> 
-        size_t createNode(T & data, const std::string & name = ""){
-          if(name_to_index_.count(name)) {
-            PANACEA_FAIL("Cannot createNode name of memory has already been assigned.");
-          }
-          auto unique_val = std::make_unique<T>(data);
-          auto mem_node = MemoryNodeUnique<T>(std::move(unique_val),true,name);
-          memories_.push_back(std::make_unique<MemoryNodeUnique<T>>(std::move(mem_node)));
-          name_to_index_[name] = memories_.size() - 1;
-          return memories_.size() - 1;
-        }
+        size_t manageMemory(T & data, const std::string & name = "");
 
       template<class T> 
-        size_t createNode(std::unique_ptr<T> && data, const std::string & name = ""){
-          PANACEA_FAIL("Cannot use createNode with data that is already stored in a unique_ptr, consider using addNode instead.");
-          return -1;
-        }
+        size_t manageMemory(std::unique_ptr<T> && data, const std::string & name = "");
 
         BaseMemoryNode * getMemory(const int index) {
           assert(index < memories_.size() && index >= 0 );
@@ -132,20 +107,76 @@ namespace panacea {
         }
 
       template<class T>
-        T  getRawPointer(int index) {
+        T  getRawPointer(int index); 
+
+      template<class T>
+        T  getRawPointer(const std::string & name);
+
+    };
+
+  /// Here it is assumed the data in the node is not owned by the memory manager
+      /// returns the id in the vector
+      template<class T> 
+      inline  size_t MemoryManager::managePointer(T & data, const std::string & name){
+
+            if(name_to_index_.count(name)) {
+              PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+            }
+
+            T * data_ptr = &data;
+            memories_.push_back(std::make_unique<MemoryNode<T>>(MemoryNode<T>(data_ptr,false,name)));
+            name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      template<class T> 
+       inline size_t MemoryManager::managePointer(T * data, const std::string & name){
+
+          if(name_to_index_.count(name)) {
+            PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+          }
+          memories_.push_back(std::make_unique<MemoryNode<T>>(data,false,name));
+          name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      /// The data passed in will now be owned by the memory manager
+      /// returns the id in the vector
+      /// This is actually very unsame, a reference does not indicated ownership
+      /// of the object, if we are are going to create a Node and assume ownership
+      /// it has to aready be in a unique pointer
+      /// E.g. it is non-trivial to convert a nested array of heap allocated pointers
+      /// to a unique pointer, or what if an object on the stack is passed in
+//      template<class T> 
+//    inline    size_t MemoryManager::(T & data, const std::string & name){
+//          PANACEA_FAIL("Cannot use createNode with data that is already stored in a unique_ptr, consider using addNode instead.");
+//          return -1;
+//        }
+
+      template<class T> 
+     inline   size_t MemoryManager::manageMemory(std::unique_ptr<T> && data, const std::string & name){
+if(name_to_index_.count(name)) {
+            PANACEA_FAIL("Cannot createNode name of memory has already been assigned.");
+          }
+          auto mem_node = MemoryNodeUnique<T>(std::move(data),true,name);
+          memories_.push_back(std::make_unique<MemoryNodeUnique<T>>(std::move(mem_node)));
+          name_to_index_[name] = memories_.size() - 1;
+          return memories_.size() - 1;
+        }
+
+      template<class T>
+       inline T  MemoryManager::getRawPointer(int index) {
           assert(index < memories_.size() );
           return std::any_cast<T>(memories_.at(index)->getRawDataPointer()); 
         }
 
       template<class T>
-        T  getRawPointer(const std::string & name) {
+      inline  T  MemoryManager::getRawPointer(const std::string & name) {
           if(name_to_index_.count(name) == 0) {
             PANACEA_FAIL("Cannot getRawPointer name of memory is not known.");
           }
           return std::any_cast<T>(memories_.at(name_to_index_[name])->getRawDataPointer()); 
         }
-
-    };
 
 }
 #endif // PANACEA_PRIVATE_MEMORY_H

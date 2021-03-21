@@ -3,11 +3,15 @@
 #define PANACEA_PRIVATE_HELPER_H
 #pragma once
 
+// Local private PANACEA includes
+#include "primitives/primitive_attributes.hpp"
+
 // Standard includes
 #include <vector>
 
 namespace panacea {
   
+  class MemoryManager;
 namespace test {
 
   /*
@@ -32,6 +36,16 @@ namespace test {
       ~ArrayData();
       double ** data;
   }; 
+
+  /*
+   * Will populate primitive attributes class with
+   * appropriate members:
+   *
+   * - BaseKernelWrapper
+   * - ReducedCovariance matrix
+   * - ReducedInvCovariance matrix
+   */
+  //PrimitiveAttributes generatePrimitiveAttributes(::panacea::MemoryManager & mem_manager);
 
 } // test
 

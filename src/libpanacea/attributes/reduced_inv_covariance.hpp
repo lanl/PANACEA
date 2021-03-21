@@ -15,6 +15,8 @@ namespace panacea {
     private:
       std::unique_ptr<Matrix> matrix_;
     public:
+      ReducedInvCovariance(std::unique_ptr<Matrix> matrix) :
+        matrix_(std::move(matrix)) {};
       double operator()(const int row, const int col) const;
   };
 }
