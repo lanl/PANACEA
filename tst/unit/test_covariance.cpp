@@ -39,10 +39,11 @@ TEST_CASE("Testing:covariance test trivial constructor","[unit,panacea]"){
   REQUIRE( cov(1,0) == Approx(1.0) );
   REQUIRE( cov(1,1) == Approx(1.0) );
 
-  REQUIRE( cov.getDeterminant() == Approx(0,0) );
+  REQUIRE( cov.getDeterminant() == Approx(0.0) );
 }
 
 TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
+
   std::vector<std::vector<double>> data {
       {0.6787,    0.6948,    0.7094},
       {0.7577,    0.3171,    0.7547},
@@ -56,25 +57,61 @@ TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
 
   Covariance cov(&dwrapper);
 
-  const int number_of_dimensions = 3;
-  REQUIRE(cov.rows() == number_of_dimensions);
-  REQUIRE(cov.cols() == number_of_dimensions);
+  WHEN("Testing after initialization") {
+    const int number_of_dimensions = 3;
+    REQUIRE(cov.rows() == number_of_dimensions);
+    REQUIRE(cov.cols() == number_of_dimensions);
 
-  REQUIRE(cov.getMean(0) == Approx(0.5664));
-  REQUIRE(cov.getMean(1) == Approx(0.4695));
-  REQUIRE(cov.getMean(2) == Approx(0.5396));
+    REQUIRE(cov.getMean(0) == Approx(0.5664).margin(1e-3));
+    REQUIRE(cov.getMean(1) == Approx(0.4695).margin(1e-3));
+    REQUIRE(cov.getMean(2) == Approx(0.5396).margin(1e-3));
 
-  REQUIRE(cov.getCummulativeDescPoints() == data.size());
+    REQUIRE(cov.getCummulativeDescPoints() == data.size());
 
-  REQUIRE( cov(0,0) == Approx(0.055) );
-  REQUIRE( cov(0,1) == Approx(0.0378) );
-  REQUIRE( cov(0,2) == Approx(0.0297) );
-  REQUIRE( cov(1,0) == Approx(0.0378) );
-  REQUIRE( cov(1,1) == Approx(0.1006) );
-  REQUIRE( cov(1,2) == Approx(-0.0305) );
-  REQUIRE( cov(2,0) == Approx(0.0297) );
-  REQUIRE( cov(2,1) == Approx(-0.0305) );
-  REQUIRE( cov(2,2) == Approx(0.0639) );
+    REQUIRE( cov(0,0) == Approx(0.055).margin(1e-3) );
+    REQUIRE( cov(0,1) == Approx(0.0378).margin(1e-3) );
+    REQUIRE( cov(0,2) == Approx(0.0297).margin(1e-3) );
+    REQUIRE( cov(1,0) == Approx(0.0378).margin(1e-3) );
+    REQUIRE( cov(1,1) == Approx(0.1006).margin(1e-3) );
+    REQUIRE( cov(1,2) == Approx(-0.0305).margin(1e-3) );
+    REQUIRE( cov(2,0) == Approx(0.0297).margin(1e-3) );
+    REQUIRE( cov(2,1) == Approx(-0.0305).margin(1e-3) );
+    REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
+  }
+  
+  std::vector<std::vector<double>> update_data {
+	 {0.0318, 0.7952, 0.4984},
+	 {0.2769, 0.1869, 0.9597},
+	 {0.0462, 0.4898, 0.3404},
+	 {0.0971, 0.4456, 0.5853},
+	 {0.8235, 0.6463, 0.2238}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> 
+    dwrapper2(&update_data, update_data.size(), update_data.at(0).size());
+
+  cov.update(&dwrapper2);
+
+  WHEN("Testing after update") {
+    const int number_of_dimensions = 3;
+    REQUIRE(cov.rows() == number_of_dimensions);
+    REQUIRE(cov.cols() == number_of_dimensions);
+
+    REQUIRE(cov.getMean(0) == Approx(0.4249).margin(1e-3));
+    REQUIRE(cov.getMean(1) == Approx(0.4891).margin(1e-3));
+    REQUIRE(cov.getMean(2) == Approx(0.5314).margin(1e-3));
+
+    REQUIRE(cov.getCummulativeDescPoints() == (data.size()+update_data.size()));
+
+    REQUIRE( cov(0,0) == Approx(0.0981).margin(1e-3) );
+    REQUIRE( cov(0,1) == Approx(0.0173).margin(1e-3) );
+    REQUIRE( cov(0,2) == Approx(0.0037).margin(1e-3) );
+    REQUIRE( cov(1,0) == Approx(0.0173).margin(1e-3) );
+    REQUIRE( cov(1,1) == Approx(0.0717).margin(1e-3) );
+    REQUIRE( cov(1,2) == Approx(-0.0344).margin(1e-3) );
+    REQUIRE( cov(2,0) == Approx(0.0037).margin(1e-3) );
+    REQUIRE( cov(2,1) == Approx(-0.0344).margin(1e-3) );
+    REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
 
 
+  }
 }

@@ -11,6 +11,8 @@
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
 
+// Standard includes
+#include <cassert>
 #include <iostream>
 namespace panacea {
 
@@ -128,7 +130,7 @@ namespace panacea {
           }
           (*A)(dim,dim) += sum;
         } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim) { // account for off diagonal elements
+        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
