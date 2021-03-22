@@ -4,7 +4,7 @@
 
 namespace panacea {
 
-  template 
+  template<class T>
     class PassKey {
       private:
         PassKey() {}

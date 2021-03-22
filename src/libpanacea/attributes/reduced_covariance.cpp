@@ -8,10 +8,6 @@
 
 namespace panacea {
 
-  ReducedCovariance::ReducedCovariance() {
-    matrix_ = createMatrix(0,0);
-  }
-
   double ReducedCovariance::getDeterminant() const {
     return matrix_->getDeterminant();
   }

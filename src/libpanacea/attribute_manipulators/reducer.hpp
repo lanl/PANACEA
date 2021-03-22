@@ -12,8 +12,17 @@
 namespace panacea {
 
   class Reducer {
+    private:
+      /*
+       * The starting theshold is used to determine when linear dependence is 
+       * occuring. The lower this value is the less likely that linear dependence
+       * will be detected, initially. However, the threshold is iteratively 
+       * increased until the determinant is > 0.
+       */   
+      double starting_threshold_ = 1E-9;
+
     public:
-      
+      explicit Reducer(double threshold) : starting_threshold_(threshold) {}; 
       /**
        * @brief Designed to reduce/rearrange the covariance matrix
        *
@@ -30,7 +39,7 @@ namespace panacea {
        * @return 
        */
       ReducedCovariance reduce(
-          Covariance cov,
+          const Covariance & cov,
           std::vector<int> preferred_dimensions) const;
   };
 }

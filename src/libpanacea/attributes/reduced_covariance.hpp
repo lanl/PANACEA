@@ -14,13 +14,17 @@
 
 namespace panacea {
 
+  class Reducer;
+
   class ReducedCovariance {
     private:
       std::unique_ptr<Matrix> matrix_;
 
+      ReducedCovariance(PassKey<Reducer>);
       ReducedCovariance(PassKey<Reducer> key, std::unique_ptr<Matrix> matrix) :
         matrix_(std::move(matrix)) {};
     public:
+      ReducedCovariance() = delete;
 
       double getDeterminant() const;
       int getNumberDimensions() const;
