@@ -2,7 +2,15 @@
 #define PANACEA_PRIVATE_ROWECHELON_H
 #pragma once
 
+// Local private PANACEA includes
+#include "row_echelon.hpp"
+
+// Standard includes
+#include <vector>
+
 namespace panacea {
+
+  class Matrix;
 
   class RowEchelon {
     private: 

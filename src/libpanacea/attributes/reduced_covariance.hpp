@@ -20,10 +20,11 @@ namespace panacea {
     private:
       std::unique_ptr<Matrix> matrix_;
 
+    public:
       ReducedCovariance(PassKey<Reducer>);
       ReducedCovariance(PassKey<Reducer> key, std::unique_ptr<Matrix> matrix) :
         matrix_(std::move(matrix)) {};
-    public:
+
       ReducedCovariance() = delete;
 
       double getDeterminant() const;

@@ -9,7 +9,9 @@
 #include "panacea/matrix.hpp"
 
 // Standard includes
-#include <algorithm>
+#include <numeric>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 namespace panacea {
@@ -34,8 +36,8 @@ namespace panacea {
       for( const auto & dim : preferred_dimensions) {
         if( dim < 0 || dim >= cov.rows()) {
           error_detected = true;
-          error_msg += "Dimension " + dim " is out of bounds for covariance ";
-          error_msg += "matrix of size " + cov.rows() + ".\n";
+          error_msg += "Dimension " + std::to_string(dim) + " is out of bounds for covariance ";
+          error_msg += "matrix of size " + std::to_string(cov.rows()) + ".\n";
         }
       }
       if(error_detected){
@@ -99,7 +101,7 @@ namespace panacea {
         }
 
         for( int col = 0; col < mat->cols(); ++col){
-          std::swap(mat->operator(ind_rows.at(index),col),mat->operator(ind_rows.at(index_of_chosen),col));
+          std::swap(mat->operator()(ind_rows.at(index),col),mat->operator()(ind_rows.at(index_of_chosen),col));
           std::swap(test_swaps_check.at(ind_rows.at(index)), test_swaps_check.at(ind_rows.at(index_of_chosen)));
         }
         std::swap(ind_rows.at(index), ind_rows.at(index_of_chosen));
@@ -113,7 +115,7 @@ namespace panacea {
           if(ind_cols.at(index_of_chosen) == chosen_row) { break; }
         }
         for( int row = 0; row < mat->rows(); ++row){
-          std::swap(mat->operator(row,ind_cols.at(index)), mat->operator(row, ind_cols.at(index_of_chosen)));
+          std::swap(mat->operator()(row,ind_cols.at(index)), mat->operator()(row, ind_cols.at(index_of_chosen)));
         }
         std::swap(ind_cols.at(index), ind_rows.at(index_of_chosen));
       }
@@ -131,7 +133,7 @@ namespace panacea {
       std::vector<int> independent_rows;
       for(int i = 0; i<tmp->rows(); ++i){
         for(int k=0; k<tmp->cols(); ++k){
-          if( std::abs(tmp->operator(i,k)) > threshold){
+          if( std::abs(tmp->operator()(i,k)) > threshold){
             independent_rows.push_back(ind_rows.at(i));
             break;
           }
@@ -173,12 +175,12 @@ namespace panacea {
         const std::vector<int> & priority_rows,
         const double threshold){
 
-      auto tmp = createMatrix(covariance_.rows(),covariance_.cols());
+      auto tmp = createMatrix(cov.rows(),cov.cols());
 
-      for ( int ind1=0;ind1<covariance_.rows();++ind1){
-        for ( int ind2=ind1;ind2<covariance_.rows();++ind2){
-          tmp->operator(ind1,ind2) = covariance_(ind1,ind2);
-          tmp->operator(ind2,ind1) = tmp->operator(ind1,ind2);
+      for ( int ind1=0;ind1<cov.rows();++ind1){
+        for ( int ind2=ind1;ind2<cov.rows();++ind2){
+          tmp->operator()(ind1,ind2) = cov(ind1,ind2);
+          tmp->operator()(ind2,ind1) = tmp->operator()(ind1,ind2);
         }
       }
 
@@ -229,8 +231,8 @@ namespace panacea {
       for( int ind_row : independent_rows){
         int reduced_col = 0;
         for( int ind_col : independent_rows){
-          reduced_covar_raw_mat->operator(reduced_row, reduced_col) = cov(ind_row,ind_col);
-          reduced_covar_raw_mat->operator(reduced_col, reduced_row) = cov(ind_col,ind_row);
+          reduced_covar_raw_mat->operator()(reduced_row, reduced_col) = cov(ind_row,ind_col);
+          reduced_covar_raw_mat->operator()(reduced_col, reduced_row) = cov(ind_col,ind_row);
           ++reduced_col; 
         }
         ++reduced_row; 
@@ -251,19 +253,20 @@ namespace panacea {
 
     runChecks_(cov, priority_rows);
 
-    double threshold = threshold_;
+    double threshold = starting_threshold_;
     do {
       std::vector<int> independent_dims = findLinearlyIndependentDescDimensions_(
           cov,
           priority_rows,
-          const double threshold);
+          threshold);
 
       if( independent_dims.size() == 0) {
         independent_dims.push_back(priority_rows.at(0));
       }
 
       auto raw_mat = createRedCovarRawMatrix_(cov, independent_dims);
-      if( ReducedCovar reduced_covar(PassKey<Reducer>,std::move(raw_mat)).getDeterminant() > 0.0 ) {
+      auto reduced_covar = ReducedCovariance(PassKey<Reducer>(),std::move(raw_mat));
+      if( reduced_covar.getDeterminant() > 0.0 ) {
         return reduced_covar;
       }
 

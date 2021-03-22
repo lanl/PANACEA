@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 namespace panacea {
@@ -52,6 +53,10 @@ namespace panacea {
   
   int MatrixEigen::cols() const {
     return matrix_->cols();
+  }
+
+  void MatrixEigen::print() const {
+    std::cout << *matrix_ << std::endl;
   }
 }
 

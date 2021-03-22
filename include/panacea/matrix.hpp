@@ -29,6 +29,8 @@ namespace panacea {
 
       virtual int rows() const = 0;
       virtual int cols() const = 0;
+
+      virtual void print() const = 0;
   };
 
   // Will create a matrix 

@@ -32,6 +32,8 @@ namespace panacea {
 
       virtual int rows() const final;
       virtual int cols() const final;
+
+      virtual void print() const final;
   };
 }
 

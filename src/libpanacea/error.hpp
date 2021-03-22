@@ -11,7 +11,8 @@
 
 namespace panacea {
   namespace error {
-    inline void fail(const char *const message, const char *const filename, int const linenumber) {
+    template<typename T>
+    inline void fail(T message, const char *const filename, int const linenumber) {
       std::stringstream stream;
       stream << "PANACEA ERROR" << std::endl;
       stream << "  Message:     " << message << std::endl;
