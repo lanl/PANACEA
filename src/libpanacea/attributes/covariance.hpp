@@ -22,12 +22,6 @@ namespace panacea {
       /// The covariance matrix
       std::unique_ptr<Matrix> matrix_;
       
-      /// A is used for updating the covariance matrix
-      std::unique_ptr<Matrix> A_;
-
-      /// B is used for updating the covariance matrix
-      std::unique_ptr<Vector> B_;
-
       /// Mean of the values used to create the covariance matrix
       std::unique_ptr<Vector> mean_;
 
