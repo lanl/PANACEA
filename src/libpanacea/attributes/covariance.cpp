@@ -1,5 +1,5 @@
 /*
- * Class for stroing the covariance matrix
+ * Class for storing the covariance matrix
  */
 
 // Local private PANACEA includes
@@ -30,74 +30,42 @@ namespace panacea {
       } 
     }
 
-    void calculateA(Matrix * A, BaseDescriptorWrapper * desc_wrap) {
+    void updateCovariance(
+        Matrix * covariance,
+        const Vector * current_mean,
+        const Vector * new_mean,
+        const int current_num_pts,
+        BaseDescriptorWrapper * desc_wrap) {
+
       const int num_dims = desc_wrap->getNumberDimensions();
       const int num_pts = desc_wrap->getNumberPoints();
-      A->resize(num_dims, num_dims);
+
+      assert(covariance->rows() == num_dims);
+      assert(covariance->cols() == num_dims);
+      assert(current_mean->rows() == num_dims);
+      assert(new_mean->rows() == num_dims);
+      const int total_num_pts = current_num_pts + num_pts;
       for( int dim=0; dim<num_dims; ++dim){
         { // account for diagonal
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim); 
           }
-          (*A)(dim,dim) = sum;
+          const double A_ij = (*covariance)(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) + 
+            static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim) + sum;
+          (*covariance)(dim,dim)  = 1.0/(static_cast<double>(total_num_pts) - 1.0);
+          (*covariance)(dim,dim) *= (A_ij - static_cast<double>(total_num_pts) * (*new_mean)(dim)*(*new_mean)(dim)); 
         } // end account for diagonal
         for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
-          }  
-          (*A)(dim,dim2) = sum;
-          (*A)(dim2,dim) = sum;
-        } // account for off diagonal elements
-      }
-    }
-
-    void calculateB(Vector * B, BaseDescriptorWrapper * desc_wrap) {
-      const int num_dims = desc_wrap->getNumberDimensions();
-      const int num_pts = desc_wrap->getNumberPoints();
-      B->resize(num_dims);
-      for( int dim=0; dim<num_dims; ++dim){
-        double sum = 0.0;
-        for( int pt = 0; pt<num_pts; ++pt) {
-          sum += (*desc_wrap)(pt,dim); 
-        }
-        (*B)(dim) = sum; 
-      }
-    }
-
-    /*
-     * A, B and the mean must have previously been calculated, current_num_pts refers
-     * to the number of points that have already been used in previous calculations of 
-     * the covariance matrix.
-     */
-    void updateCovariance(
-        Matrix * covariance,
-        const Matrix * A,
-        const Vector * B,
-        const Vector * mean,
-        const int current_num_pts,
-        BaseDescriptorWrapper * desc_wrap) {
-
-      const int num_dims = desc_wrap->getNumberDimensions();
-      const int num_pts = desc_wrap->getNumberPoints();
-      assert(covariance->rows() == num_dims);
-      assert(covariance->cols() == num_dims);
-      assert(A->rows() == num_dims);
-      assert(A->cols() == num_dims);
-      assert(B->rows() == num_dims);
-      const int total_num_pts = current_num_pts + num_pts;
-      for( int dim=0; dim<num_dims; ++dim){
-        { // account for diagonal
-          (*covariance)(dim,dim) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          (*covariance)(dim,dim) *= ((*A)(dim,dim) - 2.0 * (*mean)(dim)*(*B)(dim) + 
-              static_cast<double>(total_num_pts)*(*mean)(dim)*(*mean)(dim));
-
-        } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
+          }
+          const double A_ij = (*covariance)(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) + 
+            static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim2) + sum;
           (*covariance)(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          (*covariance)(dim,dim2) *= ((*A)(dim,dim2) - (*mean)(dim)*(*B)(dim2) - (*mean)(dim2) * (*B)(dim) +
-              static_cast<double>(total_num_pts)*(*mean)(dim) * (*mean)(dim2));
+          (*covariance)(dim,dim2) *= (A_ij + 
+              static_cast<double>(total_num_pts) * -1.0* (*new_mean)(dim) * (*new_mean)(dim2));
           (*covariance)(dim2,dim) = (*covariance)(dim,dim2);
         } // account for off diagonal elements
       }
@@ -116,43 +84,6 @@ namespace panacea {
         (*mean)(dim) = (old_sum + new_sum)/static_cast<double>(num_pts + current_num_desc_pts);
       }
     }
-
-    void updateA(Matrix * A, BaseDescriptorWrapper * desc_wrap) {
-      const int num_dims = desc_wrap->getNumberDimensions();
-      const int num_pts = desc_wrap->getNumberPoints();
-      assert(A->rows() == num_dims);
-      assert(A->cols() == num_dims);
-      for( int dim=0; dim<num_dims; ++dim){
-        { // account for diagonal
-          double sum = 0.0;
-          for( int pt = 0; pt<num_pts; ++pt) {
-            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim); 
-          }
-          (*A)(dim,dim) += sum;
-        } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
-          double sum = 0.0;
-          for( int pt = 0; pt<num_pts; ++pt) {
-            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
-          }  
-          (*A)(dim,dim2) += sum;
-          (*A)(dim2,dim) += sum;
-        } // account for off diagonal elements
-      }
-    }
-
-    void updateB(Vector * B, BaseDescriptorWrapper * desc_wrap) {
-      const int num_dims = desc_wrap->getNumberDimensions();
-      const int num_pts = desc_wrap->getNumberPoints();
-      assert(B->rows() == num_dims);
-      for( int dim=0; dim<num_dims; ++dim){
-        double sum = 0.0;
-        for( int pt = 0; pt<num_pts; ++pt) {
-          sum += (*desc_wrap)(pt,dim); 
-        }
-        (*B)(dim) = (*B)(dim) + sum; 
-      }
-    }
   } // namespace correlated
 
   Covariance::Covariance(BaseDescriptorWrapper * desc_wrap) {
@@ -161,17 +92,26 @@ namespace panacea {
     const int num_dims = desc_wrap->getNumberDimensions();
     matrix_ = createMatrix(num_dims, num_dims);
     mean_ = createVector(num_dims);
-    A_ = createMatrix(num_dims, num_dims);
-    B_ = createVector(num_dims);
 
-    correlated::calculateMean(mean_.get(), desc_wrap);
-    correlated::calculateA(A_.get(), desc_wrap);
-    correlated::calculateB(B_.get(), desc_wrap);
+    auto new_mean = createVector(num_dims);
+    for( int row=0; row< mean_->rows(); ++row){
+      mean_->operator()(row) = 0.0;
+      new_mean->operator()(row) = mean_->operator()(row);
+    }
+
+    correlated::calculateMean(new_mean.get(), desc_wrap);
 
     matrix_->resize(num_dims, num_dims);
     matrix_->setZero();
-    correlated::updateCovariance(matrix_.get(), A_.get(), B_.get(), mean_.get(), total_number_data_pts_, desc_wrap);
+    
+    correlated::updateCovariance(
+        matrix_.get(),
+        mean_.get(),
+        new_mean.get(),
+        total_number_data_pts_,
+        desc_wrap);
 
+    mean_ = std::move(new_mean);
     // Record the total number of data points used to create the covariance matrix
     total_number_data_pts_ = desc_wrap->getNumberPoints();
     
@@ -179,10 +119,24 @@ namespace panacea {
 
   void Covariance::update(BaseDescriptorWrapper * desc_wrap) {
 
-    correlated::updateMean(mean_.get(), desc_wrap, total_number_data_pts_);
-    correlated::updateA(A_.get(), desc_wrap);
-    correlated::updateB(B_.get(), desc_wrap);
-    correlated::updateCovariance(matrix_.get(), A_.get(), B_.get(), mean_.get(), total_number_data_pts_, desc_wrap);
+    auto new_mean = createVector(mean_->rows());
+    for( int row=0; row< mean_->rows(); ++row){
+      new_mean->operator()(row) = mean_->operator()(row);
+    }
+
+    correlated::updateMean(
+        new_mean.get(),
+        desc_wrap,
+        total_number_data_pts_);
+
+    correlated::updateCovariance(
+        matrix_.get(),
+        mean_.get(),
+        new_mean.get(),
+        total_number_data_pts_,
+        desc_wrap);
+
+    mean_ = std::move(new_mean);
     total_number_data_pts_ += desc_wrap->getNumberPoints();
    
   }
