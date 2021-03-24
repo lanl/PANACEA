@@ -117,6 +117,27 @@ namespace panacea {
     
   }
 
+  Covariance::Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts) {
+    assert(matrix->rows() == matrix->cols() && "Covariance matrix must be square");
+    assert(mean->rows() == matrix->rows() && "Mean and covariance matrix must have the same dimensions.");
+    assert(total_num_pts > 0 && "Total number of points must be greater than 0");
+    
+    // Check for symmetry
+    const double threshold = 1E-5;
+    for( int i = 0; i < matrix->rows(); ++i) {
+      for( int j = i+1; j < matrix->rows(); ++j) {
+        // Don't need to check the diagonal
+        if( matrix->operator(i,j) > threshold || matrix->operator(j,i) > threshold) {
+          // Only check values that are not too close to 0.0
+          const double diff = std::abs(matrix->operator(i,j) - matrix->operator(j,i));
+          const double avg =  std::abs(matrix->operator(i,j) + matrix->operator(j,i))/2.0;
+          assert(diff/avg < threshold && "Covariance symmetry criteria not satisfied"); 
+        }
+      }
+    }
+      
+  }
+
   void Covariance::update(BaseDescriptorWrapper * desc_wrap) {
 
     auto new_mean = createVector(mean_->rows());

@@ -265,7 +265,12 @@ namespace panacea {
       }
 
       auto raw_mat = createRedCovarRawMatrix_(cov, independent_dims);
-      auto reduced_covar = ReducedCovariance(PassKey<Reducer>(),std::move(raw_mat));
+
+      auto reduced_covar = ReducedCovariance(
+          PassKey<Reducer>(),
+          std::move(raw_mat),
+          independent_dims);
+
       if( reduced_covar.getDeterminant() > 0.0 ) {
         return reduced_covar;
       }

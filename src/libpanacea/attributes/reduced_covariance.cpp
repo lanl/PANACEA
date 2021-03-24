@@ -17,5 +17,9 @@ namespace panacea {
     // able to return the rows or columns
     return matrix_->rows();
   }
+
+  const std::vector<int> & ReducedCovariance::getChosenDimensionIndices() const {
+    return chosen_dimension_indices_;
+  }
 }
 

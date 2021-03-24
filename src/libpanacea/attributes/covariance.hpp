@@ -29,6 +29,9 @@ namespace panacea {
       int total_number_data_pts_ = 0;
     public:
       explicit Covariance(BaseDescriptorWrapper * desc_wrap);
+      Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts) :
+        matirx_(std::move(matrix)), mean_(std::move(mean)), total_number_data_pts_(total_num_pts);
+
       /// Designed to update the covariance matrix
       void update(BaseDescriptorWrapper * desc_wrap);
 
