@@ -63,10 +63,10 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
   Covariance covar(std::move(mat),std::move(vec),num_pts);
   Reducer reducer;
   std::vector<int> priority_rows { 0, 1, 2, 3};
-  ReducedCovariance reduced_covar = reducer.reduce(covar);
+  ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
 
   // The order of the dimensions should be consistent
-  REQUIRE(reduced_covar.getNumberDimensions == 4);
+  REQUIRE(reduced_covar.getNumberDimensions() == 4);
 
   REQUIRE(reduced_covar.getChosenDimensionIndices().at(0) == 0);
   REQUIRE(reduced_covar.getChosenDimensionIndices().at(1) == 1);
@@ -126,10 +126,10 @@ TEST_CASE("Testing:reducer2","[unit,panacea]"){
 
   Reducer reducer;
   std::vector<int> priority_rows { 0, 1, 2, 3};
-  ReducedCovariance reduced_covar = reducer.reduce(covar);
+  ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
 
   // One of the dimensions should be ommitted due to linear dependence
-  REQUIRE(reduced_covar.getNumberDimensions == 3);
+  REQUIRE(reduced_covar.getNumberDimensions() == 3);
 
   REQUIRE(reduced_covar.getChosenDimensionIndices().at(0) == 0);
   REQUIRE(reduced_covar.getChosenDimensionIndices().at(1) == 1);
