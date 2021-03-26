@@ -26,7 +26,7 @@ namespace panacea {
       ReducedCovariance(PassKey<Reducer>);
       ReducedCovariance(PassKey<Reducer> key, 
           std::unique_ptr<Matrix> matrix,
-          std::vector<int> chosen_dimension_indices) :
+          const std::vector<int> & chosen_dimension_indices) :
         matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices) {};
 
@@ -35,6 +35,8 @@ namespace panacea {
       ReducedCovariance() = delete;
 
       double operator()(const int row, const int col) const;
+
+      void print() const;
 
       double getDeterminant() const;
       int getNumberDimensions() const;

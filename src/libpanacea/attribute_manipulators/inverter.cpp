@@ -13,8 +13,11 @@ namespace panacea {
       ReducedInvCovariance 
         Inverter::invert(const ReducedCovariance & reduced_cov) const {
           auto inv_matrix = pseudoInverse(reduced_cov.get(PassKey<Inverter>()));          
-          ReducedInvCovariance 
-            reduced_inv_cov(PassKey<Inverter>(), std::move(inv_matrix)); 
+          ReducedInvCovariance reduced_inv_cov(
+              PassKey<Inverter>(),
+              std::move(inv_matrix),
+              reduced_cov.getChosenDimensionIndices()); 
+
           return reduced_inv_cov;
       } 
 }

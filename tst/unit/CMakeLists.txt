@@ -4,6 +4,7 @@ list( APPEND TEST_SOURCES
     test_covariance.cpp
     test_descriptor_wrappers.cpp
     test_gaussian_uncorrelated.cpp
+    test_inverter.cpp
     test_kernel_wrappers.cpp
     test_memory_manager.cpp
     test_reducer.cpp

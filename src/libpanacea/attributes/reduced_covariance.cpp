@@ -6,6 +6,9 @@
 // Private local PANACEA includes
 #include "reduced_covariance.hpp"
 
+// Standard includes
+#include <iostream>
+
 namespace panacea {
 
   double ReducedCovariance::operator()(const int row, const int col) const {
@@ -28,6 +31,16 @@ namespace panacea {
 
   const std::vector<int> & ReducedCovariance::getChosenDimensionIndices() const {
     return chosen_dimension_indices_;
+  }
+
+  void ReducedCovariance::print() const {
+    std::cout << "Reduced Covariance Matrix" << std::endl;
+    matrix_->print();
+    std::cout << "Reduced Covariance Dimensions" << std::endl;
+    for( int dim : chosen_dimension_indices_) {
+      std::cout << dim << " ";
+    } 
+    std::cout << std::endl;
   }
 }
 

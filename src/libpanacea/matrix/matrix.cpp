@@ -19,7 +19,7 @@ namespace panacea {
   }
 
   std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat, const MatrixTypes type) {
-      if(MatrixTypes::Default != mat->type() || MatrixTypes::Eigen != mat->type()){
+      if(MatrixTypes::Default != mat->type() && MatrixTypes::Eigen != mat->type()){
         PANACEA_FAIL("Pseudo inverse is not supported for specified matrix type."); 
       }
       auto new_mat = createMatrix(mat->rows(), mat->cols(), type);
