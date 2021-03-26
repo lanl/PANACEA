@@ -11,6 +11,11 @@
 using namespace std;
 using namespace panacea;
 
+/**
+ * For reference refer to the row echelon jupyter-notebook in:
+ * PANACEA/jupyter_notebooks/RowEchelon
+ **/
+
 TEST_CASE("Testing:row_echelon1","[unit,panacea]"){
 
   auto mat = createMatrix(4,4);
@@ -142,12 +147,12 @@ TEST_CASE("Testing:row_echelon2","[unit,panacea]"){
   REQUIRE(mat->operator()(1,0) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(1,1) == Approx(2.0).margin(1E-3));
   REQUIRE(mat->operator()(1,2) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(1,3) == Approx(18.0).margin(1E-3));
+  REQUIRE(mat->operator()(1,3) == Approx(-18.0).margin(1E-3));
 
   // Row 2
   REQUIRE(mat->operator()(2,0) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(2,1) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(2,2) == Approx(-11.0).margin(1E-3));
+  REQUIRE(mat->operator()(2,2) == Approx(11.0).margin(1E-3));
   REQUIRE(mat->operator()(2,3) == Approx(144.0).margin(1E-3));
 
   // Row 3
@@ -283,7 +288,7 @@ TEST_CASE("Testing:row_echelon4","[unit,panacea]"){
   //  2.0   3.0   2.0   5.0
   //  0.0   1.0   0.0  -9.0
   //  0.0   0.0  11.0 144.0
-  //  0.0   0.0   0.0  24.814
+  //  0.0   0.0   0.0  24.818
   //  0.0   0.0   0.0   0.0
 
   // Row 0
@@ -308,13 +313,13 @@ TEST_CASE("Testing:row_echelon4","[unit,panacea]"){
   REQUIRE(mat->operator()(3,0) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(3,1) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(3,2) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,3) == Approx(24.814).margin(1E-3));
+  REQUIRE(mat->operator()(3,3) == Approx(24.818).margin(1E-3));
 
   // Row 4
-  REQUIRE(mat->operator()(3,0) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,1) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,2) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,3) == Approx(0.0).margin(1E-3));
+  REQUIRE(mat->operator()(4,0) == Approx(0.0).margin(1E-3));
+  REQUIRE(mat->operator()(4,1) == Approx(0.0).margin(1E-3));
+  REQUIRE(mat->operator()(4,2) == Approx(0.0).margin(1E-3));
+  REQUIRE(mat->operator()(4,3) == Approx(0.0).margin(1E-3));
 }
 
 TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
@@ -340,21 +345,21 @@ TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
   mat->operator()(1,1) =   2.0;
   mat->operator()(1,2) =   0.0;
   mat->operator()(1,3) = -18.0;
-  mat->operator()(0,4) =   7.0;
+  mat->operator()(1,4) =   7.0;
 
   // Row 2
   mat->operator()(2,0) =  -8.0;
   mat->operator()(2,1) =   1.0;
   mat->operator()(2,2) =   3.0;
   mat->operator()(2,3) =   7.0;
-  mat->operator()(0,4) =   2.0;
+  mat->operator()(2,4) =   2.0;
 
   // Row 3
   mat->operator()(3,0) =   0.0;
   mat->operator()(3,1) =   1.0;
   mat->operator()(3,2) =   0.0;
   mat->operator()(3,3) =  -9.0;
-  mat->operator()(0,4) =   4.0;
+  mat->operator()(3,4) =   4.0;
 
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
@@ -364,39 +369,37 @@ TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
   mat->print();
   // Solution should be
   //
-  //  2.0   3.0   2.0   5.0
-  //  0.0   1.0   0.0  -9.0
-  //  0.0   0.0  11.0 144.0
-  //  0.0   0.0   0.0  24.814
-  //  0.0   0.0   0.0   0.0
+  //  2.0   3.0   2.0   5.0   0.0
+  //  0.0   2.0   0.0 -18.0   7.0
+  //  0.0   0.0  11.0 144.0 -43.5
+  //  0.0   0.0   0.0   0.0   0.5
 
   // Row 0
   REQUIRE(mat->operator()(0,0) == Approx(2.0).margin(1E-3));
   REQUIRE(mat->operator()(0,1) == Approx(3.0).margin(1E-3));
   REQUIRE(mat->operator()(0,2) == Approx(2.0).margin(1E-3));
   REQUIRE(mat->operator()(0,3) == Approx(5.0).margin(1E-3));
+  REQUIRE(mat->operator()(0,4) == Approx(0.0).margin(1E-3));
 
   // Row 1
   REQUIRE(mat->operator()(1,0) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(1,1) == Approx(1.0).margin(1E-3));
+  REQUIRE(mat->operator()(1,1) == Approx(2.0).margin(1E-3));
   REQUIRE(mat->operator()(1,2) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(1,3) == Approx(-9.0).margin(1E-3));
+  REQUIRE(mat->operator()(1,3) == Approx(-18.0).margin(1E-3));
+  REQUIRE(mat->operator()(1,4) == Approx(7.0).margin(1E-3));
 
   // Row 2
   REQUIRE(mat->operator()(2,0) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(2,1) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(2,2) == Approx(11.0).margin(1E-3));
   REQUIRE(mat->operator()(2,3) == Approx(144.0).margin(1E-3));
+  REQUIRE(mat->operator()(2,4) == Approx(-43.5).margin(1E-3));
 
   // Row 3
   REQUIRE(mat->operator()(3,0) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(3,1) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(3,2) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,3) == Approx(24.814).margin(1E-3));
-
-  // Row 4
-  REQUIRE(mat->operator()(3,0) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,1) == Approx(0.0).margin(1E-3));
-  REQUIRE(mat->operator()(3,2) == Approx(0.0).margin(1E-3));
   REQUIRE(mat->operator()(3,3) == Approx(0.0).margin(1E-3));
+  REQUIRE(mat->operator()(3,4) == Approx(0.5).margin(1E-3));
+
 }

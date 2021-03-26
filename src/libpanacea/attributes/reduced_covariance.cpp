@@ -8,6 +8,14 @@
 
 namespace panacea {
 
+  double ReducedCovariance::operator()(const int row, const int col) const {
+    return matrix_->operator()(row,col);
+  }
+
+  const Matrix * ReducedCovariance::get(PassKey<Inverter>) const {
+    return matrix_.get();
+  }
+
   double ReducedCovariance::getDeterminant() const {
     return matrix_->getDeterminant();
   }

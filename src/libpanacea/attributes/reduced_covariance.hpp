@@ -14,6 +14,7 @@
 
 namespace panacea {
 
+  class Inverter;
   class Reducer;
 
   class ReducedCovariance {
@@ -25,7 +26,11 @@ namespace panacea {
       ReducedCovariance(PassKey<Reducer> key, std::unique_ptr<Matrix> matrix) :
         matrix_(std::move(matrix)) {};
 
+      const Matrix * get(PassKey<Inverter>) const;
+
       ReducedCovariance() = delete;
+
+      double operator()(const int row, const int col) const;
 
       double getDeterminant() const;
       int getNumberDimensions() const;

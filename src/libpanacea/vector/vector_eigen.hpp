@@ -24,6 +24,7 @@ namespace panacea {
     public:
       VectorEigen();
       virtual ~VectorEigen() final {};
+      virtual VectorEigen& operator=(const Vector * vec) final;
       virtual double& operator()(const int row) final;
       virtual double operator()(const int row) const final;
       virtual void resize(const int rows) final;

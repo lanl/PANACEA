@@ -21,6 +21,15 @@ namespace panacea {
     vector_->resize(rows);
   }
 
+  VectorEigen& VectorEigen::operator=(const Vector * vec) {
+    assert(vec!=nullptr);
+    this->resize(vec->rows());
+    for(int row = 0; row < vec->rows(); ++row) {
+      this->operator()(row) = vec->operator()(row);
+    }
+    return *this;
+  }
+
   double& VectorEigen::operator()(const int row) {
     assert(row>=0);
     assert(row<vector_->rows());

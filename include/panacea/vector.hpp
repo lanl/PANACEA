@@ -12,11 +12,11 @@ namespace panacea {
     Eigen
   };
 
-
   class Vector {
 
     public:
       virtual ~Vector() {};
+      virtual Vector& operator=(const Vector * vec) = 0;
       virtual double& operator()(const int row) = 0;
       virtual double operator()(const int row) const = 0;
 

@@ -20,7 +20,9 @@ namespace panacea {
     public:
       MatrixEigen();
       virtual ~MatrixEigen() final {};
-
+      virtual const MatrixTypes type() const final;
+      virtual MatrixEigen & operator=(const MatrixEigen & mat) final;
+      virtual MatrixEigen & operator=(const Matrix * mat) final;
       virtual double& operator()(const int row, const int col) final;
       virtual double operator()(const int row, const int col) const final;
 
@@ -34,7 +36,13 @@ namespace panacea {
       virtual int cols() const final;
 
       virtual void print() const final;
+
+      // Local method should not be part of the interface
+      Eigen::MatrixXd pseudoInverse() const;
   };
+
+  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat); 
+
 }
 
 #endif // PANACEA_PRIVATE_MATRIXEIGEN_H

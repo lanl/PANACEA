@@ -16,6 +16,8 @@ namespace panacea {
     matrix_ = std::make_unique<Eigen::MatrixXd>();
   }
 
+  const MatrixTypes MatrixEigen::type() const { return MatrixTypes::Eigen; }
+
   double MatrixEigen::getDeterminant() const {
     assert(matrix_->rows() > 0 || matrix_->cols() > 0 );
     return matrix_->determinant();
@@ -25,6 +27,26 @@ namespace panacea {
     assert(rows>=0);
     assert(cols>=0);
     matrix_->resize(rows,cols);
+  }
+
+  MatrixEigen & MatrixEigen::operator=(const MatrixEigen & mat) {
+    this->resize(mat.rows(), mat.cols());
+    for(int row = 0; row < mat.rows(); ++row){
+      for(int col = 0; col < mat.cols(); ++col){
+        this->operator()(row,col) = mat(row,col);
+      }
+    }
+    return *this;
+  }
+
+  MatrixEigen & MatrixEigen::operator=(const Matrix * mat) {
+    this->resize(mat->rows(), mat->cols());
+    for(int row = 0; row < mat->rows(); ++row){
+      for(int col = 0; col < mat->cols(); ++col){
+        this->operator()(row,col) = mat->operator()(row,col);
+      }
+    }
+    return *this;
   }
 
   double & MatrixEigen::operator()(const int row, const int col) {
@@ -57,6 +79,23 @@ namespace panacea {
 
   void MatrixEigen::print() const {
     std::cout << *matrix_ << std::endl;
+  }
+
+  Eigen::MatrixXd MatrixEigen::pseudoInverse() const {
+    return matrix_->completeOrthogonalDecomposition().pseudoInverse(); 
+  }
+
+  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat) {
+    assert(return_mat != nullptr);
+    assert(return_mat->rows() == mat->rows());
+    assert(return_mat->cols() == mat->cols());
+
+    auto temp_mat = mat->pseudoInverse(); 
+    for( int row = 0; row < temp_mat.rows(); ++row){
+      for(int col = 0; col < temp_mat.cols(); ++col){
+        return_mat->operator()(row,col) = temp_mat(row,col);
+      }
+    }
   }
 }
 

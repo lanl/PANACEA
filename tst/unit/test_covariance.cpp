@@ -14,6 +14,10 @@
 using namespace std;
 using namespace panacea;
 
+/**
+ * Jupyter notebooks depecting the logic behind the update calls can be found
+ * in PANACEA/jupyter_notebooks/Covariance
+ **/
 TEST_CASE("Testing:covariance test trivial constructor","[unit,panacea]"){
 
   // 3 points 2 dimensions
@@ -111,7 +115,5 @@ TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
     REQUIRE( cov(2,0) == Approx(0.0037).margin(1e-3) );
     REQUIRE( cov(2,1) == Approx(-0.0344).margin(1e-3) );
     REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
-
-
   }
 }
