@@ -19,7 +19,6 @@ namespace panacea {
       virtual Vector& operator=(const Vector * vec) = 0;
       virtual double& operator()(const int row) = 0;
       virtual double operator()(const int row) const = 0;
-
       virtual void resize(const int rows) = 0;
       virtual int rows() const = 0;
   };

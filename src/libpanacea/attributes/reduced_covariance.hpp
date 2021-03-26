@@ -11,6 +11,7 @@
 
 // Standard includes
 #include <memory>
+#include <vector>
 
 namespace panacea {
 
@@ -20,11 +21,14 @@ namespace panacea {
   class ReducedCovariance {
     private:
       std::unique_ptr<Matrix> matrix_;
-
+      std::vector<int> chosen_dimension_indices_; 
     public:
       ReducedCovariance(PassKey<Reducer>);
-      ReducedCovariance(PassKey<Reducer> key, std::unique_ptr<Matrix> matrix) :
-        matrix_(std::move(matrix)) {};
+      ReducedCovariance(PassKey<Reducer> key, 
+          std::unique_ptr<Matrix> matrix,
+          std::vector<int> chosen_dimension_indices) :
+        matrix_(std::move(matrix)),
+        chosen_dimension_indices_(chosen_dimension_indices) {};
 
       const Matrix * get(PassKey<Inverter>) const;
 
@@ -34,6 +38,7 @@ namespace panacea {
 
       double getDeterminant() const;
       int getNumberDimensions() const;
+      const std::vector<int> & getChosenDimensionIndices() const;
   };
 }
 

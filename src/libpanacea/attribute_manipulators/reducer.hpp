@@ -22,6 +22,7 @@ namespace panacea {
       double starting_threshold_ = 1E-9;
 
     public:
+      Reducer() = default;
       explicit Reducer(double threshold) : starting_threshold_(threshold) {}; 
       /**
        * @brief Designed to reduce/rearrange the covariance matrix
