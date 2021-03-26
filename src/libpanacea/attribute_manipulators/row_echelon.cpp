@@ -18,7 +18,7 @@ namespace panacea {
         const int m,
         Matrix * tmp,
         const double threshold,
-        std::vector<int> ind_rows
+        std::vector<int> & ind_rows
         ){
 
       // Check to see if current column is 0 and if we

@@ -9,6 +9,8 @@
 #include "panacea/matrix.hpp"
 
 // Standard includes
+#include <algorithm>
+#include <iostream>
 #include <numeric>
 #include <unordered_set>
 #include <utility>
@@ -25,12 +27,14 @@ namespace panacea {
           const Covariance & cov,
           const std::vector<int> & preferred_dimensions) {
 
-      // These two checks are unnecessary because by definition of how the
+      // The first two checks are unnecessary because by definition of how the
       // covariance matrix is created, it shoudl be square and symmetric
       // Check 1 ensure the matrix is square
       // Check 2 ensure the matrix is symmetric
       // Check 3 ensure the preferred_dimensions exist within the matrix, as
       //         in the indices are in bounds
+      // Check 4 ensure that the prefferred dimensions are unique, there
+      //         are not repeated entries
       std::string error_msg = "";
       bool error_detected = false;
       for( const auto & dim : preferred_dimensions) {
@@ -43,10 +47,22 @@ namespace panacea {
       if(error_detected){
         PANACEA_FAIL(error_msg);
       }
-
       if(cov.rows() == 0) {
         PANACEA_FAIL("Reducer cannot reduce a covariance matrix of size 0");
       }
+
+      std::unordered_set<int> unique_vals;
+      int count = 0;
+      for( const auto & dim : preferred_dimensions) {
+        unique_vals.insert(dim);
+        ++count;
+        if(unique_vals.size() != count) {
+          std::string error_msg = "Preferred dimensions are not unique ";
+          error_msg += "cannot reduce matrix when specefied dimensions ";
+          error_msg += "have duplicates.";
+          PANACEA_FAIL(error_msg); 
+        }
+      } 
     }
 
     // After calling this function the matrix should be reordered such that 
@@ -83,8 +99,6 @@ namespace panacea {
       }
       std::vector<int> ind_cols = ind_rows;
 
-      // This vector is purely used for testing purposes.
-      std::vector<int> test_swaps_check = ind_rows;
       // Priority rows
       // ind 0, 1, 2, 3, 4
       // row 4, 0, 5, 2, 3
@@ -96,28 +110,31 @@ namespace panacea {
         int chosen_row = priority_rows_tmp1.at(index);
 
         int index_of_chosen = 0;
-        for(;index_of_chosen<mat->rows();++index_of_chosen){
+        for(;index_of_chosen<mat->rows();++index_of_chosen){ 
           if(ind_rows.at(index_of_chosen) == chosen_row) { break; }
         }
 
-        for( int col = 0; col < mat->cols(); ++col){
-          std::swap(mat->operator()(ind_rows.at(index),col),mat->operator()(ind_rows.at(index_of_chosen),col));
-          std::swap(test_swaps_check.at(ind_rows.at(index)), test_swaps_check.at(ind_rows.at(index_of_chosen)));
+        if( index_of_chosen != index ) {
+          for( int col = 0; col < mat->cols(); ++col){
+            std::swap(mat->operator()(index,col),mat->operator()(index_of_chosen,col));
+          }
+          std::swap(ind_rows.at(index), ind_rows.at(index_of_chosen));
         }
-        std::swap(ind_rows.at(index), ind_rows.at(index_of_chosen));
       }
 
       std::vector<int> priority_rows_tmp2 = priority_rows;
       for(int index=0; index < priority_rows_tmp2.size(); ++index ){
-        int chosen_row = priority_rows_tmp2.at(index);
+        int chosen_col = priority_rows_tmp2.at(index);
         int index_of_chosen = 0;
-        for(;index_of_chosen<mat->rows();++index_of_chosen){
-          if(ind_cols.at(index_of_chosen) == chosen_row) { break; }
+        for(;index_of_chosen<mat->cols();++index_of_chosen){
+          if(ind_cols.at(index_of_chosen) == chosen_col) { break; }
         }
-        for( int row = 0; row < mat->rows(); ++row){
-          std::swap(mat->operator()(row,ind_cols.at(index)), mat->operator()(row, ind_cols.at(index_of_chosen)));
+        if ( index_of_chosen != index ) {
+          for( int row = 0; row < mat->rows(); ++row){
+            std::swap(mat->operator()(row, index),mat->operator()(row,index_of_chosen));
+          }
+          std::swap(ind_cols.at(index), ind_cols.at(index_of_chosen));
         }
-        std::swap(ind_cols.at(index), ind_rows.at(index_of_chosen));
       }
       return ind_rows;
     }
@@ -187,6 +204,7 @@ namespace panacea {
       // Next we are going to reorder the covariance matrix
       std::vector<int> order = reorderSymmetricMatrix_(tmp.get(), priority_rows);
 
+      tmp->print();
       // E.g. 
       // order.at(0) is row of reordered tmp that points back to the original tmp matrix
       // before it was changed which in this case is equivalent to covariance_
@@ -222,7 +240,6 @@ namespace panacea {
       std::vector<int> independent_rows) {
 
       const int len = independent_rows.size();
-//      Eigen::MatrixXd covar_reduced(len,len);
 
       auto reduced_covar_raw_mat = createMatrix(len, len);
       // Also need to know which reduced rows map to which dimensions of the original
