@@ -5,11 +5,10 @@
 
 namespace panacea {
   
-  class Matrix;
-  class Vector;
   class BaseKernelWrapper;
   class ReducedCovariance;
   class ReducedInvCovariance;
+
   /*
    * Class provides a generic means of passing in common attributes needed by the primitives
    */
