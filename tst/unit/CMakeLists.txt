@@ -6,9 +6,11 @@ list( APPEND TEST_SOURCES
     test_gaussian_uncorrelated.cpp
     test_inverter.cpp
     test_kernel_wrappers.cpp
+    test_mean.cpp
     test_memory_manager.cpp
     test_reducer.cpp
     test_row_echelon.cpp
+    test_variance.cpp
     )
 
 include_directories(../helper)

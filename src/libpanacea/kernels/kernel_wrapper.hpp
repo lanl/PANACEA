@@ -6,8 +6,12 @@
 // Local private includes
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
+#include "passkey.hpp"
 
 namespace panacea {
+
+  class KernelWrapperFactory;
+
   /*
    * The kernel wrapper should be flexible enough to allow
    * the underlying type to vary
@@ -17,7 +21,7 @@ namespace panacea {
     private:
       DataPointTemplate<T> data_wrapper_;
     public:
-      KernelWrapper(T data, int rows, int cols) : 
+      KernelWrapper(PassKey<KernelWrapperFactory>, T data, int rows, int cols) : 
         data_wrapper_(data, rows, cols) {};
 
       virtual double& operator()(const int point_ind, const int dim_ind) final;

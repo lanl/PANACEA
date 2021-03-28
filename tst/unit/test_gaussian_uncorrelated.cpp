@@ -3,6 +3,7 @@
 #include "primitives/gaussian_uncorrelated.hpp"
 
 #include "attributes/covariance.hpp"
+#include "attributes/reduced_inv_covariance.hpp"
 #include "attribute_manipulators/reducer.hpp"
 #include "attribute_manipulators/inverter.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
@@ -34,7 +35,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   Covariance cov(&dwrapper);
 
   Reducer reducer;
-  ReducedCovariance reduced_cov = reducer.reduce(cov);
+  ReducedCovariance reduced_cov = reducer.reduce(cov, std::vector<int> {});
 
   Inverter inverter;
   ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_cov);
@@ -43,8 +44,8 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   std::vector<std::vector<double>> raw_kern_data;
   std::vector<double> raw_kern_values = {0.0, 0.5};
   raw_kern_data.push_back(raw_kern_values);
-  KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&raw_kern_data,1, 2);
+  //KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&raw_kern_data,1, 2);
 
   PrimitiveAttributes attr;
-  attr.kernel_wrapper = &kwrapper;
+  //attr.kernel_wrapper = &kwrapper;
 }

@@ -186,4 +186,17 @@ namespace panacea {
   int Covariance::getCummulativeDescPoints() const {
     return total_number_data_pts_;
   }
+
+  bool Covariance::is(const NormalizationState state) const {
+    return normalized_ == state;
+  }
+
+  void Covariance::set(PassKey<Normalizer>, NormalizationState state) {
+    normalized_ = state;
+  }
+
+  double & Covariance::operator()(PassKey<Normalizer>, const int row, const int col) {
+    return matrix_->operator()(row,col);
+  }
+
 }

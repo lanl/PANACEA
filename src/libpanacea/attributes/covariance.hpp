@@ -14,6 +14,11 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
 
+  enum class NormalizationState {
+    Normalized,
+    Unnormalized
+  };
+
   /*
    * Class for storing the covariance matrix
    */
@@ -27,6 +32,8 @@ namespace panacea {
 
       /// Total number of data points used in the creation of the covariance matrix and in updating it
       int total_number_data_pts_ = 0;
+
+      NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
       explicit Covariance(BaseDescriptorWrapper * desc_wrap);
       Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts);
@@ -38,6 +45,7 @@ namespace panacea {
       /// provide access to the actual covariance matrix elements
       double operator()(const int row, const int col) const;
 
+      
       int rows() const;
       int cols() const;
 
@@ -46,6 +54,11 @@ namespace panacea {
       double getMean(const int index) const;
 
       int getCummulativeDescPoints() const;
+
+      bool is(const NormalizationState state) const;
+      // Specific to Normalizer class
+      void set(PassKey<Normalizer>, NormalizationState state);
+      double & operator()(PassKey<Normalizer>, const int row, const int col);
   };
 }
 #endif // PANACEA_PRIVATE_COVARIANCE_H

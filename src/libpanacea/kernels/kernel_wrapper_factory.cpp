@@ -2,7 +2,9 @@
 // Private local PANACEA includes
 #include "kernel_wrapper_factory.hpp"
 
-#include "primites/gaussian_uncorrelated.hpp"
+#include "error.hpp"
+#include "kernel_specifications.hpp"
+#include "primitives/gaussian_uncorrelated.hpp"
 
 // Standard includes
 #include <memory>
@@ -13,10 +15,10 @@ namespace panacea {
      BaseDescriptorWrapper * desc_wrapper, 
      const KernelSpecification & kern_specification) const {
 
-    if( kern_specification.is(KernelPrimitive::Gaussian)) {
-      if( kern_specification.is(KernelCount::OneToOne)){
-        if( kern_specification.is(KernelCorrelation::Uncorrelated)){
-          if( kern_specification.is(KernelMemory::Shared)){
+    if( kern_specification.is(settings::KernelPrimitive::Gaussian)) {
+      if( kern_specification.is(settings::KernelCount::OneToOne)){
+        if( kern_specification.is(settings::KernelCorrelation::Uncorrelated)){
+          if( kern_specification.is(settings::KernelMemory::Share)){
 
           }
         }

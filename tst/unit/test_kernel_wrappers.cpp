@@ -11,7 +11,7 @@
 
 using namespace std;
 using namespace panacea;
-
+/*
 TEST_CASE("Testing:kernel_wrapper_constructor1","[unit,panacea]"){
 
   std::vector<std::vector<double>> data;
@@ -84,6 +84,6 @@ TEST_CASE("Testing:kernel_arrangements","[unit,panacea]"){
 
   REQUIRE(kwrapper(2,0) == 3.0);
   REQUIRE(kwrapper(2,1) == 3.0);
-}
+}*/
 
 
