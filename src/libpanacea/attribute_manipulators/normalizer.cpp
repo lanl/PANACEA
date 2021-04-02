@@ -1,6 +1,7 @@
 
 // Local private PANACEA includes
 #include "normalizer.hpp"
+#include "passkey.hpp"
 
 namespace panacea {
   
@@ -16,10 +17,10 @@ namespace panacea {
     
     for( int row = 0; row < cov.rows(); ++row){
       for(int col = 0; col < cov.cols(); ++col) {
-        cov(PassKey<Normalizer>, row,col) *= inv_cov.at(col);
+        cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(col);
       }
     }
-    cov.set(NormalizationState::Normalized);
+    cov.set(PassKey<Normalizer>(), NormalizationState::Normalized);
   }
 
   void Normalizer::unnormalize(Covariance & cov) const {
@@ -27,10 +28,10 @@ namespace panacea {
     assert(cov.cols() == normalization_coeffs_.size());
     for( int row = 0; row < cov.rows(); ++row){
       for(int col = 0; col < cov.cols(); ++col) {
-        cov(PassKey<Normalizer>, row,col) *= normalization_coeffs_.at(col);
+        cov(PassKey<Normalizer>(), row,col) *= normalization_coeffs_.at(col);
       }
     }
-    cov.set(NormalizationState::Unnormalized);
+    cov.set(PassKey<Normalizer>(), NormalizationState::Unnormalized);
   }
 
 }

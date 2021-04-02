@@ -35,6 +35,8 @@ namespace panacea {
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
       virtual std::any getPointerToRawData() noexcept final;
+
+      static std::unique_ptr<BaseKernelWrapper> create();
   };
 
   template<class T>
@@ -77,5 +79,9 @@ namespace panacea {
     return data_wrapper_.getPointerToRawData();
   }
 
+  template<class T>
+  inline static std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(PassKey<KernelWrapperFactory> key, T data, int rows, int cols) {
+    return std::make_unique<KernelWrapper<T>>(key, dta, rows, cols);
+  }
 }
 #endif // PANACEA_PRIVATE_KERNELWRAPPER_H

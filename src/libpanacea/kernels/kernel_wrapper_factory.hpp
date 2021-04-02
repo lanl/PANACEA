@@ -15,10 +15,35 @@ namespace panacea {
 
   class KernelWrapperFactory {
 
-    std::unique_ptr<BaseKernelWrapper> create(
-        BaseDescriptorWrapper * desc_wrapper,
-        const KernelSpecification & kern_specification , 
-        MemoryManager & memory_manager) const;
+    private:
+
+      using KernelCreateMethod = unique_ptr<BaseKernelWrapper>(*)(PassKey<KernelWrapperFactory>, T data, int rows, int cols);
+
+      std::unordered_map<std::typeinfo, KernelCreateMethod> create_methods_;
+
+    public:
+
+      std::unique_ptr<BaseKernelWrapper> create(
+          BaseDescriptorWrapper * desc_wrapper,
+          const KernelSpecification & kern_specification , 
+          MemoryManager & memory_manager) const;
+
+      template<class T>
+      static bool registerType() {
+        if( create_methods_.count(typeid<T>::value) == 0){
+          create_methods_[typeid<T>::value] = KernelWrapper<T>::create();
+          return true;
+        }
+
+        // Standard types 
+        if( create_methods_.count(typeid<std::vector<double>*>::value) == 0){
+          create_methods_[typeid<std::vector<double>*>::value] = 
+            KernelWrapper<std::vector<double>*>::create();
+          return true;
+        }
+
+        return false;
+      }
   };
 
 }

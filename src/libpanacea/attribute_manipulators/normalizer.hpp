@@ -3,6 +3,9 @@
 #define PANACEA_PRIVATE_NORMALIZER_H
 #pragma once
 
+// Local private includes
+#include "attributes/covariance.hpp"
+
 // Standard includes
 #include <vector>
 

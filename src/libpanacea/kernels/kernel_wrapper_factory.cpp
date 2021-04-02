@@ -2,6 +2,7 @@
 // Private local PANACEA includes
 #include "kernel_wrapper_factory.hpp"
 
+#include "base_kernel_wrapper.hpp"
 #include "error.hpp"
 #include "kernel_specifications.hpp"
 #include "memory.hpp"
@@ -31,12 +32,12 @@ namespace panacea {
             } else {
               PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
             }
-            return std::make_unique<KernelWrapperBase>(
-                KernelWrapper<(*desc_wrapper)::type>(
+
+            return create_methods_[(*desc_wrapper)::type](
                   PassKey<KernelWrapperFactory>(),
                   desc_wrapper,
                   desc_wrapper->rows(),
-                  desc_wrapper->cols()));
+                  desc_wrapper->cols());
           }
         }
       } else if( kern_specification.is(settings::KernelCount::Single)) {
@@ -53,12 +54,11 @@ namespace panacea {
             }
             auto kernel_center = std::make_unique<std::vector<double>>(center);
 
-            auto kwrapper = std::make_unique<KernelWrapperBase>(
-                KernelWrapper<std::vector<double>*>(
-                  PassKey<KernelWrapperFactory>(),
-                  kernel_center.get(),
-                  1,
-                  kernel_center.size()));
+            auto kwrapper = create_methods_[typeid<std::vector<double>*>::value](
+                PassKey<KernelWrapperFactory>(),
+                kernel_center.get(),
+                1,
+                kernel_center.size());
 
             // Unlike managePointer manageMemory means the memory manager now
             // owns the memory data
