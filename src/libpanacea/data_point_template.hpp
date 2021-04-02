@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <algorithm>
+#include <any>
 #include <cassert>
 #include <vector>
 
@@ -38,6 +39,7 @@ namespace panacea {
         int rows_ = 0;
         int cols_ = 0;
       public:
+
         DataPointTemplate(T data, int rows, int cols) : 
           data_(data),
           rows_(rows),
@@ -71,11 +73,11 @@ namespace panacea {
          * This function allows one to check if two groups of data are pointing to
          * the same data. 
          */
-        void * getPointerToRawData() {
+        std::any getPointerToRawData() {
           if( std::is_pointer<T>::value ) {
-            return static_cast<void *>(data_);
+            return data_;
           } else {
-            return static_cast<void *>(&data_);
+            return &data_;
           }
         }
     };

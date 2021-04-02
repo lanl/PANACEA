@@ -30,9 +30,10 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     {0.0, 3.0},
     {2.0, 5.0}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&raw_desc_data,1, 2);
+  auto dwrapper = std::make_unique<
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,1, 2);
 
-  Covariance cov(&dwrapper);
+  Covariance cov(dwrapper.get());
 
   Reducer reducer;
   ReducedCovariance reduced_cov = reducer.reduce(cov, std::vector<int> {});
@@ -44,6 +45,15 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   std::vector<std::vector<double>> raw_kern_data;
   std::vector<double> raw_kern_values = {0.0, 0.5};
   raw_kern_data.push_back(raw_kern_values);
+
+  KernelSpecification specification(
+      settings::KernelCorrelation::Correlated,
+      settings::KernelCount::Single,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelNormalization::Variance,
+      settings::KernelMemory::Own);
+
+  auto kwrapper = create(dwrapper.get(), specification);
   //KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&raw_kern_data,1, 2);
 
   PrimitiveAttributes attr;

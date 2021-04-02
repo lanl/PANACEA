@@ -8,6 +8,10 @@
 #include "data_point_template.hpp"
 #include "error.hpp"
 
+// Standard includes
+#include <any>
+#include <vector>
+
 namespace panacea {
   /*
    * The descriptor wrapper should be flexible enough to allow
@@ -21,6 +25,8 @@ namespace panacea {
     public:
       DescriptorWrapper(T data, int rows, int cols);
 
+      typedef const T type;
+
       virtual double& operator()(const int point_ind, const int dim_ind) final;
       virtual double operator()(const int point_ind, const int dim_ind) const final;
 
@@ -32,7 +38,7 @@ namespace panacea {
       virtual void setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) final;
       virtual const std::vector<int> getReducedDimensions() const final;
       virtual const size_t getNumberReducedDimensions() const final;
-      virtual void * getPointerToRawData() noexcept final;
+      virtual std::any getPointerToRawData() noexcept final;
   };
 
   template<class T>
@@ -110,7 +116,7 @@ namespace panacea {
   }
 
   template<class T>
-  inline void * DescriptorWrapper<T>::getPointerToRawData() noexcept {
+  inline std::any DescriptorWrapper<T>::getPointerToRawData() noexcept {
     return data_wrapper_.getPointerToRawData();
   }
 

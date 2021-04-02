@@ -4,6 +4,7 @@
 #pragma once
 
 // Standard includes
+#include <any>
 #include <vector>
 
 namespace panacea {
@@ -24,7 +25,7 @@ namespace panacea {
       virtual void setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) = 0;
       virtual const std::vector<int> getReducedDimensions() const = 0;
       virtual const size_t getNumberReducedDimensions() const = 0;
-      virtual void * getPointerToRawData() noexcept = 0;
+      virtual std::any getPointerToRawData() noexcept = 0;
   };
 }
 #endif // PANACEA_PRIVATE_BASEDESCRIPTORWRAPPER_H

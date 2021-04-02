@@ -8,6 +8,9 @@
 #include "data_point_template.hpp"
 #include "passkey.hpp"
 
+// Standard includes
+#include <any>
+
 namespace panacea {
 
   class KernelWrapperFactory;
@@ -31,7 +34,7 @@ namespace panacea {
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
-      virtual void * getPointerToRawData() noexcept final;
+      virtual std::any getPointerToRawData() noexcept final;
   };
 
   template<class T>
@@ -70,7 +73,7 @@ namespace panacea {
   }
 
   template<class T>
-  inline void * KernelWrapper<T>::getPointerToRawData() noexcept {
+  inline std::any KernelWrapper<T>::getPointerToRawData() noexcept {
     return data_wrapper_.getPointerToRawData();
   }
 

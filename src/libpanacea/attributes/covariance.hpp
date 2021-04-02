@@ -6,6 +6,7 @@
 // Local PANACEA includes
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
+#include "passkey.hpp"
 
 // Standard includes
 #include <memory>
@@ -19,6 +20,7 @@ namespace panacea {
     Unnormalized
   };
 
+  class Normalizer;
   /*
    * Class for storing the covariance matrix
    */

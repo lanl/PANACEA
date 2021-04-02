@@ -6,6 +6,7 @@
 #include "base_kernel_wrapper.hpp"
 #include "descriptors/base_descriptor_wrapper.hpp"
 #include "kernel_specifications.hpp"
+#include "memory.hpp"
 
 // Standard includes
 #include <memory>
@@ -16,7 +17,8 @@ namespace panacea {
 
     std::unique_ptr<BaseKernelWrapper> create(
         BaseDescriptorWrapper * desc_wrapper,
-        const KernelSpecification & kern_specification ) const;
+        const KernelSpecification & kern_specification , 
+        MemoryManager & memory_manager) const;
   };
 
 }

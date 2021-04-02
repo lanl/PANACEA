@@ -4,6 +4,7 @@
 #pragma once
 
 // Standard includes
+#include <any>
 #include <cstddef>
 
 namespace panacea {
@@ -21,7 +22,7 @@ namespace panacea {
       virtual int getNumberDimensions() const = 0; 
       virtual int getNumberPoints() const = 0; 
       virtual void set(const Arrangement arrangement) = 0;
-      virtual void * getPointerToRawData() noexcept = 0;
+      virtual std::any getPointerToRawData() noexcept = 0;
   };
 }
 #endif // PANACEA_PRIVATE_BASEKERNELWRAPPER_H
