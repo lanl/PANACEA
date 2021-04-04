@@ -11,6 +11,7 @@
 // Standard includes
 #include <any>
 #include <vector>
+#include <typeindex>
 
 namespace panacea {
   /*
@@ -39,6 +40,7 @@ namespace panacea {
       virtual const std::vector<int> getReducedDimensions() const final;
       virtual const size_t getNumberReducedDimensions() const final;
       virtual std::any getPointerToRawData() noexcept final;
+      virtual std::type_index getTypeIndex() const noexcept final; 
   };
 
   template<class T>
@@ -120,6 +122,10 @@ namespace panacea {
     return data_wrapper_.getPointerToRawData();
   }
 
+  template<class T>
+  inline std::type_index getTypeIndex() const noexcept {
+    return typeid(T);
+  }
 
 }
 #endif // PANACEA_PRIVATE_DESCRIPTORWRAPPER_H

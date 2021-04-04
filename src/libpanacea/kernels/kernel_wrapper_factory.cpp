@@ -10,8 +10,16 @@
 
 // Standard includes
 #include <memory>
+#include <typeindex>
 
 namespace panacea {
+
+
+  std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>
+  KernelWrapperFactory::create_methods_{{
+    std::type_index(typeid(std::vector<double>*)),
+    KernelWrapper<std::vector<double>*>::create
+  }};
 
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
      BaseDescriptorWrapper * desc_wrapper, 
@@ -33,9 +41,9 @@ namespace panacea {
               PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
             }
 
-            return create_methods_[(*desc_wrapper)::type](
+            return create_methods_[desc_wrapper->getTypeIndex()](
                   PassKey<KernelWrapperFactory>(),
-                  desc_wrapper,
+                  desc_wrapper->getPointerToRawData(),
                   desc_wrapper->rows(),
                   desc_wrapper->cols());
           }
@@ -54,7 +62,7 @@ namespace panacea {
             }
             auto kernel_center = std::make_unique<std::vector<double>>(center);
 
-            auto kwrapper = create_methods_[typeid<std::vector<double>*>::value](
+            auto kwrapper = create_methods_[typeid(std::vector<double>*)](
                 PassKey<KernelWrapperFactory>(),
                 kernel_center.get(),
                 1,

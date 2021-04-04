@@ -10,6 +10,7 @@
 
 // Standard includes
 #include <any>
+#include <typeindex>
 
 namespace panacea {
 
@@ -35,8 +36,15 @@ namespace panacea {
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
       virtual std::any getPointerToRawData() noexcept final;
+      virtual std::type_index getTypeIndex() const noexcept final;
 
-      static std::unique_ptr<BaseKernelWrapper> create();
+      // Standard any should not be a reference because the underlying type should
+      // be a pointer
+      static std::unique_ptr<BaseKernelWrapper> create(
+          PassKey<KernelWrapperFactory>, 
+          std::any data, 
+          const int rows,
+          const int cols);
   };
 
   template<class T>
@@ -80,8 +88,18 @@ namespace panacea {
   }
 
   template<class T>
-  inline static std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(PassKey<KernelWrapperFactory> key, T data, int rows, int cols) {
-    return std::make_unique<KernelWrapper<T>>(key, dta, rows, cols);
+  inline std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(
+      PassKey<KernelWrapperFactory> key,
+      std::any data,
+      const int rows,
+      const int cols) {
+
+    return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
   }
+
+  template<class T>
+    inline std::type_index KernelWrapper<T>::getTypeIndex() const noexcept {
+      return typeid(T);
+    }
 }
 #endif // PANACEA_PRIVATE_KERNELWRAPPER_H

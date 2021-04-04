@@ -6,10 +6,13 @@
 #include "base_kernel_wrapper.hpp"
 #include "descriptors/base_descriptor_wrapper.hpp"
 #include "kernel_specifications.hpp"
+#include "kernel_wrapper.hpp"
 #include "memory.hpp"
+#include "passkey.hpp"
 
 // Standard includes
 #include <memory>
+#include <typeindex>
 
 namespace panacea {
 
@@ -17,9 +20,16 @@ namespace panacea {
 
     private:
 
-      using KernelCreateMethod = unique_ptr<BaseKernelWrapper>(*)(PassKey<KernelWrapperFactory>, T data, int rows, int cols);
+      using KernelCreateMethod = std::unique_ptr<BaseKernelWrapper>(*)(
+          PassKey<KernelWrapperFactory>,
+          std::any data,
+          const int rows,
+          const int cols);
 
-      std::unordered_map<std::typeinfo, KernelCreateMethod> create_methods_;
+      static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
+      /*{{
+        typeid(std::vector<double>*), KernelWrapper<std::vector<double>*>::create
+      }};;*/
 
     public:
 
@@ -30,17 +40,17 @@ namespace panacea {
 
       template<class T>
       static bool registerType() {
-        if( create_methods_.count(typeid<T>::value) == 0){
-          create_methods_[typeid<T>::value] = KernelWrapper<T>::create();
+        if( create_methods_.count(typeid(T)) == 0){
+          create_methods_[typeid(T)] = KernelWrapper<T>::create;
           return true;
         }
 
         // Standard types 
-        if( create_methods_.count(typeid<std::vector<double>*>::value) == 0){
-          create_methods_[typeid<std::vector<double>*>::value] = 
-            KernelWrapper<std::vector<double>*>::create();
+       /* if( create_methods_.count(typeid(std::vector<double>*)) == 0){
+          create_methods_[typeid(std::vector<double>*)] = 
+            ;
           return true;
-        }
+        }*/
 
         return false;
       }

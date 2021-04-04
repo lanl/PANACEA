@@ -6,6 +6,7 @@
 // Standard includes
 #include <any>
 #include <vector>
+#include <typeindex>
 
 namespace panacea {
 
@@ -26,6 +27,7 @@ namespace panacea {
       virtual const std::vector<int> getReducedDimensions() const = 0;
       virtual const size_t getNumberReducedDimensions() const = 0;
       virtual std::any getPointerToRawData() noexcept = 0;
+      virtual std::type_index getTypeIndex() const noexcept = 0; 
   };
 }
 #endif // PANACEA_PRIVATE_BASEDESCRIPTORWRAPPER_H
