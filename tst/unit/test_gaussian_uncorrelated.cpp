@@ -34,13 +34,16 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     {2.0, 5.0}};
 
   auto dwrapper = std::make_unique<
-    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,1, 2);
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   Covariance cov(dwrapper.get());
 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   Reducer reducer;
   ReducedCovariance reduced_cov = reducer.reduce(cov, std::vector<int> {});
 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   Inverter inverter;
   ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_cov);
 
@@ -48,6 +51,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   std::vector<std::vector<double>> raw_kern_data;
   std::vector<double> raw_kern_values = {0.0, 0.5};
   raw_kern_data.push_back(raw_kern_values);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
   KernelSpecification specification(
       settings::KernelCorrelation::Correlated,
@@ -57,11 +61,14 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelMemory::Own,
       settings::KernelCenter::Mean);
 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   MemoryManager mem_manager;
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   KernelWrapperFactory kfactory;
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   auto kwrapper = kfactory.create(dwrapper.get(), specification, mem_manager);
   //KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&raw_kern_data,1, 2);
 
-  PrimitiveAttributes attr;
+  //PrimitiveAttributes attr;
   //attr.kernel_wrapper = &kwrapper;
 }

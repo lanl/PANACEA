@@ -89,6 +89,7 @@ namespace panacea {
   Covariance::Covariance(BaseDescriptorWrapper * desc_wrap) {
     // Resize the covariance matrix based on the number of descriptor dimensions
     assert(desc_wrap != nullptr);
+    assert(desc_wrap->getNumberPoints() > 1);
     const int num_dims = desc_wrap->getNumberDimensions();
     matrix_ = createMatrix(num_dims, num_dims);
     mean_ = createVector(num_dims);
@@ -199,4 +200,15 @@ namespace panacea {
     return matrix_->operator()(row,col);
   }
 
+  void Covariance::print() const {
+    std::cout << "Covariance Matrix\n";
+    matrix_->print();
+    std::cout << "\n";
+    std::cout << "Mean\n";
+    mean_->print();
+    std::cout << "\n";
+    std::cout << "Total Number of Points\n";
+    std::cout << total_number_data_pts_;
+    std::cout << std::endl;
+  }
 }

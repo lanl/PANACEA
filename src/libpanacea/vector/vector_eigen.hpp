@@ -29,6 +29,7 @@ namespace panacea {
       virtual double operator()(const int row) const final;
       virtual void resize(const int rows) final;
       virtual int rows() const final;
+      virtual void print() const final;
   };
 }
 

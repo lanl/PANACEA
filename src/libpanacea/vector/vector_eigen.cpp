@@ -8,6 +8,7 @@
 
 // Standard includes
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 namespace panacea {
@@ -44,6 +45,10 @@ namespace panacea {
 
   int VectorEigen::rows() const {
     return vector_->rows();
+  }
+
+  void VectorEigen::print() const {
+    std::cout << (*vector_) << std::endl;
   }
 }
 

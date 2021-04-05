@@ -21,6 +21,7 @@ namespace panacea {
       virtual double operator()(const int row) const = 0;
       virtual void resize(const int rows) = 0;
       virtual int rows() const = 0;
+      virtual void print() const = 0;
   };
 
   std::unique_ptr<Vector> createVector(const int rows, const VectorTypes type = VectorTypes::Default);

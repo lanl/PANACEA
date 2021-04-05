@@ -18,7 +18,7 @@ namespace panacea {
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
 
-  class GaussUncorrelated : public Primitive {
+  class GaussCorrelated : public Primitive {
     private:
       const int kernel_index_;
       PrimitiveAttributes attributes_; 

@@ -3,6 +3,9 @@
 #include "normalizer.hpp"
 #include "passkey.hpp"
 
+// Standard includes
+#include <cassert>
+
 namespace panacea {
   
   void Normalizer::normalize(Covariance & cov) const {

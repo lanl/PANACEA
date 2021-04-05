@@ -61,6 +61,8 @@ namespace panacea {
       // Specific to Normalizer class
       void set(PassKey<Normalizer>, NormalizationState state);
       double & operator()(PassKey<Normalizer>, const int row, const int col);
+
+      void print() const;
   };
 }
 #endif // PANACEA_PRIVATE_COVARIANCE_H

@@ -30,7 +30,8 @@ namespace panacea {
           } else {
             mean.reserve(data2d.rows());
             for( int col = 0; col < data2d.cols(); ++col) {
-              mean.push_back(data2d(0,col));
+              int row = 0;
+              mean.push_back(data2d(row,col));
             }
             for( int row = 1; row < data2d.rows(); ++row){
               for( int col = 0; col < data2d.cols(); ++col) {
