@@ -268,12 +268,6 @@ namespace panacea {
       std::iota(priority_rows.begin(), priority_rows.end(), 0);
     }
 
-    // Printing rows
-    for( auto & item : priority_rows ) {
-      std::cout << "row " << item << std::endl;
-    } 
-
-    cov.print();    
     runChecks_(cov, priority_rows);
 
     double threshold = starting_threshold_;

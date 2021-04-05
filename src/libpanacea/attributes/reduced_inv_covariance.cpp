@@ -22,9 +22,9 @@ namespace panacea {
   }
 
   void ReducedInvCovariance::print() const {
-    std::cout << "Reduced Covariance Matrix" << std::endl;
+    std::cout << "Reduced Inverse Covariance Matrix\n";
     matrix_->print();
-    std::cout << "Reduced Covariance Dimensions" << std::endl;
+    std::cout << "Reduced Inverse Covariance Dimensions\n";
     for( int dim : chosen_dimension_indices_) {
       std::cout << dim << " ";
     } 

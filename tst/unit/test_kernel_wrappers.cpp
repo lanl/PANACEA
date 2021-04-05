@@ -2,6 +2,8 @@
 // Local private includes
 #include "kernels/kernel_wrapper.hpp"
 
+#include "helper.hpp"
+
 // Third party includes
 #include <catch2/catch.hpp>
 
@@ -11,11 +13,12 @@
 
 using namespace std;
 using namespace panacea;
-/*
+
 TEST_CASE("Testing:kernel_wrapper_constructor1","[unit,panacea]"){
 
   std::vector<std::vector<double>> data;
-  KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&data,0,0);
+  KernelWrapper<std::vector<std::vector<double>>*> 
+    kwrapper(test::Test::key(), &data,0,0);
 
 }
 
@@ -27,7 +30,9 @@ TEST_CASE("Testing:kernel_wrapper_constructor2","[unit,panacea]"){
   data.push_back(values);
   data.push_back(values);
 
-  KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&data,2, 3);
+  KernelWrapper<std::vector<std::vector<double>>*> 
+    kwrapper(test::Test::key(), &data,2, 3);
+
   REQUIRE(kwrapper.rows() == 2);
   REQUIRE(kwrapper.cols() == 3);
 
@@ -43,7 +48,8 @@ TEST_CASE("Testing:kernel_wrapper_access","[unit,panacea]"){
   data.push_back(values);
   data.push_back(values);
 
-  KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&data,2,3);
+  KernelWrapper<std::vector<std::vector<double>>*> 
+    kwrapper(test::Test::key(),&data,2,3);
 
   REQUIRE(kwrapper(0,0) == 1.0);
   REQUIRE(kwrapper(1,0) == 1.0);
@@ -63,7 +69,8 @@ TEST_CASE("Testing:kernel_arrangements","[unit,panacea]"){
   data.push_back(values);
   data.push_back(values);
 
-  KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&data,2,3);
+  KernelWrapper<std::vector<std::vector<double>>*> 
+    kwrapper(test::Test::key(),&data,2,3);
 
   // Flip how the rows and columns are being interpreted
   kwrapper.set(Arrangement::DimensionsAlongRowsPointsAlongCols);
@@ -84,6 +91,5 @@ TEST_CASE("Testing:kernel_arrangements","[unit,panacea]"){
 
   REQUIRE(kwrapper(2,0) == 3.0);
   REQUIRE(kwrapper(2,1) == 3.0);
-}*/
-
+}
 

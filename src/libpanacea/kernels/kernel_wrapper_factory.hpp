@@ -27,10 +27,7 @@ namespace panacea {
 
     private:
 
-        static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
-      /*{{
-        typeid(std::vector<double>*), KernelWrapper<std::vector<double>*>::create
-      }};;*/
+      static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
 
     public:
 
@@ -40,21 +37,13 @@ namespace panacea {
           MemoryManager & memory_manager) const;
 
       template<class T>
-      static bool registerType() {
-        if( create_methods_.count(typeid(T)) == 0){
-          create_methods_[typeid(T)] = KernelWrapper<T>::create;
-          return true;
+        static bool registerType() {
+          if( create_methods_.count(typeid(T)) == 0){
+            create_methods_[typeid(T)] = KernelWrapper<T>::create;
+            return true;
+          }
+          return false;
         }
-
-        // Standard types 
-       /* if( create_methods_.count(typeid(std::vector<double>*)) == 0){
-          create_methods_[typeid(std::vector<double>*)] = 
-            ;
-          return true;
-        }*/
-
-        return false;
-      }
   };
 
 }

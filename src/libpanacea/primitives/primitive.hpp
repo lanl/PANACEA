@@ -16,7 +16,7 @@ namespace panacea {
   class Primitive {
    
     public:
-      virtual ~Primitive() = default;
+//      virtual ~Primitive() = default;
 
       /*
        * Reset a primitive inolves updating the kernel pointer

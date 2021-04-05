@@ -4,6 +4,7 @@
 #pragma once
 
 // Local private PANACEA includes
+#include "passkey.hpp"
 #include "primitives/primitive_attributes.hpp"
 
 // Standard includes
@@ -12,7 +13,16 @@
 namespace panacea {
   
   class MemoryManager;
+
 namespace test {
+
+  /*
+   * Test class for access to constructors through PassKey idiom
+   */ 
+  class Test {
+    public:
+      static PassKey<Test> key() { return PassKey<Test>(); } 
+  };
 
   /*
    * Creates data containing two rows of 

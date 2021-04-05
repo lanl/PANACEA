@@ -5,6 +5,9 @@
 // Local private PANACEA includes
 #include "settings.hpp"
 
+// Standard includes
+#include <type_traits>
+
 namespace panacea {
 
   namespace defaults {
@@ -44,6 +47,23 @@ namespace panacea {
         kern_memory_(kern_memory),
         kern_center_(kern_center)
           {};
+
+      template<class T>
+      inline T get() const {
+        if constexpr( std::is_same<T, settings::KernelCorrelation>::value){
+          return kern_correlation_;
+        } else if constexpr( std::is_same<T, settings::KernelCount>::value) {
+          return kern_count_;
+        } else if constexpr( std::is_same<T, settings::KernelPrimitive>::value) {
+          return kern_prim_;
+        } else if constexpr( std::is_same<T, settings::KernelNormalization>::value) {
+          return kern_normalization_;
+        } else if constexpr( std::is_same<T, settings::KernelMemory>::value) {
+          return kern_memory_;
+        } else if constexpr( std::is_same<T, settings::KernelCenterCalculation>::value) {
+          return kern_center_;
+        }
+      } 
 
       inline bool is(const settings::KernelCorrelation & correlation) const noexcept {
         if( correlation == kern_correlation_ ) return true;

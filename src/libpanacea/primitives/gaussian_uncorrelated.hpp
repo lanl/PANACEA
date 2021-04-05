@@ -6,9 +6,11 @@
 // Private local includes
 #include "primitive.hpp"
 
+#include "passkey.hpp"
 #include "primitive_attributes.hpp"
 
 // Standard includes
+#include <memory>
 #include <vector>
 
 namespace panacea {
@@ -17,6 +19,11 @@ namespace panacea {
   enum class GradSetting;
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
+  class PrimitiveFactory;
+
+  namespace test {
+    class Test;
+  }
 
   class GaussUncorrelated : public Primitive {
     private:
@@ -24,8 +31,15 @@ namespace panacea {
       PrimitiveAttributes attributes_; 
       double pre_factor_;
     public:
-      explicit GaussUncorrelated(const int & kernel_index) : kernel_index_(kernel_index) {};
-      GaussUncorrelated(const PrimitiveAttributes & prim_att, const int & kernel_index) : kernel_index_(kernel_index) {};
+      GaussUncorrelated(const PassKey<PrimitiveFactory> &,
+          const int & kernel_index) : kernel_index_(kernel_index) {};
+
+      GaussUncorrelated(const PassKey<test::Test> &,
+          const int & kernel_index) : kernel_index_(kernel_index) {};
+
+      GaussUncorrelated(const PassKey<PrimitiveFactory> &, 
+          const PrimitiveAttributes & prim_att,
+          const int & kernel_index) : kernel_index_(kernel_index) {};
 
       // Do not make const reference
       virtual void reset(PrimitiveAttributes) final;
@@ -54,7 +68,19 @@ namespace panacea {
           std::vector<EquationSetting> prim_settings, 
           GradSetting grad_setting) const final; 
 
+      static std::unique_ptr<Primitive> create(
+          const PassKey<PrimitiveFactory> & key, 
+          const PrimitiveAttributes & prim_att,
+          const int & kernel_index);
+
   };
+
+  inline std::unique_ptr<Primitive> GaussUncorrelated::create(
+      const PassKey<PrimitiveFactory> & key, 
+      const PrimitiveAttributes & prim_att,
+      const int & kernel_index) {
+    return std::make_unique<GaussUncorrelated>(key, prim_att, kernel_index); 
+  }
 }
 
 #endif // PANACEA_PRIVATE_GAUSSIAN_UNCORRELATED_H

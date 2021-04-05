@@ -7,10 +7,12 @@
 #include "attribute_manipulators/reducer.hpp"
 #include "attribute_manipulators/inverter.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
+#include "helper.hpp"
 #include "kernels/kernel_wrapper.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
 #include "memory.hpp"
+#include "primitives/primitive_factory.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -23,26 +25,19 @@ using namespace std;
 using namespace panacea;
 
 TEST_CASE("Testing:creation of gaussian uncorrelated primitive","[unit,panacea]"){
-  GaussUncorrelated gauss(0);
+  GaussUncorrelated gauss(test::Test::key(), 0);
 }
 
 TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]"){
 
   // Assumes we are dealing with two dimensions and two points
+  // The dimensions are linearly dependent so only one will ultimately be used
   std::vector<std::vector<double>> raw_desc_data{
     {0.0, 3.0},
     {2.0, 5.0}};
 
   auto dwrapper = std::make_unique<
     DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
-
-  Covariance cov(dwrapper.get());
-
-  Reducer reducer;
-  ReducedCovariance reduced_cov = reducer.reduce(cov, std::vector<int> {});
-
-  Inverter inverter;
-  ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_cov);
 
   KernelSpecification specification(
       settings::KernelCorrelation::Uncorrelated,
@@ -53,14 +48,17 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelCenterCalculation::None);
 
   MemoryManager mem_manager;
-  KernelWrapperFactory kfactory;
-  auto kwrapper = kfactory.create(dwrapper.get(), specification, mem_manager);
 
-  PrimitiveAttributes attr;
-  attr.kernel_wrapper = kwrapper.get();
-  attr.reduced_covariance = &reduced_cov;
-  attr.reduced_inv_covariance = &reduced_inv_cov;
+  PrimitiveFactory prim_factory;
+  
+  prim_factory.registerPrimitive<
+    GaussUncorrelated,
+    settings::KernelPrimitive::Gaussian,
+    settings::KernelCorrelation::Uncorrelated>();
 
-      
+  auto gauss_uncorrelated_prim = prim_factory.create(
+      dwrapper.get(),
+      mem_manager,
+      specification);
 
 }

@@ -17,6 +17,9 @@ namespace panacea {
 
   class KernelWrapperFactory;
 
+  namespace test {
+    class Test;
+  }
   /*
    * The kernel wrapper should be flexible enough to allow
    * the underlying type to vary
@@ -27,6 +30,9 @@ namespace panacea {
       DataPointTemplate<T> data_wrapper_;
     public:
       KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
+        data_wrapper_(data, rows, cols) {};
+
+      KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
         data_wrapper_(data, rows, cols) {};
 
       virtual double& operator()(const int point_ind, const int dim_ind) final;
