@@ -10,6 +10,7 @@
 
 // Standard includes
 #include <any>
+#include <memory>
 #include <typeindex>
 
 namespace panacea {
@@ -25,7 +26,7 @@ namespace panacea {
     private:
       DataPointTemplate<T> data_wrapper_;
     public:
-      KernelWrapper(PassKey<KernelWrapperFactory>, T data, int rows, int cols) : 
+      KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
         data_wrapper_(data, rows, cols) {};
 
       virtual double& operator()(const int point_ind, const int dim_ind) final;
@@ -41,7 +42,7 @@ namespace panacea {
       // Standard any should not be a reference because the underlying type should
       // be a pointer
       static std::unique_ptr<BaseKernelWrapper> create(
-          PassKey<KernelWrapperFactory>, 
+          const PassKey<KernelWrapperFactory> &, 
           std::any data, 
           const int rows,
           const int cols);
@@ -89,7 +90,7 @@ namespace panacea {
 
   template<class T>
   inline std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(
-      PassKey<KernelWrapperFactory> key,
+      const PassKey<KernelWrapperFactory> & key,
       std::any data,
       const int rows,
       const int cols) {

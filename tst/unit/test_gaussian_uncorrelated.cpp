@@ -8,6 +8,9 @@
 #include "attribute_manipulators/inverter.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
 #include "kernels/kernel_wrapper.hpp"
+#include "kernels/kernel_wrapper_factory.hpp"
+#include "kernels/kernel_specifications.hpp"
+#include "memory.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -51,9 +54,12 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelCount::Single,
       settings::KernelPrimitive::Gaussian,
       settings::KernelNormalization::Variance,
-      settings::KernelMemory::Own);
+      settings::KernelMemory::Own,
+      settings::KernelCenter::Mean);
 
-  auto kwrapper = create(dwrapper.get(), specification);
+  MemoryManager mem_manager;
+  KernelWrapperFactory kfactory;
+  auto kwrapper = kfactory.create(dwrapper.get(), specification, mem_manager);
   //KernelWrapper<std::vector<std::vector<double>>*> kwrapper(&raw_kern_data,1, 2);
 
   PrimitiveAttributes attr;

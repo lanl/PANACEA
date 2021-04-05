@@ -17,16 +17,17 @@
 namespace panacea {
 
   class KernelWrapperFactory {
-
-    private:
+    public:
 
       using KernelCreateMethod = std::unique_ptr<BaseKernelWrapper>(*)(
-          PassKey<KernelWrapperFactory>,
+          const PassKey<KernelWrapperFactory> &,
           std::any data,
           const int rows,
           const int cols);
 
-      static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
+    private:
+
+        static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
       /*{{
         typeid(std::vector<double>*), KernelWrapper<std::vector<double>*>::create
       }};;*/

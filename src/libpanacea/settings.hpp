@@ -76,6 +76,10 @@ namespace panacea {
       Share
     };
 
+    enum class KernelCenter {
+      Mean,
+      Median
+    };
   }
 }
 

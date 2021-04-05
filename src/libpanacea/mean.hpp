@@ -2,21 +2,19 @@
 #define PANACEA_PRIVATE_MEAN_H
 #pragma once
 
+// Local private includes
+#include "data_settings.hpp"
+
 // Standard includes
 #include <vector>
 
 namespace panacea {
 
-  enum class Direction {
-    AlongRows,
-    AlongColumns
-  };
-
   class Mean {
     public:
 
       template<class T, const Direction dir = Direction::AlongRows> 
-        std::vector<double> calculate(T data2d) {
+        std::vector<double> calculate(const T & data2d) {
 
           std::vector<double> mean;
           if constexpr(dir == Direction::AlongRows) {

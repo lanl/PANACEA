@@ -20,9 +20,9 @@ TEST_CASE("Testing:mean","[unit,panacea]"){
       int rows() const { return data_.size(); }
       int cols() const { return data_.at(0).size(); } 
 
-      double operator()(const int row, const int col){
+      double operator()(const int & row, const int & col) const {
         return data_.at(row).at(col);
-      }
+      } 
   };
 
   Data data2d;

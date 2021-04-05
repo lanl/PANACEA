@@ -5,7 +5,10 @@
 #include "base_kernel_wrapper.hpp"
 #include "error.hpp"
 #include "kernel_specifications.hpp"
+#include "mean.hpp"
+#include "median.hpp"
 #include "memory.hpp"
+#include "passkey.hpp"
 #include "primitives/gaussian_uncorrelated.hpp"
 
 // Standard includes
@@ -17,8 +20,8 @@ namespace panacea {
 
   std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>
   KernelWrapperFactory::create_methods_{{
-    std::type_index(typeid(std::vector<double>*)),
-    KernelWrapper<std::vector<double>*>::create
+    std::type_index(typeid(std::vector<std::vector<double>>*)),
+    KernelWrapper<std::vector<std::vector<double>>*>::create
   }};
 
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
@@ -52,21 +55,22 @@ namespace panacea {
         if( kern_specification.is(settings::KernelCorrelation::Correlated) ){
           if( kern_specification.is(settings::KernelMemory::Own )) {
             // Create data for the kernel
-            std::vector<double> center;
+            std::vector<std::vector<double>> centers;
             if( kern_specification.is(settings::KernelCenter::Mean )) {
               Mean mean;
-              center = mean.calculate(desc_wrapper);
+              centers.push_back(mean.calculate(*desc_wrapper));
             } else if (kern_specification.is(settings::KernelCenter::Mean )) {
               Median median;
-              center = median.calculate(desc_wrapper);
+              centers.push_back(median.calculate(*desc_wrapper));
             }
-            auto kernel_center = std::make_unique<std::vector<double>>(center);
+            auto kernel_center = std::make_unique<std::vector<std::vector<double>>>(centers);
 
-            auto kwrapper = create_methods_[typeid(std::vector<double>*)](
+            auto kwrapper = create_methods_[
+              typeid(std::vector<std::vector<double>>*)](
                 PassKey<KernelWrapperFactory>(),
                 kernel_center.get(),
                 1,
-                kernel_center.size());
+                kernel_center->size());
 
             // Unlike managePointer manageMemory means the memory manager now
             // owns the memory data

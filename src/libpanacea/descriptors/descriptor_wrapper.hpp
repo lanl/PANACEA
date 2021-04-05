@@ -123,7 +123,7 @@ namespace panacea {
   }
 
   template<class T>
-  inline std::type_index getTypeIndex() const noexcept {
+  inline std::type_index DescriptorWrapper<T>::getTypeIndex() const noexcept {
     return typeid(T);
   }
 
