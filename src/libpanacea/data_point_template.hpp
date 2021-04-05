@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <any>
 #include <cassert>
+#include <iostream>
 #include <vector>
 
 namespace panacea {
@@ -80,6 +81,8 @@ namespace panacea {
             return &data_;
           }
         }
+
+        void print() const;
     };
 
   template<class T>
@@ -92,6 +95,22 @@ namespace panacea {
         number_dimensions_ = rows_;
         number_points_ = cols_;
       } 
+    }
+
+  template<class T>
+    inline void DataPointTemplate<T>::print() const {
+
+      std::cout << "Rows " << rows() << " Columns " << cols() << "\n";
+      std::cout << "Dimensions " << getNumberDimensions();
+      std::cout << " Points " << getNumberPoints() << "\n";
+      std::cout << "\nData\n";
+      for( int row = 0; row < rows(); ++row) {
+        for( int col = 0; col < cols(); ++col) {
+          std::cout << this->operator()(row,col) << " ";
+        }
+        std::cout << "\n";
+      }
+      std::cout << std::endl;
     }
 
   template<class T> 

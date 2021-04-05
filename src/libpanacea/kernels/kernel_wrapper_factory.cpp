@@ -33,17 +33,19 @@ namespace panacea {
       if( kern_specification.is(settings::KernelCount::OneToOne)){
         if( kern_specification.is(settings::KernelCorrelation::Uncorrelated)){
           if( kern_specification.is(settings::KernelMemory::Share)){
-
-
             auto any_ptr = desc_wrapper->getPointerToRawData();
-            if( any_ptr.type() == typeid(std::vector<double> *)){
+            if( any_ptr.type() == typeid(std::vector<std::vector<double>> *)){
               memory_manager.managePointer(
-                  std::any_cast<std::vector<double>*>(desc_wrapper->getPointerToRawData()),
+                  std::any_cast<std::vector<std::vector<double>>*>(
+                    desc_wrapper->getPointerToRawData()),
                   "Kernel Centers");
             } else {
               PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
             }
 
+            if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
+              PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
+            }
             return create_methods_[desc_wrapper->getTypeIndex()](
                   PassKey<KernelWrapperFactory>(),
                   desc_wrapper->getPointerToRawData(),
@@ -56,10 +58,10 @@ namespace panacea {
           if( kern_specification.is(settings::KernelMemory::Own )) {
             // Create data for the kernel
             std::vector<std::vector<double>> centers;
-            if( kern_specification.is(settings::KernelCenter::Mean )) {
+            if( kern_specification.is(settings::KernelCenterCalculation::Mean )) {
               Mean mean;
               centers.push_back(mean.calculate(*desc_wrapper));
-            } else if (kern_specification.is(settings::KernelCenter::Mean )) {
+            } else if (kern_specification.is(settings::KernelCenterCalculation::Median )) {
               Median median;
               centers.push_back(median.calculate(*desc_wrapper));
             }

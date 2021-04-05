@@ -38,7 +38,7 @@ namespace panacea {
       virtual void set(const Arrangement arrangement) final;
       virtual std::any getPointerToRawData() noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final;
-
+      virtual void print() const final;
       // Standard any should not be a reference because the underlying type should
       // be a pointer
       static std::unique_ptr<BaseKernelWrapper> create(
@@ -86,6 +86,11 @@ namespace panacea {
   template<class T>
   inline std::any KernelWrapper<T>::getPointerToRawData() noexcept {
     return data_wrapper_.getPointerToRawData();
+  }
+
+  template<class T>
+  inline void KernelWrapper<T>::print() const {
+    data_wrapper_.print();
   }
 
   template<class T>

@@ -18,8 +18,8 @@ namespace panacea {
       = ::panacea::settings::KernelNormalization::Variance;
     const ::panacea::settings::KernelMemory kern_memory_default 
       = ::panacea::settings::KernelMemory::Own;
-    const ::panacea::settings::KernelCenter kern_center_default 
-      = ::panacea::settings::KernelCenter::Mean;
+    const ::panacea::settings::KernelCenterCalculation kern_center_default 
+      = ::panacea::settings::KernelCenterCalculation::Mean;
   }
 
   class KernelSpecification {
@@ -28,7 +28,7 @@ namespace panacea {
       const settings::KernelPrimitive kern_prim_ = defaults::kern_primitive_default;
       const settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
       const settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
-      const settings::KernelCenter kern_center_ = defaults::kern_center_default;
+      const settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
     public:
       KernelSpecification(
           const settings::KernelCorrelation & kern_correlation,
@@ -36,7 +36,7 @@ namespace panacea {
           const settings::KernelPrimitive & kern_prim,
           const settings::KernelNormalization & kern_normalization,
           const settings::KernelMemory & kern_memory,
-          const settings::KernelCenter & kern_center) :
+          const settings::KernelCenterCalculation & kern_center) :
         kern_correlation_(kern_correlation),
         kern_count_(kern_count),
         kern_prim_(kern_prim),
@@ -70,7 +70,7 @@ namespace panacea {
         return false;
       }
       
-      inline bool is(const settings::KernelCenter & kern_center) const noexcept {
+      inline bool is(const settings::KernelCenterCalculation & kern_center) const noexcept {
         if( kern_center == kern_center_ ) return true;
         return false;
       }

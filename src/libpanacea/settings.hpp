@@ -76,7 +76,8 @@ namespace panacea {
       Share
     };
 
-    enum class KernelCenter {
+    enum class KernelCenterCalculation {
+      None,
       Mean,
       Median
     };

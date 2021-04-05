@@ -41,6 +41,7 @@ namespace panacea {
       virtual const size_t getNumberReducedDimensions() const final;
       virtual std::any getPointerToRawData() noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final; 
+      virtual void print() const final;
   };
 
   template<class T>
@@ -120,6 +121,11 @@ namespace panacea {
   template<class T>
   inline std::any DescriptorWrapper<T>::getPointerToRawData() noexcept {
     return data_wrapper_.getPointerToRawData();
+  }
+
+  template<class T>
+  inline void DescriptorWrapper<T>::print() const {
+    data_wrapper_.print();
   }
 
   template<class T>
