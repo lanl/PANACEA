@@ -46,7 +46,11 @@ namespace panacea {
           const int point_target, 
           std::vector<EquationSetting> prim_settings, 
           GradSetting grad_setting) const = 0; 
+
+      virtual ~Primitive() = 0;
   };
+
+  //Primitive::~Primitive() {};
 }
 
 #endif // PANACEA_PRIVATE_PRIMITIVE_H

@@ -52,6 +52,7 @@ namespace panacea {
           std::any data, 
           const int rows,
           const int cols);
+
   };
 
   template<class T>
