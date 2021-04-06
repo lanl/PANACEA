@@ -9,6 +9,7 @@
 #include "kernels/kernel_wrapper.hpp"
 #include "error.hpp"
 #include "primitive_attributes.hpp"
+#include "settings.hpp"
 
 // Standard includes
 #include <cmath>
@@ -54,8 +55,8 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
       const int point_target, 
-      std::vector<EquationSetting> prim_settings, 
-      GradSetting grad_setting) const {
+      const std::vector<settings::EquationSetting> & prim_settings, 
+      const settings::GradSetting & grad_setting) const {
 
     std::vector<double> grad;
     grad.reserve(descriptors->getNumberReducedDimensions());

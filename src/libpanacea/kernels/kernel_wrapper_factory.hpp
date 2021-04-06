@@ -13,6 +13,7 @@
 // Standard includes
 #include <memory>
 #include <typeindex>
+#include <vector>
 
 namespace panacea {
 

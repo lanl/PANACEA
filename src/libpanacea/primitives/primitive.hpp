@@ -10,8 +10,11 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
-  enum class EquationSetting;
-  enum class GradSetting;
+
+  namespace settings {
+    enum class EquationSetting;
+    enum class GradSetting;
+  }
 
   class Primitive {
    
@@ -44,13 +47,12 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
           const int point_target, 
-          std::vector<EquationSetting> prim_settings, 
-          GradSetting grad_setting) const = 0; 
+          const std::vector<settings::EquationSetting> & prim_settings, 
+          const settings::GradSetting & grad_setting) const = 0; 
 
       virtual ~Primitive() = 0;
   };
 
-  //Primitive::~Primitive() {};
 }
 
 #endif // PANACEA_PRIVATE_PRIMITIVE_H

@@ -37,5 +37,8 @@ namespace panacea {
     cov.set(PassKey<Normalizer>(), NormalizationState::Unnormalized);
   }
 
+  const std::vector<double> & Normalizer::getNormalizationCoeffs() const noexcept {
+    return normalization_coeffs_;
+  }
 }
 

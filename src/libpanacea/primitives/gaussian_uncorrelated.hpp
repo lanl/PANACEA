@@ -15,11 +15,14 @@
 
 namespace panacea {
 
-  enum class EquationSetting;
-  enum class GradSetting;
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
   class PrimitiveFactory;
+
+  namespace settings {
+    enum class EquationSetting;
+    enum class GradSetting;
+  }
 
   namespace test {
     class Test;
@@ -65,8 +68,8 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
           const int point_target, 
-          std::vector<EquationSetting> prim_settings, 
-          GradSetting grad_setting) const final; 
+          const std::vector<settings::EquationSetting> & prim_settings, 
+          const settings::GradSetting & grad_setting) const final; 
 
       static std::unique_ptr<Primitive> create(
           const PassKey<PrimitiveFactory> & key, 

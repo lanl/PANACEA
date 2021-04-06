@@ -14,6 +14,11 @@
 #include "primitives/primitive.hpp"
 #include "primitive_attributes.hpp"
 
+// Standard includes
+#include <memory>
+#include <unordered_map>
+#include <vector>
+
 namespace panacea {
 
   std::unordered_map<settings::KernelPrimitive,
@@ -21,7 +26,7 @@ namespace panacea {
         PrimitiveFactory::PrimitiveCreateMethod>>
           PrimitiveFactory::create_methods_;
 
-  std::unique_ptr<Primitive> PrimitiveFactory::create(
+  std::vector<std::unique_ptr<Primitive>> PrimitiveFactory::create(
       BaseDescriptorWrapper * dwrapper,
       MemoryManager & mem_manager,
       const KernelSpecification & specification) const {
@@ -47,9 +52,23 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    int index = 0;
-    return create_methods_[specification.get<settings::KernelPrimitive>()]\
-      [specification.get<settings::KernelCorrelation>()]\
-      (PassKey<PrimitiveFactory>(), attr, index);
+    std::vector<std::unique_ptr<Primitive>> primitives;
+    if( specification.is(settings::KernelCount::OneToOne)){
+      primitives.reserve(kwrapper->getNumberPoints());
+      for( int kernel_index = 0; kernel_index < kwrapper->getNumberPoints(); ++kernel_index){
+        primitives.push_back(
+          create_methods_[specification.get<settings::KernelPrimitive>()]\
+        [specification.get<settings::KernelCorrelation>()]\
+        (PassKey<PrimitiveFactory>(), attr, kernel_index));
+      }
+      
+    } else {
+      const int kernel_index = 0;
+      primitives.emplace_back(
+          create_methods_[specification.get<settings::KernelPrimitive>()]\
+        [specification.get<settings::KernelCorrelation>()]\
+        (PassKey<PrimitiveFactory>(), attr, kernel_index));
+    }
+    return primitives;
   }
 }

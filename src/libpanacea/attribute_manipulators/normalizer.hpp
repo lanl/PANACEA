@@ -24,6 +24,8 @@ namespace panacea {
       Normalizer(const std::vector<double> & normalization_coeffs) :
         normalization_coeffs_(normalization_coeffs) {};
 
+      const std::vector<double> & getNormalizationCoeffs() const noexcept;
+
       void normalize(Covariance & cov) const; 
       void unnormalize(Covariance & cov) const; 
   };

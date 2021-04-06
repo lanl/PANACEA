@@ -9,6 +9,7 @@
 // Standard includes
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace panacea {
 
@@ -51,7 +52,7 @@ namespace panacea {
         return true;
       }
 
-      std::unique_ptr<Primitive> create(
+      std::vector<std::unique_ptr<Primitive>> create(
           BaseDescriptorWrapper * dwrapper,
           MemoryManager & mem_manager,
           const KernelSpecification & specification) const;

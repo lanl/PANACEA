@@ -6,6 +6,7 @@
 namespace panacea {
   
   class BaseKernelWrapper;
+  class Normalizer;
   class ReducedCovariance;
   class ReducedInvCovariance;
 
@@ -14,6 +15,7 @@ namespace panacea {
    */
   class PrimitiveAttributes {
     public:
+      Normalizer * normalizer = nullptr;
       BaseKernelWrapper * kernel_wrapper = nullptr;
       ReducedCovariance * reduced_covariance = nullptr;
       ReducedInvCovariance * reduced_inv_covariance = nullptr;       
