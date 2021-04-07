@@ -56,24 +56,32 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     settings::KernelPrimitive::Gaussian,
     settings::KernelCorrelation::Uncorrelated>();
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   auto gauss_uncorrelated_prim_grp = prim_factory.create(
       dwrapper.get(),
       mem_manager,
       specification);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // There should be two primitives sense it is a one to one ratio and there 
   // are two descriptors
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.size() == 2);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->getId() == 0);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->getId() == 1);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // Get the density located at the center of both primitives
-  std::cout << "density prim 1" << std::endl;
-  std::cout << gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) << std::endl;
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) == Approx(0.282095));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),1) == Approx(0.282095));
+  
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),1) == Approx(0.103777));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),0) == Approx(0.103777));
+
+  std::vector<settings::EquationSetting> eq_settings = {settings::EquationSetting::None}; 
+  // Calculate the density at this location
+  const int descriptor_ind = 0;
+  // Calculate the gradient with respect to this point
+  auto grad = gauss_uncorrelated_prim_grp.primitives.at(0)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, settings::GradSetting::WRTKernel );
+
+  for ( auto val : grad) {
+    std::cout << "val " << val << std::endl;
+  }
 //  std::cout << "density prim 2" << std::endl;
 //  std::cout << gauss_uncorrelated_prims.at(1)->compute(dwrapper.get(),1) << std::endl;
 }

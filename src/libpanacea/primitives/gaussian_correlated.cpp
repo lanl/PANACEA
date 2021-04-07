@@ -51,7 +51,7 @@ namespace panacea {
   std::vector<double> GaussCorrelated::compute_grad(
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
-      const int point_target, 
+//      const int point_target,
       const std::vector<settings::EquationSetting> & prim_settings, 
       const settings::GradSetting & grad_setting) const {
 

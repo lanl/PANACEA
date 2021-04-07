@@ -94,13 +94,15 @@ namespace panacea {
     PrimitiveGroup prim_grp;
     prim_grp.kernel_wrapper = kwrapper.get();
     prim_grp.covariance = std::make_unique<Covariance>(dwrapper);
-    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
-    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(inverter.invert(*prim_grp.reduced_covariance));
+    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
+        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
+        inverter.invert(*prim_grp.reduced_covariance));
 
     // Update the dwrapper so that it has an uptodate account of the reduced dimensions
     dwrapper->setReducedNumberDimensions(prim_grp.reduced_covariance->getChosenDimensionIndices());
 
-    if(create_methods_.count(pecification.get<settings::KernelPrimitive>()) == 0){
+    if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported";
       PANACEA_FAIL(error_msg);
     }

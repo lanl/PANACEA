@@ -9,6 +9,7 @@ namespace panacea {
       virtual std::vector<double> generateCoefficients(
           BaseDescriptorWrapper * desc_wrapper) const final;
 
+      static std::unique_ptr<BaseNormalizationMethod> create();
   };
 }
 #endif // PANACEA_PRIVATE_NORMALIZATION_METHOD_VARIANCE_H

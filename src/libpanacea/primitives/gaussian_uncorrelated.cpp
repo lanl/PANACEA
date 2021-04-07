@@ -58,13 +58,14 @@ namespace panacea {
   std::vector<double> GaussUncorrelated::compute_grad(
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
-      const int point_target, 
+//      const int point_target, 
       const std::vector<settings::EquationSetting> & prim_settings, 
       const settings::GradSetting & grad_setting) const {
 
     assert(descriptors != nullptr);
     assert(attributes_.kernel_wrapper != nullptr);
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double exp_term;
     if (std::find(prim_settings.begin(), 
           prim_settings.end(), 
@@ -73,21 +74,28 @@ namespace panacea {
     } else {
       exp_term = compute(descriptors, descriptor_ind);
     }
-
-    std::vector<double> grad(descriptors->getNumberDimensions(),0.0);
   
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::vector<double> grad(descriptors->getNumberDimensions(),0.0);
+
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const auto & chosen_dims = attributes_.reduced_inv_covariance->getChosenDimensionIndices();
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     int index = 0;
     for ( const int & dim : chosen_dims ) {
-
+      
+      std::cout << "Cycling dimension " << dim << std::endl;
       const double diff =  descriptors->operator()(descriptor_ind,dim) - 
         attributes_.kernel_wrapper->operator()(kernel_index_,dim);
-
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::cout << "Normalization coefficients size " << norm_coeffs.size() << std::endl;
       grad.at(dim) = (diff * norm_coeffs.at(dim)* norm_coeffs.at(dim)) * 
         attributes_.reduced_inv_covariance->operator()(index,index) * exp_term;
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       ++index;
     }
 

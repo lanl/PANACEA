@@ -42,12 +42,13 @@ namespace panacea {
        *
        * descriptor_ind - the index of the descriptor value we are interested in calculating the gradient at
        * kernel_ind - the index of the kernel 
-       * point_ind - the point the gradient is being taken with respect too
+       * point_ind - the point the gradient is being taken with respect too, (not needed because it must 
+       * either be the descriptor or the kernel otherwise the gradient is 0.0)
        */
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
-          const int point_target, 
+//          const int point_target, 
           const std::vector<settings::EquationSetting> & prim_settings, 
           const settings::GradSetting & grad_setting) const = 0; 
 
