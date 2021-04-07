@@ -59,6 +59,7 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/io/*
   ${panacea_SOURCE_DIR}/src/libpanacea/kernels/*
   ${panacea_SOURCE_DIR}/src/libpanacea/matrix/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/normalization_methods/*
   ${panacea_SOURCE_DIR}/src/libpanacea/primitives/*
   ${panacea_SOURCE_DIR}/src/libpanacea/tasks/*
   ${panacea_SOURCE_DIR}/src/libpanacea/vector/*

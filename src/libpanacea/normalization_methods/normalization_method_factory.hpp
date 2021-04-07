@@ -8,6 +8,7 @@
 
 // Standard includes
 #include <memory>
+#include <unordered_map>
 
 namespace panacea {
 
@@ -22,7 +23,7 @@ namespace panacea {
       static std::unordered_map<
         settings::KernelNormalization,
         NormalizationMethod> normalization_methods_;
-    pubic:
+    public:
       template<class T, settings::KernelNormalization kern_norm>
       static bool registerNormalizationMethod(){
         if( normalization_methods_.count(kern_norm) ) {
@@ -35,7 +36,7 @@ namespace panacea {
 
       std::unique_ptr<BaseNormalizationMethod> create(
           BaseDescriptorWrapper * desc_wrapper,
-          const KernelNormalization & norm_method) const;
+          const settings::KernelNormalization & norm_method) const;
   };
 }
 

@@ -6,17 +6,17 @@
 #include "normalization_method_base.hpp"
 
 // Standard includes
-#include <memor>
+#include <memory>
 
 namespace panacea {
 
-  std::unordered_map<settings::KernelPrimitive,
+  std::unordered_map<settings::KernelNormalization,
     NormalizationMethodFactory::NormalizationMethod>
       NormalizationMethodFactory::normalization_methods_;
 
   std::unique_ptr<BaseNormalizationMethod> NormalizationMethodFactory::create(
           BaseDescriptorWrapper * desc_wrapper,
-          const KernelNormalization & norm_method) const {
+          const settings::KernelNormalization & norm_method) const {
 
     if( normalization_methods_.count(norm_method) == 0) {
       std::string error_msg = "Normalization Method is not supported.";

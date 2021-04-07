@@ -2,7 +2,12 @@
 #define PANACEA_PRIVATE_NORMALIZATION_METHOD_BASE_H
 #pragma once
 
+// Standard includes
+#include <vector>
+
 namespace panacea {
+
+  class BaseDescriptorWrapper;
 
   class BaseNormalizationMethod {
     public:

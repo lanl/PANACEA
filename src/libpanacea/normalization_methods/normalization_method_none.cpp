@@ -1,6 +1,8 @@
 // Local private PANACEA includes
 #include "normalization_method_none.hpp"
 
+#include "descriptors/base_descriptor_wrapper.hpp"
+
 // Standard includes
 #include <numeric>
 #include <vector>

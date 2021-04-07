@@ -18,7 +18,7 @@ namespace panacea {
       std::vector<double> calculate(T data2d) {
         // Sample variance requires larger than 1 number of points in each
         // dimension
-        if constexpr(std::is_pointer<T>::value) {
+        if constexpr(std::is_pointer<typename std::remove_const<T>::type>::value) {
           assert(data2d->rows() > 1);
           Mean mean;
           std::vector<double> mean_vec = 
@@ -34,7 +34,7 @@ namespace panacea {
           } 
 
           const double divisor = 1.0/static_cast<double>(data2d->rows()-1);
-          for(int col = 0; col < data2d.cols(); ++col ) {
+          for(int col = 0; col < data2d->cols(); ++col ) {
             variance_vec.at(col) *= divisor;
           }
           return variance_vec;
