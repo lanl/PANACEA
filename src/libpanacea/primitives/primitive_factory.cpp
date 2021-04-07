@@ -14,6 +14,7 @@
 #include "memory.hpp"
 #include "primitives/primitive.hpp"
 #include "primitive_attributes.hpp"
+#include "primitive_group.hpp"
 
 // Standard includes
 #include <memory>
@@ -22,12 +23,64 @@
 
 namespace panacea {
 
-  std::unordered_map<settings::KernelPrimitive,
-        std::unordered_map<settings::KernelCorrelation,
-        PrimitiveFactory::PrimitiveCreateMethod>>
-          PrimitiveFactory::create_methods_;
+  /*************************************************
+   * Declaring Static Private Member Methods
+   *************************************************/
 
-  std::vector<std::unique_ptr<Primitive>> PrimitiveFactory::create(
+  void PrimitiveFactory::OneToOne(const PassKey<PrimitiveFactory> &,
+      PrimitiveGroup & prim_grp,
+      const KernelSpecification & specification
+      ){
+
+    prim_grp.primitives.reserve(prim_grp.kernel_wrapper->getNumberPoints());
+    for( int kernel_index = 0;
+        kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
+        ++kernel_index){
+
+      prim_grp.primitives.push_back(
+          create_methods_[specification.get<settings::KernelPrimitive>()]\
+          [specification.get<settings::KernelCorrelation>()]\
+          (PassKey<PrimitiveFactory>(),
+           std::move(prim_grp.createPrimitiveAttributes()),
+           kernel_index));
+    }
+  }
+
+  void PrimitiveFactory::Single(const PassKey<PrimitiveFactory> &,
+      PrimitiveGroup & prim_grp,
+      const KernelSpecification & specification
+      ){
+
+    const int kernel_index = 0;
+    prim_grp.primitives.emplace_back(
+        create_methods_[specification.get<settings::KernelPrimitive>()]\
+        [specification.get<settings::KernelCorrelation>()]\
+        (PassKey<PrimitiveFactory>(),
+         std::move(prim_grp.createPrimitiveAttributes()),
+         kernel_index));
+  }
+
+  /***************************************************************
+   * Declaring private Member function maps
+   **************************************************************/
+
+  std::unordered_map<settings::KernelPrimitive,
+    std::unordered_map<settings::KernelCorrelation,
+    PrimitiveFactory::PrimitiveCreateMethod>>
+      PrimitiveFactory::create_methods_;
+
+  std::unordered_map<settings::KernelCount,
+    PrimitiveFactory::PrimitiveCountMethod>
+      PrimitiveFactory::count_methods_{
+        {settings::KernelCount::OneToOne, PrimitiveFactory::OneToOne},
+        {settings::KernelCount::Single, PrimitiveFactory::Single}
+      };
+
+  /***********************************************************
+   * Declaring public methods
+   ***********************************************************/
+
+  PrimitiveGroup PrimitiveFactory::create(
       BaseDescriptorWrapper * dwrapper,
       MemoryManager & mem_manager,
       const KernelSpecification & specification) const {
@@ -38,43 +91,28 @@ namespace panacea {
     Reducer reducer;
     Inverter inverter;
 
-    PrimitiveAttributes attr;
-    attr.kernel_wrapper = kwrapper.get();
-    attr.covariance = std::make_unique<Covariance>(dwrapper);
-    attr.reduced_covariance = std::make_unique<ReducedCovariance>(reducer.reduce(*attr.covariance, std::vector<int> {}));
-    attr.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(inverter.invert(*attr.reduced_covariance));
+    PrimitiveGroup prim_grp;
+    prim_grp.kernel_wrapper = kwrapper.get();
+    prim_grp.covariance = std::make_unique<Covariance>(dwrapper);
+    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(inverter.invert(*prim_grp.reduced_covariance));
 
-    if(specification.get<settings::KernelPrimitive>() != settings::KernelPrimitive::Gaussian){
-      std::string error_msg = "Currently, only gaussian kernels are supported";
+    // Update the dwrapper so that it has an uptodate account of the reduced dimensions
+    dwrapper->setReducedNumberDimensions(prim_grp.reduced_covariance->getChosenDimensionIndices());
+
+    if(create_methods_.count(pecification.get<settings::KernelPrimitive>()) == 0){
+      std::string error_msg = "Kernel Primitive is not supported";
       PANACEA_FAIL(error_msg);
     }
 
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    if( specification.is(settings::KernelCount::OneToOne)){
-      primitives.reserve(kwrapper->getNumberPoints());
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      for( int kernel_index = 0; kernel_index < kwrapper->getNumberPoints(); ++kernel_index){
-        std::cout << "Creating kernel with index " << kernel_index << std::endl;
-        primitives.push_back(
-          create_methods_[specification.get<settings::KernelPrimitive>()]\
-        [specification.get<settings::KernelCorrelation>()]\
-        (PassKey<PrimitiveFactory>(), std::move(attr), kernel_index));
-        std::cout << "Id is " << primitives.at(kernel_index)->getId() << std::endl;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      
-    } else {
-      const int kernel_index = 0;
-      primitives.emplace_back(
-          create_methods_[specification.get<settings::KernelPrimitive>()]\
-        [specification.get<settings::KernelCorrelation>()]\
-        (PassKey<PrimitiveFactory>(), std::move(attr), kernel_index));
+    if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
+      std::string error_msg = "Kernel count method is not supported.";
+      PANACEA_FAIL(error_msg);
     }
-  
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp,specification);
+
     mem_manager.manageMemory(std::move(kwrapper),specification.get<std::string>());
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    return primitives;
+    return prim_grp;
   }
 }

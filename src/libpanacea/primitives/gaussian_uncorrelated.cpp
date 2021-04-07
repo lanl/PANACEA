@@ -37,36 +37,21 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       const int descriptor_ind) const {
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(descriptor_wrapper != nullptr);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(descriptor_ind > -1);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(attributes_.kernel_wrapper != nullptr);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(kernel_index_ > -1);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     assert(kernel_index_ < attributes_.kernel_wrapper->getNumberPoints());
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     double exponent = 0.0;   
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     int index = 0;
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     for ( const int dim : descriptor_wrapper->getReducedDimensions() ) {
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
       double diff = (*descriptor_wrapper)(descriptor_ind, dim) - (*attributes_.kernel_wrapper)(kernel_index_,dim);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
       exponent += diff * diff * attributes_.reduced_inv_covariance->operator()(index, index);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
       ++index;
     }
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     exponent *= -0.5;
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     return pre_factor_ * std::exp(exponent);
   }
 

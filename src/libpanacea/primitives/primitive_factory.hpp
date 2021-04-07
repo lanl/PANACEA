@@ -4,6 +4,7 @@
 
 // Local private includes
 #include "passkey.hpp"
+#include "primitive_group.hpp"
 #include "settings.hpp"
 
 // Standard includes
@@ -28,11 +29,30 @@ namespace panacea {
         PrimitiveAttributes prim_attr,
         const int & kernel_index);
 
+      using PrimitiveCountMethod = void(*)(
+        const PassKey<PrimitiveFactory> &,
+        PrimitiveGroup & prim_grp,
+        const KernelSpecification & specification);
+
     private:
 
       static std::unordered_map<settings::KernelPrimitive,
         std::unordered_map<settings::KernelCorrelation,
         PrimitiveCreateMethod>> create_methods_;
+
+      static std::unordered_map<settings::KernelCount,
+        PrimitiveCountMethod> count_methods_;
+
+      static void OneToOne(
+        const PassKey<PrimitiveFactory> &,
+        PrimitiveGroup & prim_grp,
+        const KernelSpecification & specification);
+
+      static void Single(
+        const PassKey<PrimitiveFactory> &,
+        PrimitiveGroup & prim_grp,
+        const KernelSpecification & specification);
+
 
     public:
 
@@ -52,7 +72,7 @@ namespace panacea {
         return true;
       }
 
-      std::vector<std::unique_ptr<Primitive>> create(
+      PrimitiveGroup create(
           BaseDescriptorWrapper * dwrapper,
           MemoryManager & mem_manager,
           const KernelSpecification & specification) const;

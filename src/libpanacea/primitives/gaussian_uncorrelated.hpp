@@ -45,18 +45,14 @@ namespace panacea {
           const int & kernel_index) : kernel_index_(kernel_index) {};
 
       GaussUncorrelated(const PassKey<PrimitiveFactory> &, 
-          PrimitiveAttributes & prim_att,
+          PrimitiveAttributes prim_att,
           const int & kernel_index) : 
         kernel_index_(kernel_index) ,
               attributes_(std::move(prim_att)),
                 pre_factor_(1.0/(std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
                 std::pow(constants::PI_SQRT*constants::SQRT_2,
                 static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
-                {
-                
-                  std::cout << "Calling constructor uncorrelated gaussian" << std::endl; 
-                  std::cout << "Pre factor is " << pre_factor_ << std::endl;
-                };
+                {};
 
       virtual int getId() const noexcept final { return kernel_index_; }
       // Do not make const reference

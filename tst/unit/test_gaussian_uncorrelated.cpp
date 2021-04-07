@@ -57,7 +57,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     settings::KernelCorrelation::Uncorrelated>();
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  auto gauss_uncorrelated_prims = prim_factory.create(
+  auto gauss_uncorrelated_prim_grp = prim_factory.create(
       dwrapper.get(),
       mem_manager,
       specification);
@@ -65,15 +65,15 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // There should be two primitives sense it is a one to one ratio and there 
   // are two descriptors
-  REQUIRE(gauss_uncorrelated_prims.size() == 2);
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.size() == 2);
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  REQUIRE(gauss_uncorrelated_prims.at(0)->getId() == 0);
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->getId() == 0);
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  REQUIRE(gauss_uncorrelated_prims.at(1)->getId() == 1);
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->getId() == 1);
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // Get the density located at the center of both primitives
   std::cout << "density prim 1" << std::endl;
-  std::cout << gauss_uncorrelated_prims.at(0)->compute(dwrapper.get(),0) << std::endl;
+  std::cout << gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) << std::endl;
 //  std::cout << "density prim 2" << std::endl;
 //  std::cout << gauss_uncorrelated_prims.at(1)->compute(dwrapper.get(),1) << std::endl;
 }
