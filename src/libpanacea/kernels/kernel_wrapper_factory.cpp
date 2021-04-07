@@ -3,20 +3,20 @@
 #include "kernel_wrapper_factory.hpp"
 
 #include "base_kernel_wrapper.hpp"
+#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 #include "kernel_specifications.hpp"
 #include "mean.hpp"
 #include "median.hpp"
 #include "memory.hpp"
 #include "passkey.hpp"
+#include "settings.hpp"
 #include "primitives/gaussian_uncorrelated.hpp"
 
 // Standard includes
 #include <memory>
 #include <typeindex>
-
 namespace panacea {
-
 
   std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>
     KernelWrapperFactory::create_methods_{{

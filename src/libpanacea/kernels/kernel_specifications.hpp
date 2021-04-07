@@ -1,11 +1,13 @@
 #ifndef PANACEA_PRIVATE_KERNEL_SPECIFICATIONS
 #define PANACEA_PRIVATE_KERNEL_SPECIFICATIONS
 #pragma once
- 
+
 // Local private PANACEA includes
 #include "settings.hpp"
 
 // Standard includes
+#include <sstream>
+#include <string>
 #include <type_traits>
 
 namespace panacea {
@@ -26,29 +28,29 @@ namespace panacea {
   }
 
   class KernelSpecification {
-      const settings::KernelCorrelation kern_correlation_ = defaults::kern_correlation_default;
-      const settings::KernelCount kern_count_ = defaults::kern_count_default;
-      const settings::KernelPrimitive kern_prim_ = defaults::kern_primitive_default;
-      const settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
-      const settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
-      const settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
+    const settings::KernelCorrelation kern_correlation_ = defaults::kern_correlation_default;
+    const settings::KernelCount kern_count_ = defaults::kern_count_default;
+    const settings::KernelPrimitive kern_prim_ = defaults::kern_primitive_default;
+    const settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
+    const settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
+    const settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
     public:
-      KernelSpecification(
-          const settings::KernelCorrelation & kern_correlation,
-          const settings::KernelCount & kern_count,
-          const settings::KernelPrimitive & kern_prim,
-          const settings::KernelNormalization & kern_normalization,
-          const settings::KernelMemory & kern_memory,
-          const settings::KernelCenterCalculation & kern_center) :
-        kern_correlation_(kern_correlation),
-        kern_count_(kern_count),
-        kern_prim_(kern_prim),
-        kern_normalization_(kern_normalization),
-        kern_memory_(kern_memory),
-        kern_center_(kern_center)
-          {};
+    KernelSpecification(
+        const settings::KernelCorrelation & kern_correlation,
+        const settings::KernelCount & kern_count,
+        const settings::KernelPrimitive & kern_prim,
+        const settings::KernelNormalization & kern_normalization,
+        const settings::KernelMemory & kern_memory,
+        const settings::KernelCenterCalculation & kern_center) :
+      kern_correlation_(kern_correlation),
+      kern_count_(kern_count),
+      kern_prim_(kern_prim),
+      kern_normalization_(kern_normalization),
+      kern_memory_(kern_memory),
+      kern_center_(kern_center)
+    {};
 
-      template<class T>
+    template<class T>
       inline T get() const {
         if constexpr( std::is_same<T, settings::KernelCorrelation>::value){
           return kern_correlation_;
@@ -62,38 +64,49 @@ namespace panacea {
           return kern_memory_;
         } else if constexpr( std::is_same<T, settings::KernelCenterCalculation>::value) {
           return kern_center_;
+        } else if constexpr( std::is_same<T, std::string>::value) {
+          std::stringstream string_spec("Kernel ");
+          string_spec << settings::toString(kern_correlation_);
+          string_spec << "," << settings::toString(kern_count_);
+          string_spec << "," << settings::toString(kern_prim_);
+          string_spec << "," << settings::toString(kern_normalization_);
+          string_spec << "," << settings::toString(kern_memory_);
+          string_spec << "," << settings::toString(kern_center_);
+          return string_spec.str();
         }
       } 
 
-      inline bool is(const settings::KernelCorrelation & correlation) const noexcept {
-        if( correlation == kern_correlation_ ) return true;
-        return false;
-      }
 
-      inline bool is(const settings::KernelCount & kern_count) const noexcept {
-        if( kern_count == kern_count_ ) return true;
-        return false;
-      }
 
-      inline bool is(const settings::KernelPrimitive & kern_prim) const noexcept {
-        if( kern_prim == kern_prim_ ) return true;
-        return false;
-      }
+    inline bool is(const settings::KernelCorrelation & correlation) const noexcept {
+      if( correlation == kern_correlation_ ) return true;
+      return false;
+    }
 
-      inline bool is(const settings::KernelNormalization & kern_normalization) const noexcept {
-        if( kern_normalization == kern_normalization_ ) return true;
-        return false;
-      }
-      
-      inline bool is(const settings::KernelMemory & kern_memory) const noexcept {
-        if( kern_memory == kern_memory_ ) return true;
-        return false;
-      }
-      
-      inline bool is(const settings::KernelCenterCalculation & kern_center) const noexcept {
-        if( kern_center == kern_center_ ) return true;
-        return false;
-      }
+    inline bool is(const settings::KernelCount & kern_count) const noexcept {
+      if( kern_count == kern_count_ ) return true;
+      return false;
+    }
+
+    inline bool is(const settings::KernelPrimitive & kern_prim) const noexcept {
+      if( kern_prim == kern_prim_ ) return true;
+      return false;
+    }
+
+    inline bool is(const settings::KernelNormalization & kern_normalization) const noexcept {
+      if( kern_normalization == kern_normalization_ ) return true;
+      return false;
+    }
+
+    inline bool is(const settings::KernelMemory & kern_memory) const noexcept {
+      if( kern_memory == kern_memory_ ) return true;
+      return false;
+    }
+
+    inline bool is(const settings::KernelCenterCalculation & kern_center) const noexcept {
+      if( kern_center == kern_center_ ) return true;
+      return false;
+    }
   };
 }
 #endif // PANACEA_PRIVATE_KERNEL_SPECIFICATIONS

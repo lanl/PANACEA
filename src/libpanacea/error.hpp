@@ -7,7 +7,7 @@
 #include <sstream>
 
 #define PANACEA_FAIL(message)                                                          \
-  panacea::error::fail(message, __FILE__, __LINE__);
+  ::panacea::error::fail(message, __FILE__, __LINE__);
 
 namespace panacea {
   namespace error {

@@ -3,19 +3,26 @@
 #pragma once
 
 // Local private includes
-#include "base_kernel_wrapper.hpp"
-#include "descriptors/base_descriptor_wrapper.hpp"
-#include "kernel_specifications.hpp"
+//#include "base_kernel_wrapper.hpp"
+//#include "descriptors/base_descriptor_wrapper.hpp"
+//#include "kernel_specifications.hpp"
 #include "kernel_wrapper.hpp"
-#include "memory.hpp"
+//#include "memory.hpp"
 #include "passkey.hpp"
 
 // Standard includes
+#include <any>
 #include <memory>
 #include <typeindex>
-#include <vector>
+#include <unordered_map>
+//#include <vector>
 
 namespace panacea {
+
+  class BaseDescriptorWrapper;
+  class BaseKernelWrapper;
+  class KernelSpecification;
+  class MemoryManager;
 
   class KernelWrapperFactory {
     public:
@@ -46,7 +53,6 @@ namespace panacea {
           return false;
         }
   };
-
 }
 
 #endif // PANACEA_PRIVATE_KERNELWRAPPER_FACTORY

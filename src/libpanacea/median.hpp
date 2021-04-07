@@ -39,49 +39,49 @@ namespace panacea {
 
     public:
 
-      template<class T, const Direction dir = Direction::AlongRows> 
-        std::vector<double> calculate(const T & data2d) {
+    template<class T, const Direction dir = Direction::AlongRows> 
+      std::vector<double> calculate(const T & data2d) {
 
-          std::vector<double> median;
-          if constexpr(dir == Direction::AlongRows) {
-            median.reserve(data2d.cols());
-            if( data2d.rows() % 2 == 1) {
-              // is odd 
-              for( int row = 0; row < data2d.rows(); ++row){
-                const auto local_column = createSortedColumn(data2d, row);
-                median.push_back(local_column.at(data2d.rows() / 2));
-              }
-            } else {
-              // is even
-              for( int row = 0; row < data2d.rows(); ++row){
-                const auto local_column = createSortedColumn(data2d, row);
-                const double avg_of_two = 
-                  (local_column.at(data2d.rows() / 2) + 
-                   local_column.at((data2d.rows() / 2) - 1)) * 0.5;
-                median.push_back(avg_of_two);
-              }
+        std::vector<double> median;
+        if constexpr(dir == Direction::AlongRows) {
+          median.reserve(data2d.cols());
+          if( data2d.rows() % 2 == 1) {
+            // is odd 
+            for( int row = 0; row < data2d.rows(); ++row){
+              const auto local_column = createSortedColumn(data2d, row);
+              median.push_back(local_column.at(data2d.rows() / 2));
             }
           } else {
-            median.reserve(data2d.rows());
-            if( data2d.cols() % 2 == 1) {
-              // is odd 
-              for( int col = 0; col < data2d.cols(); ++col){
-                const auto local_row = createSortedRow(data2d, col);
-                median.push_back(local_row.at(data2d.cols() / 2));
-              }
-            } else {
-              // is even
-              for( int col = 0; col < data2d.cols(); ++col){
-                const auto local_row = createSortedRow(data2d, col);
-                const double avg_of_two = 
-                  (local_row.at(data2d.cols() / 2) + 
-                   local_row.at((data2d.cols() / 2) - 1)) * 0.5;
-                median.push_back(avg_of_two);
-              }
+            // is even
+            for( int row = 0; row < data2d.rows(); ++row){
+              const auto local_column = createSortedColumn(data2d, row);
+              const double avg_of_two = 
+                (local_column.at(data2d.rows() / 2) + 
+                 local_column.at((data2d.rows() / 2) - 1)) * 0.5;
+              median.push_back(avg_of_two);
             }
           }
-          return median; 
+        } else {
+          median.reserve(data2d.rows());
+          if( data2d.cols() % 2 == 1) {
+            // is odd 
+            for( int col = 0; col < data2d.cols(); ++col){
+              const auto local_row = createSortedRow(data2d, col);
+              median.push_back(local_row.at(data2d.cols() / 2));
+            }
+          } else {
+            // is even
+            for( int col = 0; col < data2d.cols(); ++col){
+              const auto local_row = createSortedRow(data2d, col);
+              const double avg_of_two = 
+                (local_row.at(data2d.cols() / 2) + 
+                 local_row.at((data2d.cols() / 2) - 1)) * 0.5;
+              median.push_back(avg_of_two);
+            }
+          }
         }
+        return median; 
+      }
   };
 }
 

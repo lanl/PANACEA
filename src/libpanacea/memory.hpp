@@ -91,8 +91,8 @@ namespace panacea {
       /// it has to aready be in a unique pointer
       /// E.g. it is non-trivial to convert a nested array of heap allocated pointers
       /// to a unique pointer, or what if an object on the stack is passed in
-      template<class T> 
-        size_t manageMemory(T & data, const std::string & name = "");
+      //      template<class T> 
+      //        size_t manageMemory(T & data, const std::string & name = "");
 
       template<class T> 
         size_t manageMemory(std::unique_ptr<T> && data, const std::string & name = "");
@@ -117,11 +117,6 @@ namespace panacea {
 
   };
 
-  /// Here it is assumed the data in the node is not owned by the memory manager
-  /// returns the id in the vector
-  //template<class T> 
-  //  inline  size_t MemoryManager::managePointer(TypeRegister & type_register, T & data, const std::string & name){
-
   template<class T> 
     inline  size_t MemoryManager::managePointer(T & data, const std::string & name){
       if(name_to_index_.count(name)) {
@@ -133,11 +128,6 @@ namespace panacea {
       name_to_index_[name] = memories_.size() - 1;
       return memories_.size() - 1;
     }
-/*
-  template<> 
-    inline  size_t MemoryManager::managePointer(TypeRegister & type_register, std::any & data, const std::string & name){
-      return managePointer(type_register, type_register.convert(data), name);
-    }*/
 
   template<class T> 
     inline size_t MemoryManager::managePointer(T * data, const std::string & name){

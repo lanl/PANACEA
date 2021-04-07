@@ -18,11 +18,9 @@
 
 namespace panacea {
 
-  void GaussCorrelated::reset(PrimitiveAttributes attributes) {
+  void GaussCorrelated::reset(PrimitiveAttributes & attributes) {
     assert(attributes.kernel_wrapper != nullptr);
-    assert(attributes.reduced_covariance != nullptr);
-    assert(attributes.reduced_inv_covariance != nullptr);
-    attributes_ = attributes; 
+    attributes_ = std::move(attributes); 
     double determinant = attributes_.reduced_covariance->getDeterminant();
     if( determinant <= 0.0 ) {
       std::cout << "Determinant value: " << determinant << std::endl;
@@ -38,13 +36,12 @@ namespace panacea {
       const int sample_ind) const {
 
     assert(attributes_.kernel_wrapper != nullptr);
-    assert(attributes_.reduced_inv_covariance != nullptr);
 
     double exponent = 0.0;   
     int index = 0;
     for ( const int dim : descriptor_wrapper->getReducedDimensions() ) {
       double diff = (*descriptor_wrapper)(sample_ind, dim) - (*attributes_.kernel_wrapper)(kernel_index_,dim);
-      exponent += diff * diff * (*attributes_.reduced_inv_covariance)(index, index);
+      exponent += diff * diff * attributes_.reduced_inv_covariance->operator()(index, index);
       ++index;
     }
     exponent *= -0.5;

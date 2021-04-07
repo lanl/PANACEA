@@ -11,6 +11,7 @@
 #include "error.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
+#include "memory.hpp"
 #include "primitives/primitive.hpp"
 #include "primitive_attributes.hpp"
 
@@ -31,21 +32,17 @@ namespace panacea {
       MemoryManager & mem_manager,
       const KernelSpecification & specification) const {
 
-    Covariance cov(dwrapper);
-
-    Reducer reducer;
-    ReducedCovariance reduced_cov = reducer.reduce(cov, std::vector<int> {});
-
-    Inverter inverter;
-    ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_cov);
-
     KernelWrapperFactory kfactory;
     auto kwrapper = kfactory.create(dwrapper, specification, mem_manager);
 
+    Reducer reducer;
+    Inverter inverter;
+
     PrimitiveAttributes attr;
     attr.kernel_wrapper = kwrapper.get();
-    attr.reduced_covariance = &reduced_cov;
-    attr.reduced_inv_covariance = &reduced_inv_cov;
+    attr.covariance = std::make_unique<Covariance>(dwrapper);
+    attr.reduced_covariance = std::make_unique<ReducedCovariance>(reducer.reduce(*attr.covariance, std::vector<int> {}));
+    attr.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(inverter.invert(*attr.reduced_covariance));
 
     if(specification.get<settings::KernelPrimitive>() != settings::KernelPrimitive::Gaussian){
       std::string error_msg = "Currently, only gaussian kernels are supported";
@@ -55,20 +52,29 @@ namespace panacea {
     std::vector<std::unique_ptr<Primitive>> primitives;
     if( specification.is(settings::KernelCount::OneToOne)){
       primitives.reserve(kwrapper->getNumberPoints());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       for( int kernel_index = 0; kernel_index < kwrapper->getNumberPoints(); ++kernel_index){
+        std::cout << "Creating kernel with index " << kernel_index << std::endl;
         primitives.push_back(
           create_methods_[specification.get<settings::KernelPrimitive>()]\
         [specification.get<settings::KernelCorrelation>()]\
-        (PassKey<PrimitiveFactory>(), attr, kernel_index));
+        (PassKey<PrimitiveFactory>(), std::move(attr), kernel_index));
+        std::cout << "Id is " << primitives.at(kernel_index)->getId() << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       
     } else {
       const int kernel_index = 0;
       primitives.emplace_back(
           create_methods_[specification.get<settings::KernelPrimitive>()]\
         [specification.get<settings::KernelCorrelation>()]\
-        (PassKey<PrimitiveFactory>(), attr, kernel_index));
+        (PassKey<PrimitiveFactory>(), std::move(attr), kernel_index));
     }
+  
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    mem_manager.manageMemory(std::move(kwrapper),specification.get<std::string>());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return primitives;
   }
 }

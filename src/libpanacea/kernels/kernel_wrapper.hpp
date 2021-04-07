@@ -25,90 +25,90 @@ namespace panacea {
    * the underlying type to vary
    */
   template<class T>
-  class KernelWrapper : public BaseKernelWrapper {
-    private:
-      DataPointTemplate<T> data_wrapper_;
-    public:
-      KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
-        data_wrapper_(data, rows, cols) {};
+    class KernelWrapper : public BaseKernelWrapper {
+      private:
+        DataPointTemplate<T> data_wrapper_;
+      public:
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
+          data_wrapper_(data, rows, cols) {};
 
-      KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
-        data_wrapper_(data, rows, cols) {};
+        KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
+          data_wrapper_(data, rows, cols) {};
 
-      virtual double& operator()(const int point_ind, const int dim_ind) final;
-      virtual double operator()(const int point_ind, const int dim_ind) const final;
-      virtual int rows() const final;
-      virtual int cols() const final;
-      virtual int getNumberDimensions() const final;
-      virtual int getNumberPoints() const final;
-      virtual void set(const Arrangement arrangement) final;
-      virtual std::any getPointerToRawData() noexcept final;
-      virtual std::type_index getTypeIndex() const noexcept final;
-      virtual void print() const final;
-      // Standard any should not be a reference because the underlying type should
-      // be a pointer
-      static std::unique_ptr<BaseKernelWrapper> create(
-          const PassKey<KernelWrapperFactory> &, 
-          std::any data, 
-          const int rows,
-          const int cols);
+        virtual double& operator()(const int point_ind, const int dim_ind) final;
+        virtual double operator()(const int point_ind, const int dim_ind) const final;
+        virtual int rows() const final;
+        virtual int cols() const final;
+        virtual int getNumberDimensions() const final;
+        virtual int getNumberPoints() const final;
+        virtual void set(const Arrangement arrangement) final;
+        virtual std::any getPointerToRawData() noexcept final;
+        virtual std::type_index getTypeIndex() const noexcept final;
+        virtual void print() const final;
+        // Standard any should not be a reference because the underlying type should
+        // be a pointer
+        static std::unique_ptr<BaseKernelWrapper> create(
+            const PassKey<KernelWrapperFactory> &, 
+            std::any data, 
+            const int rows,
+            const int cols);
 
-  };
-
-  template<class T>
-  inline double& KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) {
-    return data_wrapper_(point_ind, dim_ind);
-  }
+    };
 
   template<class T>
-  inline double KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) const {
-    return data_wrapper_(point_ind, dim_ind);
-  }
+    inline double& KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) {
+      return data_wrapper_(point_ind, dim_ind);
+    }
 
   template<class T>
-  inline int KernelWrapper<T>::rows() const {
-    return data_wrapper_.rows();
-  }
+    inline double KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) const {
+      return data_wrapper_(point_ind, dim_ind);
+    }
 
   template<class T>
-  inline int KernelWrapper<T>::cols() const {
-    return data_wrapper_.cols();
-  }
+    inline int KernelWrapper<T>::rows() const {
+      return data_wrapper_.rows();
+    }
 
   template<class T>
-  inline int KernelWrapper<T>::getNumberDimensions() const {
-    return data_wrapper_.getNumberDimensions();
-  }
+    inline int KernelWrapper<T>::cols() const {
+      return data_wrapper_.cols();
+    }
 
   template<class T>
-  inline int KernelWrapper<T>::getNumberPoints() const {
-    return data_wrapper_.getNumberPoints();
-  }
+    inline int KernelWrapper<T>::getNumberDimensions() const {
+      return data_wrapper_.getNumberDimensions();
+    }
 
   template<class T>
-  inline void KernelWrapper<T>::set(const Arrangement arrangement) {
-    data_wrapper_.set(arrangement);
-  }
+    inline int KernelWrapper<T>::getNumberPoints() const {
+      return data_wrapper_.getNumberPoints();
+    }
 
   template<class T>
-  inline std::any KernelWrapper<T>::getPointerToRawData() noexcept {
-    return data_wrapper_.getPointerToRawData();
-  }
+    inline void KernelWrapper<T>::set(const Arrangement arrangement) {
+      data_wrapper_.set(arrangement);
+    }
 
   template<class T>
-  inline void KernelWrapper<T>::print() const {
-    data_wrapper_.print();
-  }
+    inline std::any KernelWrapper<T>::getPointerToRawData() noexcept {
+      return data_wrapper_.getPointerToRawData();
+    }
 
   template<class T>
-  inline std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(
-      const PassKey<KernelWrapperFactory> & key,
-      std::any data,
-      const int rows,
-      const int cols) {
+    inline void KernelWrapper<T>::print() const {
+      data_wrapper_.print();
+    }
 
-    return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
-  }
+  template<class T>
+    inline std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(
+        const PassKey<KernelWrapperFactory> & key,
+        std::any data,
+        const int rows,
+        const int cols) {
+
+      return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
+    }
 
   template<class T>
     inline std::type_index KernelWrapper<T>::getTypeIndex() const noexcept {

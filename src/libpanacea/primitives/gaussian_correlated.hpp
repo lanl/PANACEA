@@ -6,10 +6,13 @@
 // Private local includes
 #include "primitive.hpp"
 
+#include "attributes/reduced_covariance.hpp"
+#include "constants.hpp"
 #include "passkey.hpp"
 #include "primitive_attributes.hpp"
 
 // Standard includes
+#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -27,9 +30,9 @@ namespace panacea {
 
   class GaussCorrelated : public Primitive {
     private:
-      const int kernel_index_;
+      const int kernel_index_ = -1;
       PrimitiveAttributes attributes_; 
-      double pre_factor_;
+      double pre_factor_ = 0.0;
     public:
       GaussCorrelated(const PassKey<PrimitiveFactory> &,
           const int & kernel_index) : kernel_index_(kernel_index) {};
@@ -38,11 +41,18 @@ namespace panacea {
           const int & kernel_index) : kernel_index_(kernel_index) {};
 
       GaussCorrelated(const PassKey<PrimitiveFactory> &, 
-          const PrimitiveAttributes & prim_att,
-          const int & kernel_index) : kernel_index_(kernel_index) {};
+          PrimitiveAttributes & prim_att,
+          const int & kernel_index) : 
+        kernel_index_(kernel_index) ,
+        attributes_(std::move(prim_att)),
+        pre_factor_(1.0/(std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
+              std::pow(constants::PI_SQRT*constants::SQRT_2,
+                static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
+    {};
 
+      virtual int getId() const noexcept final { return kernel_index_; }
       // Do not make const reference
-      virtual void reset(PrimitiveAttributes) final;
+      virtual void reset(PrimitiveAttributes &) final;
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
@@ -70,14 +80,14 @@ namespace panacea {
 
       static std::unique_ptr<Primitive> create(
           const PassKey<PrimitiveFactory> &, 
-          const PrimitiveAttributes & prim_att,
+          PrimitiveAttributes prim_att,
           const int & kernel_index);
 
   };
 
   inline std::unique_ptr<Primitive> GaussCorrelated::create(
           const PassKey<PrimitiveFactory> & key, 
-          const PrimitiveAttributes & prim_att,
+          PrimitiveAttributes prim_att,
           const int & kernel_index) {
     return std::make_unique<GaussCorrelated>(key, prim_att,kernel_index);
   }

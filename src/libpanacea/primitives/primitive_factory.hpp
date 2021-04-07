@@ -25,7 +25,7 @@ namespace panacea {
     public: 
       using PrimitiveCreateMethod = std::unique_ptr<Primitive>(*)(
         const PassKey<PrimitiveFactory> &,
-        const PrimitiveAttributes & prim_attr,
+        PrimitiveAttributes prim_attr,
         const int & kernel_index);
 
     private:

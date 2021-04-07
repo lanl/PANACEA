@@ -19,7 +19,8 @@ namespace panacea {
   class Primitive {
    
     public:
-//      virtual ~Primitive() = default;
+
+      virtual int getId() const noexcept = 0;
 
       /*
        * Reset a primitive inolves updating the kernel pointer
@@ -27,7 +28,7 @@ namespace panacea {
        * reset the prefactor value
        */
       // Do not make const reference
-      virtual void reset(PrimitiveAttributes) = 0;
+      virtual void reset(PrimitiveAttributes &) = 0;
 
       /*
        * Computes the density
