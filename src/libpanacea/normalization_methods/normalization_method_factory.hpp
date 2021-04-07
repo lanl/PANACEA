@@ -4,6 +4,7 @@
 #pragma once
 
 // Local private includes
+#include "passkey.hpp"
 #include "settings.hpp"
 
 // Standard includes
@@ -18,7 +19,7 @@ namespace panacea {
   class NormalizationMethodFactory {
 
     public:
-      using NormalizationMethod = std::unique_ptr<BaseNormalizationMethod>(*)();
+      using NormalizationMethod = std::unique_ptr<BaseNormalizationMethod>(*)(const PassKey<NormalizationMethodFactory> &);
     private:
       static std::unordered_map<
         settings::KernelNormalization,

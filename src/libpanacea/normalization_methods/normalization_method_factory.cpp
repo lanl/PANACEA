@@ -4,6 +4,7 @@
 
 #include "error.hpp"
 #include "normalization_method_base.hpp"
+#include "passkey.hpp"
 
 // Standard includes
 #include <memory>
@@ -22,8 +23,9 @@ namespace panacea {
       std::string error_msg = "Normalization Method is not supported.";
       PANACEA_FAIL(error_msg);
     }
-    
-    return normalization_methods_[norm_method]();
+   
+    const PassKey<NormalizationMethodFactory> key;
+    return normalization_methods_[norm_method](key);
   }
 
 }

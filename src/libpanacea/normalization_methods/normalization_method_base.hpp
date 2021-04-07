@@ -14,6 +14,7 @@ namespace panacea {
       virtual std::vector<double> generateCoefficients( 
           BaseDescriptorWrapper * desc_wrapper) const = 0;
 
+      virtual ~BaseNormalizationMethod() = 0;
   };
 }
 

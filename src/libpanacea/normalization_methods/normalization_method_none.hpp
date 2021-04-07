@@ -21,7 +21,12 @@ namespace panacea {
       virtual std::vector<double> generateCoefficients(
           BaseDescriptorWrapper * desc_wrapper) const final;
 
-      static std::unique_ptr<BaseNormalizationMethod> create();
+      static std::unique_ptr<BaseNormalizationMethod> create(const PassKey<NormalizationMethodFactory> &);
   };
+  
+  inline std::unique_ptr<BaseNormalizationMethod> NormalizationMethodNone::create(
+      const PassKey<NormalizationMethodFactory> & key) {
+    return std::make_unique<NormalizationMethodNone>(key);
+  }
 }
 #endif // PANACEA_PRIVATE_NORMALIZATION_METHOD_NONE_H
