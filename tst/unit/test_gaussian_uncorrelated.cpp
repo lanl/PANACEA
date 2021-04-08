@@ -43,7 +43,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelCorrelation::Uncorrelated,
       settings::KernelCount::OneToOne,
       settings::KernelPrimitive::Gaussian,
-      settings::KernelNormalization::Variance,
+      settings::KernelNormalization::None,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None);
 
