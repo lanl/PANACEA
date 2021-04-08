@@ -5,6 +5,7 @@
 // Local private includes
 #include "normalization_method_base.hpp"
 #include "passkey.hpp"
+#include "settings.hpp"
 
 // Standard includes
 #include <memory>
@@ -22,6 +23,8 @@ namespace panacea {
           BaseDescriptorWrapper * desc_wrapper) const final;
 
       static std::unique_ptr<BaseNormalizationMethod> create(const PassKey<NormalizationMethodFactory> &);
+
+      static const settings::KernelNormalization type;
   };
   
   inline std::unique_ptr<BaseNormalizationMethod> NormalizationMethodNone::create(

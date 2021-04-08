@@ -188,8 +188,12 @@ namespace panacea {
     return total_number_data_pts_;
   }
 
-  bool Covariance::is(const NormalizationState state) const {
+  bool Covariance::is(const NormalizationState & state) const noexcept {
     return normalized_ == state;
+  }
+
+  const NormalizationState & Covariance::getNormalizationState() const noexcept {
+    return normalized_;
   }
 
   void Covariance::set(PassKey<Normalizer>, NormalizationState state) {

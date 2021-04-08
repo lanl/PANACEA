@@ -2,6 +2,7 @@
 // Local private includes
 #include "primitive_group.hpp"
 
+#include "attribute_manipulators/normalizer.hpp"
 #include "primitive_attributes.hpp"
 
 namespace panacea {

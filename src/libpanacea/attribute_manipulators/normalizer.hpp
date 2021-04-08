@@ -21,7 +21,8 @@ namespace panacea {
   class Normalizer {
       std::vector<double> normalization_coeffs_;
     public:
-      Normalizer(const std::vector<double> & normalization_coeffs) :
+      Normalizer() = default;
+      explicit Normalizer(const std::vector<double> & normalization_coeffs) :
         normalization_coeffs_(normalization_coeffs) {};
 
       const std::vector<double> & getNormalizationCoeffs() const noexcept;

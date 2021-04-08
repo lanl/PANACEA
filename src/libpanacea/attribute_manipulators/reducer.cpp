@@ -286,7 +286,8 @@ namespace panacea {
       auto reduced_covar = ReducedCovariance(
           PassKey<Reducer>(),
           std::move(raw_mat),
-          independent_dims);
+          independent_dims,
+          cov.getNormalizationState());
 
       if( reduced_covar.getDeterminant() > 0.0 ) {
         return reduced_covar;

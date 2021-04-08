@@ -7,6 +7,7 @@
 #include "attributes/covariance.hpp"
 #include "attributes/reduced_covariance.hpp"
 #include "attributes/reduced_inv_covariance.hpp"
+#include "attribute_manipulators/normalizer.hpp"
 #include "primitive.hpp"
 #include "primitive_attributes.hpp"
 
@@ -21,7 +22,7 @@ namespace panacea {
 
   class PrimitiveGroup {
     public:
-      Normalizer * normalizer = nullptr;
+      Normalizer normalizer;
       BaseKernelWrapper * kernel_wrapper = nullptr;
       std::unique_ptr<Covariance> covariance = nullptr;
       std::unique_ptr<ReducedCovariance> reduced_covariance = nullptr;

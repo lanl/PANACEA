@@ -25,12 +25,12 @@ namespace panacea {
         settings::KernelNormalization,
         NormalizationMethod> normalization_methods_;
     public:
-      template<class T, settings::KernelNormalization kern_norm>
+      template<class T>
       static bool registerNormalizationMethod(){
-        if( normalization_methods_.count(kern_norm) ) {
+        if( normalization_methods_.count(T::type) ) {
           return false;
         } else {
-          normalization_methods_[kern_norm] = T::create;
+          normalization_methods_[T::type] = T::create;
         }
         return true;
       }

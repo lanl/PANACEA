@@ -14,4 +14,8 @@ namespace panacea {
     std::vector<double> coeffs(desc_wrapper->getNumberReducedDimensions(), 1.0);
     return coeffs; 
   }
+
+  const settings::KernelNormalization NormalizationMethodNone::type = 
+        settings::KernelNormalization::None;
+
 }

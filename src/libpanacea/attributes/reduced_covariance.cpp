@@ -33,6 +33,10 @@ namespace panacea {
     return chosen_dimension_indices_;
   }
 
+  bool ReducedCovariance::is(const NormalizationState & state) const noexcept {
+    return state == normalized_;
+  }
+
   void ReducedCovariance::print() const {
     std::cout << "Reduced Covariance Matrix\n";
     matrix_->print();
@@ -41,6 +45,10 @@ namespace panacea {
       std::cout << dim << " ";
     } 
     std::cout << std::endl;
+  }
+
+  const NormalizationState & ReducedCovariance::getNormalizationState() const noexcept {
+    return normalized_;
   }
 }
 

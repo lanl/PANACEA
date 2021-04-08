@@ -12,6 +12,9 @@
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
 #include "memory.hpp"
+#include "normalization_methods/normalization_method_factory.hpp"
+#include "normalization_methods/normalization_method_none.hpp"
+#include "normalization_methods/normalization_method_variance.hpp"
 #include "primitives/primitive.hpp"
 #include "primitive_attributes.hpp"
 #include "primitive_group.hpp"
@@ -76,6 +79,21 @@ namespace panacea {
         {settings::KernelCount::Single, PrimitiveFactory::Single}
       };
 
+  /***************************************************
+   * File scope static functions
+   ***************************************************/
+
+  static Normalizer createNormalizer(
+      BaseDescriptorWrapper * dwrapper,
+      const KernelSpecification & specification) {
+
+    NormalizationMethodFactory norm_method_factory;
+    norm_method_factory.registerNormalizationMethod<NormalizationMethodNone>();
+    norm_method_factory.registerNormalizationMethod<NormalizationMethodVariance>();
+    auto norm_method = norm_method_factory.create(dwrapper,specification.get<settings::KernelNormalization>());
+    return Normalizer(norm_method->generateCoefficients(dwrapper));
+  }
+
   /***********************************************************
    * Declaring public methods
    ***********************************************************/
@@ -90,10 +108,13 @@ namespace panacea {
 
     Reducer reducer;
     Inverter inverter;
-
+   
     PrimitiveGroup prim_grp;
     prim_grp.kernel_wrapper = kwrapper.get();
     prim_grp.covariance = std::make_unique<Covariance>(dwrapper);
+    prim_grp.normalizer = createNormalizer(dwrapper, specification);
+    prim_grp.normalizer.normalize(*prim_grp.covariance); 
+
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(

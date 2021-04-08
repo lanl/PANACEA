@@ -14,17 +14,16 @@ using namespace panacea;
 TEST_CASE("Testing:normalization_method_factory","[unit,panacea]"){
   // 3 points 2 dimensions
   std::vector<std::vector<double>> data{
-    {1.0, 4.0},
+    {1.0, 3.0},
     {2.0, 5.0},
-    {3.0, 6.0}};
+    {3.0, 7.0}};
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data, 3, 2);
 
   NormalizationMethodFactory norm_method_factory;
 
   norm_method_factory.registerNormalizationMethod<
-    NormalizationMethodVariance,
-    settings::KernelNormalization::Variance>();
+    NormalizationMethodVariance>();
 
   auto norm_method = norm_method_factory.create(&dwrapper, settings::KernelNormalization::Variance);
 
@@ -33,10 +32,8 @@ TEST_CASE("Testing:normalization_method_factory","[unit,panacea]"){
   // Only be two dimensions
   REQUIRE(norm_coefficients.size() == 2);
 
-  std::cout << "Variance of dimensions " << std::endl;
-  for ( auto & coef : norm_coefficients) {
-    std::cout << coef << std::endl;
-  }
+  REQUIRE(norm_coefficients.at(0) == Approx(1.0));
+  REQUIRE(norm_coefficients.at(1) == Approx(4.0));
 
 }
 

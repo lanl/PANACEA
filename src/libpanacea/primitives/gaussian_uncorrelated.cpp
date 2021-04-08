@@ -20,7 +20,7 @@
 namespace panacea {
 
   void GaussUncorrelated::reset(PrimitiveAttributes & attributes) {
-    assert(attributes.normalizer != nullptr);
+    assert(attributes.normalizer.getNormalizationCoeffs().size() > 0);
     assert(attributes.kernel_wrapper != nullptr);
     attributes_ = std::move(attributes); 
     double determinant = attributes_.reduced_covariance->getDeterminant();
@@ -81,7 +81,7 @@ namespace panacea {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const auto & chosen_dims = attributes_.reduced_inv_covariance->getChosenDimensionIndices();
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
+    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
 
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     int index = 0;

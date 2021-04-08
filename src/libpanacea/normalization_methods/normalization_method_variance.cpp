@@ -16,4 +16,7 @@ namespace panacea {
    Variance variance;
    return variance.calculate<BaseDescriptorWrapper *>(desc_wrapper);
   }
+
+  const settings::KernelNormalization NormalizationMethodVariance::type = 
+        settings::KernelNormalization::Variance;
 }

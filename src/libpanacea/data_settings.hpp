@@ -9,5 +9,12 @@ namespace panacea {
     AlongColumns
   };
 
+  // Is an attribute normalized or not
+  enum class NormalizationState {
+    Normalized,
+    Unnormalized
+  };
+
+
 }
 #endif // PANACEA_PRIVATE_DATA_SETTINGS_H

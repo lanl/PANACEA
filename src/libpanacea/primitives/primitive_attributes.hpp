@@ -3,11 +3,13 @@
 #define PANACEA_PRIVATE_PRIMITIVEATTRIBUTES_H
 #pragma once
 
+// Local private includes
+#include "attribute_manipulators/normalizer.hpp"
+
 namespace panacea {
   
   class BaseKernelWrapper;
   class Covariance;
-  class Normalizer;
   class ReducedCovariance;
   class ReducedInvCovariance;
 
@@ -16,7 +18,7 @@ namespace panacea {
    */
   class PrimitiveAttributes {
     public:
-      Normalizer * normalizer = nullptr;
+      Normalizer normalizer;
       BaseKernelWrapper * kernel_wrapper = nullptr;
       Covariance * covariance = nullptr;
       ReducedCovariance * reduced_covariance = nullptr;

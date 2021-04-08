@@ -31,4 +31,11 @@ namespace panacea {
     std::cout << std::endl;
   }
 
+  bool ReducedInvCovariance::is(const NormalizationState & state) const noexcept {
+    return normalized_ == state;
+  }
+
+  const NormalizationState & ReducedInvCovariance::getNormalizationState() const noexcept {
+    return normalized_;
+  }
 }

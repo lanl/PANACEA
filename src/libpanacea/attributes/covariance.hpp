@@ -6,6 +6,9 @@
 // Local PANACEA includes
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
+
+// Loca private includes
+#include "data_settings.hpp"
 #include "passkey.hpp"
 
 // Standard includes
@@ -14,11 +17,6 @@
 namespace panacea {
 
   class BaseDescriptorWrapper;
-
-  enum class NormalizationState {
-    Normalized,
-    Unnormalized
-  };
 
   class Normalizer;
   /*
@@ -57,7 +55,9 @@ namespace panacea {
 
       int getCummulativeDescPoints() const;
 
-      bool is(const NormalizationState state) const;
+      bool is(const NormalizationState & state) const noexcept;
+      const NormalizationState & getNormalizationState() const noexcept;
+
       // Specific to Normalizer class
       void set(PassKey<Normalizer>, NormalizationState state);
       double & operator()(PassKey<Normalizer>, const int row, const int col);
