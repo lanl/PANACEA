@@ -15,12 +15,15 @@ namespace panacea {
     std::vector<double> inv_coeffs;
     inv_coeffs.reserve(normalization_coeffs_.size());
     for(int col = 0; col < cov.cols(); ++col) {
+      assert(normalization_coeffs_.at(col) != 0.0);
       inv_coeffs.push_back(1.0/normalization_coeffs_.at(col));
     }
     
     for( int row = 0; row < cov.rows(); ++row){
-      for(int col = 0; col < cov.cols(); ++col) {
+      for(int col = row; col < cov.cols(); ++col) {
         cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(col);
+        cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(row);
+        cov(PassKey<Normalizer>(), col,row) = cov(row,col);
       }
     }
     cov.set(PassKey<Normalizer>(), NormalizationState::Normalized);
@@ -32,6 +35,7 @@ namespace panacea {
     for( int row = 0; row < cov.rows(); ++row){
       for(int col = 0; col < cov.cols(); ++col) {
         cov(PassKey<Normalizer>(), row,col) *= normalization_coeffs_.at(col);
+        cov(PassKey<Normalizer>(), row,col) *= normalization_coeffs_.at(row);
       }
     }
     cov.set(PassKey<Normalizer>(), NormalizationState::Unnormalized);

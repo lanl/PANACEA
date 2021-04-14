@@ -45,7 +45,6 @@ namespace panacea {
       /// provide access to the actual covariance matrix elements
       double operator()(const int row, const int col) const;
 
-      
       int rows() const;
       int cols() const;
 

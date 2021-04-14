@@ -9,6 +9,7 @@ list( APPEND TEST_SOURCES
     test_mean.cpp
     test_memory_manager.cpp
     test_normalization_methods.cpp
+    test_normalizer.cpp
     test_reducer.cpp
     test_row_echelon.cpp
     test_variance.cpp
