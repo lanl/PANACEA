@@ -8,6 +8,22 @@
 
 namespace panacea {
   
+  Normalizer::Normalizer(const std::vector<double> & normalization_coeffs, const NormalizerOption opt) {
+
+    if( opt == NormalizerOption::Strict ) {
+      normalization_coeffs_ = normalization_coeffs;
+    } else {
+      normalization_coeffs_.reserve(normalization_coeffs.size());
+      for( const auto & coef : normalization_coeffs ) {
+        if( coef == 0.0 ) {
+          normalization_coeffs_.push_back(1.0);
+        } else {
+          normalization_coeffs_.push_back(coef);
+        }
+      }
+    }
+  }
+
   void Normalizer::normalize(Covariance & cov) const {
     assert(cov.cols() == normalization_coeffs_.size());
 

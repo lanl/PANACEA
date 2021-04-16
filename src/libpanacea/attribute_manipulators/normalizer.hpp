@@ -11,6 +11,16 @@
 
 namespace panacea {
 
+  /**
+   * If 0.0 are encountered:
+   * Flexible - will set normalization constant to 1.0
+   * Strict - will set to 0.0
+   **/
+  enum class NormalizerOption {
+    Flexible,
+    Strict
+  };
+
   /*
    * The only thing that gets normalized and unnormalized is
    * the covariance matrix. 
@@ -22,9 +32,9 @@ namespace panacea {
       std::vector<double> normalization_coeffs_;
     public:
       Normalizer() = default;
-      explicit Normalizer(const std::vector<double> & normalization_coeffs) :
-        normalization_coeffs_(normalization_coeffs) {};
-
+      Normalizer(const std::vector<double> & normalization_coeffs, 
+          const NormalizerOption opt = NormalizerOption::Strict);
+        
       const std::vector<double> & getNormalizationCoeffs() const noexcept;
 
       void normalize(Covariance & cov) const; 

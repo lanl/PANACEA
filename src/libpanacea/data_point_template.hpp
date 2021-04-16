@@ -99,7 +99,6 @@ namespace panacea {
 
   template<class T>
     inline void DataPointTemplate<T>::print() const {
-
       std::cout << "Rows " << rows() << " Columns " << cols() << "\n";
       std::cout << "Dimensions " << getNumberDimensions();
       std::cout << " Points " << getNumberPoints() << "\n";

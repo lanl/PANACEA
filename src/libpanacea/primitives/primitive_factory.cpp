@@ -91,7 +91,8 @@ namespace panacea {
     norm_method_factory.registerNormalizationMethod<NormalizationMethodNone>();
     norm_method_factory.registerNormalizationMethod<NormalizationMethodVariance>();
     auto norm_method = norm_method_factory.create(dwrapper,specification.get<settings::KernelNormalization>());
-    return Normalizer(norm_method->generateCoefficients(dwrapper));
+    // Flexible option will avoid errors if coefficients are 0.0, e.g. if variance is 0.0, will set such coefficients to 1.0
+    return Normalizer(norm_method->generateCoefficients(dwrapper), NormalizerOption::Flexible);
   }
 
   /***********************************************************
