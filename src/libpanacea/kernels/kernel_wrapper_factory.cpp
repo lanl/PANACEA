@@ -15,7 +15,9 @@
 
 // Standard includes
 #include <memory>
+#include <string>
 #include <typeindex>
+
 namespace panacea {
 
   std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>
@@ -27,7 +29,10 @@ namespace panacea {
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
       BaseDescriptorWrapper * desc_wrapper, 
       const KernelSpecification & kern_specification,
-      MemoryManager & memory_manager) const {
+      MemoryManager & memory_manager,
+      std::string name = "") const {
+
+    name = "Kernel Centers: " + name;
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
       if( kern_specification.is(settings::KernelMemory::Share)){
@@ -36,7 +41,7 @@ namespace panacea {
           memory_manager.managePointer(
               std::any_cast<std::vector<std::vector<double>>*>(
                 desc_wrapper->getPointerToRawData()),
-              "Kernel Centers");
+              name);
         } else {
           PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
         }
@@ -74,7 +79,7 @@ namespace panacea {
         // owns the memory data
         memory_manager.manageMemory(
             std::move(kernel_center),
-            "Kernel Centers");
+            name);
 
         return kwrapper;
       }

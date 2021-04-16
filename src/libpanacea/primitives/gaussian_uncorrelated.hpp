@@ -49,9 +49,10 @@ namespace panacea {
           const int & kernel_index) : 
         kernel_index_(kernel_index) ,
               attributes_(std::move(prim_att)),
-                pre_factor_(1.0/(std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
-                std::pow(constants::PI_SQRT*constants::SQRT_2,
-                static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
+                pre_factor_(1.0/(
+                      std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
+                      std::pow(constants::PI_SQRT*constants::SQRT_2,
+                      static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
                 {};
 
       virtual int getId() const noexcept final { return kernel_index_; }
@@ -78,7 +79,6 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
-//          const int point_target, 
           const std::vector<settings::EquationSetting> & prim_settings, 
           const settings::GradSetting & grad_setting) const final; 
 

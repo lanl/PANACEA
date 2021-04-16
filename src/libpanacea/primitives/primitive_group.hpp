@@ -13,6 +13,7 @@
 
 // Standard includes
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace panacea {
@@ -22,6 +23,7 @@ namespace panacea {
 
   class PrimitiveGroup {
     public:
+      std::string name = "";
       Normalizer normalizer;
       BaseKernelWrapper * kernel_wrapper = nullptr;
       std::unique_ptr<Covariance> covariance = nullptr;

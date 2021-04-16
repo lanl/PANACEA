@@ -101,10 +101,11 @@ namespace panacea {
   PrimitiveGroup PrimitiveFactory::create(
       BaseDescriptorWrapper * dwrapper,
       MemoryManager & mem_manager,
-      const KernelSpecification & specification) const {
+      const KernelSpecification & specification,
+      std::string name) const {
 
     KernelWrapperFactory kfactory;
-    auto kwrapper = kfactory.create(dwrapper, specification, mem_manager);
+    auto kwrapper = kfactory.create(dwrapper, specification, mem_manager, name);
 
     Reducer reducer;
     Inverter inverter;
@@ -135,7 +136,15 @@ namespace panacea {
 
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp,specification);
 
-    mem_manager.manageMemory(std::move(kwrapper),specification.get<std::string>());
+    // Assign a default name to the primitive
+    if( name.empty() ) {
+      name = specification.get<std::string>();
+    }
+
+    name = "KernelWrapper: " + name;
+    mem_manager.manageMemory(std::move(kwrapper),name);
+    prim_grp.name = name;
+
     return prim_grp;
   }
 }

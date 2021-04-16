@@ -42,7 +42,8 @@ namespace panacea {
       std::unique_ptr<BaseKernelWrapper> create(
           BaseDescriptorWrapper * desc_wrapper,
           const KernelSpecification & kern_specification , 
-          MemoryManager & memory_manager) const;
+          MemoryManager & memory_manager,
+          std::string name) const;
 
       template<class T>
         static bool registerType() {

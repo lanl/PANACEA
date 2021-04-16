@@ -75,7 +75,8 @@ namespace panacea {
       PrimitiveGroup create(
           BaseDescriptorWrapper * dwrapper,
           MemoryManager & mem_manager,
-          const KernelSpecification & specification) const;
+          const KernelSpecification & specification,
+          std::string name = "") const;
   };
 }
 
