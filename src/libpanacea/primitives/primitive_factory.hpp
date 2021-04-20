@@ -53,7 +53,6 @@ namespace panacea {
         PrimitiveGroup & prim_grp,
         const KernelSpecification & specification);
 
-
     public:
 
       template<class T, 

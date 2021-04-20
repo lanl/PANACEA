@@ -76,8 +76,6 @@ namespace panacea {
         }
       } 
 
-
-
     inline bool is(const settings::KernelCorrelation & correlation) const noexcept {
       if( correlation == kern_correlation_ ) return true;
       return false;
