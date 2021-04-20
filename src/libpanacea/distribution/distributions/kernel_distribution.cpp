@@ -5,13 +5,44 @@
 #include "descriptors/base_descriptor_wrapper.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "primitives/primitive.hpp"
+#include "primitives/gaussian_uncorrelated.hpp"
+#include "primitives/gaussian_correlated.hpp"
+#include "primitives/primitive_factory.hpp"
 #include "primitives/primitive_group.hpp"
 #include "settings.hpp"
 
 // Standard includes
+#include <iostream>
+#include <string>
 #include <vector>
 
 namespace panacea {
+
+  KernelDistribution::KernelDistribution(const PassKey<DistributionFactory> &,
+          BaseDescriptorWrapper * descriptor_wrapper,
+          MemoryManager & mem_manager,
+          const KernelSpecification & settings,
+          std::string name) {
+
+    PrimitiveFactory::registerPrimitive<GaussUncorrelated,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelCorrelation::Uncorrelated>();
+
+    PrimitiveFactory::registerPrimitive<GaussCorrelated,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelCorrelation::Correlated>();
+
+    PrimitiveFactory prim_factory;
+
+    prim_grp_ = prim_factory.create(
+        descriptor_wrapper,
+        mem_manager,
+        settings,
+        name);
+  
+    pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
+
+  }
 
   settings::DistributionType KernelDistribution::type() const noexcept {
     return settings::DistributionType::Kernel;
@@ -23,7 +54,7 @@ namespace panacea {
     for( auto & prim_ptr : prim_grp_.primitives ) {
       density += prim_ptr->compute(descriptor_wrapper, desc_ind);
     }
-    return density;
+    return pre_factor_ * density;
   }
 
   std::vector<double> KernelDistribution::compute_grad(
@@ -45,6 +76,10 @@ namespace panacea {
 
       std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
     }
+
+    std::transform(grad.begin(), grad.end(), grad.begin(),
+               std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor_)); 
+
     return grad;
   }
 }

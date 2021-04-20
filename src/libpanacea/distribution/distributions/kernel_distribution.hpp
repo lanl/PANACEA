@@ -13,6 +13,7 @@
 // Standard includes
 #include <any>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace panacea {
@@ -31,11 +32,15 @@ namespace panacea {
 
     private:
       PrimitiveGroup prim_grp_;
+
+      // For KDE 1/N value, where N is the number Kernels/primitives
+      double pre_factor_;
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
-          const KernelSpecification & settings) {};
+          const KernelSpecification & settings,
+          std::string name);
 
       virtual settings::DistributionType type() const noexcept final;
 
@@ -48,16 +53,18 @@ namespace panacea {
 
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
-          DistributionSettings * settings);
+          DistributionSettings * settings,
+          std::string name = "");
   };
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key, 
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
-      DistributionSettings * settings) {
+      DistributionSettings * settings,
+      std::string name) {
 
     assert(settings->type() == settings::DistributionType::Kernel);
 
@@ -67,7 +74,8 @@ namespace panacea {
         key,
         descriptor_wrapper,
         mem_manager,
-        kern_dist_settings->dist_settings);
+        kern_dist_settings->dist_settings,
+        name);
   }
 }
 

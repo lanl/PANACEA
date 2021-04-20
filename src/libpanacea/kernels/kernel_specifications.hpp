@@ -28,13 +28,20 @@ namespace panacea {
   }
 
   class KernelSpecification {
-    const settings::KernelCorrelation kern_correlation_ = defaults::kern_correlation_default;
-    const settings::KernelCount kern_count_ = defaults::kern_count_default;
-    const settings::KernelPrimitive kern_prim_ = defaults::kern_primitive_default;
-    const settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
-    const settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
-    const settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
+    settings::KernelCorrelation kern_correlation_ = defaults::kern_correlation_default;
+    settings::KernelCount kern_count_ = defaults::kern_count_default;
+    settings::KernelPrimitive kern_prim_ = defaults::kern_primitive_default;
+    settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
+    settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
+    settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
     public:
+    KernelSpecification() = default;
+    KernelSpecification(KernelSpecification &&) = default;
+    KernelSpecification& operator=(KernelSpecification&& ) = default;
+/*    KernelSpecification(const KernelSpecification &) = default;
+
+    KernelSpecification& operator=(const KernelSpecification& ) = default;
+*/
     KernelSpecification(
         const settings::KernelCorrelation & kern_correlation,
         const settings::KernelCount & kern_count,
@@ -49,6 +56,8 @@ namespace panacea {
       kern_memory_(kern_memory),
       kern_center_(kern_center)
     {};
+
+
 
     template<class T>
       inline T get() const {

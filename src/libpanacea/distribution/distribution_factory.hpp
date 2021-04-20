@@ -23,9 +23,10 @@ namespace panacea {
     public:
       using DistributionCreateMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
-          DistributionSettings * dist_settings
+          DistributionSettings * dist_settings,
+          std::string name
           );
 
     private:
@@ -45,9 +46,10 @@ namespace panacea {
         }
 
       std::unique_ptr<Distribution> create(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
-          DistributionSettings * settings) const;
+          DistributionSettings * settings,
+          std::string name = "") const;
   };
 
 }

@@ -22,13 +22,14 @@ namespace panacea {
         DistributionFactory::create_methods_;
 
   std::unique_ptr<Distribution> DistributionFactory::create(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
-      DistributionSettings * settings) const {
+      DistributionSettings * settings,
+      std::string name) const {
 
     assert(settings != nullptr);
 
-    if(create_methods_.count(settings->type()) != 0){
+    if(create_methods_.count(settings->type()) == 0){
       std::string error_msg = "Distribution type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
@@ -37,6 +38,7 @@ namespace panacea {
         PassKey<DistributionFactory>(),
         descriptor_wrapper,
         mem_manager,
-        settings);
+        settings,
+        name);
   }
 }
