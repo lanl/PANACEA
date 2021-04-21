@@ -56,6 +56,7 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/descriptors/*
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/*
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/distributions/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/distribution/distributions/kernel_distribution
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/distribution_settings/*
   ${panacea_SOURCE_DIR}/src/libpanacea/entropy/*
   ${panacea_SOURCE_DIR}/src/libpanacea/io/*

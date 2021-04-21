@@ -35,9 +35,9 @@ namespace panacea {
     settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
     settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
     public:
-    KernelSpecification() = default;
+/*    KernelSpecification() = default;
     KernelSpecification(KernelSpecification &&) = default;
-    KernelSpecification& operator=(KernelSpecification&& ) = default;
+    KernelSpecification& operator=(KernelSpecification&& ) = default;*/
 /*    KernelSpecification(const KernelSpecification &) = default;
 
     KernelSpecification& operator=(const KernelSpecification& ) = default;

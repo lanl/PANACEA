@@ -6,6 +6,7 @@
 #include "distribution.hpp"
 
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
+#include "kernel_distribution/kernel_distribution_gradiant.hpp"
 #include "memory.hpp"
 #include "passkey.hpp"
 #include "primitives/primitive_group.hpp"
@@ -32,7 +33,7 @@ namespace panacea {
 
     private:
       PrimitiveGroup prim_grp_;
-
+      KernelDistributionGradiant kern_dist_grad;
       // For KDE 1/N value, where N is the number Kernels/primitives
       double pre_factor_;
     public:

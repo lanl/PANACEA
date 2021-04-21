@@ -26,6 +26,11 @@ namespace panacea {
       Kernel
     };
 
+    enum class EntropyType {
+      Self,
+      Cross
+    };
+
     enum class EquationSetting {
       None,
       IgnoreExp
@@ -33,6 +38,7 @@ namespace panacea {
 
     // Whether we are taking the gradient with respect to the descriptor or the kernel
     enum class GradSetting {
+      WRTBoth,
       WRTKernel,
       WRTDescriptor
     };

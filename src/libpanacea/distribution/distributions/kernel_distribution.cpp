@@ -3,6 +3,7 @@
 #include "kernel_distribution.hpp"
 
 #include "descriptors/base_descriptor_wrapper.hpp"
+#include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "primitives/primitive.hpp"
 #include "primitives/gaussian_uncorrelated.hpp"
@@ -60,26 +61,39 @@ namespace panacea {
   std::vector<double> KernelDistribution::compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
-          const DistributionSettings & distribution_settings
+          const DistributionSettings & distribution_settings_
           ) {
 
     assert(descriptor_wrapper->getNumberDimensions() == prim_grp_.kernel_wrapper->getNumberDimensions());
+    assert(distribution_settings_.type() == settings::DistributionType::Kernel );
 
-    std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
-    for( auto & prim_ptr : prim_grp_.primitives ) {
+    auto distribution_settings = 
+      dynamic_cast<const KernelDistributionSettings &>(distribution_settings_);
 
-      std::vector<double> grad_temp = prim_ptr->compute_grad(
+#ifdef DEBUG
+    std::string error_msg = "Unsupported gradiant method encountered";
+    if(kern_dist_grad.grad_method
+        .count(distribution_settings.grad_setting) == 0) {
+      PANACEA_FAIL(error_msg);
+    }
+    if(kern_dist_grad.grad_method
+        [distribution_settings.grad_setting]
+        .count(distribution_settings.equation_settings) == 0) {
+      PANACEA_FAIL(error_msg);
+    }
+    if(kern_dist_grad.grad_method
+        [distribution_settings.grad_setting]
+        [distribution_settings.equation_settings]
+        .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
+      PANACEA_FAIL(error_msg);
+    }
+#endif // DEBUG
+    return kern_dist_grad.grad_method
+        [distribution_settings.grad_settings]
+        [distribution_settings.equation_settings]
+        [distribution_settings.dist_settings.get<settings::KernelCount>()](
           descriptor_wrapper,
           desc_ind,
-          distribution_settings.dist_grad_settings.equation_settings,
-          distribution_settings.dist_grad_settings.grad_settings);
-
-      std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
-    }
-
-    std::transform(grad.begin(), grad.end(), grad.begin(),
-               std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor_)); 
-
-    return grad;
+          prim_grp_);
   }
 }
