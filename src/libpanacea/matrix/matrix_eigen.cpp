@@ -65,6 +65,16 @@ namespace panacea {
     return (*matrix_)(row,col);
   }
 
+  void MatrixEigen::makeIdentity() {
+    for(int row = 0; row < matrix_->rows(); ++row){
+      this->operator()(row,row) = 1.0;
+      for(int col = row+1; col < matrix_->cols(); ++col){
+        this->operator()(row,col) = 0.0;
+        this->operator()(col,row) = 0.0;
+      }
+    }
+  }
+
   void MatrixEigen::setZero() {
     matrix_->setZero();
   }

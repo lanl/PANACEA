@@ -16,8 +16,17 @@
 
 namespace panacea {
 
-  class BaseDescriptorWrapper;
+  /**
+   * If 0.0 are encountered:
+   * Flexible - will set normalization constant to 1.0
+   * Strict - will set to 0.0
+   **/
+  enum class CovarianceOption {
+    Flexible,
+    Strict
+  };
 
+  class BaseDescriptorWrapper;
   class Normalizer;
   /*
    * Class for storing the covariance matrix
@@ -35,8 +44,8 @@ namespace panacea {
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
-      explicit Covariance(BaseDescriptorWrapper * desc_wrap);
-      Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts);
+      Covariance(BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt = CovarianceOption::Strict);
+      Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts, const CovarianceOption opt = CovarianceOption::Strict);
 
       /// Designed to update the covariance matrix
       void update(BaseDescriptorWrapper * desc_wrap);
@@ -55,6 +64,13 @@ namespace panacea {
       int getCummulativeDescPoints() const;
 
       bool is(const NormalizationState & state) const noexcept;
+
+      /**
+       * Check if the covariance matrix is full of 0's, this can occur if all 
+       * data passed in is stacked on top of its self. 
+       **/
+      bool isZero(const double threshold = 1E-9) const noexcept;
+
       const NormalizationState & getNormalizationState() const noexcept;
 
       // Specific to Normalizer class

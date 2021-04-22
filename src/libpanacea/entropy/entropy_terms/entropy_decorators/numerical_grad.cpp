@@ -46,7 +46,7 @@ namespace panacea {
         new_y_vals.at(0) += EntropyDecorator::compute(descriptor_wrapper);
         descriptor_wrapper->operator()(wrt_pt, dim) = new_x_vals.at(1);
         new_y_vals.at(1) += EntropyDecorator::compute(descriptor_wrapper);
-        grad.at(dim) *= (new_y_vals.at(1) - new_y_vals.at(0))/(2.0*diff);
+        grad.at(dim) = (new_y_vals.at(1) - new_y_vals.at(0))/(2.0*diff);
         // Reset to the original value
         descriptor_wrapper->operator()(wrt_pt,dim) = orig_x_val;
       }

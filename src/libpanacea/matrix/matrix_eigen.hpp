@@ -30,6 +30,7 @@ namespace panacea {
 
       virtual void resize(const int rows, const int cols) final;
 
+      virtual void makeIdentity() final;
       virtual void setZero() final;
 
       virtual int rows() const final;

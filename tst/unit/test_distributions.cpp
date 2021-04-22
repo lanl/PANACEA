@@ -50,7 +50,8 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
         settings::KernelPrimitive::Gaussian,
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
-        settings::KernelCenterCalculation::None
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible
       ));
 
   DistributionFactory dist_factory;
@@ -104,6 +105,54 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
 
   REQUIRE(grad0.at(0) == Approx(-1.0*grad2.at(0)));
   REQUIRE(grad1.at(0) == Approx(0.0));
+}
+
+TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
+
+  // 3 points 2 dimensions
+  std::vector<std::vector<double>> data1{
+    {1.0, 4.0},
+    {1.0, 4.0},
+    {1.0, 4.0}};
+
+  size_t num_pts = data1.size();
+  size_t dims = 2;
+
+  std::vector<std::vector<double>> data2{{1.0, 4.0}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper1(&data1, num_pts, dims);
+  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper2(&data2, 1, dims);
+
+  MemoryManager mem_manager;
+
+  KernelDistributionSettings kernel_settings;
+
+  kernel_settings.dist_settings = std::move(KernelSpecification(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::OneToOne,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Share,
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible
+      ));
+
+  DistributionFactory dist_factory;
+  dist_factory.registerDistribution<
+    KernelDistribution,
+    settings::DistributionType::Kernel>();
+
+  std::cout << "Creating dist1" << std::endl;
+  auto dist1 = dist_factory.create(&dwrapper1, mem_manager, &kernel_settings, "Distribution1");
+  std::cout << "Creating dist2" << std::endl;
+  auto dist2 = dist_factory.create(&dwrapper2, mem_manager, &kernel_settings, "Distribution2");
   
+  std::cout << "Computing distribution 1" << std::endl;
+  std::cout << dist1->compute(&dwrapper1,0) << std::endl;
+  std::cout << "Computing distribution 2" << std::endl;
+  std::cout << dist2->compute(&dwrapper2,0) << std::endl;
+  // Check that the values are equivalent despite one being made up of three kernels and 
+  // the other composed of a single kernel 
+  REQUIRE(dist1->compute(&dwrapper1,0) == Approx(dist2->compute(&dwrapper2,0)));
 }
 

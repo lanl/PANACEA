@@ -117,3 +117,20 @@ TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
     REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
   }
 }
+
+TEST_CASE("Testing:covariance stacked data","[unit,panacea]"){
+  std::vector<std::vector<double>> data {
+      {2.3,  1.3,  4.9},
+      {2.3,  1.3,  4.9},
+      {2.3,  1.3,  4.9},
+      {2.3,  1.3,  4.9},
+      {2.3,  1.3,  4.9},
+      {2.3,  1.3,  4.9}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> 
+    dwrapper(&data, data.size(), data.at(0).size());
+
+  CHECK_THROWS(Covariance(&dwrapper));
+
+  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+}

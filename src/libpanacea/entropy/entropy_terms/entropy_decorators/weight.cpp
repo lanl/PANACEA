@@ -1,5 +1,9 @@
+// Local private PANACEA includes
+#include "weight.hpp"
 
 // Standard includes
+#include <algorithm>
+#include <any>
 #include <vector>
 
 namespace panacea {
@@ -21,10 +25,17 @@ namespace panacea {
       const EntropySettings & entropy_settings) {
 
     auto vec = EntropyDecorator::compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
-    std::transform(vec.begin(), vec.end(), vec.begin(), std::bind(std::multiplies<double>(), std::placeholder::_1, weight) );
+    std::transform(vec.begin(), vec.end(), vec.begin(), std::bind(std::multiplies<double>(), std::placeholders::_1, weight_) );
     return vec;
   }
 
+  void Weight::set(const settings::EntropyOption & option, std::any val) {
+    if( option == settings::EntropyOption::Weight ) {
+      weight_ = std::any_cast<double>(val);
+    } else {
+      EntropyDecorator::set(option, val);
+    }
+  }
 }
 
 

@@ -26,6 +26,10 @@ namespace panacea {
 
       virtual void resize(const int rows, const int cols) = 0;
 
+      /**
+       * Turns matrix into identity matrix.
+       **/
+      virtual void makeIdentity() = 0;
       virtual void setZero() = 0;
 
       virtual int rows() const = 0;

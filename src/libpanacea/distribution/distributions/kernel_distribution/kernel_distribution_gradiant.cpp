@@ -27,13 +27,13 @@ namespace panacea {
         const int & descriptor_index,
         const int & grad_index, // Not really needed
         const PrimitiveGroup & prim_grp,
-        const KernelDistributionSettings & distribution_settings
+        const KernelDistributionSettings & distribution_settings,
+        const double pre_factor
         ) {
 
       // We want the gradiant at the location of the sample
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
       assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
       for( auto & prim_ptr : prim_grp.primitives ) {
 
@@ -46,6 +46,10 @@ namespace panacea {
         std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
 
       }
+
+      std::transform(grad.begin(), grad.end(), grad.begin(),
+          std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
+
       return grad;
     }
 
@@ -63,16 +67,21 @@ namespace panacea {
         const int & descriptor_index,
         const int & grad_index,
         const PrimitiveGroup & prim_grp,
-        const KernelDistributionSettings & distribution_settings
+        const KernelDistributionSettings & distribution_settings,
+        const double pre_factor
         ) {
 
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      return prim_grp.primitives.at(grad_index)->compute_grad(
+
+      auto grad = prim_grp.primitives.at(grad_index)->compute_grad(
             descriptor_wrapper,
             descriptor_index,
             distribution_settings.equation_settings,
             settings::GradSetting::WRTKernel);
+
+      std::transform(grad.begin(), grad.end(), grad.begin(),
+          std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
+      return grad;
     }
 
     std::vector<double> gradiant_one_to_one_wrt_both(
@@ -80,13 +89,13 @@ namespace panacea {
         const int & descriptor_index,
         const int & grad_index, 
         const PrimitiveGroup & prim_grp,
-        const KernelDistributionSettings & distribution_settings
+        const KernelDistributionSettings & distribution_settings,
+        const double pre_factor
         ) {
 
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
       assert(descriptor_index == grad_index);
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
       for( auto & prim_ptr : prim_grp.primitives ) {
         // Ignore the gradiant of the kernel with the same index because the gradiants will cancel
@@ -100,6 +109,9 @@ namespace panacea {
           std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
         }
       }
+
+      std::transform(grad.begin(), grad.end(), grad.begin(),
+          std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
       return grad;
     }
 

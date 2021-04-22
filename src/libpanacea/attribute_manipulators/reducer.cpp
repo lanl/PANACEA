@@ -35,6 +35,7 @@ namespace panacea {
       //         in the indices are in bounds
       // Check 4 ensure that the prefferred dimensions are unique, there
       //         are not repeated entries
+      // Check 5 ensure that the covariance matrix does not contain 0's on the diagonal
       std::string error_msg = "";
       bool error_detected = false;
       for( const auto & dim : preferred_dimensions) {
@@ -58,11 +59,21 @@ namespace panacea {
         ++count;
         if(unique_vals.size() != count) {
           std::string error_msg = "Preferred dimensions are not unique ";
-          error_msg += "cannot reduce matrix when specefied dimensions ";
+          error_msg += "cannot reduce matrix when specified dimensions ";
           error_msg += "have duplicates.";
           PANACEA_FAIL(error_msg); 
         }
       } 
+
+      for ( int dim = 0; dim < cov.rows(); ++dim ){
+        if( cov(dim,dim) == 0.0 ) {
+          cov.print();
+          std::string error_msg = "Trying to reduce covariance matrix, ";
+          error_msg += "but candidate covariance matrix has 0's along ";
+          error_msg += "the diagonal.";
+          PANACEA_FAIL(error_msg);
+        }
+      }
     }
 
     // After calling this function the matrix should be reordered such that 

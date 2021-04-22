@@ -91,8 +91,21 @@ namespace panacea {
     norm_method_factory.registerNormalizationMethod<NormalizationMethodNone>();
     norm_method_factory.registerNormalizationMethod<NormalizationMethodVariance>();
     auto norm_method = norm_method_factory.create(dwrapper,specification.get<settings::KernelNormalization>());
+    if( specification.is(settings::KernelAlgorithm::Strict) ) {
+      return Normalizer(norm_method->generateCoefficients(dwrapper), NormalizerOption::Strict);
+    }
     // Flexible option will avoid errors if coefficients are 0.0, e.g. if variance is 0.0, will set such coefficients to 1.0
     return Normalizer(norm_method->generateCoefficients(dwrapper), NormalizerOption::Flexible);
+  }
+
+  static std::unique_ptr<Covariance> createCovariance(
+      BaseDescriptorWrapper * dwrapper,
+      const KernelSpecification & specification) {
+
+    if( specification.is(settings::KernelAlgorithm::Strict) ) {
+      return std::make_unique<Covariance>(dwrapper, CovarianceOption::Strict);
+    }
+    return std::make_unique<Covariance>(dwrapper, CovarianceOption::Flexible);
   }
 
   /***********************************************************
@@ -110,10 +123,12 @@ namespace panacea {
 
     Reducer reducer;
     Inverter inverter;
-   
+  
     PrimitiveGroup prim_grp;
     prim_grp.kernel_wrapper = kwrapper.get();
-    prim_grp.covariance = std::make_unique<Covariance>(dwrapper);
+
+    prim_grp.covariance = createCovariance(dwrapper, specification);
+
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
     prim_grp.normalizer.normalize(*prim_grp.covariance); 
 

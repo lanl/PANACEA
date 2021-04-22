@@ -53,6 +53,19 @@ namespace panacea {
       WRTDescriptor
     };
 
+    /** 
+     * Fail if the specified kernel specifications are not satisfied
+     * the algorithm flexibility in determining best options if the 
+     * ones specefied lead to non ideal conditions, i.e. if defining
+     * a covariance matrix for a kernel in which the data is stacked
+     * at a single point then the covariance matrix will become 0
+     * everywhere which will lead to numerical problems.
+     **/
+    enum class KernelAlgorithm {
+      Strict,   
+      Flexible  
+    };
+
     enum class KernelPrimitive {
       Gaussian,
       Exponential    
@@ -151,7 +164,13 @@ namespace panacea {
           if( setting == KernelPrimitive::Gaussian ) {
             return "Primitive=Gaussian";
           } else if(setting == KernelPrimitive::Exponential) {
-            return "Primitive::Exponential";
+            return "Primitive=Exponential";
+          }
+        } else if constexpr( std::is_same<KernelAlgorithm,T>::value ) {
+          if( setting == KernelAlgorithm::Strict ) {
+            return "Algorithm=Strict";
+          } else if(setting == KernelAlgorithm::Flexible) {
+            return "Primitive=Flexible";
           }
         } else if constexpr( std::is_same<CalculationType,T>::value ) {
           if( setting == CalculationType::Numerical ) {

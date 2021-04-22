@@ -8,6 +8,7 @@
 #include "entropy/entropy_terms/entropy_term.hpp"
 
 // Standard includes
+#include <memory>
 #include <vector>
 
 namespace panacea {
@@ -18,10 +19,15 @@ namespace panacea {
   class EntropyDecorator : public EntropyTerm {
 
     protected:
-      EntropyTerm* entropy_term_;
+      std::unique_ptr<EntropyTerm> entropy_term_;
 
     public:
-      EntropyDecorator(EntropyTerm* entropy_term) : entropy_term_(entropy_term) {};
+      explicit EntropyDecorator(std::unique_ptr<EntropyTerm> entropy_term) : 
+        entropy_term_(std::move(entropy_term)) {};
+
+      virtual settings::EntropyType type() const noexcept override {
+        return entropy_term_->type();
+      }
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper) override {

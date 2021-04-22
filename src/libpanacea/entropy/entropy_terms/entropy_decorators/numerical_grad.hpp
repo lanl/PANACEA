@@ -7,6 +7,7 @@
 #include "entropy_decorator.hpp"
 
 // Standard includes
+#include <memory>
 #include <vector>
 
 namespace panacea {
@@ -21,7 +22,7 @@ namespace panacea {
     bool numerical_grad_ = true;
 
     public: 
-      NumericalGrad(EntropyTerm * entropy_term) : EntropyDecorator(entropy_term) {};
+      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) : EntropyDecorator(std::move(entropy_term)) {};
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,

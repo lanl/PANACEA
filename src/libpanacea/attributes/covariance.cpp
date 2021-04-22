@@ -6,6 +6,7 @@
 #include "covariance.hpp"
 
 #include "descriptors/base_descriptor_wrapper.hpp"
+#include "error.hpp"
 
 // Local public PANACEA includes
 #include "panacea/matrix.hpp"
@@ -86,10 +87,9 @@ namespace panacea {
     }
   } // namespace correlated
 
-  Covariance::Covariance(BaseDescriptorWrapper * desc_wrap) {
+  Covariance::Covariance(BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt) {
     // Resize the covariance matrix based on the number of descriptor dimensions
     assert(desc_wrap != nullptr);
-    assert(desc_wrap->getNumberPoints() > 1);
     const int num_dims = desc_wrap->getNumberDimensions();
     matrix_ = createMatrix(num_dims, num_dims);
     mean_ = createVector(num_dims);
@@ -112,14 +112,55 @@ namespace panacea {
         total_number_data_pts_,
         desc_wrap);
 
+    if( isZero() ) {
+      // Making matrix equal to the identity matirx
+      if( opt == CovarianceOption::Flexible ) {
+        matrix_->makeIdentity();
+      } else {
+        std::string error_msg = "Covariance matrix is 0 everywhere, likely because your data is stacked.";
+        error_msg += " Either get a better starting data set or allow flexibility in the algorithm.";
+        PANACEA_FAIL(error_msg);
+      }
+    }else if(desc_wrap->getNumberPoints() == 1) {
+      if( opt == CovarianceOption::Flexible ) {
+        matrix_->makeIdentity();
+      } else {
+        std::string error_msg = "You are trying to create covariance matrix with a single point";
+        error_msg += " Either get a better starting data set or allow flexibility in the algorithm.";
+        PANACEA_FAIL(error_msg);
+      }
+    } else { 
+      for( int dim1 = 0; dim1 < desc_wrap->getNumberDimensions(); ++dim1){
+
+        if( std::abs(matrix_->operator()(dim1,dim1)) < 1E-9 ){
+          if ( opt == CovarianceOption::Flexible ) {
+            matrix_->operator()(dim1,dim1) = 1.0;
+          } else {
+            std::string error_msg = "Zero's detected in the diagonal of covariance matrix. ";
+            error_msg += " Either get a better starting data set or allow flexibility in the";
+            error_msg += " covariance matrix algorithm.";
+            PANACEA_FAIL(error_msg);
+          }
+        }
+      }
+      // Set any diagonal elements that are equal to 0.0 equal to 1.0
+    }
+
     mean_ = std::move(new_mean);
     // Record the total number of data points used to create the covariance matrix
     total_number_data_pts_ = desc_wrap->getNumberPoints();
     
   }
 
-  Covariance::Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts) :
-        matrix_(std::move(matrix)), mean_(std::move(mean)), total_number_data_pts_(total_num_pts) {
+  Covariance::Covariance(
+      std::unique_ptr<Matrix> matrix,
+      std::unique_ptr<Vector> mean,
+      int total_num_pts,
+      const CovarianceOption opt) :
+        matrix_(std::move(matrix)),
+        mean_(std::move(mean)),
+        total_number_data_pts_(total_num_pts) {
+
     assert(matrix_->rows() == matrix_->cols() && "Covariance matrix must be square");
     assert(mean_->rows() == matrix_->rows() && "Mean and covariance matrix must have the same dimensions.");
     assert(total_num_pts > 0 && "Total number of points must be greater than 0");
@@ -129,7 +170,7 @@ namespace panacea {
     for( int i = 0; i < matrix_->rows(); ++i) {
       for( int j = i+1; j < matrix_->rows(); ++j) {
         // Don't need to check the diagonal
-        if( matrix_->operator()(i,j) > threshold || matrix_->operator()(j,i) > threshold) {
+        if( std::abs(matrix_->operator()(i,j)) > threshold) {
           // Only check values that are not too close to 0.0
           const double diff = std::abs(matrix_->operator()(i,j) - matrix_->operator()(j,i));
           const double avg =  std::abs(matrix_->operator()(i,j) + matrix_->operator()(j,i))/2.0;
@@ -137,7 +178,44 @@ namespace panacea {
         }
       }
     }
+
+    // All elements in the covariance matrix are found to be 0.0
+    if( isZero() ) {
+      // Making matrix equal to the identity matirx
+      if( opt == CovarianceOption::Flexible ) {
+        matrix_->makeIdentity();
+      } else {
+        std::string error_msg = "Covariance matrix is 0 everywhere, likely because your data is stacked.";
+        error_msg += " Either get a better starting data set or allow flexibility in the algorithm.";
+        PANACEA_FAIL(error_msg);
+      }
+    }  else {
       
+      for( int dim1 = 0; dim1 < matrix_->rows(); ++dim1){
+
+        if( std::abs(matrix_->operator()(dim1,dim1)) < 1E-9 ){
+          if ( opt == CovarianceOption::Flexible ) {
+            matrix_->operator()(dim1,dim1) = 1.0;
+          } else {
+            std::string error_msg = "Zero's detected in the diagonal of covariance matrix. ";
+            error_msg += " Either get a better starting data set or allow flexibility in the";
+            error_msg += " covariance matrix algorithm.";
+            PANACEA_FAIL(error_msg);
+          }
+        }
+      }
+    }
+  }
+
+  bool Covariance::isZero(const double threshold ) const noexcept {
+    assert(threshold > 0.0);
+    // Because it is symmetric only need to check one half    
+    for( int i = 0; i < matrix_->rows(); ++i) {
+      for( int j = i; j < matrix_->cols(); ++j) {
+        if( std::abs(matrix_->operator()(i,j)) > threshold ) return false;
+      }
+    }
+    return true;
   }
 
   void Covariance::update(BaseDescriptorWrapper * desc_wrap) {

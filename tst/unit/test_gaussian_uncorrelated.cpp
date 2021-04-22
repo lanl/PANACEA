@@ -45,7 +45,8 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelPrimitive::Gaussian,
       settings::KernelNormalization::None,
       settings::KernelMemory::Share,
-      settings::KernelCenterCalculation::None);
+      settings::KernelCenterCalculation::None,
+      settings::KernelAlgorithm::Flexible);
 
   MemoryManager mem_manager;
 
@@ -147,7 +148,8 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
         settings::KernelPrimitive::Gaussian,
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
-        settings::KernelCenterCalculation::None);
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible);
 
     MemoryManager mem_manager;
 
@@ -218,6 +220,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     auto dwrapper = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
 
+    std::cout << "Descriptor Wrapper " << std::endl; 
     dwrapper->print();
 
     KernelSpecification specification(
@@ -226,7 +229,8 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         settings::KernelPrimitive::Gaussian,
         settings::KernelNormalization::Variance,
         settings::KernelMemory::Share,
-        settings::KernelCenterCalculation::None);
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible);
 
     MemoryManager mem_manager;
 

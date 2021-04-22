@@ -25,6 +25,8 @@ namespace panacea {
       = ::panacea::settings::KernelMemory::Own;
     const ::panacea::settings::KernelCenterCalculation kern_center_default 
       = ::panacea::settings::KernelCenterCalculation::Mean;
+    const ::panacea::settings::KernelAlgorithm kern_algorithm_default 
+      = ::panacea::settings::KernelAlgorithm::Strict;
   }
 
   class KernelSpecification {
@@ -34,27 +36,25 @@ namespace panacea {
     settings::KernelNormalization kern_normalization_ = defaults::kern_normalization_default;
     settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
     settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
+    settings::KernelAlgorithm kern_algorithm_ = defaults::kern_algorithm_default;
     public:
     KernelSpecification() = default;
-/*    KernelSpecification(KernelSpecification &&) = default;
-    KernelSpecification& operator=(KernelSpecification&& ) = default;*/
-/*    KernelSpecification(const KernelSpecification &) = default;
 
-    KernelSpecification& operator=(const KernelSpecification& ) = default;
-*/
     KernelSpecification(
         const settings::KernelCorrelation & kern_correlation,
         const settings::KernelCount & kern_count,
         const settings::KernelPrimitive & kern_prim,
         const settings::KernelNormalization & kern_normalization,
         const settings::KernelMemory & kern_memory,
-        const settings::KernelCenterCalculation & kern_center) :
+        const settings::KernelCenterCalculation & kern_center,
+        const settings::KernelAlgorithm & kern_algorithm) :
       kern_correlation_(kern_correlation),
       kern_count_(kern_count),
       kern_prim_(kern_prim),
       kern_normalization_(kern_normalization),
       kern_memory_(kern_memory),
-      kern_center_(kern_center)
+      kern_center_(kern_center),
+      kern_algorithm_(kern_algorithm)
     {};
 
     template<class T>
@@ -71,6 +71,8 @@ namespace panacea {
           return kern_memory_;
         } else if constexpr( std::is_same<T, settings::KernelCenterCalculation>::value) {
           return kern_center_;
+        } else if constexpr( std::is_same<T, settings::KernelAlgorithm>::value) {
+          return kern_algorithm_;
         } else if constexpr( std::is_same<T, std::string>::value) {
           std::stringstream string_spec("Kernel ");
           string_spec << settings::toString(kern_correlation_);
@@ -79,6 +81,7 @@ namespace panacea {
           string_spec << "," << settings::toString(kern_normalization_);
           string_spec << "," << settings::toString(kern_memory_);
           string_spec << "," << settings::toString(kern_center_);
+          string_spec << "," << settings::toString(kern_algorithm_);
           return string_spec.str();
         }
       } 
@@ -110,6 +113,11 @@ namespace panacea {
 
     inline bool is(const settings::KernelCenterCalculation & kern_center) const noexcept {
       if( kern_center == kern_center_ ) return true;
+      return false;
+    }
+    
+    inline bool is(const settings::KernelAlgorithm & kern_algorithm) const noexcept {
+      if( kern_algorithm == kern_algorithm_ ) return true;
       return false;
     }
   };

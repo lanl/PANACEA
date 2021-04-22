@@ -120,7 +120,9 @@ namespace panacea {
   template<class T> 
     inline  size_t MemoryManager::managePointer(T & data, const std::string & name){
       if(name_to_index_.count(name)) {
-        PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+        std::string error_msg = "Cannot add Node, name of memory has already been assigned.\n";
+        error_msg += name;
+        PANACEA_FAIL(error_msg);
       }
 
       T * data_ptr = &data;
@@ -133,25 +135,14 @@ namespace panacea {
     inline size_t MemoryManager::managePointer(T * data, const std::string & name){
 
       if(name_to_index_.count(name)) {
-        PANACEA_FAIL("Cannot addNode name of memory has already been assigned.");
+        std::string error_msg = "Cannot manager Pointer, name of memory has already ";
+        error_msg += "been assigned.\n" + name;
+        PANACEA_FAIL(error_msg);
       }
       memories_.push_back(std::make_unique<MemoryNode<T>>(data,false,name));
       name_to_index_[name] = memories_.size() - 1;
       return memories_.size() - 1;
     }
-
-  /// The data passed in will now be owned by the memory manager
-  /// returns the id in the vector
-  /// This is actually very unsame, a reference does not indicated ownership
-  /// of the object, if we are are going to create a Node and assume ownership
-  /// it has to aready be in a unique pointer
-  /// E.g. it is non-trivial to convert a nested array of heap allocated pointers
-  /// to a unique pointer, or what if an object on the stack is passed in
-  //      template<class T> 
-  //    inline    size_t MemoryManager::(T & data, const std::string & name){
-  //          PANACEA_FAIL("Cannot use createNode with data that is already stored in a unique_ptr, consider using addNode instead.");
-  //          return -1;
-  //        }
 
   template<class T> 
     inline   size_t MemoryManager::manageMemory(std::unique_ptr<T> && data, const std::string & name){

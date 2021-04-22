@@ -23,7 +23,8 @@ namespace panacea {
           const int & descriptor_index,
           const int & grad_index,
           const PrimitiveGroup & prim_grp,
-          const KernelDistributionSettings & distribution_settings
+          const KernelDistributionSettings & distribution_settings,
+          const double pre_factor
           );
    
       static std::unordered_map<settings::GradSetting,

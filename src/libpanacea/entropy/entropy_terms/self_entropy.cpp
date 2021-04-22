@@ -46,22 +46,27 @@ namespace panacea {
 
       assert(entropy_settings.dist_settings != nullptr);
 
-      double inv_distribution = 1.0/distribution_->compute(descriptor_wrapper, desc_ind);
-
+      std::vector<double> inv_distribution;
+      inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
+      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){ 
+        inv_distribution.push_back(-1.0/distribution_->compute(descriptor_wrapper, desc_ind2));
+      }
       // Compute the gradiant with respect to the Descriptors 
       std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
 
       const DistributionSettings * dist_settings = entropy_settings.dist_settings.get();
       // Compute the gradiant with respect to each of the Kernels 
-      for( int grad_ind = 0; grad_ind < descriptor_wrapper->getNumberPoints(); ++grad_ind ){
-        std::vector<double> grad_temp = distribution_->compute_grad(descriptor_wrapper, desc_ind, grad_ind, *dist_settings);
-        std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
-      }
-      std::transform(grad.begin(), grad.end(), grad.begin(),
+      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
+        std::vector<double> grad_temp = distribution_->compute_grad(descriptor_wrapper, desc_ind2, desc_ind, *dist_settings);
+
+        std::transform(grad_temp.begin(), grad_temp.end(), grad_temp.begin(),
           std::bind(std::multiplies<double>(), 
             std::placeholders::_1, 
-            inv_distribution));
+            inv_distribution.at(desc_ind2)));
 
+        std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
+
+      }
       return grad;
   }
 
