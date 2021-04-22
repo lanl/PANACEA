@@ -73,4 +73,5 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
   auto grad = entropy_term->compute_grad(&dwrapper_init,0, settings);
   std::cout << "Self entropy grad of first descriptor " << grad.at(0) << std::endl;
 
+
 }

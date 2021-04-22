@@ -33,7 +33,8 @@ namespace panacea {
 
     enum class EntropyOption {
       Weight,
-      IncrementRatio // Used in numerical gradiant calculations
+      IncrementRatio, // Used in numerical gradiant calculations
+      NumericalGrad   // Turn numerical gradiant on or off 
     };
 
     enum class EquationSetting {

@@ -18,6 +18,7 @@ namespace panacea {
   class NumericalGrad : public EntropyDecorator {
 
     double inc_ratio_ = 0.0001;
+    bool numerical_grad_ = true;
 
     public: 
       NumericalGrad(EntropyTerm * entropy_term) : EntropyDecorator(entropy_term) {};
