@@ -28,8 +28,21 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class Normalizer;
+
   /*
    * Class for storing the covariance matrix
+   *
+   * The covariance matrix can be generate using two techniques, the first is
+   * to pass in a descriptor wrapper class. The data in the descriptor wrapper
+   * is used to create the covariance matrix.
+   *
+   * Note, by default covariance matrix creation will adhere to a strict interpretation
+   * of what a covariance matrix is. Thus if all of your data points are stacked on 
+   * top of one another than you will end up with a covariance matrix full of 0.0's which
+   * does not make sense and is numerically instable for use with a kernel. 
+   *
+   * To avoid this case the CovarianceOption = Flexible can be specified this will
+   * allow the covariance matrix to assign 0's on problematic diagonal elements.
    */
   class Covariance {
     private:
