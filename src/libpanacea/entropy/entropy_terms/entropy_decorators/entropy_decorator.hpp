@@ -4,7 +4,16 @@
 #define PANACEA_PRIVATE_ENTROPYDECORATOR_H
 #pragma once
 
+// Local private PANACEA include
+#include "entropy/entropy_terms/entropy_term.hpp"
+
+// Standard includes
+#include <vector>
+
 namespace panacea {
+
+  class BaseDescriptorWrapper;
+  class EntropySettings;
 
   class EntropyDecorator : public EntropyTerm {
 
@@ -32,6 +41,9 @@ namespace panacea {
         return entropy_term_->compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
       }
 
+      virtual void set(const settings::EntropyOption & option, std::any val) override {
+        return entropy_term_->set(option, val);
+      }
   };
 
 }

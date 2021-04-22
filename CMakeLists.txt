@@ -59,8 +59,9 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/distributions/kernel_distribution/*
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/distribution_settings/*
   ${panacea_SOURCE_DIR}/src/libpanacea/entropy/*
-  ${panacea_SOURCE_DIR}/src/libpanacea/entropy/entropy_settins/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/entropy/entropy_settings/*
   ${panacea_SOURCE_DIR}/src/libpanacea/entropy/entropy_terms/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/entropy/entropy_terms/entropy_decorators/*
   ${panacea_SOURCE_DIR}/src/libpanacea/io/*
   ${panacea_SOURCE_DIR}/src/libpanacea/kernels/*
   ${panacea_SOURCE_DIR}/src/libpanacea/matrix/*

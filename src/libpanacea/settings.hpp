@@ -32,7 +32,8 @@ namespace panacea {
     };
 
     enum class EntropyOption {
-      Weight
+      Weight,
+      IncrementRatio // Used in numerical gradiant calculations
     };
 
     enum class EquationSetting {

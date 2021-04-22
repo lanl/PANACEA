@@ -28,7 +28,7 @@ namespace panacea {
        * Computes the entropy if a single point is used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper
+          const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind) = 0;
 
       virtual std::vector<double> compute_grad(
@@ -36,7 +36,7 @@ namespace panacea {
           const int desc_ind,
           const EntropySettings & entropy_settings) = 0;
 
-      virtual void set(const EntropyOption & option, std::any val) = 0;
+      virtual void set(const settings::EntropyOption & option, std::any val) = 0;
 
       virtual ~EntropyTerm() = 0;
   };

@@ -3,18 +3,31 @@
 #define PANACEA_PRIVATE_ENTROPYDECORATOR_NUMERICALGRAD_H
 #pragma once
 
+// Local private PANACEA includes
+#include "entropy_decorator.hpp"
+
+// Standard includes
+#include <vector>
+
 namespace panacea {
+
+  class BaseDescriptorWrapper;
+  class EntropySettings;
+  class EntropyTerm;
 
   class NumericalGrad : public EntropyDecorator {
 
+    double inc_ratio_ = 0.0001;
+
     public: 
-      NumericalGrad(EntropyTerm entropy_term) : EntropyDecorator(entropy_term) {};
+      NumericalGrad(EntropyTerm * entropy_term) : EntropyDecorator(entropy_term) {};
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 
+      virtual void set(const settings::EntropyOption & option, std::any val) override;
   };
 
 }

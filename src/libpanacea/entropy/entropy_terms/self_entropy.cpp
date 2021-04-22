@@ -36,8 +36,6 @@ namespace panacea {
     assert(descriptor_wrapper != nullptr);
 
     return -1.0 * log(distribution_->compute(descriptor_wrapper, desc_ind));
-
-    return self_entropy;
   }
 
   std::vector<double> SelfEntropy::compute_grad(
@@ -47,12 +45,7 @@ namespace panacea {
           ) {
 
       assert(entropy_settings.dist_settings != nullptr);
-//      std::vector<double> inv_distribution();
-//      inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
-      
-//      for( int desc_ind1 = 0; desc_ind1 < descriptor_wrapper->getNumberPoints(); ++desc_ind1 ){
-//        inv_distribution.push_back( 1.0/distribution_.compute(descriptor_wrapper, desc_ind1));
-//      }
+
       double inv_distribution = 1.0/distribution_->compute(descriptor_wrapper, desc_ind);
 
       // Compute the gradiant with respect to the Descriptors 
@@ -80,7 +73,6 @@ namespace panacea {
       std::string name) {
 
     name = "Self Entropy " + name;
-
     // Create distribution 
     DistributionFactory dist_factory;
     dist_factory.registerDistribution<
@@ -90,7 +82,7 @@ namespace panacea {
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 
-  void SelfEntropy::set(const EntropyOption & option, std::any val) {
+  void SelfEntropy::set(const settings::EntropyOption & option, std::any val) {
     std::string error_msg = "SelfEntropy does not contain any options that can be set";
     PANACEA_FAIL(error_msg);
   }
