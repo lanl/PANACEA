@@ -42,7 +42,8 @@ namespace panacea {
         virtual int getNumberDimensions() const final;
         virtual int getNumberPoints() const final;
         virtual void set(const Arrangement arrangement) final;
-        virtual std::any getPointerToRawData() noexcept final;
+//        virtual std::any getPointerToRawData() noexcept final;
+        virtual const std::any getPointerToRawData() const noexcept final;
         virtual std::type_index getTypeIndex() const noexcept final;
         virtual void print() const final;
         // Standard any should not be a reference because the underlying type should
@@ -89,9 +90,14 @@ namespace panacea {
     inline void KernelWrapper<T>::set(const Arrangement arrangement) {
       data_wrapper_.set(arrangement);
     }
-
+/*
   template<class T>
     inline std::any KernelWrapper<T>::getPointerToRawData() noexcept {
+      return data_wrapper_.getPointerToRawData();
+    }*/
+
+  template<class T>
+    inline const std::any KernelWrapper<T>::getPointerToRawData() const noexcept {
       return data_wrapper_.getPointerToRawData();
     }
 

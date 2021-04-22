@@ -49,7 +49,9 @@ namespace panacea {
     return settings::DistributionType::Kernel;
   }
 
-  double KernelDistribution::compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) {
+  double KernelDistribution::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper, 
+      const int desc_ind) {
     // Cycle through the primitives and compute the density
     double density = 0.0;
     for( auto & prim_ptr : prim_grp_.primitives ) {
@@ -61,39 +63,110 @@ namespace panacea {
   std::vector<double> KernelDistribution::compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
-          const DistributionSettings & distribution_settings_
+          const int grad_ind,
+          const DistributionSettings & distribution_settings_,
+          std::any option
           ) {
 
     assert(descriptor_wrapper->getNumberDimensions() == prim_grp_.kernel_wrapper->getNumberDimensions());
     assert(distribution_settings_.type() == settings::DistributionType::Kernel );
 
+    settings::GradSetting grad_setting;
+    if( option.type() != typeid(settings::None) ){
+      grad_setting = std::any_cast<settings::GradSetting>(option);
+    }
     auto distribution_settings = 
       dynamic_cast<const KernelDistributionSettings &>(distribution_settings_);
 
-#ifdef DEBUG
+#ifndef NDEBUG
     std::string error_msg = "Unsupported gradiant method encountered";
-    if(kern_dist_grad.grad_method
-        .count(distribution_settings.grad_setting) == 0) {
-      PANACEA_FAIL(error_msg);
+    if( option.type() == typeid(settings::None) ) {
+      if(kern_dist_grad.grad_method
+          .count(settings::GradSetting::WRTBoth) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          .count(settings::GradSetting::WRTKernel) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [settings::GradSetting::WRTBoth]
+          .count(distribution_settings.equation_settings) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [settings::GradSetting::WRTKernel]
+          .count(distribution_settings.equation_settings) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [settings::GradSetting::WRTBoth]
+          [distribution_settings.equation_settings]
+          .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [settings::GradSetting::WRTKernel]
+          [distribution_settings.equation_settings]
+          .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+    } else {
+      if(kern_dist_grad.grad_method
+          .count(grad_setting) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [grad_setting]
+          .count(distribution_settings.equation_settings) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
+      if(kern_dist_grad.grad_method
+          [grad_setting]
+          [distribution_settings.equation_settings]
+          .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
+        PANACEA_FAIL(error_msg);
+      }
     }
-    if(kern_dist_grad.grad_method
-        [distribution_settings.grad_setting]
-        .count(distribution_settings.equation_settings) == 0) {
-      PANACEA_FAIL(error_msg);
+#endif // NDEBUG
+
+    if( option.type() == typeid(settings::None) ) {
+      if( desc_ind == grad_ind ) {
+
+        return kern_dist_grad.grad_method
+          [settings::GradSetting::WRTBoth]
+          [distribution_settings.equation_settings]
+            [distribution_settings.dist_settings.get<settings::KernelCount>()](
+                descriptor_wrapper,
+                desc_ind,
+                grad_ind,
+                prim_grp_,
+                distribution_settings);
+      } else {
+        // Remaining cases should occur WRTKernel only 
+        return kern_dist_grad.grad_method
+          [settings::GradSetting::WRTKernel]
+          [distribution_settings.equation_settings]
+            [distribution_settings.dist_settings.get<settings::KernelCount>()](
+                descriptor_wrapper,
+                desc_ind,
+                grad_ind,
+                prim_grp_,
+                distribution_settings);
+      }
+    } else {
+
+      return kern_dist_grad.grad_method
+          [grad_setting]
+          [distribution_settings.equation_settings]
+            [distribution_settings.dist_settings.get<settings::KernelCount>()](
+                descriptor_wrapper,
+                desc_ind,
+                grad_ind,
+                prim_grp_,
+                distribution_settings);
+
     }
-    if(kern_dist_grad.grad_method
-        [distribution_settings.grad_setting]
-        [distribution_settings.equation_settings]
-        .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
-      PANACEA_FAIL(error_msg);
-    }
-#endif // DEBUG
-    return kern_dist_grad.grad_method
-        [distribution_settings.grad_settings]
-        [distribution_settings.equation_settings]
-        [distribution_settings.dist_settings.get<settings::KernelCount>()](
-          descriptor_wrapper,
-          desc_ind,
-          prim_grp_);
+
   }
 }

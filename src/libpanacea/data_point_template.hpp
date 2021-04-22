@@ -74,7 +74,15 @@ namespace panacea {
          * This function allows one to check if two groups of data are pointing to
          * the same data. 
          */
-        std::any getPointerToRawData() {
+        /*std::any getPointerToRawData() {
+          if( std::is_pointer<T>::value ) {
+            return data_;
+          } else {
+            return &data_;
+          }
+        }*/
+
+        const std::any getPointerToRawData() const {
           if( std::is_pointer<T>::value ) {
             return data_;
           } else {

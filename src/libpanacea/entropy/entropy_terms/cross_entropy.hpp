@@ -14,13 +14,18 @@ namespace panacea {
       virtual settings::EntropyType type() const noexcept final;
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper) final;
+          const BaseDescriptorWrapper * descriptor_wrapper) override;
+
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper
+          const int desc_ind) override;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
-          const EntropySettings & entropy_settings) final;
+          const EntropySettings & entropy_settings) override;
 
+      virtual void set(const EntropyOption & option, std::any val) override;
   };
 
 }

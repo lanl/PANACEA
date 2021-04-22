@@ -12,6 +12,7 @@
 namespace panacea {
 
   class BaseDescriptorWrapper;
+  class KernelDistributionSettings;
   class PrimitiveGroup;
 
   class KernelDistributionGradiant {
@@ -20,7 +21,10 @@ namespace panacea {
       using GradiantMethod = std::vector<double>(*)(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int & descriptor_index,
-          const PrimitiveGroup & prim_grp);
+          const int & grad_index,
+          const PrimitiveGroup & prim_grp,
+          const KernelDistributionSettings & distribution_settings
+          );
    
       static std::unordered_map<settings::GradSetting,
         std::unordered_map<settings::EquationSetting,

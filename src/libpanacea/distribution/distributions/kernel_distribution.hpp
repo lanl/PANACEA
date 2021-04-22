@@ -50,7 +50,9 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
-          const DistributionSettings & distribution_settings) final;
+          const int grad_ind,
+          const DistributionSettings & distribution_settings,
+          std::any grad_setting) final;
 
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,

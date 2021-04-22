@@ -38,7 +38,7 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
     {2.0, 5.0},
     {3.0, 6.0}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data, 3, 2);
+  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_init(&data, 3, 2);
 
   MemoryManager mem_manager;
 
@@ -58,28 +58,52 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
     KernelDistribution,
     settings::DistributionType::Kernel>();
 
-  auto dist = dist_factory.create(&dwrapper, mem_manager, &kernel_settings);
+  auto dist = dist_factory.create(&dwrapper_init, mem_manager, &kernel_settings);
 
-  REQUIRE(dist->compute(&dwrapper,0) == Approx(dist->compute(&dwrapper,2)));
-  REQUIRE(dist->compute(&dwrapper,1) > dist->compute(&dwrapper,0));
+  REQUIRE(dist->compute(&dwrapper_init,0) == Approx(dist->compute(&dwrapper_init,2)));
+  REQUIRE(dist->compute(&dwrapper_init,1) > dist->compute(&dwrapper_init,0));
 
   const DistributionSettings * dist_settings = &kernel_settings;
 
-  auto grad0 = dist->compute_grad(&dwrapper,0, *dist_settings);
-  auto grad1 = dist->compute_grad(&dwrapper,1, *dist_settings);
-  auto grad2 = dist->compute_grad(&dwrapper,2, *dist_settings);
+  std::vector<std::vector<double>> data_sample{
+    {1.25, 4.5}};
 
-  REQUIRE(grad0.at(0) == Approx(-1.0 * grad2.at(0)));
-  // Should be positive if the gradient was taken with respect to Descriptors,
-  // magnitude of density would be increasing from left to right near point 0,
-  // but the default behavior is to take the gradiant with respect to the kernel
-  // which has the opposite sign
-  REQUIRE(grad0.at(0) < 0.0);
-  // Should be negative if the gradient was taken with respect to Descriptors,
-  // magnitude of density would be increasing from left to right near point 0,
-  // but the default behavior is to take the gradiant with respect to the kernel
-  // which has the opposite sign
-  REQUIRE(grad2.at(0) > 0.0);
+  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample(&data_sample, 3, 2);
+
+  auto grad_setting = settings::GradSetting::WRTKernel;
+  auto grad0_wrt_kern = dist->compute_grad(&dwrapper_sample,0,0, *dist_settings, grad_setting);
+  auto grad1_wrt_kern = dist->compute_grad(&dwrapper_sample,0,1, *dist_settings, grad_setting);
+  auto grad2_wrt_kern = dist->compute_grad(&dwrapper_sample,0,2, *dist_settings, grad_setting);
+  std::cout << "grad0 WRT kernel Assuming we are sampling from a location removed from kernel " << grad0_wrt_kern.at(0) << std::endl;
+  std::cout << "grad1 WRT kernel Assuming we are sampling from a location removed from kernel " << grad1_wrt_kern.at(0) << std::endl;
+  std::cout << "grad2 WRT kernel Assuming we are sampling from a location removed from kernel " << grad2_wrt_kern.at(0) << std::endl;
+
+  // Add all the gradiants together
+  std::transform(grad0_wrt_kern.begin(), grad0_wrt_kern.end(), grad1_wrt_kern.begin(), grad0_wrt_kern.begin(), std::plus<double>());
+  std::transform(grad0_wrt_kern.begin(), grad0_wrt_kern.end(), grad2_wrt_kern.begin(), grad0_wrt_kern.begin(), std::plus<double>());
+
+  std::cout << "Sum of gradiants WRT kernel Assuming we are sampling from a location removed from kernel " << grad0_wrt_kern.at(0) << std::endl;
+  
+  grad_setting = settings::GradSetting::WRTDescriptor;
+  auto grad0_wrt_desc = dist->compute_grad(&dwrapper_sample,0,0, *dist_settings, grad_setting);
+
+  std::cout << "grad0 WRT descriptor assuming we are sampling from a location removed from kernel " << grad0_wrt_desc.at(0) << std::endl;
+  REQUIRE(grad0_wrt_desc.at(0) == Approx(-1.0 * grad0_wrt_kern.at(0)));
+
+  grad_setting = settings::GradSetting::WRTBoth;
+  
+  auto grad0 = dist->compute_grad(&dwrapper_init,0,0, *dist_settings, grad_setting);
+  auto grad1 = dist->compute_grad(&dwrapper_init,1,1, *dist_settings, grad_setting);
+  auto grad2 = dist->compute_grad(&dwrapper_init,2,2, *dist_settings, grad_setting);
+
+  std::cout << "grad0 WRT both if probing at location of first descriptor/kernel " << grad0.at(0) << std::endl;
+  std::cout << "grad1 WRT both if probing at location of second descriptor/kernel  " << grad1.at(0) << std::endl;
+  std::cout << "grad2 WRT both if probing at location of third descriptor/kernel  " << grad2.at(0) << std::endl;
+  REQUIRE(grad0.at(0) > 0.0);
+  REQUIRE(grad2.at(0) < 0.0);
+
+  REQUIRE(grad0.at(0) == Approx(-1.0*grad2.at(0)));
   REQUIRE(grad1.at(0) == Approx(0.0));
+  
 }
 

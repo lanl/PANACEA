@@ -61,17 +61,16 @@ namespace panacea {
   std::vector<double> GaussUncorrelated::compute_grad(
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
-      const std::vector<settings::EquationSetting> & prim_settings, 
+      const settings::EquationSetting & prim_settings, 
       const settings::GradSetting & grad_setting) const {
 
     assert(descriptors != nullptr);
     assert(attributes_.kernel_wrapper != nullptr);
     assert(attributes_.reduced_inv_covariance != nullptr);
+    assert(grad_setting != settings::GradSetting::WRTBoth && "Terms will cancel should avoid calling grad method at all");
 
     double exp_term;
-    if (std::find(prim_settings.begin(), 
-          prim_settings.end(), 
-          settings::EquationSetting::IgnoreExp) != prim_settings.end()) {
+    if (prim_settings == settings::EquationSetting::IgnoreExp) {
       exp_term = 1.0;
     } else {
       exp_term = compute(descriptors, descriptor_ind);
@@ -86,15 +85,19 @@ namespace panacea {
     for ( const int & dim : chosen_dims ) {
       const double diff =  descriptors->operator()(descriptor_ind,dim) - 
         attributes_.kernel_wrapper->operator()(kernel_index_,dim);
+//      std::cout << "diff " << diff << " norm coeff " << norm_coeffs.at(dim) << " exp term " << exp_term << " Reduced inv covar " << attributes_.reduced_inv_covariance->operator()(index,index) << std::endl;
       grad.at(dim) = 
         (diff * 
          norm_coeffs.at(dim) *
          norm_coeffs.at(dim)) * 
         attributes_.reduced_inv_covariance->operator()(index,index) * 
         exp_term;
+ //     std::cout << "Grad at dim " << dim << " grad " << grad.at(dim) << std::endl;
       ++index;
     }
 
+  //  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    
     if ( grad_setting == settings::GradSetting::WRTDescriptor ) {
       // Multiply the gradient by negative 1
       for ( const int & dim : chosen_dims ) {

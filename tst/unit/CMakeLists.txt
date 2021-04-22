@@ -13,6 +13,7 @@ list( APPEND TEST_SOURCES
     test_normalizer.cpp
     test_reducer.cpp
     test_row_echelon.cpp
+    test_self_entropy.cpp
     test_variance.cpp
     )
 

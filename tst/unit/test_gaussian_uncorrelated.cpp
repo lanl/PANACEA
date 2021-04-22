@@ -73,7 +73,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),1) == Approx(0.103777));
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),0) == Approx(0.103777));
 
-  std::vector<settings::EquationSetting> eq_settings = {settings::EquationSetting::None}; 
+  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
 
   {
     const int descriptor_ind = 0;
@@ -129,7 +129,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
   const int descriptor_ind = 1;
   const int kernel_ind = 0;
 
-  std::vector<settings::EquationSetting> eq_settings = {settings::EquationSetting::None}; 
+  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
 
   for( int index = 0; index < numbers1.size(); ++index ) {
     // Assumes we are dealing with two dimensions and two points
@@ -207,7 +207,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
   const int descriptor_ind = 1;
   const int kernel_ind = 0;
 
-  std::vector<settings::EquationSetting> eq_settings = {settings::EquationSetting::None}; 
+  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
   for( int index = 0; index < numbers1.size(); ++index ) {
     // Assumes we are dealing with two dimensions and two points
     // The dimensions are linearly dependent so only one will ultimately be used

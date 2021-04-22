@@ -39,7 +39,8 @@ namespace panacea {
       virtual void setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) final;
       virtual const std::vector<int> getReducedDimensions() const final;
       virtual const size_t getNumberReducedDimensions() const final;
-      virtual std::any getPointerToRawData() noexcept final;
+//      virtual std::any getPointerToRawData() noexcept final;
+      virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final; 
       virtual void print() const final;
   };
@@ -118,8 +119,13 @@ namespace panacea {
     return reduced_chosen_dimensions_.size();
   }
 
-  template<class T>
+/*  template<class T>
   inline std::any DescriptorWrapper<T>::getPointerToRawData() noexcept {
+    return data_wrapper_.getPointerToRawData();
+  }*/
+
+  template<class T>
+  inline const std::any DescriptorWrapper<T>::getPointerToRawData() const noexcept {
     return data_wrapper_.getPointerToRawData();
   }
 

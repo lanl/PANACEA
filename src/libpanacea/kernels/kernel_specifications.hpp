@@ -35,8 +35,8 @@ namespace panacea {
     settings::KernelMemory kern_memory_ = defaults::kern_memory_default;
     settings::KernelCenterCalculation kern_center_ = defaults::kern_center_default;
     public:
-/*    KernelSpecification() = default;
-    KernelSpecification(KernelSpecification &&) = default;
+    KernelSpecification() = default;
+/*    KernelSpecification(KernelSpecification &&) = default;
     KernelSpecification& operator=(KernelSpecification&& ) = default;*/
 /*    KernelSpecification(const KernelSpecification &) = default;
 
@@ -56,8 +56,6 @@ namespace panacea {
       kern_memory_(kern_memory),
       kern_center_(kern_center)
     {};
-
-
 
     template<class T>
       inline T get() const {

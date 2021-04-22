@@ -31,9 +31,17 @@ namespace panacea {
       Cross
     };
 
+    enum class EntropyOption {
+      Weight
+    };
+
     enum class EquationSetting {
       None,
       IgnoreExp
+    };
+
+    enum class None {
+      None
     };
 
     // Whether we are taking the gradient with respect to the descriptor or the kernel

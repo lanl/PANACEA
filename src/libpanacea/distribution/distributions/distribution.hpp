@@ -6,6 +6,7 @@
 #include "settings.hpp"
 
 // Standard includes
+#include <any>
 #include <vector>
 
 namespace panacea {
@@ -23,7 +24,8 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
-          const DistributionSettings & distribution_settings) = 0;
+          const int grad_ind, // The index associated with whatever we are taking the gradiant with respect to
+          const DistributionSettings & distribution_settings, std::any extra_options = settings::None::None) = 0;
 
       virtual ~Distribution() = 0;
   };

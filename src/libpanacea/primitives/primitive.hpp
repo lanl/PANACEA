@@ -48,7 +48,7 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
-          const std::vector<settings::EquationSetting> & prim_settings, 
+          const settings::EquationSetting & prim_settings, 
           const settings::GradSetting & grad_setting) const = 0; 
 
       virtual ~Primitive() = 0;
