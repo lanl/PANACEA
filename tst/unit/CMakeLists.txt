@@ -4,6 +4,7 @@ list( APPEND TEST_SOURCES
     test_covariance.cpp
     test_descriptor_wrappers.cpp
     test_distributions.cpp
+    test_gaussian_correlated.cpp
     test_gaussian_uncorrelated.cpp
     test_inverter.cpp
     test_kernel_wrappers.cpp
