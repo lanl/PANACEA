@@ -87,6 +87,16 @@ namespace panacea {
       const settings::EquationSetting & prim_settings, 
       const settings::GradSetting & grad_setting) const {
 
+    assert(descriptors != nullptr);
+    assert(descriptor_ind > -1);
+    assert(descriptor_ind < descriptors->getNumberPoints() );
+    assert(attributes_.kernel_wrapper != nullptr);
+    assert(kernel_index_ > -1);
+    assert(kernel_index_ < attributes_.kernel_wrapper->getNumberPoints());
+    assert(attributes_.reduced_inv_covariance != nullptr);
+    assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
+    assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+
     auto & descs  = *(descriptors);
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
     auto & kerns = *(attributes_.kernel_wrapper);
@@ -147,6 +157,7 @@ namespace panacea {
           2.0*diff.at(dim) * 
           red_inv_cov(index,index)) * 
         exp_term * 
+        norm_coeffs.at(dim) *
         norm_coeffs.at(dim);
       ++index;
     }

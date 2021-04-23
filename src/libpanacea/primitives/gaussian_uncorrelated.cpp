@@ -86,18 +86,14 @@ namespace panacea {
     for ( const int & dim : chosen_dims ) {
       const double diff =  descriptors->operator()(descriptor_ind,dim) - 
         attributes_.kernel_wrapper->operator()(kernel_index_,dim);
-//      std::cout << "diff " << diff << " norm coeff " << norm_coeffs.at(dim) << " exp term " << exp_term << " Reduced inv covar " << attributes_.reduced_inv_covariance->operator()(index,index) << std::endl;
       grad.at(dim) = 
         (diff * 
          norm_coeffs.at(dim) *
          norm_coeffs.at(dim)) * 
         attributes_.reduced_inv_covariance->operator()(index,index) * 
         exp_term;
- //     std::cout << "Grad at dim " << dim << " grad " << grad.at(dim) << std::endl;
       ++index;
     }
-
-  //  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     
     if ( grad_setting == settings::GradSetting::WRTDescriptor ) {
       // Multiply the gradient by negative 1

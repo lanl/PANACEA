@@ -269,6 +269,12 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
     const std::vector<double> norm_coeffs =  gauss_correlated_prim_grp.normalizer.getNormalizationCoeffs();
     const double grad_val = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0)) * norm_coeffs.at(0);
 
+    std::cout << "Norm Coefficients" << std::endl;
+    for( const auto & norm_coef : norm_coeffs ) {
+      std::cout << norm_coef << " ";
+    }
+    std::cout << std::endl;
+
     REQUIRE( grad_val == Approx(grad_wrt_desc.at(0))); 
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
     const auto grad_wrt_kern = gauss_correlated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
