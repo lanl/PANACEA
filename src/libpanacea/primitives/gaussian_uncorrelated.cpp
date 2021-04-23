@@ -25,8 +25,8 @@ namespace panacea {
     attributes_ = std::move(attributes); 
     double determinant = attributes_.reduced_covariance->getDeterminant();
     if( determinant <= 0.0 ) {
-      std::cout << "Determinant value: " << determinant << std::endl;
-      PANACEA_FAIL("Determinant is less than 0");
+      std::string error_msg = "Determinant is less than 0 value: " + std::to_string(determinant);
+      PANACEA_FAIL(error_msg);
     }
     pre_factor_ = 1.0/(std::pow(determinant,0.5) * 
         std::pow(constants::PI_SQRT*constants::SQRT_2,
@@ -69,13 +69,14 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(grad_setting != settings::GradSetting::WRTBoth && "Terms will cancel should avoid calling grad method at all");
 
-    double exp_term;
-    if (prim_settings == settings::EquationSetting::IgnoreExp) {
-      exp_term = 1.0;
-    } else {
-      exp_term = compute(descriptors, descriptor_ind);
-    }
-  
+    const double exp_term = [&]{
+      if (prim_settings == settings::EquationSetting::IgnoreExp) {
+        return 1.0;
+      } else {
+        return compute(descriptors, descriptor_ind);
+      }
+    }();
+
     std::vector<double> grad(descriptors->getNumberDimensions(),0.0);
 
     const auto & chosen_dims = attributes_.reduced_inv_covariance->getChosenDimensionIndices();

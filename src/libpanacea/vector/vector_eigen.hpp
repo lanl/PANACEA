@@ -6,6 +6,8 @@
 // Local PANACEA includes
 #include "panacea/vector.hpp"
 
+#include "data_settings.hpp"
+
 // Third party includes
 #include <Eigen/Dense>
 
@@ -20,15 +22,19 @@ namespace panacea {
    */
   class VectorEigen : public Vector {
     private: 
+      Direction direction_ = Direction::AlongRows;
       std::unique_ptr<Eigen::VectorXd> vector_;
     public:
       VectorEigen();
       virtual ~VectorEigen() final {};
       virtual VectorEigen& operator=(const Vector * vec) final;
-      virtual double& operator()(const int row) final;
-      virtual double operator()(const int row) const final;
-      virtual void resize(const int rows) final;
+      virtual double& operator()(const int index) final;
+      virtual double operator()(const int index) const final;
+      virtual Direction direction() const final;
+      virtual void resize(const int size) final;
+      virtual void setZero() final;
       virtual int rows() const final;
+      virtual int cols() const final;
       virtual void print() const final;
   };
 }

@@ -18,11 +18,14 @@
 
 namespace panacea {
 
-  enum class EquationSetting;
-  enum class GradSetting;
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
   class PrimitiveFactory;
+
+  namespace settings {
+    enum class EquationSetting;
+    enum class GradSetting;
+  }
 
   namespace test {
     class Test;
@@ -45,7 +48,8 @@ namespace panacea {
           const int & kernel_index) : 
         kernel_index_(kernel_index) ,
         attributes_(std::move(prim_att)),
-        pre_factor_(1.0/(std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
+        pre_factor_(1.0/(
+              std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) * 
               std::pow(constants::PI_SQRT*constants::SQRT_2,
                 static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
     {};
@@ -61,12 +65,10 @@ namespace panacea {
       /*
        * Compute the gradient of the primitive
        *
-       * provde:
+       * provide:
        *
        * 1. descriptors - the descriptors
        * 2. descriptor_ind - the descriptor index calculating the gradient at
-       * 3. kernel_ind - the kernel index 
-       * 4. point_target - the index of either the kernel or descriptor that the gradient is being taken 
        * with respect too (not needed because it shoule either be the kernel or the descriptor)
        * 5. EquationSetting - determines if things should be added or removed from gradient 
        * 6. GradSetting - whether the gradient is with respect to the descriptors or kernels or both
@@ -74,7 +76,6 @@ namespace panacea {
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptors,
           const int descriptor_ind,
-//          const int point_target, 
           const settings::EquationSetting & prim_settings, 
           const settings::GradSetting & grad_setting) const final; 
 

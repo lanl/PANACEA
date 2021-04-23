@@ -11,6 +11,8 @@ namespace panacea {
     Default,
     Eigen
   };
+  
+  enum class Direction;
 
   class Vector {
 
@@ -19,8 +21,25 @@ namespace panacea {
       virtual Vector& operator=(const Vector * vec) = 0;
       virtual double& operator()(const int row) = 0;
       virtual double operator()(const int row) const = 0;
+
+      /**
+       * Is it a row or column matrix 
+       **/
+      virtual Direction direction() const = 0;
+
+      /**
+       * Does not guarantee values are set to 0.
+       **/
       virtual void resize(const int rows) = 0;
+
+      /**
+       * Sets all values in the vector equal to 0
+       **/
+      virtual void setZero() = 0;
+
       virtual int rows() const = 0;
+      virtual int cols() const = 0;
+
       virtual void print() const = 0;
   };
 

@@ -66,12 +66,10 @@ namespace panacea {
       /*
        * Compute the gradient of the primitive
        *
-       * provde:
+       * provide:
        *
        * 1. descriptors - the descriptors
        * 2. descriptor_ind - the descriptor index calculating the gradient at
-       * 3. kernel_ind - the kernel index 
-       * 4. point_target - the index of either the kernel or descriptor that the gradient is being taken 
        * with respect too ( not needed should either be the point or the descriptor otherwise the gradient is 0.0)
        * 5. EquationSetting - determines if things should be added or removed from gradient 
        * 6. GradSetting - whether the gradient is with respect to the descriptors or kernels or both

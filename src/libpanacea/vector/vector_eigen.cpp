@@ -17,9 +17,13 @@ namespace panacea {
     vector_ = std::make_unique<Eigen::VectorXd>();
   }
 
-  void VectorEigen::resize(const int rows) {
-    assert(rows>=0);
-    vector_->resize(rows);
+  void VectorEigen::setZero() {
+    vector_->setZero();
+  }
+
+  void VectorEigen::resize(const int size) {
+    assert(vector_->rows()>=0);
+    vector_->resize(size);
   }
 
   VectorEigen& VectorEigen::operator=(const Vector * vec) {
@@ -31,20 +35,36 @@ namespace panacea {
     return *this;
   }
 
-  double& VectorEigen::operator()(const int row) {
-    assert(row>=0);
-    assert(row<vector_->rows());
-    return (*vector_)(row);
+  double& VectorEigen::operator()(const int index) {
+    assert(index>=0);
+    assert(index<vector_->rows());
+    return (*vector_)(index);
   }
 
-  double VectorEigen::operator()(const int row) const {
-    assert(row>=0);
-    assert(row<vector_->rows());
-    return (*vector_)(row);
+  double VectorEigen::operator()(const int index) const {
+    assert(index>=0);
+    assert(index<vector_->rows());
+    return (*vector_)(index);
   }
 
   int VectorEigen::rows() const {
-    return vector_->rows();
+    if( direction_ == Direction::AlongRows ) {
+      return vector_->rows();
+    } else {
+      return 1;
+    }
+  }
+
+  Direction VectorEigen::direction() const {
+    return direction_;
+  }
+
+  int VectorEigen::cols() const {
+    if( direction_ == Direction::AlongColumns) {
+      return 1;
+    } else {
+      return vector_->rows();
+    }
   }
 
   void VectorEigen::print() const {

@@ -36,6 +36,10 @@ namespace panacea {
       double operator()(const int row, const int col) const;
 
       void print() const;
+
+      /**
+       * Gets the total number of dimensions in the reduced inverse covariance matrix
+       **/
       int getNumberDimensions() const;
       const std::vector<int> & getChosenDimensionIndices() const;
 
