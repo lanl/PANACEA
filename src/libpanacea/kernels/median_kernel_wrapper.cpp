@@ -16,10 +16,12 @@ namespace panacea {
       BaseDescriptorWrapper * desc_wrapper
       ) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Median median;
     auto center_ = median.calculate<
       BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   MedianKernelWrapper::MedianKernelWrapper(

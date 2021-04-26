@@ -64,6 +64,7 @@ namespace panacea {
       const int rows,
       const int cols) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::make_unique<MedianKernelWrapper>(key, std::any_cast<BaseDescriptorWrapper *>(data)); 
   }
 

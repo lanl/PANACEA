@@ -32,20 +32,25 @@ namespace panacea {
 
     // Ensure valid method exists
     if( create_methods_.count(kern_specification.get<settings::KernelCenterCalculation>()) == 0){
-      std::string error_msg = "Kernel creation method is missing for the specified type.";
+      std::string error_msg = "Kernel creation method is missing for the specified type: ";
+      error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
       PANACEA_FAIL(error_msg);
     }
-    if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
-      std::string error_msg = "Kernel creation method is missing for the specified type.";
-      PANACEA_FAIL(error_msg);
-    }
+
     
     name = "Kernel Centers: " + name;
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
+
+      if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
+        std::string error_msg = "Kernel creation method is missing for the specified internal type.";
+        PANACEA_FAIL(error_msg);
+      }
+
       if( kern_specification.is(settings::KernelMemory::Share)){
         auto any_ptr = desc_wrapper->getPointerToRawData();
         if( any_ptr.type() == typeid(std::vector<std::vector<double>> *)){
+          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           memory_manager.managePointer(
               std::any_cast<std::vector<std::vector<double>>*>(
                 desc_wrapper->getPointerToRawData()),
@@ -57,6 +62,7 @@ namespace panacea {
         if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
           PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
         }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_wrapper->getTypeIndex()](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper->getPointerToRawData(),
@@ -66,12 +72,15 @@ namespace panacea {
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
 
-        if( not kern_specification.is(settings::KernelCenterCalculation::Mean) ||
+        if( not kern_specification.is(settings::KernelCenterCalculation::Mean) &&
             not kern_specification.is(settings::KernelCenterCalculation::Median)) {
-          PANACEA_FAIL("Kernel Center Calculation must be Mean or Median when Count is Single."); 
+          std::string error_msg = "Kernel Center Calculation must be Mean or Median when Count is Single: ";
+          error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
+          PANACEA_FAIL(error_msg); 
         }
 
-
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+        std::cout << settings::toString(kern_specification.get<settings::KernelCenterCalculation>()) << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
         [typeid(std::vector<double>)](
           PassKey<KernelWrapperFactory>(),
@@ -79,32 +88,6 @@ namespace panacea {
           1,
           desc_wrapper->getNumberDimensions());
 
-
-        // Create data for the kernel
-/*        std::vector<std::vector<double>> centers;
-        if( kern_specification.is(settings::KernelCenterCalculation::Mean )) {
-          Mean mean;
-          centers.push_back(mean.calculate(*desc_wrapper));
-        } else if (kern_specification.is(settings::KernelCenterCalculation::Median )) {
-          Median median;
-          centers.push_back(median.calculate(*desc_wrapper));
-        }
-        auto kernel_center = std::make_unique<std::vector<std::vector<double>>>(centers);
-
-        auto kwrapper = create_methods_[
-          typeid(std::vector<std::vector<double>>*)](
-              PassKey<KernelWrapperFactory>(),
-              kernel_center.get(),
-              1,
-              kernel_center->size());
-*/
-        // Unlike managePointer manageMemory means the memory manager now
-        // owns the memory data
-//        memory_manager.manageMemory(
-//            std::move(kernel_center),
-//            name);
-
-//        return kwrapper;
       }
     }
     std::string error_msg = "The combination of kernel specifications is not";

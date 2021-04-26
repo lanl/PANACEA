@@ -26,10 +26,12 @@ namespace panacea {
       BaseDescriptorWrapper * desc_wrapper
       ) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Mean mean;
     std::vector<double> center_ = mean.calculate<BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
     number_pts_mean_ = desc_wrapper->getNumberPoints();
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   double& MeanKernelWrapper::operator()(const int point_ind, const int dim_ind) {

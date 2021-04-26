@@ -42,14 +42,14 @@ namespace panacea {
           MemoryManager & memory_manager,
           std::string name) const;
 
-      template<settings::KernelCenterCalculation kernel_center, class T>
+      template<settings::KernelCenterCalculation kernel_center, class T, class S>
         static bool registerKernel() {
           if( create_methods_.count(kernel_center) == 0 ) {
-            create_methods_[kernel_center][typeid(T)] = KernelWrapper<T>::create;
+            create_methods_[kernel_center][typeid(T)] = S::create;
             return true;
           } else {
             if( create_methods_[kernel_center].count(typeid(T)) == 0){
-              create_methods_[kernel_center][typeid(T)] = KernelWrapper<T>::create;
+              create_methods_[kernel_center][typeid(T)] = S::create;
               return true;
             }
           }

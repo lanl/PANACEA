@@ -117,6 +117,137 @@ TEST_CASE("Testing:compute of gaussian correlated primitive","[unit,panacea]"){
   }
 }
 
+TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel","[unit,panacea]"){
+
+  // Assumes we are dealing with two dimensions and three points
+  std::vector<std::vector<double>> raw_desc_data{
+    {0.0, 3.0},
+    {2.0, 5.0},
+    {7.0, 7.0}};
+
+  auto dwrapper = std::make_unique<
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,3, 2);
+
+  KernelSpecification specification(
+      settings::KernelCorrelation::Correlated,
+      settings::KernelCount::Single,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelNormalization::None,
+      settings::KernelMemory::Own,
+      settings::KernelCenterCalculation::Mean,
+      settings::KernelAlgorithm::Flexible);
+
+  MemoryManager mem_manager;
+
+  PrimitiveFactory prim_factory;
+  
+  prim_factory.registerPrimitive<
+    GaussCorrelated,
+    settings::KernelPrimitive::Gaussian,
+    settings::KernelCorrelation::Correlated>();
+
+  auto gauss_correlated_prim_grp = prim_factory.create(
+      dwrapper.get(),
+      mem_manager,
+      specification);
+
+  // There should be two primitives sense it is a one to one ratio and there 
+  // are two descriptors
+  REQUIRE(gauss_correlated_prim_grp.primitives.size() == 1);
+  REQUIRE(gauss_correlated_prim_grp.primitives.at(0)->getId() == 0);
+
+  // Get the density located at the center of the primitives and compare it with the densities
+  // at the sides, density at center should be greater
+  //
+  // Center will be 
+  // 
+  // col1  col2
+  //  3.0   5.0
+  //
+  std::vector<std::vector<double>> raw_desc_data_sample{
+    {3.0, 5.0},
+    {2.9, 4.9},
+    {3.1, 5.1}};
+
+  auto dwrapper_sample = std::make_unique<
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data_sample,3, 2);
+
+  const int single_kernel_index = 0;
+  const double sample_center = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),0);
+  const double sample_side1 = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),1);
+  const double sample_side2 = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),2);
+
+  REQUIRE( sample_center > sample_side1);
+  REQUIRE( sample_center > sample_side2);
+  REQUIRE( sample_side1 == Approx(sample_side2));
+ 
+}
+
+TEST_CASE("Testing:compute of gaussian correlated primitive single median kernel","[unit,panacea]"){
+
+  // Assumes we are dealing with two dimensions and three points
+  std::vector<std::vector<double>> raw_desc_data{
+    {0.0, 3.0},
+    {2.0, 5.0},
+    {8.0, 7.0}};
+
+  auto dwrapper = std::make_unique<
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,3, 2);
+
+  KernelSpecification specification(
+      settings::KernelCorrelation::Correlated,
+      settings::KernelCount::Single,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelNormalization::None,
+      settings::KernelMemory::Own,
+      settings::KernelCenterCalculation::Median,
+      settings::KernelAlgorithm::Flexible);
+
+  MemoryManager mem_manager;
+
+  PrimitiveFactory prim_factory;
+  
+  prim_factory.registerPrimitive<
+    GaussCorrelated,
+    settings::KernelPrimitive::Gaussian,
+    settings::KernelCorrelation::Correlated>();
+
+  auto gauss_correlated_prim_grp = prim_factory.create(
+      dwrapper.get(),
+      mem_manager,
+      specification);
+
+  // There should be two primitives sense it is a one to one ratio and there 
+  // are two descriptors
+  REQUIRE(gauss_correlated_prim_grp.primitives.size() == 1);
+  REQUIRE(gauss_correlated_prim_grp.primitives.at(0)->getId() == 0);
+
+  // Get the density located at the center of the primitives and compare it with the densities
+  // at the sides, density at center should be greater
+  //
+  // Center will be 
+  // 
+  // col1  col2
+  //  2.0   5.0
+  //
+  std::vector<std::vector<double>> raw_desc_data_sample{
+    {2.0, 5.0},
+    {1.9, 4.9},
+    {2.1, 5.1}};
+
+  auto dwrapper_sample = std::make_unique<
+    DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data_sample,3, 2);
+
+  const int single_kernel_index = 0;
+  const double sample_center = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),0);
+  const double sample_side1 = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),1);
+  const double sample_side2 = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),2);
+
+  REQUIRE( sample_center > sample_side1);
+  REQUIRE( sample_center > sample_side2);
+  REQUIRE( sample_side1 == Approx(sample_side2));
+}
+
 TEST_CASE("Testing:compute of gaussian correlated primitive grad","[unit,panacea]"){
 
   // Set of numbers to test the gradient at

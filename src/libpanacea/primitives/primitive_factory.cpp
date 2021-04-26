@@ -122,11 +122,22 @@ namespace panacea {
 
     KernelWrapperFactory kfactory;
 
-    kfactory.registerKernel<settings::KernelCenterCalculation::None, std::vector<std::vector<double>>*>();
-    kfactory.registerKernel<settings::KernelCenterCalculation::Mean, std::vector<double>>();
-    kfactory.registerKernel<settings::KernelCenterCalculation::Median, std::vector<double>>();
+    kfactory.registerKernel<settings::KernelCenterCalculation::None,
+      std::vector<std::vector<double>>*,
+      KernelWrapper<std::vector<std::vector<double>>*>>();
+
+    kfactory.registerKernel<settings::KernelCenterCalculation::Mean,
+      std::vector<double>,
+      MeanKernelWrapper>();
+
+    kfactory.registerKernel<settings::KernelCenterCalculation::Median,
+      std::vector<double>,
+      MedianKernelWrapper>();
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto kwrapper = kfactory.create(dwrapper, specification, mem_manager, name);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Reducer reducer;
     Inverter inverter;
   
@@ -147,12 +158,14 @@ namespace panacea {
     dwrapper->setReducedNumberDimensions(prim_grp.reduced_covariance->getChosenDimensionIndices());
 
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
-      std::string error_msg = "Kernel Primitive is not supported";
+      std::string error_msg = "Kernel Primitive is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
       PANACEA_FAIL(error_msg);
     }
 
     if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
-      std::string error_msg = "Kernel count method is not supported.";
+      std::string error_msg = "Kernel count method is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelCount>());
       PANACEA_FAIL(error_msg);
     }
 
