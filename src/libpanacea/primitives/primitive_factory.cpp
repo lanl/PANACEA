@@ -11,6 +11,8 @@
 #include "error.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
+#include "kernels/mean_kernel_wrapper.hpp"
+#include "kernels/median_kernel_wrapper.hpp"
 #include "memory.hpp"
 #include "normalization_methods/normalization_method_factory.hpp"
 #include "normalization_methods/normalization_method_none.hpp"
@@ -119,6 +121,10 @@ namespace panacea {
       std::string name) const {
 
     KernelWrapperFactory kfactory;
+
+    kfactory.registerKernel<settings::KernelCenterCalculation::None, std::vector<std::vector<double>>*>();
+    kfactory.registerKernel<settings::KernelCenterCalculation::Mean, std::vector<double>>();
+    kfactory.registerKernel<settings::KernelCenterCalculation::Median, std::vector<double>>();
     auto kwrapper = kfactory.create(dwrapper, specification, mem_manager, name);
 
     Reducer reducer;

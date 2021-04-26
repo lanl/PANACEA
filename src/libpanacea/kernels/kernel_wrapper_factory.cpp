@@ -20,11 +20,9 @@
 
 namespace panacea {
 
-  std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>
-    KernelWrapperFactory::create_methods_{{
-      std::type_index(typeid(std::vector<std::vector<double>>*)),
-        KernelWrapper<std::vector<std::vector<double>>*>::create
-    }};
+  std::unordered_map<settings::KernelCenterCalculation, 
+    std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>>
+    KernelWrapperFactory::create_methods_;
 
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
       BaseDescriptorWrapper * desc_wrapper, 
@@ -32,6 +30,16 @@ namespace panacea {
       MemoryManager & memory_manager,
       std::string name = "") const {
 
+    // Ensure valid method exists
+    if( create_methods_.count(kern_specification.get<settings::KernelCenterCalculation>()) == 0){
+      std::string error_msg = "Kernel creation method is missing for the specified type.";
+      PANACEA_FAIL(error_msg);
+    }
+    if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
+      std::string error_msg = "Kernel creation method is missing for the specified type.";
+      PANACEA_FAIL(error_msg);
+    }
+    
     name = "Kernel Centers: " + name;
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
@@ -49,7 +57,7 @@ namespace panacea {
         if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
           PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
         }
-        return create_methods_[desc_wrapper->getTypeIndex()](
+        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_wrapper->getTypeIndex()](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper->getPointerToRawData(),
             desc_wrapper->rows(),
@@ -57,8 +65,23 @@ namespace panacea {
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
+
+        if( not kern_specification.is(settings::KernelCenterCalculation::Mean) ||
+            not kern_specification.is(settings::KernelCenterCalculation::Median)) {
+          PANACEA_FAIL("Kernel Center Calculation must be Mean or Median when Count is Single."); 
+        }
+
+
+        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
+        [typeid(std::vector<double>)](
+          PassKey<KernelWrapperFactory>(),
+          desc_wrapper,
+          1,
+          desc_wrapper->getNumberDimensions());
+
+
         // Create data for the kernel
-        std::vector<std::vector<double>> centers;
+/*        std::vector<std::vector<double>> centers;
         if( kern_specification.is(settings::KernelCenterCalculation::Mean )) {
           Mean mean;
           centers.push_back(mean.calculate(*desc_wrapper));
@@ -74,14 +97,14 @@ namespace panacea {
               kernel_center.get(),
               1,
               kernel_center->size());
-
+*/
         // Unlike managePointer manageMemory means the memory manager now
         // owns the memory data
-        memory_manager.manageMemory(
-            std::move(kernel_center),
-            name);
+//        memory_manager.manageMemory(
+//            std::move(kernel_center),
+//            name);
 
-        return kwrapper;
+//        return kwrapper;
       }
     }
     std::string error_msg = "The combination of kernel specifications is not";

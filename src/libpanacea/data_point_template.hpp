@@ -40,7 +40,8 @@ namespace panacea {
         int rows_ = 0;
         int cols_ = 0;
       public:
-
+  
+        DataPointTemplate() = default;
         DataPointTemplate(T data, int rows, int cols) : 
           data_(data),
           rows_(rows),
@@ -74,14 +75,6 @@ namespace panacea {
          * This function allows one to check if two groups of data are pointing to
          * the same data. 
          */
-        /*std::any getPointerToRawData() {
-          if( std::is_pointer<T>::value ) {
-            return data_;
-          } else {
-            return &data_;
-          }
-        }*/
-
         const std::any getPointerToRawData() const {
           if( std::is_pointer<T>::value ) {
             return data_;
@@ -124,11 +117,17 @@ namespace panacea {
     inline double& DataPointTemplate<T>::operator()(const int point_ind, const int dim_ind) {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
-
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
-        return (*data_)[point_ind][dim_ind];
+      if constexpr(std::is_pointer<T>::value) {
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+          return (*data_)[point_ind][dim_ind];
+        }
+        return (*data_)[dim_ind][point_ind];
+      } else {
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+          return (data_)[point_ind][dim_ind];
+        }
+        return (data_)[dim_ind][point_ind];
       }
-      return (*data_)[dim_ind][point_ind];
     }
 
   template<class T> 
@@ -136,10 +135,17 @@ namespace panacea {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
-        return (*data_)[point_ind][dim_ind];
+      if constexpr(std::is_pointer<T>::value) {
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+          return (*data_)[point_ind][dim_ind];
+        }
+        return (*data_)[dim_ind][point_ind];
+      } else {
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+          return (data_)[point_ind][dim_ind];
+        }
+        return (data_)[dim_ind][point_ind];
       }
-      return (*data_)[dim_ind][point_ind];
     } 
 
   /*
@@ -167,6 +173,33 @@ namespace panacea {
         return data_->at(point_ind).at(dim_ind);
       }
       return data_->at(dim_ind).at(point_ind);
+    } 
+
+  /*
+   * Specialization of the template in the case that a vector is used
+   */
+  template<> 
+    inline double& DataPointTemplate<std::vector<double>>::operator()(
+        const int point_ind, const int dim_ind) {
+      assert(point_ind == 0 );
+      assert(dim_ind >= 0 && dim_ind < number_dimensions_);
+
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        return data_.at(dim_ind);
+      }
+      return data_.at(point_ind);
+    }
+
+  template<> 
+    inline double DataPointTemplate<std::vector<double>>::operator()(
+        const int point_ind, const int dim_ind) const {
+      assert(point_ind == 0);
+      assert(dim_ind >= 0 && dim_ind < number_dimensions_);
+
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        return data_.at(dim_ind);
+      }
+      return data_.at(point_ind);
     } 
 
   template class DataPointTemplate<std::vector<std::vector<double>>*>;

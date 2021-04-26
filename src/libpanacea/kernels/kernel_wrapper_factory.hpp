@@ -3,19 +3,15 @@
 #pragma once
 
 // Local private includes
-//#include "base_kernel_wrapper.hpp"
-//#include "descriptors/base_descriptor_wrapper.hpp"
-//#include "kernel_specifications.hpp"
 #include "kernel_wrapper.hpp"
-//#include "memory.hpp"
 #include "passkey.hpp"
+#include "settings.hpp"
 
 // Standard includes
 #include <any>
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
-//#include <vector>
 
 namespace panacea {
 
@@ -35,7 +31,8 @@ namespace panacea {
 
     private:
 
-      static std::unordered_map<std::type_index, KernelCreateMethod> create_methods_;
+      static std::unordered_map<settings::KernelCenterCalculation,
+        std::unordered_map<std::type_index, KernelCreateMethod>> create_methods_;
 
     public:
 
@@ -45,11 +42,16 @@ namespace panacea {
           MemoryManager & memory_manager,
           std::string name) const;
 
-      template<class T>
-        static bool registerType() {
-          if( create_methods_.count(typeid(T)) == 0){
-            create_methods_[typeid(T)] = KernelWrapper<T>::create;
+      template<settings::KernelCenterCalculation kernel_center, class T>
+        static bool registerKernel() {
+          if( create_methods_.count(kernel_center) == 0 ) {
+            create_methods_[kernel_center][typeid(T)] = KernelWrapper<T>::create;
             return true;
+          } else {
+            if( create_methods_[kernel_center].count(typeid(T)) == 0){
+              create_methods_[kernel_center][typeid(T)] = KernelWrapper<T>::create;
+              return true;
+            }
           }
           return false;
         }

@@ -1,6 +1,9 @@
 
 // Local private includes
 #include "kernels/kernel_wrapper.hpp"
+#include "kernels/kernel_wrapper_factory.hpp"
+#include "kernels/mean_kernel_wrapper.hpp"
+#include "kernels/median_kernel_wrapper.hpp"
 
 #include "helper.hpp"
 
@@ -13,6 +16,14 @@
 
 using namespace std;
 using namespace panacea;
+
+TEST_CASE("Testing:kernel_wrapper_factory trivial registration","[unit,panacea]"){
+
+  KernelWrapperFactory kern_factory;
+  kern_factory.registerKernel<settings::KernelCenterCalculation::None, std::vector<std::vector<double>>*>();
+  kern_factory.registerKernel<settings::KernelCenterCalculation::Mean, std::vector<double>>();
+  kern_factory.registerKernel<settings::KernelCenterCalculation::Median, std::vector<double>>();
+}
 
 TEST_CASE("Testing:kernel_wrapper_constructor1","[unit,panacea]"){
 
