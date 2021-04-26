@@ -20,6 +20,10 @@ namespace panacea {
   class BaseDescriptorWrapper;
   class KernelWrapperFactory;
 
+  namespace test {
+    class Test;
+  }
+
   class MeanKernelWrapper : public BaseKernelWrapper {
 
     private:
@@ -29,6 +33,11 @@ namespace panacea {
 
       MeanKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
+          BaseDescriptorWrapper * desc_wrapper
+          );
+
+      MeanKernelWrapper(
+          const PassKey<test::Test> &,
           BaseDescriptorWrapper * desc_wrapper
           );
 
@@ -49,8 +58,6 @@ namespace panacea {
           std::any data, 
           const int rows,
           const int cols);
-
-
   };
 
   inline std::unique_ptr<BaseKernelWrapper> MeanKernelWrapper::create(

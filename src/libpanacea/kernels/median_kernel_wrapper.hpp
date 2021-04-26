@@ -19,6 +19,10 @@ namespace panacea {
   class BaseDescriptorWrapper;
   class KernelWrapperFactory;
 
+  namespace test {
+    class Test;
+  }
+
   class MedianKernelWrapper : public BaseKernelWrapper {
 
     private:
@@ -27,6 +31,11 @@ namespace panacea {
 
       MedianKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
+          BaseDescriptorWrapper * desc_wrapper
+          );
+
+      MedianKernelWrapper(
+          const PassKey<test::Test> &,
           BaseDescriptorWrapper * desc_wrapper
           );
 

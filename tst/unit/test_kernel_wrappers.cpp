@@ -1,5 +1,6 @@
 
 // Local private includes
+#include "descriptors/descriptor_wrapper.hpp"
 #include "kernels/kernel_wrapper.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/mean_kernel_wrapper.hpp"
@@ -23,6 +24,27 @@ TEST_CASE("Testing:kernel_wrapper_factory trivial registration","[unit,panacea]"
   kern_factory.registerKernel<settings::KernelCenterCalculation::None, std::vector<std::vector<double>>*>();
   kern_factory.registerKernel<settings::KernelCenterCalculation::Mean, std::vector<double>>();
   kern_factory.registerKernel<settings::KernelCenterCalculation::Median, std::vector<double>>();
+}
+
+TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
+
+  std::vector<std::vector<double>> data = {{1.0},{2.0},{6.0}};
+  
+  DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,1); 
+
+  WHEN("Testing mean kernel wrapper"){
+    MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
+    REQUIRE(mean_kwrapper.getNumberDimensions() == 1);
+    REQUIRE(mean_kwrapper.getNumberPoints() == 1);
+    REQUIRE(mean_kwrapper(0,0) == Approx(3.0));
+  }
+
+  WHEN("Testing median kernel wrapper"){
+    MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
+    REQUIRE(median_kwrapper.getNumberDimensions() == 1);
+    REQUIRE(median_kwrapper.getNumberPoints() == 1);
+    REQUIRE(median_kwrapper(0,0) == Approx(2.0));
+  }
 }
 
 TEST_CASE("Testing:kernel_wrapper_constructor1","[unit,panacea]"){

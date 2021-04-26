@@ -16,7 +16,18 @@ namespace panacea {
       ) {
 
     Mean mean;
-    auto center_ = mean.calculate(*desc_wrapper);
+    std::vector<double> center_ = mean.calculate<BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
+    number_pts_mean_ = desc_wrapper->getNumberPoints();
+    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+  }
+
+  MeanKernelWrapper::MeanKernelWrapper(
+      const PassKey<test::Test> &,
+      BaseDescriptorWrapper * desc_wrapper
+      ) {
+
+    Mean mean;
+    std::vector<double> center_ = mean.calculate<BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
     number_pts_mean_ = desc_wrapper->getNumberPoints();
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
   }

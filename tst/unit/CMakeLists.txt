@@ -9,6 +9,7 @@ list( APPEND TEST_SOURCES
     test_inverter.cpp
     test_kernel_wrappers.cpp
     test_mean.cpp
+    test_median.cpp
     test_memory_manager.cpp
     test_normalization_methods.cpp
     test_normalizer.cpp

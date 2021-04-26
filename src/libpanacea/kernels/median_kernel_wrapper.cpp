@@ -17,7 +17,19 @@ namespace panacea {
       ) {
 
     Median median;
-    auto center_ = median.calculate(*desc_wrapper);
+    auto center_ = median.calculate<
+      BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
+    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+  }
+
+  MedianKernelWrapper::MedianKernelWrapper(
+      const PassKey<test::Test> &,
+      BaseDescriptorWrapper * desc_wrapper
+      ) {
+
+    Median median;
+    auto center_ = median.calculate<
+      BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
   }
 
