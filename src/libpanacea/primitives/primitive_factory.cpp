@@ -134,10 +134,8 @@ namespace panacea {
       std::vector<double>,
       MedianKernelWrapper>();
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto kwrapper = kfactory.create(dwrapper, specification, mem_manager, name);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Reducer reducer;
     Inverter inverter;
   

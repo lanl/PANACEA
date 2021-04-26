@@ -50,7 +50,6 @@ namespace panacea {
       if( kern_specification.is(settings::KernelMemory::Share)){
         auto any_ptr = desc_wrapper->getPointerToRawData();
         if( any_ptr.type() == typeid(std::vector<std::vector<double>> *)){
-          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           memory_manager.managePointer(
               std::any_cast<std::vector<std::vector<double>>*>(
                 desc_wrapper->getPointerToRawData()),
@@ -62,7 +61,6 @@ namespace panacea {
         if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
           PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
         }
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_wrapper->getTypeIndex()](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper->getPointerToRawData(),
@@ -79,8 +77,6 @@ namespace panacea {
           PANACEA_FAIL(error_msg); 
         }
 
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        std::cout << settings::toString(kern_specification.get<settings::KernelCenterCalculation>()) << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
         [typeid(std::vector<double>)](
           PassKey<KernelWrapperFactory>(),
