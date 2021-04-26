@@ -47,6 +47,9 @@ namespace panacea {
 
       virtual double compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) final;
 
+      /**
+       * Keep in mind the default grad_setting is inherited from distribution base class.
+       **/
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,

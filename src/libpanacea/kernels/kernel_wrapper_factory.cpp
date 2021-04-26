@@ -87,7 +87,8 @@ namespace panacea {
       }
     }
     std::string error_msg = "The combination of kernel specifications is not";
-    error_msg += " yet supported.";
+    error_msg += " yet supported.\n";
+    error_msg += kern_specification.get<std::string>();
     PANACEA_FAIL(error_msg);
   }
 }

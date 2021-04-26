@@ -116,50 +116,19 @@ namespace panacea {
     for ( const int dim : chosen_dims ) {
       // ( a_i * (d_x_i - d_mu_i) )
       diff.at(dim) = (descs(descriptor_ind,dim) - 
-          kerns(kernel_index_,dim)) * norm_coeffs.at(dim);
+          kerns(kernel_index_,dim));
     } 
 
-    // Step 2 lets calculate Sum1 for each dimension
-    std::vector<double> sum1(ndim,0.0);
-    int index1 = 0;
-    for ( const int dim1 : chosen_dims ) {
-      int index2 = 0;
-      for ( const int dim2 : chosen_dims ) {
-        if( dim1 != dim2 ) {
-          sum1.at(dim1) +=  red_inv_cov(index2,index1);
-        }
-        ++index2;
-      }
-      ++index1;
-    } 
-
-    // Step 3 lets calculate Sum2 for each dimension
-    std::vector<double> sum2(ndim,0.0);
-    index1 = 0;
-    for ( const int dim1 : chosen_dims ) {
-      int index2 = 0;
-      for ( const int dim2 : chosen_dims ) {
-        if( index1 != index2 ) {
-          sum2.at(dim1) +=  diff.at(dim2) * red_inv_cov(index2,index1);
-        }
-        ++index2;
-      }
-      ++index1;
-    } 
-
-    // Step 4 add Everything together, multiply by -1.0 depending on whether the sample or the kernel is the target  
     std::vector<double> grad(ndim,0.0);
 
-    int index = 0;
+    int index1 = 0;
     for ( const int dim : chosen_dims ) {
-      grad.at(dim) = 0.5*(sum1.at(dim) + 
-          sum2.at(dim) + 
-          2.0*diff.at(dim) * 
-          red_inv_cov(index,index)) * 
-        exp_term * 
-        norm_coeffs.at(dim) *
-        norm_coeffs.at(dim);
-      ++index;
+      int index2 = 0;
+      for ( const int dim2 : chosen_dims ) { 
+        grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) * norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
+        ++index2;
+      }
+      ++index1;
     }
 
     if ( grad_setting == settings::GradSetting::WRTDescriptor ) {

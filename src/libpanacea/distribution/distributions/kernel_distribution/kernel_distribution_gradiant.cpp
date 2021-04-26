@@ -54,6 +54,37 @@ namespace panacea {
     }
 
     /**
+     * Will calculate the gradiant at the location of the desc_index, 
+     * assumes we are taking the gradiant with respect to the decriptor
+     * with a single kernel, thus the gradient will not need to effect
+     * any changes to the kernel. 
+     **/
+    std::vector<double> gradiant_single_wrt_desc_only(
+        const BaseDescriptorWrapper * descriptor_wrapper,
+        const int & descriptor_index,
+        const int & grad_index, // Not really needed
+        const PrimitiveGroup & prim_grp,
+        const KernelDistributionSettings & distribution_settings,
+        const double pre_factor
+        ) {
+
+      // We want the gradiant at the location of the sample
+      assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
+      assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
+
+      std::vector<double> grad = prim_grp.primitives.at(0)->compute_grad(
+          descriptor_wrapper,
+          descriptor_index,
+          distribution_settings.equation_settings,
+          settings::GradSetting::WRTDescriptor);
+
+      std::transform(grad.begin(), grad.end(), grad.begin(),
+          std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
+
+      return grad;
+    }
+
+    /**
      * One to one mapping between the descriptors and the kernels, this
      * means that the kernels and descriptors are the same. We are interested
      * in the gradiant at the location of the descriptor index if we were to 
@@ -142,6 +173,11 @@ namespace panacea {
       [settings::GradSetting::WRTBoth]
       [settings::EquationSetting::None]
       [settings::KernelCount::OneToOne] = gradiant_one_to_one_wrt_both;
+
+    grad_method
+      [settings::GradSetting::WRTDescriptor]
+      [settings::EquationSetting::None]
+      [settings::KernelCount::Single] = gradiant_single_wrt_desc_only;
   }
 
 }

@@ -375,9 +375,10 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
         mem_manager,
         specification);
 
-    std::vector<double> grad_wrt_desc;
     const settings::GradSetting setting1 = settings::GradSetting::WRTDescriptor;
-    grad_wrt_desc = gauss_correlated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting1 );
+    std::vector<double> grad_wrt_desc_analy = gauss_correlated_prim_grp.primitives.at(
+        kernel_ind)->compute_grad(
+          dwrapper.get(), descriptor_ind, eq_settings, setting1 );
 
     // Compare with numerical result
     std::vector<std::vector<double>> raw_desc_data2{
@@ -398,7 +399,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
     const double val3 = gauss_correlated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper3.get(),descriptor_ind);
 
     const std::vector<double> norm_coeffs =  gauss_correlated_prim_grp.normalizer.getNormalizationCoeffs();
-    const double grad_val = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0)) * norm_coeffs.at(0);
+    const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));
 
     std::cout << "Norm Coefficients" << std::endl;
     for( const auto & norm_coef : norm_coeffs ) {
@@ -406,10 +407,10 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
     }
     std::cout << std::endl;
 
-    REQUIRE( grad_val == Approx(grad_wrt_desc.at(0))); 
+    REQUIRE( grad_val_numer == Approx(grad_wrt_desc_analy.at(0))); 
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
     const auto grad_wrt_kern = gauss_correlated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
     
-    REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
+    REQUIRE( (grad_wrt_desc_analy.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop
 }

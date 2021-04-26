@@ -2,6 +2,7 @@
 list( APPEND TEST_SOURCES
     catch_main.cpp
     test_covariance.cpp
+    test_cross_entropy.cpp
     test_descriptor_wrappers.cpp
     test_distributions.cpp
     test_gaussian_correlated.cpp

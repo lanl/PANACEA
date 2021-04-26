@@ -34,8 +34,6 @@ namespace panacea {
       settings::KernelCorrelation::Correlated>();
 
     PrimitiveFactory prim_factory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Creating prim group " << std::endl;
     prim_grp_ = prim_factory.create(
         descriptor_wrapper,
         mem_manager,
