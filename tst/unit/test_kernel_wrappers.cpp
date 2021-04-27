@@ -75,6 +75,28 @@ TEST_CASE("Testing:kernel_wrappers with update","[unit,panacea]") {
     // (5.0 + 6.0) / 2.0 = 5.5
     REQUIRE(median_kwrapper(0,0) == Approx(5.5));
   }
+
+  WHEN("Testing one to one kernel wrapper"){
+
+    KernelWrapper<vector<vector<double>> *> kwrapper(
+        test::Test::key(),
+        std::any_cast<vector<vector<double>> *>(dwrapper.getPointerToRawData()),
+        3,
+        1);
+
+    kwrapper.update(&dwrapper2);
+    REQUIRE(kwrapper.getNumberDimensions() == 1);
+    // Unlike mean and median the new points will
+    // simply overwrite the existing
+    REQUIRE(kwrapper.getNumberPoints() == 5);
+
+    REQUIRE(kwrapper(0,0) == Approx(5.0));
+    REQUIRE(kwrapper(1,0) == Approx(8.0));
+    REQUIRE(kwrapper(2,0) == Approx(3.0));
+    REQUIRE(kwrapper(3,0) == Approx(9.0));
+    REQUIRE(kwrapper(4,0) == Approx(6.0));
+
+  }
 }
 
 TEST_CASE("Testing:kernel_wrapper_constructor1","[unit,panacea]"){
