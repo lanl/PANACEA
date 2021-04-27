@@ -41,6 +41,7 @@ namespace panacea {
        * alternate between removing an extra element from the front and back
        **/
       bool remove_from_front_ = true;
+      int number_pts_median_; // Number of points used to calculate the median
     public:
 
       MedianKernelWrapper(

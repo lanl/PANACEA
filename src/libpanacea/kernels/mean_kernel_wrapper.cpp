@@ -15,15 +15,10 @@ namespace panacea {
       const BaseDescriptorWrapper * dwrapper
       ) {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Mean mean;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     number_pts_mean_ = dwrapper->getNumberPoints();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   MeanKernelWrapper::MeanKernelWrapper(
@@ -31,15 +26,10 @@ namespace panacea {
       const BaseDescriptorWrapper * dwrapper
       ) {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Mean mean;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     number_pts_mean_ = dwrapper->getNumberPoints();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   double& MeanKernelWrapper::operator()(const int point_ind, const int dim_ind) {
@@ -63,7 +53,7 @@ namespace panacea {
   }
 
   int MeanKernelWrapper::getNumberPoints() const {
-    return data_wrapper_.getNumberPoints();
+    return number_pts_mean_;
   }
 
   void MeanKernelWrapper::set(const Arrangement arrangement) {

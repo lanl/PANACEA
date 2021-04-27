@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <deque>
+#include <iostream>
 #include <vector>
 
 namespace panacea {
@@ -98,7 +99,6 @@ namespace panacea {
      *
      *     col1      col2
      *     2.0       5.0
-     * 
      *
      **/
     template<class T, const Direction dir = Direction::AlongRows> 
@@ -107,7 +107,7 @@ namespace panacea {
         std::vector<double> median;
         if constexpr(std::is_pointer<typename std::remove_const<T>::type>::value) {
           if constexpr(dir == Direction::AlongRows) {
-            median.reserve(data2d->cols());
+            median.reserve(data2d->rows());
             if( data2d->cols() % 2 == 1) {
               // is odd 
               for( int row = 0; row < data2d->rows(); ++row){
@@ -125,7 +125,7 @@ namespace panacea {
               }
             }
           } else {
-            median.reserve(data2d->rows());
+            median.reserve(data2d->cols());
             if( data2d->rows() % 2 == 1) {
               // is odd 
               for( int col = 0; col < data2d->cols(); ++col){
@@ -144,13 +144,15 @@ namespace panacea {
             }
           }
         } else if constexpr(std::is_same<typename std::remove_const<T>::type, std::vector<std::deque<double>>>::value) {
-
+      
+          std::cout << "DEQUE MEDIAN" << std::endl;
           if(data2d.size() == 0) return median;
 
           const int rows = data2d.size();
           const int cols = data2d.at(0).size();
           if constexpr(dir == Direction::AlongRows) {
-            median.reserve(cols);
+          std::cout << "Along rows" << std::endl;
+            median.reserve(rows);
             if( cols % 2 == 1) {
               // is odd 
               for( int row = 0; row < rows; ++row){
@@ -168,21 +170,27 @@ namespace panacea {
               }
             }
           } else {
-            median.reserve(rows);
+          std::cout << "Along columns" << std::endl;
+            median.reserve(cols);
             if( rows % 2 == 1) {
               // is odd 
+              std::cout << "Number of columns " << cols << std::endl;
+              std::cout << "Number of rows " << rows << std::endl;
               for( int col = 0; col < cols; ++col){
                 const auto local_column = createSortedColumn(data2d, col);
+                std::cout << "Odd number value is " << local_column.at(rows / 2) << std::endl;
                 median.push_back(local_column.at(rows / 2));
               }
             } else {
               // is even
+              std::cout << "Number of columns " << cols << std::endl;
               for( int col = 0; col < cols; ++col){
                 const auto local_column = createSortedColumn(data2d, col);
                 const double avg_of_two = 
                   (local_column.at(rows / 2) + 
                    local_column.at(rows / 2) - 1) * 0.5;
                 median.push_back(avg_of_two);
+                std::cout << "Adding element to median " << avg_of_two << std::endl;
               }
             }
           }
@@ -190,7 +198,7 @@ namespace panacea {
 
         } else { // If not a pointer type
           if constexpr(dir == Direction::AlongRows) {
-            median.reserve(data2d.cols());
+            median.reserve(data2d.rows());
             if( data2d.cols() % 2 == 1) {
               // is odd 
               for( int row = 0; row < data2d.rows(); ++row){
@@ -208,7 +216,7 @@ namespace panacea {
               }
             }
           } else {
-            median.reserve(data2d.rows());
+            median.reserve(data2d.cols());
             if( data2d.rows() % 2 == 1) {
               // is odd 
               for( int col = 0; col < data2d.cols(); ++col){

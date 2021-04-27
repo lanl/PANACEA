@@ -35,6 +35,7 @@ namespace panacea {
       for( int dim = 0; dim < ndim; ++dim) {
         std::sort(pts_near_median.at(dim).begin(), pts_near_median.at(dim).end());
       } 
+    
     }
 
     void trim(
@@ -86,6 +87,8 @@ namespace panacea {
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
     update_median_point_values(dwrapper, points_near_median_);
     trim(points_near_median_, number_pts_store_, remove_from_front_);
+    
+    number_pts_median_ = dwrapper->getNumberPoints();
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
@@ -100,6 +103,7 @@ namespace panacea {
 
     update_median_point_values(dwrapper, points_near_median_);
     trim(points_near_median_, number_pts_store_, remove_from_front_);
+    number_pts_median_ = dwrapper->getNumberPoints();
   }
 
   void MedianKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
@@ -108,8 +112,13 @@ namespace panacea {
     trim(points_near_median_, number_pts_store_, remove_from_front_);
 
     Median median;
+    // Because of how the points are stored, for ease of sorting we need to
+    // calculate the median here Along the Rows. 
     auto center_ = median.calculate<
-      std::vector<std::deque<double>>,Direction::AlongColumns>(points_near_median_);
+      std::vector<std::deque<double>>,Direction::AlongRows>(points_near_median_);
+
+    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    number_pts_median_ += dwrapper->getNumberPoints();
   }
 
   double& MedianKernelWrapper::operator()(const int point_ind, const int dim_ind) {
@@ -133,7 +142,7 @@ namespace panacea {
   }
 
   int MedianKernelWrapper::getNumberPoints() const {
-    return data_wrapper_.getNumberPoints();
+    return number_pts_median_;
   }
 
   void MedianKernelWrapper::set(const Arrangement arrangement) {

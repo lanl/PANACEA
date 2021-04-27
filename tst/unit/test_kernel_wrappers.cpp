@@ -27,15 +27,53 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
   WHEN("Testing mean kernel wrapper"){
     MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
     REQUIRE(mean_kwrapper.getNumberDimensions() == 1);
-    REQUIRE(mean_kwrapper.getNumberPoints() == 1);
+    REQUIRE(mean_kwrapper.getNumberPoints() == 3);
     REQUIRE(mean_kwrapper(0,0) == Approx(3.0));
   }
 
   WHEN("Testing median kernel wrapper"){
     MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
     REQUIRE(median_kwrapper.getNumberDimensions() == 1);
-    REQUIRE(median_kwrapper.getNumberPoints() == 1);
+    REQUIRE(median_kwrapper.getNumberPoints() == 3);
     REQUIRE(median_kwrapper(0,0) == Approx(2.0));
+  }
+}
+
+TEST_CASE("Testing:kernel_wrappers with update","[unit,panacea]") {
+
+  // 1.0 + 2.0 + 6.0 = 9.0
+  std::vector<std::vector<double>> data = {{1.0},{2.0},{6.0}};
+  
+  DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,1); 
+  
+  std::vector<std::vector<double>> data2 = {{5.0},{8.0},{3.0}, {9.0}, {6.0}};
+  DescriptorWrapper<vector<vector<double>> *> dwrapper2(&data2,5,1); 
+
+  WHEN("Testing mean kernel wrapper"){
+    MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
+    mean_kwrapper.update(&dwrapper2);
+    REQUIRE(mean_kwrapper.getNumberDimensions() == 1);
+    REQUIRE(mean_kwrapper.getNumberPoints() == 8);
+    //
+    // data     1.0 + 2.0 + 6.0 = 9.0
+    // data2    5.0 + 8.0 + 3.0 + 9.0 + 6.0 = 31.0
+    //
+    // 9.0 + 31.0 = 40.0 
+    //
+    // 40.0 / 8.0 = 5.0
+    REQUIRE(mean_kwrapper(0,0) == Approx(5.0)); 
+  }
+
+  WHEN("Testing median kernel wrapper"){
+    MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
+    median_kwrapper.update(&dwrapper2);
+    REQUIRE(median_kwrapper.getNumberDimensions() == 1);
+    REQUIRE(median_kwrapper.getNumberPoints() == 8);
+    // 
+    // 1.0, 2.0, 3.0, 5.0, 6.0, 6.0, 8.0, 9.0
+    //
+    // (5.0 + 6.0) / 2.0 = 5.5
+    REQUIRE(median_kwrapper(0,0) == Approx(5.5));
   }
 }
 
