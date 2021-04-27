@@ -78,7 +78,7 @@ namespace panacea {
 
   std::unique_ptr<EntropyTerm> CrossEntropy::create(
       const PassKey<EntropyFactory> & key,
-      BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
       EntropySettings * settings,
       std::string name) {
@@ -86,8 +86,8 @@ namespace panacea {
     name = "Cross Entropy " + name;
     // Create distribution 
     DistributionFactory dist_factory;
-    dist_factory.registerDistribution<
-      KernelDistribution,settings::DistributionType::Kernel>();
+//    dist_factory.registerDistribution<
+//      KernelDistribution,settings::DistributionType::Kernel>();
 
     auto dist = dist_factory.create(descriptor_wrapper, mem_manager, settings->dist_settings.get() ,name);
     return std::make_unique<CrossEntropy>(key, std::move(dist));
@@ -97,4 +97,9 @@ namespace panacea {
     std::string error_msg = "CrossEntropy does not contain any options that can be set";
     PANACEA_FAIL(error_msg);
   }
+
+  void CrossEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
+    distribution_->update(descriptor_wrapper);
+  }
+
 }

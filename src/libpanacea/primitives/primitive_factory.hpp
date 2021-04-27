@@ -55,6 +55,8 @@ namespace panacea {
 
     public:
 
+      PrimitiveFactory();
+
       template<class T, 
         settings::KernelPrimitive kern_prim,
         settings::KernelCorrelation kern_corr>
@@ -72,7 +74,7 @@ namespace panacea {
       }
 
       PrimitiveGroup create(
-          BaseDescriptorWrapper * dwrapper,
+          const BaseDescriptorWrapper * dwrapper,
           MemoryManager & mem_manager,
           const KernelSpecification & specification,
           std::string name = "") const;

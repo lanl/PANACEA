@@ -24,6 +24,20 @@ namespace panacea {
     std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>>
     KernelWrapperFactory::create_methods_;
 
+  KernelWrapperFactory::KernelWrapperFactory() {
+    registerKernel<settings::KernelCenterCalculation::None,
+      std::vector<std::vector<double>>*,
+      KernelWrapper<std::vector<std::vector<double>>*>>();
+
+    registerKernel<settings::KernelCenterCalculation::Mean,
+      std::vector<double>,
+      MeanKernelWrapper>();
+
+    registerKernel<settings::KernelCenterCalculation::Median,
+      std::vector<double>,
+      MedianKernelWrapper>();
+  }
+
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
       BaseDescriptorWrapper * desc_wrapper, 
       const KernelSpecification & kern_specification,

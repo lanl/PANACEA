@@ -37,8 +37,8 @@ namespace panacea {
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
       virtual void setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) final;
-      virtual const std::vector<int> getReducedDimensions() const final;
-      virtual const size_t getNumberReducedDimensions() const final;
+//      virtual const std::vector<int> getReducedDimensions() const final;
+//      virtual const size_t getNumberReducedDimensions() const final;
 //      virtual std::any getPointerToRawData() noexcept final;
       virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final; 
@@ -91,7 +91,7 @@ namespace panacea {
     }
   }
 
-  template<class T>
+/*  template<class T>
   inline void DescriptorWrapper<T>::setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) {
     /// Ensure that the maximum chosen dimension is less than
     /// the total number of dimensions
@@ -117,7 +117,7 @@ namespace panacea {
   template<class T>
   inline const size_t DescriptorWrapper<T>::getNumberReducedDimensions() const {
     return reduced_chosen_dimensions_.size();
-  }
+  }*/
 
 /*  template<class T>
   inline std::any DescriptorWrapper<T>::getPointerToRawData() noexcept {

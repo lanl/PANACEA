@@ -43,9 +43,11 @@ namespace panacea {
 
       virtual void set(const settings::EntropyOption & option, std::any val) override;
 
+      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override;
+
       static std::unique_ptr<EntropyTerm> create(
           const PassKey<EntropyFactory> & key,
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           EntropySettings * settings,
           std::string name);

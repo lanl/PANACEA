@@ -2,6 +2,7 @@
 // Local private PANACEA includes
 #include "distribution_factory.hpp"
 
+#include "distributions/kernel_distribution.hpp"
 #include "memory.hpp"
 #include "error.hpp"
 #include "passkey.hpp"
@@ -21,8 +22,12 @@ namespace panacea {
     DistributionFactory::DistributionCreateMethod>
         DistributionFactory::create_methods_;
 
+  DistributionFactory::DistributionFactory() {
+    DistributionFactory::registerDistribution<KernelDistribution,settings::DistributionType::Kernel>();
+  }
+
   std::unique_ptr<Distribution> DistributionFactory::create(
-      BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
       DistributionSettings * settings,
       std::string name) const {

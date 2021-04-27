@@ -38,6 +38,11 @@ namespace panacea {
 
       virtual void set(const settings::EntropyOption & option, std::any val) = 0;
 
+      /**
+       * Update the internals
+       **/
+      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+
       virtual ~EntropyTerm() = 0;
   };
 }

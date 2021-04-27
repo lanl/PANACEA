@@ -23,12 +23,12 @@ namespace panacea {
       virtual int getId() const noexcept = 0;
 
       /*
-       * Reset a primitive inolves updating the kernel pointer
+       * Updating a primitive inolves updating the kernel pointer
        * reset the inverse covariance matrix 
        * reset the prefactor value
        */
       // Do not make const reference
-      virtual void reset(PrimitiveAttributes &) = 0;
+      virtual void update(PrimitiveAttributes &) = 0;
 
       /*
        * Computes the density

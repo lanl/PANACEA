@@ -31,6 +31,8 @@ namespace panacea {
       std::unique_ptr<ReducedInvCovariance> reduced_inv_covariance = nullptr;
       std::vector<std::unique_ptr<Primitive>> primitives;
 
+      void update(const BaseDescriptorWrapper * descriptor_wrapper);
+
       PrimitiveAttributes createPrimitiveAttributes() noexcept;
   };
 }

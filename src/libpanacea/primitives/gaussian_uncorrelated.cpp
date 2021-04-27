@@ -19,7 +19,7 @@
 
 namespace panacea {
 
-  void GaussUncorrelated::reset(PrimitiveAttributes & attributes) {
+  void GaussUncorrelated::update(PrimitiveAttributes & attributes) {
     assert(attributes.normalizer.getNormalizationCoeffs().size() > 0);
     assert(attributes.kernel_wrapper != nullptr);
     attributes_ = std::move(attributes); 

@@ -23,7 +23,7 @@ namespace panacea {
     public:
       using DistributionCreateMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           DistributionSettings * dist_settings,
           std::string name
@@ -34,6 +34,7 @@ namespace panacea {
         create_methods_;
 
     public:
+      DistributionFactory();
 
       template<class T, settings::DistributionType dist_type>
         static bool registerDistribution() {
@@ -46,7 +47,7 @@ namespace panacea {
         }
 
       std::unique_ptr<Distribution> create(
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           DistributionSettings * settings,
           std::string name = "") const;

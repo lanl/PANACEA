@@ -17,26 +17,26 @@ namespace panacea {
   class BaseNormalizationMethod;
 
   class NormalizationMethodFactory {
-
     public:
-      using NormalizationMethod = std::unique_ptr<BaseNormalizationMethod>(*)(const PassKey<NormalizationMethodFactory> &);
+      typedef std::vector<double> (*NormalizationMethod)(const BaseDescriptorWrapper * desc_wrapper);
     private:
       static std::unordered_map<
         settings::KernelNormalization,
         NormalizationMethod> normalization_methods_;
     public:
-      template<class T>
+      NormalizationMethodFactory();
+
+      template<NormalizationMethod norm_method,settings::KernelNormalization opt>
       static bool registerNormalizationMethod(){
-        if( normalization_methods_.count(T::type) ) {
+        if( normalization_methods_.count(opt) ) {
           return false;
         } else {
-          normalization_methods_[T::type] = T::create;
+          normalization_methods_[opt] = norm_method;
         }
         return true;
       }
-
-      std::unique_ptr<BaseNormalizationMethod> create(
-          BaseDescriptorWrapper * desc_wrapper,
+  
+      NormalizationMethod create(
           const settings::KernelNormalization & norm_method) const;
   };
 }

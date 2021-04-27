@@ -19,7 +19,7 @@ namespace panacea {
         EntropyFactory::create_methods_;
 
   std::unique_ptr<EntropyTerm> EntropyFactory::create(
-      BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
       EntropySettings * settings,
       std::string name) const {

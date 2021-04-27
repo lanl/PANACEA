@@ -20,18 +20,18 @@
 namespace panacea {
 
   KernelDistribution::KernelDistribution(const PassKey<DistributionFactory> &,
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           const KernelSpecification & settings,
           std::string name) {
 
-    PrimitiveFactory::registerPrimitive<GaussUncorrelated,
+/*    PrimitiveFactory::registerPrimitive<GaussUncorrelated,
       settings::KernelPrimitive::Gaussian,
       settings::KernelCorrelation::Uncorrelated>();
 
     PrimitiveFactory::registerPrimitive<GaussCorrelated,
       settings::KernelPrimitive::Gaussian,
-      settings::KernelCorrelation::Correlated>();
+      settings::KernelCorrelation::Correlated>();*/
 
     PrimitiveFactory prim_factory;
     prim_grp_ = prim_factory.create(
@@ -170,5 +170,10 @@ namespace panacea {
 
     }
 
+  }
+
+  void KernelDistribution::update(const BaseDescriptorWrapper * descriptor_wrapper) {
+    prim_grp_.update(descriptor_wrapper);
+    pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
   }
 }

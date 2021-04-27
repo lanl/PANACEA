@@ -21,7 +21,7 @@
 
 namespace panacea {
 
-  void GaussCorrelated::reset(PrimitiveAttributes & attributes) {
+  void GaussCorrelated::update(PrimitiveAttributes & attributes) {
     assert(attributes.kernel_wrapper != nullptr);
     attributes_ = std::move(attributes); 
     double determinant = attributes_.reduced_covariance->getDeterminant();

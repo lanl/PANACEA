@@ -38,7 +38,7 @@ namespace panacea {
       double pre_factor_;
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           const KernelSpecification & settings,
           std::string name);
@@ -57,9 +57,14 @@ namespace panacea {
           const DistributionSettings & distribution_settings,
           std::any grad_setting) final;
 
+      /**
+       * Will update the underlying data groups and ensure the prefactor is up to date.
+       **/
+      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) final;
+
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
-          BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper * descriptor_wrapper,
           MemoryManager & mem_manager,
           DistributionSettings * settings,
           std::string name = "");
@@ -67,7 +72,7 @@ namespace panacea {
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key, 
-      BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper * descriptor_wrapper,
       MemoryManager & mem_manager,
       DistributionSettings * settings,
       std::string name) {

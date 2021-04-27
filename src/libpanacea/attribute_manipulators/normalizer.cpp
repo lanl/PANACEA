@@ -1,27 +1,62 @@
 
 // Local private PANACEA includes
 #include "normalizer.hpp"
+
+#include "normalization_methods/normalization_method_factory.hpp"
+#include "normalization_methods/normalization_method_base.hpp"
 #include "passkey.hpp"
 
 // Standard includes
 #include <cassert>
+#include <vector>
 
 namespace panacea {
-  
-  Normalizer::Normalizer(const std::vector<double> & normalization_coeffs, const NormalizerOption opt) {
 
-    if( opt == NormalizerOption::Strict ) {
-      normalization_coeffs_ = normalization_coeffs;
-    } else {
-      normalization_coeffs_.reserve(normalization_coeffs.size());
-      for( const auto & coef : normalization_coeffs ) {
-        if( coef == 0.0 ) {
-          normalization_coeffs_.push_back(1.0);
-        } else {
-          normalization_coeffs_.push_back(coef);
+  /********************************************************
+   * Local functions
+   ********************************************************/ 
+  namespace {
+
+    void trim(
+        const std::vector<double> & in,
+        const NormalizerOption & opt,
+        std::vector<double> & out){
+
+      out.clear();
+      if( opt == NormalizerOption::Strict ) {
+        out = in;
+      } else {
+        out.reserve(in.size());
+        for( const auto & coef : in ) {
+          if( coef == 0.0 ) {
+            out.push_back(1.0);
+          } else {
+            out.push_back(coef);
+          }
         }
       }
     }
+
+  }
+
+  /********************************************************
+   * Public methods
+   ********************************************************/ 
+
+  Normalizer::Normalizer(const std::vector<double> & normalization_coeffs,
+      const NormalizerOption opt) : norm_option_(opt) {
+    trim(normalization_coeffs, norm_option_, normalization_coeffs_);
+  }
+
+  Normalizer::Normalizer(const BaseDescriptorWrapper * dwrapper,
+      const settings::KernelNormalization & norm_method, 
+      const NormalizerOption opt) : norm_option_(opt) {
+
+    NormalizationMethodFactory norm_method_factory;
+    norm_method_ = norm_method_factory.create(norm_method);
+    const auto normalization_coeffs = norm_method_(dwrapper);
+    trim(normalization_coeffs, norm_option_, normalization_coeffs_);
+
   }
 
   void Normalizer::normalize(Covariance & cov) const {
@@ -59,6 +94,13 @@ namespace panacea {
 
   const std::vector<double> & Normalizer::getNormalizationCoeffs() const noexcept {
     return normalization_coeffs_;
+  }
+
+  void Normalizer::update(const BaseDescriptorWrapper * dwrapper) {
+
+    assert(norm_method_ != nullptr);
+    const auto normalization_coeffs = norm_method_(dwrapper);
+    trim(normalization_coeffs, norm_option_, normalization_coeffs_);
   }
 }
 

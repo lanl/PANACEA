@@ -36,6 +36,8 @@ namespace panacea {
 
     public:
 
+      KernelWrapperFactory();
+
       std::unique_ptr<BaseKernelWrapper> create(
           BaseDescriptorWrapper * desc_wrapper,
           const KernelSpecification & kern_specification , 

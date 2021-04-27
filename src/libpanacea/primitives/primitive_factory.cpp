@@ -86,22 +86,19 @@ namespace panacea {
    ***************************************************/
 
   static Normalizer createNormalizer(
-      BaseDescriptorWrapper * dwrapper,
+      const BaseDescriptorWrapper * dwrapper,
       const KernelSpecification & specification) {
 
-    NormalizationMethodFactory norm_method_factory;
-    norm_method_factory.registerNormalizationMethod<NormalizationMethodNone>();
-    norm_method_factory.registerNormalizationMethod<NormalizationMethodVariance>();
-    auto norm_method = norm_method_factory.create(dwrapper,specification.get<settings::KernelNormalization>());
     if( specification.is(settings::KernelAlgorithm::Strict) ) {
-      return Normalizer(norm_method->generateCoefficients(dwrapper), NormalizerOption::Strict);
+      return Normalizer(dwrapper, NormalizerOption::Strict);
     }
-    // Flexible option will avoid errors if coefficients are 0.0, e.g. if variance is 0.0, will set such coefficients to 1.0
-    return Normalizer(norm_method->generateCoefficients(dwrapper), NormalizerOption::Flexible);
+    // Flexible option will avoid errors if coefficients are 0.0, 
+    // e.g. if variance is 0.0, will set such coefficients to 1.0
+    return Normalizer(dwrapper, NormalizerOption::Flexible);
   }
 
   static std::unique_ptr<Covariance> createCovariance(
-      BaseDescriptorWrapper * dwrapper,
+      const BaseDescriptorWrapper * dwrapper,
       const KernelSpecification & specification) {
 
     if( specification.is(settings::KernelAlgorithm::Strict) ) {
@@ -114,15 +111,27 @@ namespace panacea {
    * Declaring public methods
    ***********************************************************/
 
+  PrimitiveFactory::PrimitiveFactory() {
+    
+    registerPrimitive<GaussUncorrelated,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelCorrelation::Uncorrelated>();
+
+    registerPrimitive<GaussCorrelated,
+      settings::KernelPrimitive::Gaussian,
+      settings::KernelCorrelation::Correlated>();
+
+  }
+
   PrimitiveGroup PrimitiveFactory::create(
-      BaseDescriptorWrapper * dwrapper,
+      const BaseDescriptorWrapper * dwrapper,
       MemoryManager & mem_manager,
       const KernelSpecification & specification,
       std::string name) const {
 
     KernelWrapperFactory kfactory;
 
-    kfactory.registerKernel<settings::KernelCenterCalculation::None,
+/*    kfactory.registerKernel<settings::KernelCenterCalculation::None,
       std::vector<std::vector<double>>*,
       KernelWrapper<std::vector<std::vector<double>>*>>();
 
@@ -132,7 +141,7 @@ namespace panacea {
 
     kfactory.registerKernel<settings::KernelCenterCalculation::Median,
       std::vector<double>,
-      MedianKernelWrapper>();
+      MedianKernelWrapper>();*/
 
     auto kwrapper = kfactory.create(dwrapper, specification, mem_manager, name);
 
@@ -153,7 +162,8 @@ namespace panacea {
         inverter.invert(*prim_grp.reduced_covariance));
 
     // Update the dwrapper so that it has an uptodate account of the reduced dimensions
-    dwrapper->setReducedNumberDimensions(prim_grp.reduced_covariance->getChosenDimensionIndices());
+    // I don't like having this in here!
+//    dwrapper->setReducedNumberDimensions(prim_grp.reduced_covariance->getChosenDimensionIndices());
 
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported: ";
