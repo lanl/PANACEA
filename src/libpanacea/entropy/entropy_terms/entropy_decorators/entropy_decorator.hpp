@@ -50,6 +50,15 @@ namespace panacea {
       virtual void set(const settings::EntropyOption & option, std::any val) override {
         return entropy_term_->set(option, val);
       }
+
+      virtual const std::vector<int> & getDimensions() const noexcept override {
+        return entropy_term_->getDimensions();
+      }
+
+      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override {
+        return entropy_term_->update(descriptor_wrapper);
+      }
+
   };
 
 }

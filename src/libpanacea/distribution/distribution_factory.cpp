@@ -3,7 +3,6 @@
 #include "distribution_factory.hpp"
 
 #include "distributions/kernel_distribution.hpp"
-#include "memory.hpp"
 #include "error.hpp"
 #include "passkey.hpp"
 
@@ -28,9 +27,7 @@ namespace panacea {
 
   std::unique_ptr<Distribution> DistributionFactory::create(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      MemoryManager & mem_manager,
-      DistributionSettings * settings,
-      std::string name) const {
+      DistributionSettings * settings) const {
 
     assert(settings != nullptr);
 
@@ -42,8 +39,6 @@ namespace panacea {
     return create_methods_.at(settings->type())(
         PassKey<DistributionFactory>(),
         descriptor_wrapper,
-        mem_manager,
-        settings,
-        name);
+        settings);
   }
 }

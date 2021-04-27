@@ -29,11 +29,11 @@ namespace panacea {
        **/
       auto descriptor_wrapper = const_cast<BaseDescriptorWrapper *>(const_descriptor_wrapper);
 
-      const int ndim = descriptor_wrapper->getNumberDimensions(); 
+      const int ndim = getDimensions().size(); 
       std::vector<double> grad(ndim,0.0);
 
       // Cycle through dimensions
-      for( int dim : descriptor_wrapper->getReducedDimensions() ){
+      for( const int & dim : getDimensions() ){
         assert(dim < ndim);
         const double orig_x_val = descriptor_wrapper->operator()(wrt_pt,dim);
         const double diff = orig_x_val*inc_ratio_;

@@ -12,7 +12,9 @@
 // Standard includes
 #include <any>
 #include <cstddef>
+#include <deque>
 #include <typeindex>
+#include <vector>
 
 namespace panacea {
 
@@ -27,16 +29,28 @@ namespace panacea {
 
     private:
       DataPointTemplate<std::vector<double>> data_wrapper_;
+
+      /**
+       * Number of points to track to watch to keep an up to date median
+       **/
+      int number_pts_store_ = 100;
+      std::vector<std::deque<double>>  points_near_median_;
+
+      /**
+       * Will alternate if an odd number of points need to be remove
+       * alternate between removing an extra element from the front and back
+       **/
+      bool remove_from_front_ = true;
     public:
 
       MedianKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
-          BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper * desc_wrapper
           );
 
       MedianKernelWrapper(
           const PassKey<test::Test> &,
-          BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper * desc_wrapper
           );
 
       virtual double& operator()(const int point_ind, const int dim_ind) final;
@@ -46,6 +60,7 @@ namespace panacea {
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
+      virtual void update(const BaseDescriptorWrapper *) final;
       virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final;
       virtual void print() const final;
@@ -64,7 +79,7 @@ namespace panacea {
       const int rows,
       const int cols) {
 
-    return std::make_unique<MedianKernelWrapper>(key, std::any_cast<BaseDescriptorWrapper *>(data)); 
+    return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
   }
 
 }

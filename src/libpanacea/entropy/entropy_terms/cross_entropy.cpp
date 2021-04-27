@@ -7,6 +7,7 @@
 #include "distribution/distribution_factory.hpp"
 #include "distribution/distribution_settings/distribution_settings.hpp"
 #include "entropy/entropy_settings/entropy_settings.hpp"
+#include "error.hpp"
 
 // Standard includes
 #include <cassert>
@@ -79,23 +80,23 @@ namespace panacea {
   std::unique_ptr<EntropyTerm> CrossEntropy::create(
       const PassKey<EntropyFactory> & key,
       const BaseDescriptorWrapper * descriptor_wrapper,
-      MemoryManager & mem_manager,
-      EntropySettings * settings,
-      std::string name) {
+      EntropySettings * settings) {
 
-    name = "Cross Entropy " + name;
     // Create distribution 
     DistributionFactory dist_factory;
-//    dist_factory.registerDistribution<
-//      KernelDistribution,settings::DistributionType::Kernel>();
 
-    auto dist = dist_factory.create(descriptor_wrapper, mem_manager, settings->dist_settings.get() ,name);
+    auto dist = dist_factory.create(descriptor_wrapper, settings->dist_settings.get());
     return std::make_unique<CrossEntropy>(key, std::move(dist));
   }
 
   void CrossEntropy::set(const settings::EntropyOption & option, std::any val) {
     std::string error_msg = "CrossEntropy does not contain any options that can be set";
     PANACEA_FAIL(error_msg);
+  }
+
+
+  const std::vector<int> & CrossEntropy::getDimensions() const noexcept {
+    return distribution_->getDimensions();
   }
 
   void CrossEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {

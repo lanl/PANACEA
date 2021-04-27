@@ -29,7 +29,7 @@ namespace panacea {
     return matrix_->rows();
   }
 
-  const std::vector<int> & ReducedCovariance::getChosenDimensionIndices() const {
+  const std::vector<int> & ReducedCovariance::getReducedDimensions() const noexcept {
     return chosen_dimension_indices_;
   }
 

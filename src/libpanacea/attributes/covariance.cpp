@@ -18,7 +18,7 @@
 namespace panacea {
 
   namespace correlated {
-    void calculateMean(Vector * mean, BaseDescriptorWrapper * desc_wrap) {
+    void calculateMean(Vector * mean, const BaseDescriptorWrapper * desc_wrap) {
       const int num_dims = desc_wrap->getNumberDimensions();
       const int num_pts = desc_wrap->getNumberPoints();
       mean->resize(num_dims);
@@ -36,7 +36,7 @@ namespace panacea {
         const Vector * current_mean,
         const Vector * new_mean,
         const int current_num_pts,
-        BaseDescriptorWrapper * desc_wrap) {
+        const BaseDescriptorWrapper * desc_wrap) {
 
       const int num_dims = desc_wrap->getNumberDimensions();
       const int num_pts = desc_wrap->getNumberPoints();
@@ -72,7 +72,11 @@ namespace panacea {
       }
     }
 
-    void updateMean(Vector * mean, BaseDescriptorWrapper * desc_wrap, const int current_num_desc_pts) {
+    void updateMean(
+        Vector * mean,
+        const BaseDescriptorWrapper * desc_wrap,
+        const int current_num_desc_pts) {
+
       const int num_dims = desc_wrap->getNumberDimensions();
       const int num_pts = desc_wrap->getNumberPoints();
       assert(mean->rows() == num_dims);
@@ -87,7 +91,7 @@ namespace panacea {
     }
   } // namespace correlated
 
-  Covariance::Covariance(BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt) {
+  Covariance::Covariance(const BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt) {
     // Resize the covariance matrix based on the number of descriptor dimensions
     assert(desc_wrap != nullptr);
     const int num_dims = desc_wrap->getNumberDimensions();
@@ -218,7 +222,7 @@ namespace panacea {
     return true;
   }
 
-  void Covariance::update(BaseDescriptorWrapper * desc_wrap) {
+  void Covariance::update(const BaseDescriptorWrapper * desc_wrap) {
 
     auto new_mean = createVector(mean_->rows());
     for( int row=0; row< mean_->rows(); ++row){

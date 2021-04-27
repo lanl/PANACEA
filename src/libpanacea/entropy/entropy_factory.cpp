@@ -4,7 +4,9 @@
 
 #include "distribution/distribution_factory.hpp"
 #include "entropy_settings/entropy_settings.hpp"
+#include "entropy_terms/cross_entropy.hpp"
 #include "entropy_terms/entropy_term.hpp"
+#include "entropy_terms/self_entropy.hpp"
 #include "error.hpp"
 #include "settings.hpp"
 
@@ -18,11 +20,20 @@ namespace panacea {
     EntropyFactory::EntropyCreateMethod>
         EntropyFactory::create_methods_;
 
+  EntropyFactory::EntropyFactory() {
+
+    EntropyFactory::registerEntropyTerm<
+      SelfEntropy,
+      settings::EntropyType::Self>();
+
+    EntropyFactory::registerEntropyTerm<
+      CrossEntropy,
+      settings::EntropyType::Cross>();
+  }
+
   std::unique_ptr<EntropyTerm> EntropyFactory::create(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      MemoryManager & mem_manager,
-      EntropySettings * settings,
-      std::string name) const {
+      EntropySettings * settings) const {
 
     assert(settings != nullptr);
 
@@ -34,9 +45,7 @@ namespace panacea {
     return create_methods_.at(settings->type)(
         PassKey<EntropyFactory>(),
         descriptor_wrapper,
-        mem_manager,
-        settings,
-        name);
+        settings);
   }
 
 }

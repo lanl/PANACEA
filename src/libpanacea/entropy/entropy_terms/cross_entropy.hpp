@@ -6,7 +6,6 @@
 // Local private PANACEA includes
 #include "entropy_term.hpp"
 
-#include "memory.hpp"
 #include "passkey.hpp"
 #include "settings.hpp"
 
@@ -44,14 +43,14 @@ namespace panacea {
 
       virtual void set(const settings::EntropyOption & option, std::any val) override;
 
+      virtual const std::vector<int> & getDimensions() const noexcept override;
+
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override;
 
       static std::unique_ptr<EntropyTerm> create(
           const PassKey<EntropyFactory> & key,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          EntropySettings * settings,
-          std::string name);
+          EntropySettings * settings);
 
   };
 

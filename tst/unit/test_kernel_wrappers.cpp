@@ -18,23 +18,6 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:kernel_wrapper_factory trivial registration","[unit,panacea]"){
-
-  KernelWrapperFactory kern_factory;
-
-  kern_factory.registerKernel<settings::KernelCenterCalculation::None,
-    std::vector<std::vector<double>>*,
-    KernelWrapper<std::vector<std::vector<double>>*> >();
-
-  kern_factory.registerKernel<settings::KernelCenterCalculation::Mean,
-    std::vector<double>,
-    MeanKernelWrapper>();
-
-  kern_factory.registerKernel<settings::KernelCenterCalculation::Median,
-    std::vector<double>,
-    MedianKernelWrapper>();
-}
-
 TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
 
   std::vector<std::vector<double>> data = {{1.0},{2.0},{6.0}};

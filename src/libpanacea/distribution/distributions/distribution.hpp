@@ -27,6 +27,11 @@ namespace panacea {
           const int grad_ind, // The index associated with whatever we are taking the gradiant with respect to
           const DistributionSettings & distribution_settings, std::any extra_options = settings::None::None) = 0;
 
+      /**
+       * Get the actul dimensions used in the distribution
+       **/
+      virtual const std::vector<int> & getDimensions() const noexcept = 0;
+
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 
       virtual ~Distribution() = 0;

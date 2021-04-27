@@ -11,7 +11,6 @@
 #include "entropy/entropy_terms/entropy_decorators/numerical_grad.hpp"
 #include "entropy/entropy_terms/entropy_decorators/weight.hpp"
 #include "kernels/kernel_specifications.hpp"
-#include "memory.hpp"
 #include "settings.hpp"
 
 // Third party includes
@@ -23,11 +22,6 @@
 
 using namespace std;
 using namespace panacea;
-
-TEST_CASE("Testing:cross entropy creation registration trivial","[unit,panacea]"){
-  EntropyFactory entropy_factory;
-  entropy_factory.registerEntropyTerm<CrossEntropy,settings::EntropyType::Cross>();
-}
 
 TEST_CASE("Testing:cross entropy","[unit,panacea]"){
   // 3 points 2 dimensions
@@ -58,16 +52,12 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
   settings.type = settings::EntropyType::Cross;
   settings.dist_settings = std::make_unique<KernelDistributionSettings>(kernel_settings);
 
-  MemoryManager mem_manager;
-
   EntropyFactory entropy_factory;
-  entropy_factory.registerEntropyTerm<CrossEntropy,settings::EntropyType::Cross>();
 
   WHEN("Testing Numerical Decorator centered over kernel") {
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
         &dwrapper_init,
-        mem_manager,
         &settings);
 
     std::vector<std::vector<double>> data_sample_max{
@@ -104,7 +94,6 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
         &dwrapper_init,
-        mem_manager,
         &settings);
 
     std::vector<std::vector<double>> data_sample_max{

@@ -30,8 +30,7 @@ namespace panacea {
 
   namespace test {
     class Test;
-  }
-
+  } 
   class GaussUncorrelated : public Primitive {
     private:
       const int kernel_index_ = -1;

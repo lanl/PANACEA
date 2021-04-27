@@ -7,7 +7,6 @@
 
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
 #include "kernel_distribution/kernel_distribution_gradiant.hpp"
-#include "memory.hpp"
 #include "passkey.hpp"
 #include "primitives/primitive_group.hpp"
 
@@ -39,9 +38,7 @@ namespace panacea {
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          const KernelSpecification & settings,
-          std::string name);
+          const KernelSpecification & settings);
 
       virtual settings::DistributionType type() const noexcept final;
 
@@ -56,6 +53,8 @@ namespace panacea {
           const int grad_ind,
           const DistributionSettings & distribution_settings,
           std::any grad_setting) final;
+      
+      virtual const std::vector<int> & getDimensions() const noexcept final;
 
       /**
        * Will update the underlying data groups and ensure the prefactor is up to date.
@@ -65,17 +64,13 @@ namespace panacea {
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          DistributionSettings * settings,
-          std::string name = "");
+          DistributionSettings * settings);
   };
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key, 
       const BaseDescriptorWrapper * descriptor_wrapper,
-      MemoryManager & mem_manager,
-      DistributionSettings * settings,
-      std::string name) {
+      DistributionSettings * settings) {
 
     assert(settings->type() == settings::DistributionType::Kernel);
 
@@ -84,9 +79,7 @@ namespace panacea {
     return std::make_unique<KernelDistribution>(
         key,
         descriptor_wrapper,
-        mem_manager,
-        kern_dist_settings->dist_settings,
-        name);
+        kern_dist_settings->dist_settings);
   }
 }
 

@@ -18,7 +18,6 @@ namespace panacea {
   class BaseDescriptorWrapper;
   class BaseKernelWrapper;
   class KernelSpecification;
-  class MemoryManager;
 
   class KernelWrapperFactory {
     public:
@@ -39,10 +38,8 @@ namespace panacea {
       KernelWrapperFactory();
 
       std::unique_ptr<BaseKernelWrapper> create(
-          BaseDescriptorWrapper * desc_wrapper,
-          const KernelSpecification & kern_specification , 
-          MemoryManager & memory_manager,
-          std::string name) const;
+          const BaseDescriptorWrapper * desc_wrapper,
+          const KernelSpecification & kern_specification) const;
 
       template<settings::KernelCenterCalculation kernel_center, class T, class S>
         static bool registerKernel() {

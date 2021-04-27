@@ -3,7 +3,6 @@
 #include "normalization_methods/normalization_method_factory.hpp"
 
 #include "descriptors/descriptor_wrapper.hpp"
-#include "normalization_methods/normalization_method_variance.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -22,12 +21,9 @@ TEST_CASE("Testing:normalization_method_factory","[unit,panacea]"){
 
   NormalizationMethodFactory norm_method_factory;
 
-  norm_method_factory.registerNormalizationMethod<
-    NormalizationMethodVariance>();
+  auto norm_method = norm_method_factory.create(settings::KernelNormalization::Variance);
 
-  auto norm_method = norm_method_factory.create(&dwrapper, settings::KernelNormalization::Variance);
-
-  std::vector<double> norm_coefficients = norm_method->generateCoefficients(&dwrapper);
+  std::vector<double> norm_coefficients = norm_method(&dwrapper);
 
   // Only be two dimensions
   REQUIRE(norm_coefficients.size() == 2);

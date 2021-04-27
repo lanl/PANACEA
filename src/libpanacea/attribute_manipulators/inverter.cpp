@@ -16,7 +16,7 @@ namespace panacea {
           ReducedInvCovariance reduced_inv_cov(
               PassKey<Inverter>(),
               std::move(inv_matrix),
-              reduced_cov.getChosenDimensionIndices(),
+              reduced_cov.getReducedDimensions(),
               reduced_cov.getNormalizationState()); 
 
           return reduced_inv_cov;

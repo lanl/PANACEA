@@ -11,26 +11,105 @@
 
 namespace panacea {
 
+  /*******************************************
+   * File scope functions
+   *******************************************/
+
+  namespace {
+
+    void update_median_point_values(const BaseDescriptorWrapper * dwrapper, std::vector<std::deque<double>> & pts_near_median ){
+      const int num_pts = dwrapper->getNumberPoints();
+      const int ndim = dwrapper->getNumberDimensions();
+
+      if( pts_near_median.size() != ndim ) {
+        pts_near_median.resize(ndim);
+      }
+
+      for( int dim = 0; dim < ndim; ++dim) {
+        for( int pt = 0; pt < num_pts; ++pt) {
+          pts_near_median.at(dim).push_back(dwrapper->operator()(pt, dim));
+        }
+      }
+
+      // Sort each of the deques
+      for( int dim = 0; dim < ndim; ++dim) {
+        std::sort(pts_near_median.at(dim).begin(), pts_near_median.at(dim).end());
+      } 
+    }
+
+    void trim(
+        std::vector<std::deque<double>> & pts_near_median,
+        const int max_number_pts,
+        bool & remove_more_from_front){
+
+      const int num_pts = pts_near_median.at(0).size();
+      const int diff = max_number_pts - num_pts;
+      if( num_pts > max_number_pts ) {
+        int remove_from_front = diff/2;
+        int remove_from_back = diff/2;
+        if( diff % 2 == 1 ) {
+          if( remove_more_from_front ) {
+            ++remove_from_front;
+            remove_from_front = false;
+          } else {
+            ++remove_from_back;
+            remove_from_front = true;
+          }
+        }  
+      
+        for( int dim = 0; dim < pts_near_median.size(); ++dim){
+          // Erase from end first
+          auto it_end = pts_near_median.at(dim).end();
+          pts_near_median.at(dim).erase((it_end - remove_from_back), it_end); 
+  
+          auto it_begin = pts_near_median.at(dim).begin();
+          pts_near_median.at(dim).erase(it_begin, it_begin + remove_from_front); 
+        }
+      }
+    }
+  }
+
+  /*******************************************
+   * Public methods
+   *******************************************/
+
   MedianKernelWrapper::MedianKernelWrapper(
       const PassKey<KernelWrapperFactory> &,
-      BaseDescriptorWrapper * desc_wrapper
+      const BaseDescriptorWrapper * dwrapper
       ) {
 
     Median median;
     auto center_ = median.calculate<
-      BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
+      const BaseDescriptorWrapper *,
+            Direction::AlongColumns>(dwrapper);
+
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    update_median_point_values(dwrapper, points_near_median_);
+    trim(points_near_median_, number_pts_store_, remove_from_front_);
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
       const PassKey<test::Test> &,
-      BaseDescriptorWrapper * desc_wrapper
+      const BaseDescriptorWrapper * dwrapper
       ) {
 
     Median median;
     auto center_ = median.calculate<
-      BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
+      const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+
+    update_median_point_values(dwrapper, points_near_median_);
+    trim(points_near_median_, number_pts_store_, remove_from_front_);
+  }
+
+  void MedianKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
+
+    update_median_point_values(dwrapper, points_near_median_);
+    trim(points_near_median_, number_pts_store_, remove_from_front_);
+
+    Median median;
+    auto center_ = median.calculate<
+      std::vector<std::deque<double>>,Direction::AlongColumns>(points_near_median_);
   }
 
   double& MedianKernelWrapper::operator()(const int point_ind, const int dim_ind) {

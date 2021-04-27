@@ -11,7 +11,6 @@
 #include "entropy/entropy_terms/entropy_decorators/numerical_grad.hpp"
 #include "entropy/entropy_terms/entropy_decorators/weight.hpp"
 #include "kernels/kernel_specifications.hpp"
-#include "memory.hpp"
 #include "settings.hpp"
 
 // Third party includes
@@ -23,11 +22,6 @@
 
 using namespace std;
 using namespace panacea;
-
-TEST_CASE("Testing:entropy creation trivial","[unit,panacea]"){
-  EntropyFactory entropy_factory;
-  entropy_factory.registerEntropyTerm<SelfEntropy,settings::EntropyType::Self>();
-}
 
 TEST_CASE("Testing:self entropy","[unit,panacea]"){
   // 3 points 2 dimensions
@@ -53,14 +47,10 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
   settings.type = settings::EntropyType::Self;
   settings.dist_settings = std::make_unique<KernelDistributionSettings>(kernel_settings);
 
-  MemoryManager mem_manager;
-
   EntropyFactory entropy_factory;
-  entropy_factory.registerEntropyTerm<SelfEntropy,settings::EntropyType::Self>();
 
   auto entropy_term = entropy_factory.create(
       &dwrapper_init,
-      mem_manager,
       &settings);
 
   WHEN("Testing Numerical Decorator") {

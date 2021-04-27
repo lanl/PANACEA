@@ -71,9 +71,9 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     // The order of the dimensions should be consistent
     REQUIRE(reduced_covar.getNumberDimensions() == 3);
 
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(0) == 0);
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(1) == 1);
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(2) == 3);
+    REQUIRE(reduced_covar.getReducedDimensions().at(0) == 0);
+    REQUIRE(reduced_covar.getReducedDimensions().at(1) == 1);
+    REQUIRE(reduced_covar.getReducedDimensions().at(2) == 3);
 
     // The reduced matrix should simply be the identity matrix 
     //
@@ -99,9 +99,9 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     // The order of the dimensions should be consistent
     REQUIRE(reduced_covar.getNumberDimensions() == 3);
 
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(0) == 2);
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(1) == 1);
-    REQUIRE(reduced_covar.getChosenDimensionIndices().at(2) == 3);
+    REQUIRE(reduced_covar.getReducedDimensions().at(0) == 2);
+    REQUIRE(reduced_covar.getReducedDimensions().at(1) == 1);
+    REQUIRE(reduced_covar.getReducedDimensions().at(2) == 3);
 
     // The reduced matrix should also in this case simply be the identity matrix 
     //

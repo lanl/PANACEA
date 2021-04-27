@@ -48,7 +48,7 @@ namespace panacea {
 
       double getDeterminant() const;
       int getNumberDimensions() const;
-      const std::vector<int> & getChosenDimensionIndices() const;
+      const std::vector<int> & getReducedDimensions() const noexcept;
   };
 }
 

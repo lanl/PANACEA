@@ -11,7 +11,6 @@
 #include "kernels/kernel_wrapper.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
-#include "memory.hpp"
 #include "primitives/primitive_factory.hpp"
 
 // Third party includes
@@ -48,18 +47,10 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelCenterCalculation::None,
       settings::KernelAlgorithm::Flexible);
 
-  MemoryManager mem_manager;
-
   PrimitiveFactory prim_factory;
   
-  prim_factory.registerPrimitive<
-    GaussUncorrelated,
-    settings::KernelPrimitive::Gaussian,
-    settings::KernelCorrelation::Uncorrelated>();
-
   auto gauss_uncorrelated_prim_grp = prim_factory.create(
       dwrapper.get(),
-      mem_manager,
       specification);
 
   // There should be two primitives sense it is a one to one ratio and there 
@@ -151,18 +142,10 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
         settings::KernelCenterCalculation::None,
         settings::KernelAlgorithm::Flexible);
 
-    MemoryManager mem_manager;
-
     PrimitiveFactory prim_factory;
-
-    prim_factory.registerPrimitive<
-      GaussUncorrelated,
-      settings::KernelPrimitive::Gaussian,
-      settings::KernelCorrelation::Uncorrelated>();
 
     auto gauss_uncorrelated_prim_grp = prim_factory.create(
         dwrapper.get(),
-        mem_manager,
         specification);
 
     std::vector<double> grad_wrt_desc;
@@ -232,18 +215,10 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         settings::KernelCenterCalculation::None,
         settings::KernelAlgorithm::Flexible);
 
-    MemoryManager mem_manager;
-
     PrimitiveFactory prim_factory;
-
-    prim_factory.registerPrimitive<
-      GaussUncorrelated,
-      settings::KernelPrimitive::Gaussian,
-      settings::KernelCorrelation::Uncorrelated>();
 
     auto gauss_uncorrelated_prim_grp = prim_factory.create(
         dwrapper.get(),
-        mem_manager,
         specification);
 
     std::vector<double> grad_wrt_desc;

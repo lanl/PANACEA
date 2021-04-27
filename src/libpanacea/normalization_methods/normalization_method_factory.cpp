@@ -2,11 +2,12 @@
 // Local private includes
 #include "normalization_method_factory.hpp"
 
+#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
-#include "normalization_method_base.hpp"
 #include "mean.hpp"
 #include "median.hpp"
 #include "passkey.hpp"
+#include "variance.hpp"
 
 // Standard includes
 #include <memory>
@@ -55,12 +56,12 @@ namespace panacea {
 
       assert(checkDataQuality(desc_wrapper)); 
       Variance variance;
-      return variance.calculate<BaseDescriptorWrapper *>(desc_wrapper);
+      return variance.calculate<const BaseDescriptorWrapper *>(desc_wrapper);
     }
 
     std::vector<double> normalization_method_none(
         const BaseDescriptorWrapper * desc_wrapper){
-      std::vector<double> coeffs(desc_wrapper->getNumberReducedDimensions(), 1.0);
+      std::vector<double> coeffs(desc_wrapper->getNumberDimensions(), 1.0);
       return coeffs;
     }
   }
@@ -76,7 +77,7 @@ namespace panacea {
       settings::KernelNormalization::Variance>();
   }
 
-  NormalizationMethod NormalizationMethodFactory::create(
+  NormalizationMethodFactory::NormalizationMethod NormalizationMethodFactory::create(
           const settings::KernelNormalization & norm_method) const {
 
     if( normalization_methods_.count(norm_method) == 0) {

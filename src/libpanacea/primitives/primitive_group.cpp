@@ -2,7 +2,10 @@
 // Local private includes
 #include "primitive_group.hpp"
 
+#include "attribute_manipulators/inverter.hpp"
 #include "attribute_manipulators/normalizer.hpp"
+#include "attribute_manipulators/reducer.hpp"
+#include "kernels/base_kernel_wrapper.hpp"
 #include "primitive_attributes.hpp"
 
 // Standard includes
@@ -14,10 +17,11 @@ namespace panacea {
     assert(kernel_wrapper != nullptr); 
     kernel_wrapper->update(descriptor_wrapper);
     // Unnormalize the covariance matrix before updating 
-    normalizer.unnormalize(covariance);
+    normalizer.unnormalize(*covariance);
     covariance->update(descriptor_wrapper);
     // Now we are free to update the normalization coefficients
     normalizer.update(descriptor_wrapper);
+    normalizer.normalize(*covariance);
 
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices
     // these both need to be recalculated
@@ -30,15 +34,16 @@ namespace panacea {
         inverter.invert(*reduced_covariance));
 
     // Now we need to update all the primitives
-    for( auto prim : primitives) {
-      prim->update( createPrimitiveAttributes() );
+    for( auto & prim : primitives) {
+      auto attr = createPrimitiveAttributes();
+      prim->update(attr);
     }
   }
 
   PrimitiveAttributes PrimitiveGroup::createPrimitiveAttributes() noexcept {
     return PrimitiveAttributes {
     .normalizer = this->normalizer,
-    .kernel_wrapper = this->kernel_wrapper,
+    .kernel_wrapper = this->kernel_wrapper.get(),
     .covariance = this->covariance.get(),
     .reduced_covariance = this->reduced_covariance.get(),
     .reduced_inv_covariance = this->reduced_inv_covariance.get()};

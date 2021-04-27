@@ -12,24 +12,34 @@ namespace panacea {
 
   MeanKernelWrapper::MeanKernelWrapper(
       const PassKey<KernelWrapperFactory> &,
-      BaseDescriptorWrapper * desc_wrapper
+      const BaseDescriptorWrapper * dwrapper
       ) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Mean mean;
-    std::vector<double> center_ = mean.calculate<BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
-    number_pts_mean_ = desc_wrapper->getNumberPoints();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    number_pts_mean_ = dwrapper->getNumberPoints();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   MeanKernelWrapper::MeanKernelWrapper(
       const PassKey<test::Test> &,
-      BaseDescriptorWrapper * desc_wrapper
+      const BaseDescriptorWrapper * dwrapper
       ) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Mean mean;
-    std::vector<double> center_ = mean.calculate<BaseDescriptorWrapper *,Direction::AlongColumns>(desc_wrapper);
-    number_pts_mean_ = desc_wrapper->getNumberPoints();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    number_pts_mean_ = dwrapper->getNumberPoints();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   double& MeanKernelWrapper::operator()(const int point_ind, const int dim_ind) {
@@ -58,6 +68,25 @@ namespace panacea {
 
   void MeanKernelWrapper::set(const Arrangement arrangement) {
     data_wrapper_.set(arrangement);
+  }
+
+  void MeanKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
+    assert(dwrapper!=nullptr);
+    assert(dwrapper->getNumberDimensions() == data_wrapper_.getNumberDimensions());
+
+    Mean mean;
+    std::vector<double> new_center = mean.calculate<const BaseDescriptorWrapper *,
+      Direction::AlongColumns>(dwrapper);
+
+    const double new_num_pts = static_cast<double>(dwrapper->getNumberPoints());
+    const double inv_total_num_pts = 1.0/static_cast<double>(number_pts_mean_ + new_num_pts);
+    for( int dim = 0; dim < data_wrapper_.getNumberDimensions(); ++dim){
+      data_wrapper_(0,dim) = 
+        (data_wrapper_(0,dim) * static_cast<double>(number_pts_mean_) + 
+        new_center.at(dim) * new_num_pts) * 
+        inv_total_num_pts; 
+    }
+    number_pts_mean_ += dwrapper->getNumberPoints();
   }
 
   const std::any MeanKernelWrapper::getPointerToRawData() const noexcept {

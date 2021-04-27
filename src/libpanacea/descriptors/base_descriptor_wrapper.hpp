@@ -23,10 +23,6 @@ namespace panacea {
       virtual int getNumberDimensions() const = 0; 
       virtual int getNumberPoints() const = 0; 
       virtual void set(const Arrangement arrangement) = 0;
-//      virtual void setReducedNumberDimensions(std::vector<int> reduced_chosen_dimensions) = 0;
-//      virtual const std::vector<int> getReducedDimensions() const = 0;
-//      virtual const size_t getNumberReducedDimensions() const = 0;
-//      virtual std::any getPointerToRawData() noexcept = 0;
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;

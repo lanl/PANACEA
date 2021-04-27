@@ -39,6 +39,11 @@ namespace panacea {
       virtual void set(const settings::EntropyOption & option, std::any val) = 0;
 
       /**
+       * Get the actual dimensions used by the entropy term
+       **/
+      virtual const std::vector<int> & getDimensions() const noexcept = 0;
+
+      /**
        * Update the internals
        **/
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;

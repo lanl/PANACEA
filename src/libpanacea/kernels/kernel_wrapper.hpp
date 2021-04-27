@@ -6,6 +6,7 @@
 // Local private includes
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
+#include "descriptors/base_descriptor_wrapper.hpp"
 #include "passkey.hpp"
 
 // Standard includes
@@ -42,6 +43,8 @@ namespace panacea {
         virtual int getNumberDimensions() const final;
         virtual int getNumberPoints() const final;
         virtual void set(const Arrangement arrangement) final;
+
+        virtual void update(const BaseDescriptorWrapper *) final;
         virtual const std::any getPointerToRawData() const noexcept final;
         virtual std::type_index getTypeIndex() const noexcept final;
         virtual void print() const final;
@@ -91,6 +94,16 @@ namespace panacea {
     }
 
   template<class T>
+    inline void KernelWrapper<T>::update(const BaseDescriptorWrapper * dwrapper) {
+      std::cout << "Calling update Kernel" << std::endl;
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      data_wrapper_ = DataPointTemplate<T>(
+          std::any_cast<T>(dwrapper->getPointerToRawData()),
+          dwrapper->rows(),
+          dwrapper->cols());
+    }
+
+  template<class T>
     inline const std::any KernelWrapper<T>::getPointerToRawData() const noexcept {
       return data_wrapper_.getPointerToRawData();
     }
@@ -107,6 +120,8 @@ namespace panacea {
         const int rows,
         const int cols) {
 
+      std::cout << "Calling create KernelWrapper" << std::endl;
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
     }
 

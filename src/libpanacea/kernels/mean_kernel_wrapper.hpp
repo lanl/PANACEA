@@ -33,12 +33,12 @@ namespace panacea {
 
       MeanKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
-          BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper * desc_wrapper
           );
 
       MeanKernelWrapper(
           const PassKey<test::Test> &,
-          BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper * desc_wrapper
           );
 
       virtual double& operator()(const int point_ind, const int dim_ind) final;
@@ -48,6 +48,7 @@ namespace panacea {
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
       virtual void set(const Arrangement arrangement) final;
+      virtual void update(const BaseDescriptorWrapper *) final;
       virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final;
       virtual void print() const final;
@@ -66,7 +67,8 @@ namespace panacea {
       const int rows,
       const int cols) {
 
-    return std::make_unique<MeanKernelWrapper>(key, std::any_cast<BaseDescriptorWrapper *>(data)); 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    return std::make_unique<MeanKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
   }
 
 }

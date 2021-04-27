@@ -57,11 +57,16 @@ namespace panacea {
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
-      Covariance(BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt = CovarianceOption::Strict);
-      Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean, int total_num_pts, const CovarianceOption opt = CovarianceOption::Strict);
+      Covariance(const BaseDescriptorWrapper * desc_wrap,
+          const CovarianceOption opt = CovarianceOption::Strict);
+
+      Covariance(std::unique_ptr<Matrix> matrix,
+          std::unique_ptr<Vector> mean,
+          int total_num_pts,
+          const CovarianceOption opt = CovarianceOption::Strict);
 
       /// Designed to update the covariance matrix
-      void update(BaseDescriptorWrapper * desc_wrap);
+      void update(const BaseDescriptorWrapper * desc_wrap);
 
       /// Don't want to allow for the matrix to be arbitrarily changed but do want to
       /// provide access to the actual covariance matrix elements

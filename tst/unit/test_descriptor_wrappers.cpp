@@ -101,28 +101,3 @@ TEST_CASE("Testing:descriptor_different_template_type","[unit,panacea]"){
 
 }
 
-TEST_CASE("Testing:descriptor_reduced_dimensions","[unit,panacea]"){
-
-  std::vector<std::vector<double>> data = test::generateVecData(); 
-
-  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
-
-  std::vector<int> reduced_var = { 0, 2}; 
-  dwrapper.setReducedNumberDimensions(reduced_var);
-
-  int count1 = 0;
-  int count2 = 0;
-  for( int pt_ind = 0; pt_ind < data.size(); ++pt_ind){
-    for(const int dim : dwrapper.getReducedDimensions()){
-      if( dim == 0) {
-        REQUIRE(dwrapper(pt_ind,dim) == 1.0);
-        ++count1;
-      }else if(dim == 2) {
-        REQUIRE(dwrapper(pt_ind,dim) == 3.0);
-        ++count2;
-      }
-    }
-  }
-  REQUIRE(count1 == 2);
-  REQUIRE(count2 == 2);
-}

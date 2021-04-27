@@ -11,6 +11,7 @@
 namespace panacea {
 
   enum class Arrangement;
+  class BaseDescriptorWrapper;
   /*
    * Base Kernel interface 
    */
@@ -23,6 +24,14 @@ namespace panacea {
       virtual int getNumberDimensions() const = 0; 
       virtual int getNumberPoints() const = 0; 
       virtual void set(const Arrangement arrangement) = 0;
+
+      /**
+       * Update the kernel wrapper
+       *
+       * The BaseDescriptorWrapper used to update the kernel must have the same number of
+       * dimensions as the descriptor wrapper that was used to initialize the kernel.
+       **/
+      virtual void update(const BaseDescriptorWrapper *) = 0;
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;

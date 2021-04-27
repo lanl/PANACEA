@@ -16,7 +16,6 @@ namespace panacea {
   class BaseDescriptorWrapper;
   class EntropySettings;
   class EntropyTerm;
-  class MemoryManager;
 
   namespace settings {
     enum class EntropyType;
@@ -27,9 +26,7 @@ namespace panacea {
       using EntropyCreateMethod = std::unique_ptr<EntropyTerm>(*)(
           const PassKey<EntropyFactory> & key,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          EntropySettings * settings,
-          std::string name);
+          EntropySettings * settings);
 
     private:
 
@@ -37,6 +34,8 @@ namespace panacea {
         create_methods_;
 
     public:
+
+      EntropyFactory();
 
       template<class T, settings::EntropyType entropy_type>
         static bool registerEntropyTerm() {
@@ -50,9 +49,7 @@ namespace panacea {
 
       std::unique_ptr<EntropyTerm> create(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          EntropySettings * settings,
-          std::string name = "") const;
+          EntropySettings * settings) const;
 
   };
 }

@@ -16,7 +16,6 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class KernelSpecification;
-  class MemoryManager;
   class Primitive;
   class PrimitiveAttributes;
   class PrimitiveFactory;
@@ -75,9 +74,7 @@ namespace panacea {
 
       PrimitiveGroup create(
           const BaseDescriptorWrapper * dwrapper,
-          MemoryManager & mem_manager,
-          const KernelSpecification & specification,
-          std::string name = "") const;
+          const KernelSpecification & specification) const;
   };
 }
 

@@ -1,6 +1,6 @@
 
-#ifndef PANACEA_PRIVATE_CROSSENTROPY_H
-#define PANACEA_PRIVATE_CROSSENTROPY_H
+#ifndef PANACEA_PRIVATE_SELFENTROPY_H
+#define PANACEA_PRIVATE_SELFENTROPY_H
 #pragma once
 
 // Local private PANACEA includes
@@ -17,7 +17,6 @@
 namespace panacea {
 
   class EntropyFactory;
-  class MemoryManager;
 
   class SelfEntropy : public EntropyTerm {
       std::unique_ptr<Distribution> distribution_;
@@ -43,14 +42,14 @@ namespace panacea {
 
       virtual void set(const settings::EntropyOption & option, std::any val) override;
 
+      virtual const std::vector<int> & getDimensions() const noexcept override;
+
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override;
 
       static std::unique_ptr<EntropyTerm> create(
           const PassKey<EntropyFactory> & key,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          EntropySettings * settings,
-          std::string name);
+          EntropySettings * settings);
 
   };
 

@@ -5,7 +5,6 @@
 // Local private includes
 #include "distributions/distribution.hpp"
 #include "distribution_settings/distribution_settings.hpp"
-#include "memory.hpp"
 #include "passkey.hpp"
 #include "settings.hpp"
 
@@ -24,10 +23,7 @@ namespace panacea {
       using DistributionCreateMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          DistributionSettings * dist_settings,
-          std::string name
-          );
+          DistributionSettings * dist_settings);
 
     private:
       static std::unordered_map<settings::DistributionType,DistributionCreateMethod>
@@ -48,9 +44,7 @@ namespace panacea {
 
       std::unique_ptr<Distribution> create(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          MemoryManager & mem_manager,
-          DistributionSettings * settings,
-          std::string name = "") const;
+          DistributionSettings * settings) const;
   };
 
 }

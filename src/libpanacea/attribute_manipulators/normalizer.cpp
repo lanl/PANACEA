@@ -3,7 +3,6 @@
 #include "normalizer.hpp"
 
 #include "normalization_methods/normalization_method_factory.hpp"
-#include "normalization_methods/normalization_method_base.hpp"
 #include "passkey.hpp"
 
 // Standard includes

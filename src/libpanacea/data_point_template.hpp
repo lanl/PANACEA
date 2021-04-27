@@ -42,7 +42,7 @@ namespace panacea {
       public:
   
         DataPointTemplate() = default;
-        DataPointTemplate(T data, int rows, int cols) : 
+        DataPointTemplate(T data, const int & rows, const int & cols) : 
           data_(data),
           rows_(rows),
           cols_(cols),

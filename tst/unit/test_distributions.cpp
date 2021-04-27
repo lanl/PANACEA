@@ -4,7 +4,6 @@
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "distribution/distribution_factory.hpp"
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
-#include "memory.hpp"
 #include "settings.hpp"
 
 // Third party includes
@@ -21,16 +20,6 @@ using namespace panacea;
  * Jupyter notebooks depecting the logic behind the update calls can be found
  * in PANACEA/jupyter_notebooks/Covariance
  **/
-TEST_CASE("Testing:distributions trivial registration","[unit,panacea]"){
-
-  DistributionFactory dist_factory;
-  dist_factory.registerDistribution<
-    KernelDistribution,
-    settings::DistributionType::Kernel>();
-
-}
-
-
 TEST_CASE("Testing:distributions","[unit,panacea]"){
   // 3 points 2 dimensions
   std::vector<std::vector<double>> data{
@@ -39,8 +28,6 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
     {3.0, 6.0}};
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_init(&data, 3, 2);
-
-  MemoryManager mem_manager;
 
   KernelDistributionSettings kernel_settings;
 
@@ -55,11 +42,8 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
       ));
 
   DistributionFactory dist_factory;
-  dist_factory.registerDistribution<
-    KernelDistribution,
-    settings::DistributionType::Kernel>();
 
-  auto dist = dist_factory.create(&dwrapper_init, mem_manager, &kernel_settings);
+  auto dist = dist_factory.create(&dwrapper_init, &kernel_settings);
 
   REQUIRE(dist->compute(&dwrapper_init,0) == Approx(dist->compute(&dwrapper_init,2)));
   REQUIRE(dist->compute(&dwrapper_init,1) > dist->compute(&dwrapper_init,0));
@@ -123,8 +107,6 @@ TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper1(&data1, num_pts, dims);
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper2(&data2, 1, dims);
 
-  MemoryManager mem_manager;
-
   KernelDistributionSettings kernel_settings;
 
   kernel_settings.dist_settings = std::move(KernelSpecification(
@@ -138,14 +120,11 @@ TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
       ));
 
   DistributionFactory dist_factory;
-  dist_factory.registerDistribution<
-    KernelDistribution,
-    settings::DistributionType::Kernel>();
 
   std::cout << "Creating dist1" << std::endl;
-  auto dist1 = dist_factory.create(&dwrapper1, mem_manager, &kernel_settings, "Distribution1");
+  auto dist1 = dist_factory.create(&dwrapper1, &kernel_settings);
   std::cout << "Creating dist2" << std::endl;
-  auto dist2 = dist_factory.create(&dwrapper2, mem_manager, &kernel_settings, "Distribution2");
+  auto dist2 = dist_factory.create(&dwrapper2, &kernel_settings);
   
   std::cout << "Computing distribution 1" << std::endl;
   std::cout << dist1->compute(&dwrapper1,0) << std::endl;
