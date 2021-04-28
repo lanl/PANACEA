@@ -4,8 +4,8 @@
 #define PANACEA_PRIVATE_ENTROPYDECORATOR_H
 #pragma once
 
-// Local private PANACEA include
-#include "entropy/entropy_terms/entropy_term.hpp"
+// Public PANACEA include
+#include "panacea/entropy_term.hpp"
 
 // Standard includes
 #include <memory>

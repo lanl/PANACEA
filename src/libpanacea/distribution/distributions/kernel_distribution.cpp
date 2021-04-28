@@ -1,8 +1,10 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private PANACEA includes
 #include "kernel_distribution.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "primitives/primitive.hpp"
@@ -10,7 +12,7 @@
 #include "primitives/gaussian_correlated.hpp"
 #include "primitives/primitive_factory.hpp"
 #include "primitives/primitive_group.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <iostream>

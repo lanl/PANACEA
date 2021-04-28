@@ -4,7 +4,7 @@
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "distribution/distribution_factory.hpp"
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

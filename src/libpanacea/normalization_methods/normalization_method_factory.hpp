@@ -5,7 +5,7 @@
 
 // Local private includes
 #include "passkey.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <memory>

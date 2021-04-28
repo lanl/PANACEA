@@ -1,5 +1,5 @@
-#ifndef PANACEA_PRIVATE_ENTROPYTERM_H
-#define PANACEA_PRIVATE_ENTROPYTERM_H
+#ifndef PANACEA_ENTROPYTERM_H
+#define PANACEA_ENTROPYTERM_H
 #pragma once
 
 // Local private PANACEA includes
@@ -52,4 +52,4 @@ namespace panacea {
   };
 }
 
-#endif // PANACEA_PRIVATE_ENTROPYTERM_H
+#endif // PANACEA_ENTROPYTERM_H

@@ -6,7 +6,7 @@
 #include "distribution_settings.hpp"
 
 #include "kernels/kernel_specifications.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 namespace panacea {
 

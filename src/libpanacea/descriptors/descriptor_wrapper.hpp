@@ -3,8 +3,10 @@
 #define PANACEA_PRIVATE_DESCRIPTORWRAPPER_H
 #pragma once
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private includes
-#include "base_descriptor_wrapper.hpp"
 #include "data_point_template.hpp"
 #include "error.hpp"
 

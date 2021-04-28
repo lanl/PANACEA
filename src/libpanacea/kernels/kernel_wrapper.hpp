@@ -3,10 +3,12 @@
 #define PANACEA_PRIVATE_KERNELWRAPPER_H
 #pragma once
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private includes
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "passkey.hpp"
 
 // Standard includes

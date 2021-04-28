@@ -3,7 +3,7 @@
 #pragma once
 
 // Local private PANACEA includes
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <unordered_map>

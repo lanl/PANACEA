@@ -1,6 +1,6 @@
 
-#ifndef PANACEA_PRIVATE_BASEDESCRIPTORWRAPPER_H
-#define PANACEA_PRIVATE_BASEDESCRIPTORWRAPPER_H
+#ifndef PANACEA_BASEDESCRIPTORWRAPPER_H
+#define PANACEA_BASEDESCRIPTORWRAPPER_H
 #pragma once
 
 // Standard includes
@@ -28,4 +28,4 @@ namespace panacea {
       virtual void print() const = 0;
   };
 }
-#endif // PANACEA_PRIVATE_BASEDESCRIPTORWRAPPER_H
+#endif // PANACEA_BASEDESCRIPTORWRAPPER_H

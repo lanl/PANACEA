@@ -1,6 +1,7 @@
 
 #ifndef PANACEA_MATRIX_H
 #define PANACEA_MATRIX_H
+#pragma once
 
 // Standard includes
 #include <memory>

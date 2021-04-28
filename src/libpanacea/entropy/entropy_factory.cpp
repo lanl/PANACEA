@@ -1,14 +1,16 @@
 
+// Public PANACEA includes
+#include "panacea/entropy_term.hpp"
+
 // Local private PANACEA includes
 #include "entropy_factory.hpp"
 
 #include "distribution/distribution_factory.hpp"
 #include "entropy_settings/entropy_settings.hpp"
 #include "entropy_terms/cross_entropy.hpp"
-#include "entropy_terms/entropy_term.hpp"
 #include "entropy_terms/self_entropy.hpp"
 #include "error.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <string>

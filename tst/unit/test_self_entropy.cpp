@@ -11,7 +11,7 @@
 #include "entropy/entropy_terms/entropy_decorators/numerical_grad.hpp"
 #include "entropy/entropy_terms/entropy_decorators/weight.hpp"
 #include "kernels/kernel_specifications.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

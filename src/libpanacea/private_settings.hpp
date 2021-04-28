@@ -2,6 +2,9 @@
 #define PANACEA_PRIVATE_SETTINGS_H
 #pragma once
 
+// Public PANACEA settings
+#include "panacea/settings.hpp"
+
 // Standard includes
 #include <type_traits>
 
@@ -26,17 +29,6 @@ namespace panacea {
       Kernel
     };
 
-    enum class EntropyType {
-      Self,
-      Cross
-    };
-
-    enum class EntropyOption {
-      Weight,
-      IncrementRatio, // Used in numerical gradiant calculations
-      NumericalGrad   // Turn numerical gradiant on or off 
-    };
-
     enum class EquationSetting {
       None,
       IgnoreExp
@@ -53,44 +45,9 @@ namespace panacea {
       WRTDescriptor
     };
 
-    /** 
-     * Fail if the specified kernel specifications are not satisfied
-     * the algorithm flexibility in determining best options if the 
-     * ones specefied lead to non ideal conditions, i.e. if defining
-     * a covariance matrix for a kernel in which the data is stacked
-     * at a single point then the covariance matrix will become 0
-     * everywhere which will lead to numerical problems.
-     **/
     enum class KernelAlgorithm {
       Strict,   
       Flexible  
-    };
-
-    enum class KernelPrimitive {
-      Gaussian,
-      Exponential    
-    };
-
-    /**
-     * How the descriptors are represented by the kernel
-     * Single - a single kernel is used to represent all the descriptors
-     * OneToOne - each descriptor has it's own kernel
-     * Fixed - there are a fixed number of kernels
-     **/
-    enum class KernelCount {
-      Single,
-      OneToOne,
-      Fixed
-    };
-
-    enum class KernelCorrelation {
-      Correlated,
-      Uncorrelated
-    };
-
-    enum class KernelNormalization {
-      None,
-      Variance
     };
 
     /**
@@ -111,13 +68,6 @@ namespace panacea {
       Default,
       Own,
       Share
-    };
-
-    enum class KernelCenterCalculation {
-      None,
-      Mean,
-      Median,
-      Custom
     };
 
     template<class T>

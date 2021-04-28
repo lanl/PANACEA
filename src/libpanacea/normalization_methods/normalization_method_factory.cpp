@@ -1,8 +1,10 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private includes
 #include "normalization_method_factory.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 #include "mean.hpp"
 #include "median.hpp"

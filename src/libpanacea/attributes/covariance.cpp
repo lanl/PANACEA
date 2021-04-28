@@ -2,10 +2,12 @@
  * Class for storing the covariance matrix
  */
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private PANACEA includes
 #include "covariance.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 
 // Local public PANACEA includes

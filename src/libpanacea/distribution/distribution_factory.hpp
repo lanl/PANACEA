@@ -6,7 +6,7 @@
 #include "distributions/distribution.hpp"
 #include "distribution_settings/distribution_settings.hpp"
 #include "passkey.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <any>

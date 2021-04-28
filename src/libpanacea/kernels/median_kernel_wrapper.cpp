@@ -1,8 +1,10 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private PANACEA includes
 #include "median_kernel_wrapper.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "median.hpp"
 #include "data_point_template.hpp"
 

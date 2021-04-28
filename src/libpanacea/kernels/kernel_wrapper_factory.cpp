@@ -1,9 +1,11 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Private local PANACEA includes
 #include "kernel_wrapper_factory.hpp"
 
 #include "base_kernel_wrapper.hpp"
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 #include "kernel_specifications.hpp"
 #include "mean.hpp"
@@ -11,8 +13,8 @@
 #include "median.hpp"
 #include "median_kernel_wrapper.hpp"
 #include "passkey.hpp"
-#include "settings.hpp"
 #include "primitives/gaussian_uncorrelated.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <memory>

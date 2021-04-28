@@ -1,8 +1,10 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private PANACEA includes
 #include "self_entropy.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "distribution/distributions/distribution.hpp"
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "distribution/distribution_factory.hpp"

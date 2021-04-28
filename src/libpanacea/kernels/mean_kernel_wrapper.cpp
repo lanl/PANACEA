@@ -1,8 +1,10 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private PANACEA includes
 #include "mean_kernel_wrapper.hpp"
 
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "mean.hpp"
 
 // Standard incldues

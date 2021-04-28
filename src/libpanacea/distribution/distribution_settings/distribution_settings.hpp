@@ -3,7 +3,7 @@
 #pragma once
 
 // Local private PANACEA includes
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 namespace panacea {
 

@@ -3,11 +3,12 @@
 #define PANACEA_PRIVATE_CROSSENTROPY_H
 #pragma once
 
-// Local private PANACEA includes
-#include "entropy_term.hpp"
+// Public PANACEA includes
+#include "panacea/entropy_term.hpp"
 
+// Private PANACEA includes
 #include "passkey.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <any>

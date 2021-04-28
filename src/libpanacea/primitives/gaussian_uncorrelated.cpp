@@ -1,4 +1,7 @@
 
+// Public PANACeA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Private local PANACEA includes
 #include "gaussian_uncorrelated.hpp"
 
@@ -6,11 +9,10 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attribute_manipulators/normalizer.hpp"
 #include "constants.hpp"
-#include "descriptors/descriptor_wrapper.hpp"
 #include "kernels/kernel_wrapper.hpp"
 #include "error.hpp"
 #include "primitive_attributes.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <cmath>

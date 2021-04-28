@@ -1,4 +1,7 @@
 
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+
 // Local private includes
 #include "primitive_factory.hpp"
 
@@ -7,7 +10,6 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attribute_manipulators/inverter.hpp"
 #include "attribute_manipulators/reducer.hpp"
-#include "descriptors/base_descriptor_wrapper.hpp"
 #include "error.hpp"
 #include "gaussian_correlated.hpp"
 #include "gaussian_uncorrelated.hpp"

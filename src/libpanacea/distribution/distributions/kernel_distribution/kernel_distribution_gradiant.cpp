@@ -7,7 +7,7 @@
 #include "kernels/base_kernel_wrapper.hpp"
 #include "primitives/primitive.hpp"
 #include "primitives/primitive_group.hpp"
-#include "settings.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <iostream>
