@@ -8,6 +8,8 @@
 #include "distribution/distribution_factory.hpp"
 #include "entropy_settings/entropy_settings.hpp"
 #include "entropy_terms/cross_entropy.hpp"
+#include "entropy_terms/entropy_decorators/numerical_grad.hpp"
+#include "entropy_terms/entropy_decorators/weight.hpp"
 #include "entropy_terms/self_entropy.hpp"
 #include "error.hpp"
 #include "private_settings.hpp"
@@ -44,10 +46,19 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    return create_methods_.at(settings->type)(
+    auto ent_term = create_methods_.at(settings->type)(
         PassKey<EntropyFactory>(),
         descriptor_wrapper,
         settings);
+
+    // Add decorators
+    if( settings->weight ) {
+      ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
+    }
+    if( settings->numerical_grad_switch ) {
+      ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
+    }
+    return ent_term;
   }
 
 }

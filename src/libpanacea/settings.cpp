@@ -22,6 +22,7 @@ namespace panacea {
    * PANACEA Settings Builder methods
    ************************************************************************/
   KernelBuilder PANACEASettingsBuilder::distributionType(const settings::Kernel &) {
+    ent_settings_.dist_type_ = settings::DistributionType::Kernel;
     return KernelBuilder(ent_settings_);
   }
 

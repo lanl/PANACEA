@@ -24,11 +24,6 @@ namespace panacea {
       Analytical
     };
 
-    enum class DistributionType {
-      Histogram,
-      Kernel
-    };
-
     enum class EquationSetting {
       None,
       IgnoreExp

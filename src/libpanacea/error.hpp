@@ -15,9 +15,9 @@ namespace panacea {
     inline void fail(T message, const char *const filename, int const linenumber) {
       std::stringstream stream;
       stream << "PANACEA ERROR" << std::endl;
-      stream << "  Message:     " << message << std::endl;
       stream << "  File:        " << filename << std::endl;
       stream << "  Line number: " << linenumber << std::endl;
+      stream << "  Message:     " << message << std::endl;
       throw std::runtime_error(stream.str());
     }
   } // error

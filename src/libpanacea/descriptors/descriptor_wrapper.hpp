@@ -25,7 +25,7 @@ namespace panacea {
     private: 
       DataPointTemplate<T> data_wrapper_;
     public:
-      DescriptorWrapper(T data, int rows, int cols) : 
+      DescriptorWrapper(T data, const int & rows, const int & cols) : 
         data_wrapper_(data, rows, cols) {};
 
       typedef const T type;

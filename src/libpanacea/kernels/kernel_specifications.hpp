@@ -120,6 +120,37 @@ namespace panacea {
       if( kern_algorithm == kern_algorithm_ ) return true;
       return false;
     }
+
+    /**
+     * Define setters
+     **/
+    inline void set(const settings::KernelCorrelation & correlation) noexcept {
+      kern_correlation_ = correlation;
+    }
+
+    inline void set(const settings::KernelCount & kern_count) noexcept {
+      kern_count_ = kern_count;
+    }
+
+    inline void set(const settings::KernelPrimitive & kern_prim) noexcept {
+      kern_prim_ = kern_prim;
+    }
+
+    inline void set(const settings::KernelNormalization & kern_normalization) noexcept {
+      kern_normalization_ = kern_normalization;
+    }
+
+    inline void set(const settings::KernelMemory & kern_memory) noexcept {
+      kern_memory_ = kern_memory;
+    }
+
+    inline void set(const settings::KernelCenterCalculation & kern_center) noexcept {
+      kern_center_ = kern_center;
+    }
+    
+    inline void set(const settings::KernelAlgorithm & kern_algorithm) noexcept {
+      kern_algorithm_ = kern_algorithm;
+    }
   };
 }
 #endif // PANACEA_PRIVATE_KERNEL_SPECIFICATIONS
