@@ -34,12 +34,12 @@ namespace panacea {
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
   }
 
-  double& MeanKernelWrapper::operator()(const int point_ind, const int dim_ind) {
-    return data_wrapper_(point_ind, dim_ind);
+  double& MeanKernelWrapper::at(const int row, const int col) {
+    return data_wrapper_.at(row, col);
   }
 
-  double MeanKernelWrapper::operator()(const int point_ind, const int dim_ind) const {
-    return data_wrapper_(point_ind, dim_ind);
+  double MeanKernelWrapper::at(const int row, const int col) const {
+    return data_wrapper_.at(row, col);
   }
 
   int MeanKernelWrapper::rows() const {
@@ -90,7 +90,7 @@ namespace panacea {
   }
 
   std::type_index MeanKernelWrapper::getTypeIndex() const noexcept {
-    return typeid(std::vector<double>);
+    return std::type_index(typeid(std::vector<double>));
   }
 
 }

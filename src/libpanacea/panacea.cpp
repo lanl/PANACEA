@@ -19,20 +19,26 @@ namespace panacea {
 
   /**
    * Only certain data types can be wrapped
+   *
+   * Note we do not want to make a copy of the underlying data type which is why if 2d
+   * data is passed in we actually create a pointer. This is because this is a wrapper
+   * method.
    **/
   std::unique_ptr<BaseDescriptorWrapper> PANACEA::wrap(std::any data, const int rows, const int cols) const {
-/*    if(data.type() == typeid(double **) ) {
-      return std::make_unique<DescriptorWrapper<double **>>(
-          std::any_cast<double **>(data),
+    
+    if(data.type() == typeid(double ***) ) {
+      return std::make_unique<DescriptorWrapper<double ***>>(
+          std::any_cast<double ***>(data),
           rows,
           cols);
-    }*/
+    }
     if(data.type() == typeid(std::vector<std::vector<double>> *) ) {
       return std::make_unique<DescriptorWrapper<std::vector<std::vector<double>> *>>(
           std::any_cast<std::vector<std::vector<double>> *>(data),
           rows,
           cols);
     }
+    
     std::string error_msg = "Tried to wrap an unsuppored data type";
     PANACEA_FAIL(error_msg);
   
@@ -42,11 +48,11 @@ namespace panacea {
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
-      const BaseDescriptorWrapper & dwrapper,
+      const BaseDescriptorWrapper * dwrapper,
       const PANACEASettings & settings) const {
 
     EntropySettings entropy_settings(settings);
     EntropyFactory entropy_factory;
-    return entropy_factory.create(&dwrapper, &entropy_settings);
+    return entropy_factory.create(dwrapper, &entropy_settings);
   }
 }

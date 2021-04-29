@@ -38,8 +38,11 @@ namespace panacea {
         KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
 
-        virtual double& operator()(const int point_ind, const int dim_ind) final;
-        virtual double operator()(const int point_ind, const int dim_ind) const final;
+        KernelWrapper(const PassKey<test::Test> &,
+            const BaseDescriptorWrapper * desc_wrapper);
+        
+        virtual double& at(const int row, const int col) final;
+        virtual double at(const int row, const int col) const final;
         virtual int rows() const final;
         virtual int cols() const final;
         virtual int getNumberDimensions() const final;
@@ -61,13 +64,24 @@ namespace panacea {
     };
 
   template<class T>
-    inline double& KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) {
-      return data_wrapper_(point_ind, dim_ind);
+    KernelWrapper<T>::KernelWrapper(
+        const PassKey<test::Test> &,
+        const BaseDescriptorWrapper * dwrapper) {
+
+      data_wrapper_ = DataPointTemplate<T>(
+          std::any_cast<T>(dwrapper->getPointerToRawData()),
+          dwrapper->rows(),
+          dwrapper->cols());
     }
 
   template<class T>
-    inline double KernelWrapper<T>::operator()(const int point_ind, const int dim_ind) const {
-      return data_wrapper_(point_ind, dim_ind);
+    inline double& KernelWrapper<T>::at(const int row, const int col) {
+      return data_wrapper_.at(row, col);
+    }
+
+  template<class T>
+    inline double KernelWrapper<T>::at(const int row, const int col) const {
+      return data_wrapper_.at(row, col);
     }
 
   template<class T>
@@ -122,14 +136,12 @@ namespace panacea {
         const int rows,
         const int cols) {
 
-      std::cout << "Calling create KernelWrapper" << std::endl;
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
     }
 
   template<class T>
     inline std::type_index KernelWrapper<T>::getTypeIndex() const noexcept {
-      return typeid(T);
+      return std::type_index(typeid(typename std::remove_const<T>::type));
     }
 }
 #endif // PANACEA_PRIVATE_KERNELWRAPPER_H

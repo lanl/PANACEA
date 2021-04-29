@@ -64,6 +64,9 @@ namespace panacea {
         double& operator()(const int point_ind, const int dim_ind);
         double operator()(const int point_ind, const int dim_ind) const;
 
+        double & at(const int row, const int col);
+        double at(const int row, const int col) const;
+
         int getNumberDimensions() const noexcept { return number_dimensions_; }
         int getNumberPoints() const noexcept { return number_points_; }
 
@@ -106,11 +109,10 @@ namespace panacea {
       std::cout << "\nData\n";
       for( int row = 0; row < rows(); ++row) {
         for( int col = 0; col < cols(); ++col) {
-          std::cout << this->operator()(row,col) << " ";
+          std::cout << "\n";
         }
-        std::cout << "\n";
+        std::cout << std::endl;
       }
-      std::cout << std::endl;
     }
 
   template<class T> 
@@ -201,6 +203,73 @@ namespace panacea {
       }
       return data_.at(point_ind);
     } 
+
+
+  template<class T> 
+    inline double& DataPointTemplate<T>::at(const int row, const int col) {
+      assert(row >= 0 && row < cols_);
+      assert(col >= 0 && col < rows_);
+      if constexpr(std::is_pointer<T>::value) {
+        return (*data_)[row][col];
+      } else {
+        return (data_)[row][col];
+      }
+    }
+
+  template<class T> 
+    inline double DataPointTemplate<T>::at(const int row, const int col) const {
+      assert(row >= 0 && row < rows_);
+      assert(col >= 0 && col < cols_);
+
+      if constexpr(std::is_pointer<T>::value) {
+        return (*data_)[row][col];
+      } else {
+        return (data_)[row][col];
+      }
+    } 
+
+  /*
+   * Specialization of the template in the case that a vector pointer is used
+   */
+  template<> 
+    inline double& DataPointTemplate<std::vector<std::vector<double>> *>::at(
+        const int row, const int col) {
+      assert(row >= 0 && row < rows_);
+      assert(col >= 0 && col < cols_);
+
+      return data_->at(row).at(col);
+    }
+
+  template<> 
+    inline double DataPointTemplate<std::vector<std::vector<double>> *>::at(
+        const int row, const int col) const {
+      assert(row >= 0 && row < rows_);
+      assert(col >= 0 && col < cols_);
+
+      return data_->at(row).at(col);
+    } 
+
+  /*
+   * Specialization of the template in the case that a vector is used
+   */
+  template<> 
+    inline double& DataPointTemplate<std::vector<double>>::at(
+        const int row, const int col) {
+      assert(row == 0 );
+      assert(col >= 0 && col < cols_);
+
+      return data_.at(col);
+    }
+
+  template<> 
+    inline double DataPointTemplate<std::vector<double>>::at(
+        const int row, const int col) const {
+      assert(row == 0);
+      assert(col >= 0 && col < cols_);
+
+      return data_.at(col);
+    } 
+
 
   template class DataPointTemplate<std::vector<std::vector<double>>*>;
   template class DataPointTemplate<double ***>;

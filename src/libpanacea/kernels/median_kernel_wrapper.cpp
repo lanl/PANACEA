@@ -123,12 +123,12 @@ namespace panacea {
     number_pts_median_ += dwrapper->getNumberPoints();
   }
 
-  double& MedianKernelWrapper::operator()(const int point_ind, const int dim_ind) {
-    return data_wrapper_(point_ind, dim_ind);
+  double& MedianKernelWrapper::at(const int row, const int col) {
+    return data_wrapper_.at(row, col);
   }
 
-  double MedianKernelWrapper::operator()(const int point_ind, const int dim_ind) const {
-    return data_wrapper_(point_ind, dim_ind);
+  double MedianKernelWrapper::at(const int row, const int col) const {
+    return data_wrapper_.at(row, col);
   }
 
   int MedianKernelWrapper::rows() const {
@@ -160,7 +160,7 @@ namespace panacea {
   }
 
   std::type_index MedianKernelWrapper::getTypeIndex() const noexcept {
-    return typeid(std::vector<double>);
+    return std::type_index(typeid(std::vector<double>));
   }
 
 }

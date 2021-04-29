@@ -40,7 +40,7 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Strict
       ));
 
   EntropySettings settings;

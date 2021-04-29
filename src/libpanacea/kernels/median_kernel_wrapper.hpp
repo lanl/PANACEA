@@ -54,8 +54,8 @@ namespace panacea {
           const BaseDescriptorWrapper * desc_wrapper
           );
 
-      virtual double& operator()(const int point_ind, const int dim_ind) final;
-      virtual double operator()(const int point_ind, const int dim_ind) const final;
+      virtual double& at(const int row, const int col) final;
+      virtual double at(const int row, const int col) const final;
       virtual int rows() const final;
       virtual int cols() const final;
       virtual int getNumberDimensions() const final;

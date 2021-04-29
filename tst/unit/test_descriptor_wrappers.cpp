@@ -25,6 +25,8 @@ TEST_CASE("Testing:descriptor_wrapper_constructor2","[unit,panacea]"){
   std::vector<std::vector<double>> data = test::generateVecData(); 
   
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2, 3);
+  auto data_type_index = type_index(typeid(vector<vector<double>> *));
+  REQUIRE(data_type_index == dwrapper.getTypeIndex());
   REQUIRE(dwrapper.rows() == 2);
   REQUIRE(dwrapper.cols() == 3);
 

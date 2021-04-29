@@ -21,9 +21,9 @@ namespace panacea {
   /************************************************************************
    * PANACEA Settings Builder methods
    ************************************************************************/
-  KernelBuilder PANACEASettingsBuilder::distributionType(const settings::Kernel &) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::distributionType(const settings::Kernel &) {
     ent_settings_.dist_type_ = settings::DistributionType::Kernel;
-    return KernelBuilder(ent_settings_);
+    return *this;
   }
 
   PANACEASettingsBuilder & PANACEASettingsBuilder::set(
@@ -40,46 +40,42 @@ namespace panacea {
     return *this;
   }
 
-  /************************************************************************
-   * Kernel Builder methods
-   ************************************************************************/
-
-  KernelBuilder & KernelBuilder::weightEntropTermBy(const double & weight) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::weightEntropTermBy(const double & weight) {
     ent_settings_.weight_ = weight;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::setIncrementRatioTo(const double & inc_ratio) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::setIncrementRatioTo(const double & inc_ratio) {
     ent_settings_.inc_ratio_ = inc_ratio;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::setNumericalGradTo(const bool & on_or_off) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::setNumericalGradTo(const bool & on_or_off) {
     ent_settings_.numerical_grad_ = on_or_off;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::set(const settings::KernelPrimitive & primitive) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelPrimitive & primitive) {
     ent_settings_.primitive_ = primitive;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::set(const settings::KernelCount & kern_count) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelCount & kern_count) {
     ent_settings_.kern_count_ = kern_count;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::set(const settings::KernelCorrelation & kern_correlation) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelCorrelation & kern_correlation) {
     ent_settings_.kern_correlation_ = kern_correlation;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::set(const settings::KernelCenterCalculation & kern_center) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelCenterCalculation & kern_center) {
     ent_settings_.kern_center_ = kern_center;
     return *this;
   }
 
-  KernelBuilder & KernelBuilder::set(const settings::KernelNormalization & kern_norm) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelNormalization & kern_norm) {
     ent_settings_.kern_norm_ = kern_norm;
     return *this;
   }

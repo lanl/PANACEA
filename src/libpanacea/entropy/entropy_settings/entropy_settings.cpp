@@ -42,6 +42,18 @@ namespace panacea {
         if( auto val = in.get<KernelCenterCalculation>() ) {
           kern_dist_settings->dist_settings.set(*val);
         }
+        if( auto val = in.get<PANACEAAlgorithm>() ){
+          if( *val == PANACEAAlgorithm::Flexible ) {
+            kern_dist_settings->dist_settings.set(KernelAlgorithm::Flexible);
+          } else {
+            kern_dist_settings->dist_settings.set(KernelAlgorithm::Strict);
+          }
+        }
+        if( this->type == EntropyType::Self ) {
+          // Make the kernels share the data from the descriptors if it is a 
+          // Self entropy term
+          kern_dist_settings->dist_settings.set(KernelMemory::Share);
+        }
         this->dist_settings = std::move(kern_dist_settings);
       }
     }

@@ -44,11 +44,11 @@ namespace panacea {
       template<settings::KernelCenterCalculation kernel_center, class T, class S>
         static bool registerKernel() {
           if( create_methods_.count(kernel_center) == 0 ) {
-            create_methods_[kernel_center][typeid(T)] = S::create;
+            create_methods_[kernel_center][std::type_index(typeid(typename std::remove_const<T>::type))] = S::create;
             return true;
           } else {
-            if( create_methods_[kernel_center].count(typeid(T)) == 0){
-              create_methods_[kernel_center][typeid(T)] = S::create;
+            if( create_methods_[kernel_center].count(std::type_index(typeid(typename std::remove_const<T>::type))) == 0){
+              create_methods_[kernel_center][std::type_index(typeid(typename std::remove_const<T>::type))] = S::create;
               return true;
             }
           }

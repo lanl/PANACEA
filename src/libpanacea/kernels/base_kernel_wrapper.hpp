@@ -17,11 +17,29 @@ namespace panacea {
    */
   class BaseKernelWrapper  {
     public:
-      virtual double& operator()(const int point_ind, const int dim_ind) = 0;
-      virtual double operator()(const int point_ind, const int dim_ind) const = 0;
+
+      /**
+       * Notice this behavior is different from the descriptor wrapper here
+       * we should be passing in the row and column indices not the desc
+       * point index and dimension.
+       **/
+      virtual double& at(const int row, const int col) = 0;
+      virtual double at(const int row, const int col) const = 0;
+
+      /**
+       * Gets the total number of rows of data stored by the kernel
+       **/
       virtual int rows() const = 0;
+
+      /**
+       * Gets the total number of cols of data stored by the kernel
+       **/
       virtual int cols() const = 0;
       virtual int getNumberDimensions() const = 0; 
+
+      /**
+       * Returns the total number of points used to create the kernel
+       **/
       virtual int getNumberPoints() const = 0; 
       virtual void set(const Arrangement arrangement) = 0;
 

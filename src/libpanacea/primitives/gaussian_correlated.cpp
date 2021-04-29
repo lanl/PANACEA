@@ -45,7 +45,7 @@ namespace panacea {
     assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
     assert(attributes_.kernel_wrapper != nullptr);
     assert(kernel_index_ > -1);
-    assert(kernel_index_ < attributes_.kernel_wrapper->getNumberPoints());
+    assert(kernel_index_ < attributes_.kernel_wrapper->rows());
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
@@ -62,7 +62,7 @@ namespace panacea {
     int index = 0;
     for ( const int dim : chosen_dims ) {
       diff.push_back((descs(descriptor_ind, dim) - 
-          kerns(kernel_index_,dim)) *
+          kerns.at(kernel_index_,dim)) *
           norm_coeffs.at(dim));
     }
 
@@ -94,7 +94,7 @@ namespace panacea {
     assert(descriptor_ind < descriptors->getNumberPoints() );
     assert(attributes_.kernel_wrapper != nullptr);
     assert(kernel_index_ > -1);
-    assert(kernel_index_ < attributes_.kernel_wrapper->getNumberPoints());
+    assert(kernel_index_ < attributes_.kernel_wrapper->rows());
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
@@ -118,7 +118,7 @@ namespace panacea {
     for ( const int dim : chosen_dims ) {
       // ( a_i * (d_x_i - d_mu_i) )
       diff.at(dim) = (descs(descriptor_ind,dim) - 
-          kerns(kernel_index_,dim));
+          kerns.at(kernel_index_,dim));
     } 
 
     std::vector<double> grad(ndim,0.0);

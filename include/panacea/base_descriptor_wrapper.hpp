@@ -26,6 +26,8 @@ namespace panacea {
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;
+
+      virtual ~BaseDescriptorWrapper() = 0;
   };
 }
 #endif // PANACEA_BASEDESCRIPTORWRAPPER_H

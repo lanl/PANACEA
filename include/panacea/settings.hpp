@@ -19,7 +19,8 @@ namespace panacea {
       Kernel
     };
 
-    class Kernel {};
+    class Kernel { };
+    const Kernel kernel = Kernel();
 
     enum class EntropyOption {
       Weight,
@@ -83,13 +84,26 @@ namespace panacea {
 
   class PANACEASettingsBuilder;
 
+  /**
+   * PANACEASettings designed to be used with the fluent builder pattern
+   **/
   class PANACEASettings {
  
-      friend class KernelBuilder; 
       friend class PANACEASettingsBuilder;  
 
     public:
       static PANACEASettingsBuilder make();
+      std::optional<double> getWeight() const noexcept {
+        return weight_;
+      }
+
+      std::optional<double> getIncrement() const noexcept {
+        return inc_ratio_;
+      }
+
+      std::optional<bool> numericalGrad() const noexcept {
+        return numerical_grad_;
+      }
 
       template<class T>
       std::optional<T> get() const noexcept {
@@ -112,64 +126,44 @@ namespace panacea {
         }
       }
 
-      std::optional<double> getWeight() const noexcept {
-        return weight_;
-      }
-
-      std::optional<double> getIncrement() const noexcept {
-        return inc_ratio_;
-      }
-
-      std::optional<bool> numericalGrad() const noexcept {
-        return numerical_grad_;
-      }
 
     private:
       PANACEASettings() = default;
-      std::optional<settings::EntropyType> ent_type_ = settings::EntropyType::Self; 
-      std::optional<settings::PANACEAAlgorithm> algorithm_setting_ = settings::PANACEAAlgorithm::Strict;
-      std::optional<settings::KernelPrimitive> primitive_ = settings::KernelPrimitive::Gaussian;
-      std::optional<settings::KernelCount> kern_count_ = settings::KernelCount::OneToOne;
-      std::optional<settings::KernelCorrelation> kern_correlation_ = settings::KernelCorrelation::Uncorrelated;
-      std::optional<settings::KernelNormalization> kern_norm_ = settings::KernelNormalization::None;
-      std::optional<settings::KernelCenterCalculation> kern_center_ = settings::KernelCenterCalculation::None;
+      std::optional<settings::EntropyType> ent_type_; 
+      std::optional<settings::PANACEAAlgorithm> algorithm_setting_;
+      std::optional<settings::KernelPrimitive> primitive_;
+      std::optional<settings::KernelCount> kern_count_;
+      std::optional<settings::KernelCorrelation> kern_correlation_;
+      std::optional<settings::KernelNormalization> kern_norm_;
+      std::optional<settings::KernelCenterCalculation> kern_center_;
       std::optional<settings::DistributionType> dist_type_;
       std::optional<double> weight_;
       std::optional<double> inc_ratio_;
       std::optional<bool> numerical_grad_;
     };
 
-  class KernelBuilder;
-
   class PANACEASettingsBuilder {
     public:
-      KernelBuilder distributionType(const settings::Kernel &);
+      PANACEASettingsBuilder & distributionType(const settings::Kernel &);
 
       PANACEASettingsBuilder & set(const settings::EntropyType &);
       PANACEASettingsBuilder & set(const settings::PANACEAAlgorithm &);
-    private:
-      PANACEASettings ent_settings_;
-  };
 
-  class KernelBuilder : public PANACEASettingsBuilder {
-    public:
-      explicit KernelBuilder(PANACEASettings & settings) : ent_settings_(settings) {};
-      KernelBuilder & weightEntropTermBy(const double & weight);
-      KernelBuilder & setIncrementRatioTo(const double & inc_ratio);
-      KernelBuilder & setNumericalGradTo(const bool & on_or_off);
-      KernelBuilder & set(const settings::KernelPrimitive &);
-      KernelBuilder & set(const settings::KernelCount &);
-      KernelBuilder & set(const settings::KernelCorrelation &);
-      KernelBuilder & set(const settings::KernelCenterCalculation &);
-      KernelBuilder & set(const settings::KernelNormalization &);
+      PANACEASettingsBuilder & weightEntropTermBy(const double & weight);
+      PANACEASettingsBuilder & setIncrementRatioTo(const double & inc_ratio);
+      PANACEASettingsBuilder & setNumericalGradTo(const bool & on_or_off);
+      PANACEASettingsBuilder & set(const settings::KernelPrimitive &);
+      PANACEASettingsBuilder & set(const settings::KernelCount &);
+      PANACEASettingsBuilder & set(const settings::KernelCorrelation &);
+      PANACEASettingsBuilder & set(const settings::KernelCenterCalculation &);
+      PANACEASettingsBuilder & set(const settings::KernelNormalization &);
 
       operator PANACEASettings&&() {
            return std::move(ent_settings_); // notice the move
        }
 
-    private:
+    protected:
       PANACEASettings ent_settings_;
   };
-
 }
 #endif // PANACEA_SETTINGS_H

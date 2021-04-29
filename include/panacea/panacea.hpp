@@ -17,14 +17,15 @@ namespace panacea {
 
   class PANACEA {
 
-    std::unique_ptr<BaseDescriptorWrapper> wrap(
-        std::any,
-        const int rows,
-        const int cols) const;
+    public:
+      std::unique_ptr<BaseDescriptorWrapper> wrap(
+          std::any ,
+          const int rows,
+          const int cols) const;
 
-    std::unique_ptr<EntropyTerm> create(
-        const BaseDescriptorWrapper &, 
-        const PANACEASettings & settings) const;
+      std::unique_ptr<EntropyTerm> create(
+          const BaseDescriptorWrapper *, 
+          const PANACEASettings & settings) const;
 
   };
 

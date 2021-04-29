@@ -82,7 +82,7 @@ namespace panacea {
 
   template<class T>
   inline std::type_index DescriptorWrapper<T>::getTypeIndex() const noexcept {
-    return typeid(T);
+    return std::type_index(typeid(typename std::remove_const<T>::type));
   }
 
 }
