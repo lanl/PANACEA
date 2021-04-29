@@ -9,6 +9,7 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attribute_manipulators/normalizer.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
+#include "kernels/kernel_specifications.hpp"
 #include "primitive.hpp"
 #include "primitive_attributes.hpp"
 
@@ -21,8 +22,17 @@ namespace panacea {
 
   class Normalizer;
 
+  /**
+   * The specifications are fixed for each primitive group
+   **/
   class PrimitiveGroup {
+    private:
+      KernelSpecification specification;
     public:
+      PrimitiveGroup() = default;
+      explicit PrimitiveGroup(const KernelSpecification & specific) : specification(specific) {};
+
+      const KernelSpecification & getSpecification() { return specification; }
       std::string name = "";
       Normalizer normalizer;
       std::unique_ptr<BaseKernelWrapper> kernel_wrapper = nullptr;
@@ -30,8 +40,6 @@ namespace panacea {
       std::unique_ptr<ReducedCovariance> reduced_covariance = nullptr;
       std::unique_ptr<ReducedInvCovariance> reduced_inv_covariance = nullptr;
       std::vector<std::unique_ptr<Primitive>> primitives;
-
-      void update(const BaseDescriptorWrapper * descriptor_wrapper);
 
       PrimitiveAttributes createPrimitiveAttributes() noexcept;
   };

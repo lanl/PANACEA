@@ -7,38 +7,12 @@
 #include "attribute_manipulators/reducer.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "primitive_attributes.hpp"
+#include "primitive_factory.hpp"
 
 // Standard includes
 #include <cassert>
 
 namespace panacea {
-
-  void PrimitiveGroup::update(const BaseDescriptorWrapper * descriptor_wrapper) {
-    assert(kernel_wrapper != nullptr); 
-    kernel_wrapper->update(descriptor_wrapper);
-    // Unnormalize the covariance matrix before updating 
-    normalizer.unnormalize(*covariance);
-    covariance->update(descriptor_wrapper);
-    // Now we are free to update the normalization coefficients
-    normalizer.update(descriptor_wrapper);
-    normalizer.normalize(*covariance);
-
-    // Cannot update the reduced covariance matrix and reduced inv covariance matrices
-    // these both need to be recalculated
-    Reducer reducer;
-    reduced_covariance = std::make_unique<ReducedCovariance>(
-        reducer.reduce(*covariance, std::vector<int> {}));
-    
-    Inverter inverter;
-    reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
-        inverter.invert(*reduced_covariance));
-
-    // Now we need to update all the primitives
-    for( auto & prim : primitives) {
-      auto attr = createPrimitiveAttributes();
-      prim->update(attr);
-    }
-  }
 
   PrimitiveAttributes PrimitiveGroup::createPrimitiveAttributes() noexcept {
     return PrimitiveAttributes {

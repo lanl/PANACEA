@@ -23,7 +23,7 @@
 
 namespace panacea {
 
-  void GaussCorrelated::update(PrimitiveAttributes & attributes) {
+  void GaussCorrelated::update(PrimitiveAttributes && attributes) {
     assert(attributes.kernel_wrapper != nullptr);
     attributes_ = std::move(attributes); 
     double determinant = attributes_.reduced_covariance->getDeterminant();
@@ -40,6 +40,7 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       const int descriptor_ind) const {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
     assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
@@ -80,6 +81,7 @@ namespace panacea {
     for(int i=0; i<red_ndim; ++i) {
       VxMxV += diff.at(i) * MxV.at(i);
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return pre_factor_ * std::exp(-0.5 * VxMxV);
   }
 

@@ -49,7 +49,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive","[unit,panacea]"){
 
   PrimitiveFactory prim_factory;
   
-  auto gauss_correlated_prim_grp = prim_factory.create(
+  auto gauss_correlated_prim_grp = prim_factory.createGroup(
       dwrapper.get(),
       specification);
 
@@ -110,7 +110,6 @@ TEST_CASE("Testing:compute of gaussian correlated primitive","[unit,panacea]"){
 
 TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel","[unit,panacea]"){
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   // Assumes we are dealing with two dimensions and three points
   std::vector<std::vector<double>> raw_desc_data{
     {0.0, 3.0},
@@ -136,19 +135,14 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
   PrimitiveFactory prim_factory;
   std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   
-  auto gauss_correlated_prim_grp = prim_factory.create(
+  auto gauss_correlated_prim_grp = prim_factory.createGroup(
       dwrapper.get(),
       specification);
 
-  /*
-  // There should be two primitives sense it is a one to one ratio and there 
-  // are two descriptors
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
+  
   REQUIRE(gauss_correlated_prim_grp.primitives.size() == 1);
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   REQUIRE(gauss_correlated_prim_grp.primitives.at(0)->getId() == 0);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;*/
-/*
+
   // Get the density located at the center of the primitives and compare it with the densities
   // at the sides, density at center should be greater
   //
@@ -173,7 +167,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
   REQUIRE( sample_center > sample_side1);
   REQUIRE( sample_center > sample_side2);
   REQUIRE( sample_side1 == Approx(sample_side2));
-*/ 
+ 
 }
 
 TEST_CASE("Testing:compute of gaussian correlated primitive single median kernel","[unit,panacea]"){
@@ -198,7 +192,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single median kernel
 
   PrimitiveFactory prim_factory;
   
-  auto gauss_correlated_prim_grp = prim_factory.create(
+  auto gauss_correlated_prim_grp = prim_factory.createGroup(
       dwrapper.get(),
       specification);
 
@@ -267,7 +261,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad","[unit,panacea
 
     PrimitiveFactory prim_factory;
 
-    auto gauss_correlated_prim_grp = prim_factory.create(
+    auto gauss_correlated_prim_grp = prim_factory.createGroup(
         dwrapper.get(),
         specification);
 
@@ -340,7 +334,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
 
     PrimitiveFactory prim_factory;
 
-    auto gauss_correlated_prim_grp = prim_factory.create(
+    auto gauss_correlated_prim_grp = prim_factory.createGroup(
         dwrapper.get(),
         specification);
 

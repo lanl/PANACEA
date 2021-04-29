@@ -30,8 +30,7 @@ namespace panacea {
 
       using PrimitiveCountMethod = void(*)(
         const PassKey<PrimitiveFactory> &,
-        PrimitiveGroup & prim_grp,
-        const KernelSpecification & specification);
+        PrimitiveGroup & prim_grp);
 
     private:
 
@@ -44,13 +43,11 @@ namespace panacea {
 
       static void OneToOne(
         const PassKey<PrimitiveFactory> &,
-        PrimitiveGroup & prim_grp,
-        const KernelSpecification & specification);
+        PrimitiveGroup & prim_grp);
 
       static void Single(
         const PassKey<PrimitiveFactory> &,
-        PrimitiveGroup & prim_grp,
-        const KernelSpecification & specification);
+        PrimitiveGroup & prim_grp);
 
     public:
 
@@ -72,9 +69,19 @@ namespace panacea {
         return true;
       }
 
-      PrimitiveGroup create(
+      /**
+       * Create a primitive group
+       **/
+      PrimitiveGroup createGroup(
           const BaseDescriptorWrapper * dwrapper,
           const KernelSpecification & specification) const;
+
+      /**
+       * Updates the primitive group
+       **/ 
+      void update(
+          const BaseDescriptorWrapper * dwrapper,
+          PrimitiveGroup & primitive_grp) const;
   };
 }
 

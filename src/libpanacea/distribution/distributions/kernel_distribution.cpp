@@ -26,7 +26,7 @@ namespace panacea {
           const KernelSpecification & settings) {
 
     PrimitiveFactory prim_factory;
-    prim_grp_ = prim_factory.create(
+    prim_grp_ = prim_factory.createGroup(
         descriptor_wrapper,
         settings);
   
@@ -168,7 +168,8 @@ namespace panacea {
   }
 
   void KernelDistribution::update(const BaseDescriptorWrapper * descriptor_wrapper) {
-    prim_grp_.update(descriptor_wrapper);
+    PrimitiveFactory prim_factory;
+    prim_factory.update(descriptor_wrapper,prim_grp_);
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
   }
 }

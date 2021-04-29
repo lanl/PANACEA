@@ -56,7 +56,7 @@ namespace panacea {
 
       virtual int getId() const noexcept final { return kernel_index_; }
       // Do not make const reference
-      virtual void update(PrimitiveAttributes &) final;
+      virtual void update(PrimitiveAttributes &&) final;
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,

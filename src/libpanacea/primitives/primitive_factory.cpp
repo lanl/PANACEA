@@ -34,36 +34,58 @@ namespace panacea {
    *************************************************/
 
   void PrimitiveFactory::OneToOne(const PassKey<PrimitiveFactory> &,
-      PrimitiveGroup & prim_grp,
-      const KernelSpecification & specification
+      PrimitiveGroup & prim_grp
       ){
 
-    prim_grp.primitives.reserve(prim_grp.kernel_wrapper->getNumberPoints());
-    for( int kernel_index = 0;
-        kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
-        ++kernel_index){
+    prim_grp.primitives.reserve(prim_grp.kernel_wrapper->getNumberPoints()); 
 
-      prim_grp.primitives.push_back(
-          create_methods_[specification.get<settings::KernelPrimitive>()]\
-          [specification.get<settings::KernelCorrelation>()]\
-          (PassKey<PrimitiveFactory>(),
-           std::move(prim_grp.createPrimitiveAttributes()),
-           kernel_index));
+    const int initial_num_prim = prim_grp.primitives.size(); 
+    const int diff = prim_grp.kernel_wrapper->getNumberPoints() - initial_num_prim;
+    const int new_num_prim = initial_num_prim + diff; 
+
+    if( diff > 0 ) {
+      // Add the difference
+      for( int kernel_index = initial_num_prim;
+          kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
+          ++kernel_index){
+
+        prim_grp.primitives.push_back(
+            create_methods_[prim_grp.getSpecification().get<settings::KernelPrimitive>()]\
+            [prim_grp.getSpecification().get<settings::KernelCorrelation>()]\
+            (PassKey<PrimitiveFactory>(),
+             std::move(prim_grp.createPrimitiveAttributes()),
+             kernel_index));
+      }
+    } else {
+      // Shrink to fit 
+      prim_grp.primitives.resize(prim_grp.kernel_wrapper->getNumberPoints());
+    }
+
+    if( initial_num_prim != 0 ) {
+      int num_prim_to_update = initial_num_prim;
+      if( diff < 0 ) num_prim_to_update = prim_grp.kernel_wrapper->getNumberPoints();
+      // make sure all the primitive attributes are up to date upto the initial_num_priming index
+      for( int kernel_index = 0; kernel_index < num_prim_to_update; ++kernel_index){
+        prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
+      } 
     }
   }
 
   void PrimitiveFactory::Single(const PassKey<PrimitiveFactory> &,
-      PrimitiveGroup & prim_grp,
-      const KernelSpecification & specification
+      PrimitiveGroup & prim_grp
       ){
 
     const int kernel_index = 0;
-    prim_grp.primitives.emplace_back(
-        create_methods_[specification.get<settings::KernelPrimitive>()]\
-        [specification.get<settings::KernelCorrelation>()]\
-        (PassKey<PrimitiveFactory>(),
-         std::move(prim_grp.createPrimitiveAttributes()),
-         kernel_index));
+    if( prim_grp.primitives.size() == 0 ) {
+      prim_grp.primitives.emplace_back(
+          create_methods_[prim_grp.getSpecification().get<settings::KernelPrimitive>()]\
+          [prim_grp.getSpecification().get<settings::KernelCorrelation>()]\
+          (PassKey<PrimitiveFactory>(),
+           std::move(prim_grp.createPrimitiveAttributes()),
+           kernel_index));
+    } else {
+      prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
+    }
   }
 
   /***************************************************************
@@ -128,41 +150,27 @@ namespace panacea {
 
   }
 
-  PrimitiveGroup PrimitiveFactory::create(
+  PrimitiveGroup PrimitiveFactory::createGroup(
       const BaseDescriptorWrapper * dwrapper,
       const KernelSpecification & specification) const {
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     KernelWrapperFactory kfactory;
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
-    PrimitiveGroup prim_grp;
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
+    PrimitiveGroup prim_grp(specification);
     prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   
-//    prim_grp.kernel_wrapper = kwrapper.get();
-
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     prim_grp.covariance = createCovariance(dwrapper, specification);
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
     prim_grp.normalizer.normalize(*prim_grp.covariance); 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported: ";
@@ -176,11 +184,49 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp,specification);
-
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
+    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
     return prim_grp;
   }
+
+  void PrimitiveFactory::update(
+      const BaseDescriptorWrapper * descriptor_wrapper, 
+      PrimitiveGroup & prim_grp) const {
+
+    prim_grp.kernel_wrapper->update(descriptor_wrapper);
+    // Unnormalize the covariance matrix before updating 
+    prim_grp.normalizer.unnormalize(*prim_grp.covariance);
+    prim_grp.covariance->update(descriptor_wrapper);
+    // Now we are free to update the normalization coefficients
+    prim_grp.normalizer.update(descriptor_wrapper);
+    prim_grp.normalizer.normalize(*prim_grp.covariance);
+
+    // Cannot update the reduced covariance matrix and reduced inv covariance matrices
+    // these both need to be recalculated
+    Reducer reducer;
+    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
+        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+
+    Inverter inverter;
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
+        inverter.invert(*prim_grp.reduced_covariance));
+
+    // Now we need to update all the primitives after resizing if appropriate
+
+    if(create_methods_.count(prim_grp.getSpecification().get<settings::KernelPrimitive>()) == 0){
+      std::string error_msg = "Kernel Primitive is not supported: ";
+      error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelPrimitive>());
+      PANACEA_FAIL(error_msg);
+    }
+
+    if( count_methods_.count(prim_grp.getSpecification().get<settings::KernelCount>()) == 0){
+      std::string error_msg = "Kernel count method is not supported: ";
+      error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelCount>());
+      PANACEA_FAIL(error_msg);
+    }
+
+    count_methods_[prim_grp.getSpecification().get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
+
+  }
+
 }

@@ -28,7 +28,7 @@ namespace panacea {
        * reset the prefactor value
        */
       // Do not make const reference
-      virtual void update(PrimitiveAttributes &) = 0;
+      virtual void update(PrimitiveAttributes &&) = 0;
 
       /*
        * Computes the density

@@ -49,7 +49,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
 
   PrimitiveFactory prim_factory;
   
-  auto gauss_uncorrelated_prim_grp = prim_factory.create(
+  auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
       dwrapper.get(),
       specification);
 
@@ -144,7 +144,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
 
     PrimitiveFactory prim_factory;
 
-    auto gauss_uncorrelated_prim_grp = prim_factory.create(
+    auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
         dwrapper.get(),
         specification);
 
@@ -217,7 +217,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
 
     PrimitiveFactory prim_factory;
 
-    auto gauss_uncorrelated_prim_grp = prim_factory.create(
+    auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
         dwrapper.get(),
         specification);
 

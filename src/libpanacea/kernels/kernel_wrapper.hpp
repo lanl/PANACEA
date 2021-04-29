@@ -111,8 +111,6 @@ namespace panacea {
 
   template<class T>
     inline void KernelWrapper<T>::update(const BaseDescriptorWrapper * dwrapper) {
-      std::cout << "Calling update Kernel" << std::endl;
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       data_wrapper_ = DataPointTemplate<T>(
           std::any_cast<T>(dwrapper->getPointerToRawData()),
           dwrapper->rows(),

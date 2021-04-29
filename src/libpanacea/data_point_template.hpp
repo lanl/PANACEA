@@ -207,8 +207,8 @@ namespace panacea {
 
   template<class T> 
     inline double& DataPointTemplate<T>::at(const int row, const int col) {
-      assert(row >= 0 && row < cols_);
-      assert(col >= 0 && col < rows_);
+      assert(row >= 0 && row < rows_);
+      assert(col >= 0 && col < cols_);
       if constexpr(std::is_pointer<T>::value) {
         return (*data_)[row][col];
       } else {
