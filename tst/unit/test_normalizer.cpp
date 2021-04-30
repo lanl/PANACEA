@@ -71,5 +71,4 @@ TEST_CASE("Testing:normalizer1","[unit,panacea]"){
   REQUIRE(covar(1,2) == Approx(1.0));
   REQUIRE(covar(2,1) == Approx(1.0));
 
-
 }

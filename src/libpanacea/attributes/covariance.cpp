@@ -54,21 +54,23 @@ namespace panacea {
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim); 
           }
-          const double A_ij = (*covariance)(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) + 
+          double A_ij = (*covariance)(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) + 
             static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim) + sum;
+          double B_ij = static_cast<double>(total_num_pts) * (*new_mean)(dim)*(*new_mean)(dim);
+
           (*covariance)(dim,dim)  = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          (*covariance)(dim,dim) *= (A_ij - static_cast<double>(total_num_pts) * (*new_mean)(dim)*(*new_mean)(dim)); 
+          (*covariance)(dim,dim) *= (A_ij - B_ij); 
         } // end account for diagonal
         for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
             sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
           }
-          const double A_ij = (*covariance)(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) + 
+          double A_ij = (*covariance)(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) + 
             static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim2) + sum;
+          double B_ij = static_cast<double>(total_num_pts) * -1.0* (*new_mean)(dim) * (*new_mean)(dim2);
           (*covariance)(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          (*covariance)(dim,dim2) *= (A_ij + 
-              static_cast<double>(total_num_pts) * -1.0* (*new_mean)(dim) * (*new_mean)(dim2));
+          (*covariance)(dim,dim2) *= (A_ij + B_ij);
           (*covariance)(dim2,dim) = (*covariance)(dim,dim2);
         } // account for off diagonal elements
       }

@@ -7,8 +7,10 @@
 #include "attributes/covariance.hpp"
 
 #include "normalization_methods/normalization_method_factory.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
+#include <any>
 #include <vector>
 
 namespace panacea {
@@ -50,7 +52,9 @@ namespace panacea {
 
       const std::vector<double> & getNormalizationCoeffs() const noexcept;
 
-      void update(const BaseDescriptorWrapper * descriptor_wrapper);
+      void update(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          std::any extra_args = settings::None::None);
 
       template<class T>
       T get() const noexcept;

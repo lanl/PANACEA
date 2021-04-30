@@ -197,8 +197,10 @@ namespace panacea {
     // Unnormalize the covariance matrix before updating 
     prim_grp.normalizer.unnormalize(*prim_grp.covariance);
     prim_grp.covariance->update(descriptor_wrapper);
-    // Now we are free to update the normalization coefficients
-    prim_grp.normalizer.update(descriptor_wrapper);
+    // Now we are free to update the normalization coefficients, note that the covariance
+    // matrix must be uptodate before it can be passed into the normalizer, in the 
+    // case of the variance the diagonal is used to calculate the variance
+    prim_grp.normalizer.update(descriptor_wrapper, prim_grp.covariance.get());
     prim_grp.normalizer.normalize(*prim_grp.covariance);
 
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices

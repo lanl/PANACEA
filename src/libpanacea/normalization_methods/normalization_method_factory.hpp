@@ -8,6 +8,7 @@
 #include "private_settings.hpp"
 
 // Standard includes
+#include <any>
 #include <memory>
 #include <unordered_map>
 
@@ -18,7 +19,7 @@ namespace panacea {
 
   class NormalizationMethodFactory {
     public:
-      typedef std::vector<double> (*NormalizationMethod)(const BaseDescriptorWrapper * desc_wrapper);
+      typedef std::vector<double> (*NormalizationMethod)(const BaseDescriptorWrapper * desc_wrapper, std::any);
     private:
       static std::unordered_map<
         settings::KernelNormalization,

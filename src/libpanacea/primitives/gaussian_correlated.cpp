@@ -18,6 +18,7 @@
 
 // Standard includes
 #include <cmath>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -40,7 +41,6 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       const int descriptor_ind) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
     assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
@@ -81,8 +81,11 @@ namespace panacea {
     for(int i=0; i<red_ndim; ++i) {
       VxMxV += diff.at(i) * MxV.at(i);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    return pre_factor_ * std::exp(-0.5 * VxMxV);
+    double result = pre_factor_*std::exp(-0.5 * VxMxV );
+    if( result == 0.0 ) {
+      return std::numeric_limits<double>::min();
+    }
+    return result;
   }
 
   std::vector<double> GaussCorrelated::compute_grad(

@@ -16,6 +16,10 @@ namespace panacea {
    ********************************************************/ 
   namespace {
 
+    /**
+     * If set to flexible will ensure that none of the norm
+     * coefficients are 0.0.
+     **/
     void trim(
         const std::vector<double> & in,
         const NormalizerOption & opt,
@@ -53,7 +57,8 @@ namespace panacea {
 
     NormalizationMethodFactory norm_method_factory;
     norm_method_ = norm_method_factory.create(norm_method);
-    const auto normalization_coeffs = norm_method_(dwrapper);
+    auto extra_settings = settings::None::None;
+    const auto normalization_coeffs = norm_method_(dwrapper, extra_settings);
     trim(normalization_coeffs, norm_option_, normalization_coeffs_);
 
   }
@@ -95,10 +100,10 @@ namespace panacea {
     return normalization_coeffs_;
   }
 
-  void Normalizer::update(const BaseDescriptorWrapper * dwrapper) {
+  void Normalizer::update(const BaseDescriptorWrapper * dwrapper, std::any extra_args) {
 
     assert(norm_method_ != nullptr);
-    const auto normalization_coeffs = norm_method_(dwrapper);
+    const auto normalization_coeffs = norm_method_(dwrapper, extra_args);
     trim(normalization_coeffs, norm_option_, normalization_coeffs_);
   }
 }

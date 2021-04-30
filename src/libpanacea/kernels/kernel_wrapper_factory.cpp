@@ -59,13 +59,11 @@ namespace panacea {
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
-      std::cout << "one to one if branch " << __FILE__ << ":" << __LINE__ << std::endl;
       if( desc_wrapper->getTypeIndex() != std::type_index(desc_wrapper->getPointerToRawData().type()) ) {
         std::string error_msg = "Descriptor data index and pointerToRawData are not consistent";
         PANACEA_FAIL(error_msg);
       }
 
-      std::cout << "String is " << kern_specification.get<std::string>() << std::endl;
       if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
         std::string error_msg = "Kernel creation method is missing for the specified internal type.";
         PANACEA_FAIL(error_msg);
@@ -73,7 +71,6 @@ namespace panacea {
 
       if( kern_specification.is(settings::KernelMemory::Share)){
       
-        std::cout << "one to one if branch share " << __FILE__ << ":" << __LINE__ << std::endl;
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
         if( desc_data_type_index != 
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
