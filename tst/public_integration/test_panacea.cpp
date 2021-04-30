@@ -423,3 +423,83 @@ TEST_CASE("Testing:panacea cross entropy single median update","[integration,pan
 
 }
 
+TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,panacea]"){
+
+  PANACEASettings panacea_settings1 = PANACEASettings::make()
+                                        .set(EntropyType::Cross)
+                                        .set(PANACEAAlgorithm::Flexible)
+                                        .distributionType(kernel)
+                                            .set(KernelPrimitive::Gaussian)
+                                            .set(KernelCount::Single)
+                                            .set(KernelCorrelation::Correlated)
+                                            .set(KernelCenterCalculation::Median)
+                                            .set(KernelNormalization::Variance)
+                                            .weightEntropTermBy(1.0);
+
+  PANACEASettings panacea_settings2 = PANACEASettings::make()
+                                        .set(EntropyType::Cross)
+                                        .set(PANACEAAlgorithm::Flexible)
+                                        .distributionType(kernel)
+                                            .set(KernelPrimitive::Gaussian)
+                                            .set(KernelCount::Single)
+                                            .set(KernelCorrelation::Correlated)
+                                            .set(KernelCenterCalculation::Median)
+                                            .set(KernelNormalization::Variance)
+                                            .weightEntropTermBy(-1.0);
+
+  // pi - public interface
+  PANACEA panacea_pi;
+
+  // Data has the following form, where it is stacked
+  //
+  //         col1   col2   col3
+  // row1   1.0     0.0    0.0  Point 1
+  // row2   3.0     0.0    0.0  Point 2
+  int rows = 2;
+  int cols = 3;
+
+  auto kern_init_data = new double*[rows];
+  kern_init_data[0] = new double[cols]; 
+  kern_init_data[1] = new double[cols]; 
+
+  kern_init_data[0][0] = 1.0;
+  kern_init_data[1][0] = 3.0;
+  kern_init_data[0][1] = 0.0;
+  kern_init_data[1][1] = 0.0;
+  kern_init_data[0][2] = 0.0;
+  kern_init_data[1][2] = 0.0;
+
+  auto dwrapper_init = panacea_pi.wrap(&(kern_init_data), rows, cols);
+
+  std::unique_ptr<EntropyTerm> cross_ent1 = panacea_pi.create(dwrapper_init.get(), panacea_settings1);
+  std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(dwrapper_init.get(), panacea_settings2);
+
+  // Because we are calculating the median the memory will not be shared
+  // it is ok at this point to delete the initial data
+
+  delete[] kern_init_data[0];
+  delete[] kern_init_data[1];
+  delete[] kern_init_data;
+
+  auto desc_data = new double*[1];
+  desc_data[0] = new double[cols]; 
+  desc_data[0][0] = 2.0;
+  desc_data[0][1] = 0.0;
+  desc_data[0][2] = 0.0;
+  
+  // Using only a single row
+  auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
+  // The mean is currently at 10 and this new point is at 70 the cross entropy should be large
+  double val1 = cross_ent1->compute(dwrapper.get());
+  double val2 = cross_ent2->compute(dwrapper.get());
+ 
+  REQUIRE(val1 > 0.0 );
+  REQUIRE(val2 < 0.0 );
+  REQUIRE(std::abs(val2) == Approx(val1));
+
+  delete[] desc_data[0];
+  delete[] desc_data;
+
+}
+
+
