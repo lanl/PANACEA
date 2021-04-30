@@ -232,3 +232,69 @@ TEST_CASE("Testing:panacea cross entropy single mean","[integration,panacea]"){
   double cross_ent_val_stacked = cross_ent->compute(dwrapper.get());
   REQUIRE(cross_ent_val_stacked < cross_ent_val_spread );
 }
+
+TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panacea]"){
+
+  // Creating settings for generating a self entropy term where the 
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+  PANACEASettings panacea_settings = PANACEASettings::make()
+                                        .set(EntropyType::Cross)
+                                        .set(PANACEAAlgorithm::Flexible)
+                                        .distributionType(kernel)
+                                            .set(KernelPrimitive::Gaussian)
+                                            .set(KernelCount::Single)
+                                            .set(KernelCorrelation::Correlated)
+                                            .set(KernelCenterCalculation::Mean)
+                                            .set(KernelNormalization::None);
+
+  // pi - public interface
+  PANACEA panacea_pi;
+
+  // Data has the following form, where it is stacked
+  //
+  //         col1   col2   col3
+  // row1   10.0     0.0    0.0  Point 1
+  // row2   10.0     0.0    0.0  Point 2
+  int rows = 2;
+  int cols = 3;
+
+  auto kern_init_data = new double*[rows];
+  kern_init_data[0] = new double[cols]; 
+  kern_init_data[1] = new double[cols]; 
+
+  kern_init_data[0][0] = 10.0;
+  kern_init_data[1][0] = 10.0;
+  kern_init_data[0][1] =  0.0;
+  kern_init_data[1][1] =  0.0;
+  kern_init_data[0][2] =  0.0;
+  kern_init_data[1][2] =  0.0;
+
+  auto dwrapper_init = panacea_pi.wrap(&(kern_init_data), rows, cols);
+
+  std::unique_ptr<EntropyTerm> cross_ent = panacea_pi.create(dwrapper_init.get(), panacea_settings);
+
+  // Because we are calculating the mean the memory will not be shared
+  // it is ok at this point to delete the initial data
+
+  delete[] kern_init_data[0];
+  delete[] kern_init_data[1];
+  delete[] kern_init_data;
+
+  auto desc_data = new double*[3];
+  desc_data[0] = new double[cols]; 
+  desc_data[0][0] = 70.0; // The mean of three points 70 and 10 and 10 = 90/3 = 30
+  
+  // Using only a single row
+  auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
+  // The mean is currently at 10 and this new point is at 70 the cross entropy should be large
+  double cross_ent_val_single_pt_before_update = cross_ent->compute(dwrapper.get());
+  cross_ent->update(dwrapper.get());
+  // After update the mean is at 30 and this new point is at 70 the
+  // cross entropy should decrease 
+  double cross_ent_val_single_pt_after_update = cross_ent->compute(dwrapper.get());
+  REQUIRE(cross_ent_val_single_pt_after_update < cross_ent_val_single_pt_before_update);
+
+  delete[] desc_data[0];
+  delete[] desc_data;
+}
