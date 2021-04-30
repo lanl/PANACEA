@@ -37,6 +37,7 @@ namespace panacea {
       virtual int cols() const final;
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
+      virtual const Arrangement & arrangement() const noexcept final; 
       virtual void set(const Arrangement arrangement) final;
       virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final; 
@@ -64,6 +65,11 @@ namespace panacea {
 
   template<class T>
   inline int DescriptorWrapper<T>::getNumberPoints() const { return data_wrapper_.getNumberPoints(); }
+
+  template<class T>
+  inline const Arrangement & DescriptorWrapper<T>::arrangement() const noexcept {
+    return data_wrapper_.arrangement();
+  }
 
   template<class T>
   inline void DescriptorWrapper<T>::set(const Arrangement arrangement) {

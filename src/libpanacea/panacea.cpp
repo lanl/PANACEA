@@ -55,4 +55,16 @@ namespace panacea {
     EntropyFactory entropy_factory;
     return entropy_factory.create(dwrapper, &entropy_settings);
   }
+
+  std::unique_ptr<EntropyTerm> PANACEA::create(
+    const std::string & file_name) const {
+
+    // 1. Determine file type by looking at extension
+    // Each object should have it's own read and write methods that are registered with the file
+    // type
+    // 2. Search for entropy settings in the file
+    // 3. Call creation methods with file handle 
+
+  }
+
 }

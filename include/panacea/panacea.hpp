@@ -27,6 +27,8 @@ namespace panacea {
           const BaseDescriptorWrapper *, 
           const PANACEASettings & settings) const;
 
+      std::unique_ptr<EntropyTerm> create(const std::string & file_name) const;
+
   };
 
 };

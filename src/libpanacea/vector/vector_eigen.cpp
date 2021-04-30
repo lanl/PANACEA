@@ -17,6 +17,10 @@ namespace panacea {
     vector_ = std::make_unique<Eigen::VectorXd>();
   }
 
+  const VectorType VectorEigen::type() const {
+    return VectorType::Eigen;
+  }
+
   void VectorEigen::setZero() {
     vector_->setZero();
   }

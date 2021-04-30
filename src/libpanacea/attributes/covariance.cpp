@@ -301,4 +301,25 @@ namespace panacea {
     std::cout << total_number_data_pts_;
     std::cout << std::endl;
   }
+
+  std::vector<std::any> Covariance::write(
+      settings::FileType file_type,
+      std::ostream & os,
+      std::any cov_instance) {
+
+    std::vector<std::any> nested_objs; 
+    if( file_type == settings::FileType::TXTRestart ) { 
+      auto cov_mat = std::any_cast<Covariance *>(cov_instance); 
+      os << "[Covariance]\n";
+      os << cov_mat->total_number_data_pts_ << "\n\n";
+      os << "[Normalization State]\n";
+      os << cov_mat->normalized_ << "\n\n";
+      nested_objs.push_back(cov_mat->matrix_.get());
+      nested_objs.push_back(cov_mat->mean_.get());
+    } else {
+      PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
+    }
+    return nested_objs;
+  }
+  
 }

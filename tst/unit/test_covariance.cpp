@@ -3,12 +3,15 @@
 #include "attributes/covariance.hpp"
 
 #include "descriptors/descriptor_wrapper.hpp"
+#include "io/file_io.hpp"
+#include "io/file_io_factory.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
 
 // Standard includes
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -130,7 +133,46 @@ TEST_CASE("Testing:covariance stacked data","[unit,panacea]"){
   DescriptorWrapper<std::vector<std::vector<double>>*> 
     dwrapper(&data, data.size(), data.at(0).size());
 
-  CHECK_THROWS(Covariance(&dwrapper));
+  CHECK_THROWS(Covariance(&dwrapper, CovarianceOption::Strict));
 
   Covariance cov(&dwrapper, CovarianceOption::Flexible);
+}
+
+TEST_CASE("Testing:covariance write","[unit,panacea]"){
+  std::vector<std::vector<double>> data {
+      {7.3,  1.9,  4.9},
+      {0.3,  3.2,  1.8},
+      {2.9,  4.3,  9.2},
+      {2.3,  1.8,  8.9},
+      {1.2,  1.3,  4.1},
+      {0.3,  3.3,  5.9}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> 
+    dwrapper(&data, data.size(), data.at(0).size());
+
+  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+
+  std::fstream fs;
+  fs.open("test_covariance.restart", std::fstream::out);
+  auto data_out = cov.write(settings::FileType::TXTRestart, fs, &cov);
+}
+
+TEST_CASE("Testing:covariance write using fileio","[integration,panacea]"){
+  std::vector<std::vector<double>> data {
+      {7.3,  1.9,  4.9},
+      {0.3,  3.2,  1.8},
+      {2.9,  4.3,  9.2},
+      {2.3,  1.8,  8.9},
+      {1.2,  1.3,  4.1},
+      {0.3,  3.3,  5.9}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> 
+    dwrapper(&data, data.size(), data.at(0).size());
+
+  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+
+  FileIOFactory file_io_factory;
+  auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
+  
+  restart_file->write(&cov, "test_covariance_full.restart");
 }

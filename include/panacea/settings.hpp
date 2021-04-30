@@ -19,6 +19,11 @@ namespace panacea {
       Kernel
     };
 
+    enum class FileType {
+      TXTRestart,
+      TXTDescriptors
+    };
+
     class Kernel { };
     const Kernel kernel = Kernel();
 
@@ -77,10 +82,20 @@ namespace panacea {
       None,
       Mean,
       Median,
-      Custom
     };
 
   }
+
+  std::ostream& operator<<(std::ostream& os, const settings::DistributionType &); 
+  std::ostream& operator<<(std::ostream& os, const settings::FileType &);
+  std::ostream& operator<<(std::ostream& os, const settings::EntropyOption &);
+  std::ostream& operator<<(std::ostream& os, const settings::EntropyType &);
+  std::ostream& operator<<(std::ostream& os, const settings::PANACEAAlgorithm &); 
+  std::ostream& operator<<(std::ostream& os, const settings::KernelPrimitive &);
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCount &);
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCorrelation &);
+  std::ostream& operator<<(std::ostream& os, const settings::KernelNormalization &);
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCenterCalculation &);
 
   class PANACEASettingsBuilder;
 

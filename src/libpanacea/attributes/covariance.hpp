@@ -10,8 +10,10 @@
 // Loca private includes
 #include "data_settings.hpp"
 #include "passkey.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
+#include <any>
 #include <memory>
 
 namespace panacea {
@@ -96,6 +98,13 @@ namespace panacea {
       double & operator()(PassKey<Normalizer>, const int row, const int col);
 
       void print() const;
+
+//      static void read(settings::FileType file_type, std::istream, std::any & cov_instance);
+      static std::vector<std::any> write(
+          settings::FileType file_type,
+          std::ostream &,
+          std::any cov_instance);
+
   };
 }
 #endif // PANACEA_PRIVATE_COVARIANCE_H

@@ -6,6 +6,7 @@
 #include "panacea/settings.hpp"
 
 // Standard includes
+#include <fstream>
 #include <type_traits>
 
 /*
@@ -65,6 +66,7 @@ namespace panacea {
       Share
     };
 
+
     template<class T>
       constexpr const char * toString(T setting) {
         if constexpr( std::is_same<KernelCenterCalculation,T>::value ) {
@@ -74,8 +76,6 @@ namespace panacea {
             return "Center-Calculation=Mean";
           }else if(setting == KernelCenterCalculation::Median ) {
             return "Center-Calculation=Median";
-          }else if(setting == KernelCenterCalculation::Custom ) {
-            return "Center-Calculation=Custom";
           }
         } else if constexpr( std::is_same<KernelMemory,T>::value ) {
           if( setting == KernelMemory::Default ) {
@@ -126,6 +126,14 @@ namespace panacea {
         }
         return "";
       }
-  }
+  } // namespace settings
+
+  std::ostream& operator<<(std::ostream& os, const settings::CalculationType & );
+  std::ostream& operator<<(std::ostream& os, const settings::EquationSetting & );
+  std::ostream& operator<<(std::ostream& os, const settings::None         & );
+  std::ostream& operator<<(std::ostream& os, const settings::GradSetting  &); 
+  std::ostream& operator<<(std::ostream& os, const settings::KernelAlgorithm & );
+  std::ostream& operator<<(std::ostream& os, const settings::KernelMemory &); 
+
 }
 #endif // PANACEA_PRIVATE_SETTINGS_H

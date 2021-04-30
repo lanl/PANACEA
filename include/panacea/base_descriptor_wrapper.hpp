@@ -3,8 +3,12 @@
 #define PANACEA_BASEDESCRIPTORWRAPPER_H
 #pragma once
 
+// Public PANACEA includes
+#include "settings.hpp"
+
 // Standard includes
 #include <any>
+#include <fstream>
 #include <vector>
 #include <typeindex>
 
@@ -22,12 +26,19 @@ namespace panacea {
       virtual int cols() const = 0;
       virtual int getNumberDimensions() const = 0; 
       virtual int getNumberPoints() const = 0; 
+      virtual const Arrangement & arrangement() const noexcept = 0; 
       virtual void set(const Arrangement arrangement) = 0;
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;
 
       virtual ~BaseDescriptorWrapper() = 0;
+
+      static std::vector<std::any> write(
+          settings::FileType file_type,
+          std::ostream &,
+          std::any vector_instance);
+
   };
 }
 #endif // PANACEA_BASEDESCRIPTORWRAPPER_H

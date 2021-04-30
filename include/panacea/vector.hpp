@@ -3,11 +3,17 @@
 #define PANACEA_VECTOR_H
 #pragma once
 
+// Public PANACEA includes
+#include "settings.hpp"
+
 // Standard includes
+#include <any>
+#include <fstream>
 #include <memory>
+#include <vector>
 
 namespace panacea {
-  enum class VectorTypes {
+  enum class VectorType {
     Default,
     Eigen
   };
@@ -18,6 +24,7 @@ namespace panacea {
 
     public:
       virtual ~Vector() {};
+      virtual const VectorType type() const = 0;
       virtual Vector& operator=(const Vector * vec) = 0;
       virtual double& operator()(const int row) = 0;
       virtual double operator()(const int row) const = 0;
@@ -41,9 +48,16 @@ namespace panacea {
       virtual int cols() const = 0;
 
       virtual void print() const = 0;
+
+      static std::vector<std::any> write(
+          settings::FileType file_type,
+          std::ostream &,
+          std::any vector_instance);
   };
 
-  std::unique_ptr<Vector> createVector(const int rows, const VectorTypes type = VectorTypes::Default);
+  std::ostream& operator<<(std::ostream& os, const VectorType& vec_type);
+
+  std::unique_ptr<Vector> createVector(const int rows, const VectorType type = VectorType::Default);
 
 }
 

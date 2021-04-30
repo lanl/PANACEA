@@ -16,7 +16,7 @@ namespace panacea {
     matrix_ = std::make_unique<Eigen::MatrixXd>();
   }
 
-  const MatrixTypes MatrixEigen::type() const { return MatrixTypes::Eigen; }
+  const MatrixType MatrixEigen::type() const { return MatrixType::Eigen; }
 
   double MatrixEigen::getDeterminant() const {
     assert(matrix_->rows() > 0 || matrix_->cols() > 0 );

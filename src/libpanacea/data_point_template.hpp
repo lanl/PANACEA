@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <any>
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -19,6 +20,7 @@ namespace panacea {
     DimensionsAlongRowsPointsAlongCols
   };
 
+  std::ostream& operator<<(std::ostream& os, const Arrangement& arrange);
   /* Allows abstraction
    * T should be a (double) pointer type
    * E.g
@@ -56,7 +58,7 @@ namespace panacea {
          * the columns.
          */
         void set(const Arrangement arrangement);
-
+        const Arrangement & arrangement() const noexcept { return arrangement_; }
         /*
          * Access operator is used such that you will pass in the point and the dimension
          * not the row and column. 

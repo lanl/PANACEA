@@ -80,5 +80,157 @@ namespace panacea {
     return *this;
   }
 
+  /******************************************************
+   * Ostream enums
+   ******************************************************/
+  std::ostream& operator<<(std::ostream& os, const settings::DistributionType & dist_type) {
+    if( dist_type == settings::DistributionType::Histogram ) {
+      os << "Histogram";
+    } else if (dist_type == settings::DistributionType::Kernel ) {
+      os << "Kernel";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::FileType & file_type) {
+    if( file_type == settings::FileType::TXTRestart ) {
+      os << "TXTRestart";
+    } else if( file_type == settings::FileType::TXTDescriptors) {
+      os << "TXTDescriptors";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::EntropyOption & ent_opt) {
+    if( ent_opt == settings::EntropyOption::Weight ) {
+      os << "Weight";
+    }else if(ent_opt == settings::EntropyOption::IncrementRatio ) {
+      os << "IncrementRatio";
+    }else if(ent_opt == settings::EntropyOption::NumericalGrad ){
+      os << "NumericalGrad";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::EntropyType & ent_type) {
+    if( ent_type == settings::EntropyType::Self){
+      os << "Self";
+    }else if( ent_type == settings::EntropyType::Cross){
+      os << "Cross";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::PANACEAAlgorithm & alg) {
+    if( alg == settings::PANACEAAlgorithm::Strict){
+      os << "Strict";
+    }else if( alg== settings::PANACEAAlgorithm::Flexible){
+      os << "Flexible";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelPrimitive & kern_prim) {
+    if( kern_prim == settings::KernelPrimitive::Gaussian ){
+      os << "Gaussian";
+    }else if(kern_prim == settings::KernelPrimitive::Exponential) {
+      os << "Exponential";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCount & count) {
+    if( count == settings::KernelCount::OneToOne ) {
+      os << "OneToOne";
+    }else if( count == settings::KernelCount::Single ) {
+      os << "Single";
+    }else if(count == settings::KernelCount::Fixed){
+      os << "Fixed";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCorrelation & corr) {
+    if( corr == settings::KernelCorrelation::Correlated){
+      os << "Correlated";
+    }else if(corr == settings::KernelCorrelation::Uncorrelated) {
+      os << "Uncorrelated";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelNormalization & norm) {
+    if( norm == settings::KernelNormalization::None){
+      os << "None";
+    }else if(norm == settings::KernelNormalization::Variance) {
+      os << "Variance";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelCenterCalculation & cent) {
+    if( cent == settings::KernelCenterCalculation::None ){
+      os << "None";
+    }else if(cent == settings::KernelCenterCalculation::Mean) {
+      os << "Mean";
+    }else if(cent == settings::KernelCenterCalculation::Median) {
+      os << "Median";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::CalculationType & calc) {
+    if(calc == settings::CalculationType::Numerical) {
+      os << "Numerical";
+    }else if(calc == settings::CalculationType::Analytical) {
+      os << "Analytical";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::EquationSetting & eq_set) {
+    if( eq_set == settings::EquationSetting::None) {
+      os << "None";
+    }else if(eq_set == settings::EquationSetting::IgnoreExp) {
+      os << "IgnoreExp";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::None & none) {
+    os << "None";
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::GradSetting & grad_set) {
+    if(grad_set == settings::GradSetting::WRTDescriptor) {
+      os << "WRTDescriptor";
+    }else if(grad_set == settings::GradSetting::WRTKernel) {
+      os << "WRTKernel";
+    }else if(grad_set == settings::GradSetting::WRTBoth) {
+      os << "WRTBoth";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelAlgorithm & kern_alg) {
+    if( kern_alg == settings::KernelAlgorithm::Strict){
+      os << "Strict";
+    }else if( kern_alg == settings::KernelAlgorithm::Flexible){
+      os << "Flexible";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const settings::KernelMemory & kern_mem) {
+    if(kern_mem == settings::KernelMemory::Default) {
+      os << "Default";
+    }else if(kern_mem == settings::KernelMemory::Own) {
+      os << "Own";
+    }else if(kern_mem == settings::KernelMemory::Share) {
+      os << "Share";
+    } 
+    return os;
+  }
 
 }
