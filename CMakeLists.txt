@@ -71,9 +71,9 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/vector/*
   )
 
-add_library(libpanacea ${SOURCES})
-set_target_properties(libpanacea PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(libpanacea Eigen3::Eigen)
+add_library(panacea ${SOURCES})
+set_target_properties(panacea PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(panacea Eigen3::Eigen)
 
 include(cmake/PanaceaInstall.cmake)
 

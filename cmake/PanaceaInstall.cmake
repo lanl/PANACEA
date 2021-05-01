@@ -1,11 +1,11 @@
-target_include_directories(libpanacea PUBLIC
+target_include_directories(panacea PUBLIC
   $<BUILD_INTERFACE:${panacea_SOURCE_DIR}/src/libpanacea>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/panacea>
   )
 
 message("Instal include dir ${CMAKE_INSTALL_INCLUDEDIR}/panacea")
 
-install(TARGETS libpanacea EXPORT panaceaTargets
+install(TARGETS panacea EXPORT panaceaTargets
   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"

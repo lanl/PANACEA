@@ -2,8 +2,8 @@ list( APPEND HELPER_SOURCES
   helper/helper.cpp
   )
 
-add_library(libhelper ${HELPER_SOURCES})
-set_target_properties(libhelper PROPERTIES LINKER_LANGUAGE CXX)
+add_library(helper ${HELPER_SOURCES})
+set_target_properties(helper PROPERTIES LINKER_LANGUAGE CXX)
 
 list( APPEND UNIT_TEST_SOURCES
     unit/test_covariance.cpp
@@ -31,8 +31,8 @@ list( APPEND UNIT_TEST_SOURCES
 
 include_directories(helper)
 add_executable(panacea_tests catch_main.cpp ${UNIT_TEST_SOURCES} ${PUBLIC_INTEGRATION_TEST_SOURCES})
-add_dependencies(panacea_tests libhelper libpanacea)
-target_link_libraries(panacea_tests PUBLIC libpanacea libhelper Catch2::Catch2)
+add_dependencies(panacea_tests helper panacea)
+target_link_libraries(panacea_tests PUBLIC panacea helper Catch2::Catch2)
 
 ParseAndAddCatchTests(panacea_tests)
 
