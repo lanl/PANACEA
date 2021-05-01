@@ -28,6 +28,12 @@ namespace panacea {
       virtual int getNumberPoints() const = 0; 
       virtual const Arrangement & arrangement() const noexcept = 0; 
       virtual void set(const Arrangement arrangement) = 0;
+      
+      /**
+       * Resizing the underlying data container will only be possible if the descriptor
+       * wrapper actaully owns the data. 
+       **/
+      virtual void resize(const int rows, const int cols) = 0;
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;
@@ -37,6 +43,11 @@ namespace panacea {
       static std::vector<std::any> write(
           settings::FileType file_type,
           std::ostream &,
+          std::any vector_instance);
+
+      static std::vector<std::any> read(
+          settings::FileType file_type,
+          std::istream &,
           std::any vector_instance);
 
   };

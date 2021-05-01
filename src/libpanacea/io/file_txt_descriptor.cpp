@@ -20,12 +20,13 @@ namespace panacea {
   std::unordered_map<std::type_index,FileDescriptorTXT::WriteMethod> 
     FileDescriptorTXT::write_methods_; 
 
-//  std::unordered_map<std::type_index,ReadMethod>
-//    FileDescriptorTXT::read_methods_;
+  std::unordered_map<std::type_index,FileDescriptorTXT::ReadMethod>
+    FileDescriptorTXT::read_methods_;
 
   FileDescriptorTXT::FileDescriptorTXT() {
     // Alaways registers as a pointer
     registerWriteMethod<BaseDescriptorWrapper>();
+    registerReadMethod<BaseDescriptorWrapper>();
   }
 
   void FileDescriptorTXT::write_(
@@ -33,9 +34,8 @@ namespace panacea {
       std::ostream & os) {
 
     for( auto & obj : objs ) {
-      std::cout << "writing data from objs" << std::endl;
       if( write_methods_.count(obj.type()) == 0 ) {
-        std::string error_msg = "Unable to write object to restart file, write ";
+        std::string error_msg = "Unable to write object to descriptor txt file, write ";
         error_msg += "method is missing.";
         PANACEA_FAIL(error_msg);
       }
@@ -45,6 +45,21 @@ namespace panacea {
     }
   }
 
+  void FileDescriptorTXT::read_(
+      std::vector<std::any> & objs,
+      std::istream & is) {
+
+    for( auto & obj : objs ) {
+      if( read_methods_.count(obj.type()) == 0 ) {
+        std::string error_msg = "Unable to read object from descriptor txt file, read ";
+        error_msg += "method is missing.";
+        PANACEA_FAIL(error_msg);
+      }
+      auto data = read_methods_[obj.type()](type(), is, obj);
+      read_(data, is);
+
+    }
+  }
 
   void FileDescriptorTXT::write(std::any obj, const std::string & filename) {
 
@@ -62,4 +77,23 @@ namespace panacea {
     }
     fs.close();
   }
+
+  void FileDescriptorTXT::read(std::any obj, const std::string & filename) {
+
+    std::fstream fs;
+    fs.open(filename, std::fstream::in);
+
+    // Check if object type is registered
+    if( read_methods_.count(obj.type()) ) {
+      auto data = read_methods_[obj.type()](type(),fs,obj);
+      read_(data, fs);
+    } else {
+      std::string error_msg = "Unable to read object it does not contain ";
+      error_msg += "a registered read method.";
+      PANACEA_FAIL(error_msg);
+    }
+    fs.close();
+  }
+
+
 }

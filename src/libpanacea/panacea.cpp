@@ -64,7 +64,6 @@ namespace panacea {
     // type
     // 2. Search for entropy settings in the file
     // 3. Call creation methods with file handle 
-
   }
 
 }

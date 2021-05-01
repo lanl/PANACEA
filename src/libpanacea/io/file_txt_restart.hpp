@@ -32,6 +32,7 @@ namespace panacea {
 
     public:
       
+      FileRestartTXT();
       settings::FileType type() const noexcept final { return settings::FileType::TXTRestart; }
 
       /**
@@ -47,7 +48,6 @@ namespace panacea {
         return true;
       }
 
-      FileRestartTXT();
  /*     template<class T>
       static bool registerWriteMethod(){
         if( read_methods_.count(std::type_index(typeid(T))) ) {
@@ -58,7 +58,7 @@ namespace panacea {
         return true;
       }*/
 
-//      virtual void read(std::any & obj, const std::string & filename) final;
+      virtual void read(std::any obj, const std::string & filename) final;
       virtual void write(std::any  obj, const std::string & filename) final;
   };
 }

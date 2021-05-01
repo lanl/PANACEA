@@ -75,7 +75,8 @@ namespace panacea {
         int rows() const noexcept { return rows_; }
 
         int cols() const noexcept { return cols_; }
-
+        
+        void resize(const int rows, const int cols);
         /*
          * This function allows one to check if two groups of data are pointing to
          * the same data. 
@@ -272,8 +273,36 @@ namespace panacea {
       return data_.at(col);
     } 
 
+  template<class T>
+    inline void DataPointTemplate<T>::resize(const int rows, const int cols) {
+      if(std::is_pointer<T>::value) {
+        std::string error_msg = "Cannot resize data, it is a pointer, and is not ";
+        error_msg += "owned by the underlying object.\n";
+        PANACEA_FAIL(error_msg);
+      }
+      if constexpr(std::is_same<T,std::vector<std::vector<double>>>::value) {
+        rows_ = rows;
+        cols_ = cols;
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
+          number_points_ = rows_;
+          number_dimensions_ = cols_;
+        } else {
+          number_dimensions_ = rows;
+          number_points_ = cols;
+        }
+        data_.resize(rows);
+        for(int row = 0; row < rows; ++row ) {
+          data_.at(row).resize(cols);
+        } 
+      } else {
+        std::string error_msg = "Currently resize method is ownly supported for";
+        error_msg += " types of std::vector<std::vector<double>>.\n";
+        PANACEA_FAIL(error_msg);
+      }
+    }
 
   template class DataPointTemplate<std::vector<std::vector<double>>*>;
+  template class DataPointTemplate<std::vector<std::vector<double>>>;
   template class DataPointTemplate<double ***>;
 }
 

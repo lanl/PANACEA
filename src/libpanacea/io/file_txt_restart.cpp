@@ -66,4 +66,8 @@ namespace panacea {
     }
     fs.close();
   }
+
+  void FileRestartTXT::read(std::any obj, const std::string & filename) {
+    // Not implemented
+  }
 }

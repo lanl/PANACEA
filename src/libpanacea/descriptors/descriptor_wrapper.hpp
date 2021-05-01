@@ -35,6 +35,7 @@ namespace panacea {
 
       virtual int rows() const final;
       virtual int cols() const final;
+      virtual void resize(const int rows, const int cols);
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
       virtual const Arrangement & arrangement() const noexcept final; 
@@ -50,7 +51,9 @@ namespace panacea {
   }
 
   template<class T>
-  inline double DescriptorWrapper<T>::operator()(const int point_ind, const int dim_ind) const {
+  inline double DescriptorWrapper<T>::operator()(
+      const int point_ind,
+      const int dim_ind) const {
     return data_wrapper_(point_ind, dim_ind);
   }
 
@@ -59,6 +62,11 @@ namespace panacea {
 
   template<class T>
   inline int DescriptorWrapper<T>::cols() const { return data_wrapper_.cols(); }
+
+  template<class T>
+  inline void DescriptorWrapper<T>::resize(const int rows, const int cols) {
+    data_wrapper_.resize(rows,cols);
+  }
 
   template<class T>
   inline int DescriptorWrapper<T>::getNumberDimensions() const { return data_wrapper_.getNumberDimensions(); }
