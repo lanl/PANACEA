@@ -24,6 +24,7 @@ namespace panacea {
     private: 
       Direction direction_ = Direction::AlongRows;
       std::unique_ptr<Eigen::VectorXd> vector_;
+      virtual void direction(const Direction & direction) final { direction_ = direction; }
     public:
       VectorEigen();
       virtual ~VectorEigen() final {};

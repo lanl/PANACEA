@@ -138,7 +138,7 @@ TEST_CASE("Testing:covariance stacked data","[unit,panacea]"){
   Covariance cov(&dwrapper, CovarianceOption::Flexible);
 }
 
-TEST_CASE("Testing:covariance write","[unit,panacea]"){
+TEST_CASE("Testing:covariance read & write","[unit,panacea]"){
   std::vector<std::vector<double>> data {
       {7.3,  1.9,  4.9},
       {0.3,  3.2,  1.8},
@@ -152,12 +152,25 @@ TEST_CASE("Testing:covariance write","[unit,panacea]"){
 
   Covariance cov(&dwrapper, CovarianceOption::Flexible);
 
+  REQUIRE(cov.getCummulativeDescPoints() == 6);
+  REQUIRE(cov.getNormalizationState() == NormalizationState::Unnormalized);
   std::fstream fs;
   fs.open("test_covariance.restart", std::fstream::out);
   auto data_out = cov.write(settings::FileType::TXTRestart, fs, &cov);
+  fs.close();
+
+  Covariance cov2;
+  // The internal matrix and vectors will not be read in from this call
+  std::fstream fs2;
+  fs2.open("test_covariance.restart", std::fstream::in);
+  auto data_out2 = cov.read(settings::FileType::TXTRestart, fs2, &cov2);
+  fs2.close();
+
+  REQUIRE(cov2.getCummulativeDescPoints() == 6);
+  REQUIRE(cov2.getNormalizationState() == NormalizationState::Unnormalized);
 }
 
-TEST_CASE("Testing:covariance write using fileio","[integration,panacea]"){
+TEST_CASE("Testing:covariance read & write using fileio","[integration,panacea]"){
   std::vector<std::vector<double>> data {
       {7.3,  1.9,  4.9},
       {0.3,  3.2,  1.8},
@@ -170,9 +183,37 @@ TEST_CASE("Testing:covariance write using fileio","[integration,panacea]"){
     dwrapper(&data, data.size(), data.at(0).size());
 
   Covariance cov(&dwrapper, CovarianceOption::Flexible);
+
+  cov.print(); 
+
 
   FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
   
   restart_file->write(&cov, "test_covariance_full.restart");
+
+  Covariance cov2;
+  restart_file->read(&cov2, "test_covariance_full.restart");
+
+  cov2.print();
+
+  REQUIRE(cov.rows() == cov2.rows());
+  REQUIRE(cov.cols() == cov2.cols());
+  REQUIRE(cov.getMean(0) == Approx(cov2.getMean(0)));
+  REQUIRE(cov.getMean(1) == Approx(cov2.getMean(1)));
+  REQUIRE(cov.getMean(2) == Approx(cov2.getMean(2)));
+  REQUIRE(cov.getNormalizationState() == cov2.getNormalizationState());
+  REQUIRE(cov(0,0) == Approx(cov2(0,0))); 
+  REQUIRE(cov(1,0) == Approx(cov2(1,0))); 
+  REQUIRE(cov(2,0) == Approx(cov2(2,0))); 
+
+  REQUIRE(cov(0,1) == Approx(cov2(0,1))); 
+  REQUIRE(cov(1,1) == Approx(cov2(1,1))); 
+  REQUIRE(cov(2,1) == Approx(cov2(2,1))); 
+
+  REQUIRE(cov(0,2) == Approx(cov2(0,2))); 
+  REQUIRE(cov(1,2) == Approx(cov2(1,2))); 
+  REQUIRE(cov(2,2) == Approx(cov2(2,2))); 
+
+  REQUIRE(cov.getCummulativeDescPoints() == cov2.getCummulativeDescPoints());
 }

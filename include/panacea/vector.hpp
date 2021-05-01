@@ -22,6 +22,9 @@ namespace panacea {
 
   class Vector {
 
+    private:
+      virtual void direction(const Direction & direction) = 0;
+
     public:
       virtual ~Vector() {};
       virtual const VectorType type() const = 0;
@@ -50,8 +53,13 @@ namespace panacea {
       virtual void print() const = 0;
 
       static std::vector<std::any> write(
-          settings::FileType file_type,
+          const settings::FileType &file_type,
           std::ostream &,
+          std::any vector_instance);
+      
+      static std::vector<std::any> read(
+          const settings::FileType &file_type,
+          std::istream &,
           std::any vector_instance);
   };
 

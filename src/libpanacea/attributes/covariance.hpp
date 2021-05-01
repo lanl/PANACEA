@@ -49,16 +49,18 @@ namespace panacea {
   class Covariance {
     private:
       /// The covariance matrix
-      std::unique_ptr<Matrix> matrix_;
+      std::unique_ptr<Matrix> matrix_ = nullptr;
       
       /// Mean of the values used to create the covariance matrix
-      std::unique_ptr<Vector> mean_;
+      std::unique_ptr<Vector> mean_ = nullptr;
 
       /// Total number of data points used in the creation of the covariance matrix and in updating it
       int total_number_data_pts_ = 0;
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
+      Covariance() = default;
+
       Covariance(const BaseDescriptorWrapper * desc_wrap,
           const CovarianceOption opt = CovarianceOption::Strict);
 
@@ -99,9 +101,13 @@ namespace panacea {
 
       void print() const;
 
-//      static void read(settings::FileType file_type, std::istream, std::any & cov_instance);
+      static std::vector<std::any> read(
+          const settings::FileType & file_type,
+          std::istream &,
+          std::any cov_instance);
+
       static std::vector<std::any> write(
-          settings::FileType file_type,
+          const settings::FileType & file_type,
           std::ostream &,
           std::any cov_instance);
 

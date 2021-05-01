@@ -21,9 +21,15 @@ namespace panacea {
     private:
 
     using WriteMethod = std::vector<std::any>(*)(
-        settings::FileType,std::ostream &, std::any ); 
+        const settings::FileType &,
+        std::ostream &,
+        std::any ); 
+
     using ReadMethod = std::vector<std::any>(*)(
-        settings::FileType,std::istream &, std::any ); 
+        const settings::FileType &,
+        std::istream &,
+        std::any ); 
+
       static std::unordered_map<std::type_index,WriteMethod> write_methods_;
       static std::unordered_map<std::type_index,ReadMethod> read_methods_;
 

@@ -303,7 +303,7 @@ namespace panacea {
   }
 
   std::vector<std::any> Covariance::write(
-      settings::FileType file_type,
+      const settings::FileType & file_type,
       std::ostream & os,
       std::any cov_instance) {
 
@@ -314,6 +314,8 @@ namespace panacea {
       os << cov_mat->total_number_data_pts_ << "\n\n";
       os << "[Normalization State]\n";
       os << cov_mat->normalized_ << "\n\n";
+      // Note order of writing out the covariance matrix must be the 
+      // same as order of reading in
       nested_objs.push_back(cov_mat->matrix_.get());
       nested_objs.push_back(cov_mat->mean_.get());
     } else {
@@ -321,5 +323,68 @@ namespace panacea {
     }
     return nested_objs;
   }
-  
+ 
+  std::vector<std::any> Covariance::read(
+      const settings::FileType & file_type,
+      std::istream & is,
+      std::any cov_instance) {
+
+    std::vector<std::any> nested_objs; 
+    if( file_type == settings::FileType::TXTRestart ) { 
+      auto cov_mat = std::any_cast<Covariance *>(cov_instance); 
+
+      std::string line = "";
+
+      while(line.find("[Covariance]",0) == std::string::npos) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Did not find [Covariance] header while trying ";
+          error_msg += "to read restart file.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+        std::cout << "line is " << line << std::endl;
+      }
+
+      std::getline(is, line);
+      {
+        std::istringstream ss(line);
+        ss >> cov_mat->total_number_data_pts_;
+      }
+
+      while(line.find("[Normalization State]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Did not find [Normalization State] header while trying ";
+          error_msg += "to read restart file.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+      std::getline(is, line);
+      if( line.find("Normalized",0) != std::string::npos){
+        cov_mat->normalized_ = NormalizationState::Normalized;
+      }else if(line.find("Unnormalized",0) != std::string::npos ) {
+        cov_mat->normalized_ = NormalizationState::Unnormalized;
+      } else {
+        std::cout << "Warning normalization state value is missing from restart file.";
+        std::cout << " Assuming covariance data is unnormalized.\n";
+        std::cout << "line is: " << line << std::endl;
+        cov_mat->normalized_ = NormalizationState::Unnormalized;
+      }
+
+      // Check to see if memory has been allocated to the internal vector and matrix
+      if( cov_mat->matrix_.get() == nullptr ) {
+        cov_mat->matrix_ = createMatrix(0,0);
+      } 
+      if( cov_mat->mean_.get() == nullptr ) {
+        cov_mat->mean_ = createVector(0);
+      }
+      nested_objs.push_back(cov_mat->matrix_.get());
+      nested_objs.push_back(cov_mat->mean_.get());
+    } else {
+      PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
+    }
+    return nested_objs;
+  } 
 }

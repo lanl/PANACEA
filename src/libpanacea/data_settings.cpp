@@ -9,9 +9,9 @@ namespace panacea {
 
   std::ostream& operator<<(std::ostream& os, const Direction & dir ) {
     if( dir == Direction::AlongRows ) {
-      os << "AlongRows";
+      os << "Along Rows";
     }else if(dir == Direction::AlongColumns) {
-      os << "AlongColumns";
+      os << "Along Columns";
     }
     return os;
   }

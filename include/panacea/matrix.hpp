@@ -45,8 +45,13 @@ namespace panacea {
       virtual void print() const = 0;
 
       static std::vector<std::any> write(
-          settings::FileType file_type,
+          const settings::FileType & file_type,
           std::ostream &,
+          std::any matrix_instance);
+
+      static std::vector<std::any> read(
+          const settings::FileType & file_type,
+          std::istream &,
           std::any matrix_instance);
   };
 

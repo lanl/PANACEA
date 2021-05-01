@@ -22,14 +22,18 @@ namespace panacea {
   std::unordered_map<std::type_index,FileRestartTXT::WriteMethod> 
     FileRestartTXT::write_methods_; 
 
-//  std::unordered_map<std::type_index,ReadMethod>
-//    FileRestartTXT::read_methods_;
+  std::unordered_map<std::type_index,FileRestartTXT::ReadMethod>
+    FileRestartTXT::read_methods_;
 
   FileRestartTXT::FileRestartTXT() {
     // Alaways registers as a pointer
     registerWriteMethod<Covariance>();
     registerWriteMethod<Matrix>();
     registerWriteMethod<Vector>();
+
+    registerReadMethod<Covariance>();
+    registerReadMethod<Matrix>();
+    registerReadMethod<Vector>();
   }
 
   void FileRestartTXT::write_(
@@ -46,6 +50,21 @@ namespace panacea {
       auto data = write_methods_[obj.type()](type(), os, obj);
       write_(data, os);
 
+    }
+  }
+
+  void FileRestartTXT::read_(
+      std::vector<std::any> & objs,
+      std::istream & is) {
+
+    for( auto & obj : objs ) {
+      if( read_methods_.count(obj.type()) == 0 ) {
+        std::string error_msg = "Unable to read object from restart txt file, read ";
+        error_msg += "method is missing.";
+        PANACEA_FAIL(error_msg);
+      }
+      auto data = read_methods_[obj.type()](type(), is, obj);
+      read_(data, is);
     }
   }
 
@@ -69,5 +88,20 @@ namespace panacea {
 
   void FileRestartTXT::read(std::any obj, const std::string & filename) {
     // Not implemented
+    //
+    std::fstream fs;
+    fs.open(filename, std::fstream::in);
+
+    // Check if object type is registered
+    if( read_methods_.count(obj.type()) ) {
+      auto data = read_methods_[obj.type()](type(),fs,obj);
+      read_(data, fs);
+    } else {
+      std::string error_msg = "Unable to read object it does not contain ";
+      error_msg += "a registered read method.";
+      PANACEA_FAIL(error_msg);
+    }
+    fs.close();
+
   }
 }
