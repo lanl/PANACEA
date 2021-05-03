@@ -8,6 +8,7 @@
 
 #include "attributes/covariance.hpp"
 #include "error.hpp"
+#include "kernels/base_kernel_wrapper.hpp"
 
 // Standard includes
 #include <fstream>
@@ -30,10 +31,12 @@ namespace panacea {
     registerWriteMethod<Covariance>();
     registerWriteMethod<Matrix>();
     registerWriteMethod<Vector>();
+    registerWriteMethod<BaseKernelWrapper>();
 
     registerReadMethod<Covariance>();
     registerReadMethod<Matrix>();
     registerReadMethod<Vector>();
+    registerReadMethod<BaseKernelWrapper>();
   }
 
   void FileRestartTXT::write_(
