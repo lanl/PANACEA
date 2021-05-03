@@ -97,6 +97,17 @@ namespace panacea {
   std::ostream& operator<<(std::ostream& os, const settings::KernelNormalization &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelCenterCalculation &);
 
+  std::istream& operator>>(std::istream& is, settings::DistributionType &); 
+  std::istream& operator>>(std::istream& is, settings::FileType &);
+  std::istream& operator>>(std::istream& is, settings::EntropyOption &);
+  std::istream& operator>>(std::istream& is, settings::EntropyType &);
+  std::istream& operator>>(std::istream& is, settings::PANACEAAlgorithm &); 
+  std::istream& operator>>(std::istream& is, settings::KernelPrimitive &);
+  std::istream& operator>>(std::istream& is, settings::KernelCount &);
+  std::istream& operator>>(std::istream& is, settings::KernelCorrelation &);
+  std::istream& operator>>(std::istream& is, settings::KernelNormalization &);
+  std::istream& operator>>(std::istream& is, settings::KernelCenterCalculation &);
+
   class PANACEASettingsBuilder;
 
   /**

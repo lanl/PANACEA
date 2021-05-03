@@ -76,11 +76,11 @@ namespace panacea {
    * Private methods
    *******************************************/
 
-  ReadOption MedianKernelWrapper::getReadFunction_() {
+  ReadFunction MedianKernelWrapper::getReadFunction_() {
     return MedianKernelWrapper::read;
   }
 
-  WriteOption MedianKernelWrapper::getWriteFunction_() {
+  WriteFunction MedianKernelWrapper::getWriteFunction_() {
     return MedianKernelWrapper::write;
   }
 
@@ -195,7 +195,7 @@ namespace panacea {
    * Static methods
    ********************************************/
 
-  void MedianKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+  std::istream & MedianKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
 
       MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);  
       std::string line = "";
@@ -208,7 +208,6 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      std::getline(is, line);
       try {
         is >> kwrapper_median->number_pts_median_;
       } catch (...) {
@@ -229,7 +228,6 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      std::getline(is, line);
       try {
         is >> kwrapper_median->number_pts_store_;
       } catch (...) {
@@ -291,9 +289,10 @@ namespace panacea {
         error_msg += "line is: " + line + "\n";
         PANACEA_FAIL(error_msg);
      } 
+     return is;
   }
 
-  void MedianKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
+  std::ostream & MedianKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
     MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);
     os << "[Total Number Points]\n";
     os << kwrapper_median->number_pts_median_ << "\n";
@@ -316,6 +315,7 @@ namespace panacea {
       } 
       os << "\n";
     }
+    return os;
   }
 
 }

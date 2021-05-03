@@ -17,11 +17,11 @@ namespace panacea {
    * Public Methods
    ************************************************/
 
-  ReadOption MeanKernelWrapper::getReadFunction_() {
+  ReadFunction MeanKernelWrapper::getReadFunction_() {
     return MeanKernelWrapper::read;
   }
 
-  WriteOption MeanKernelWrapper::getWriteFunction_() {
+  WriteFunction MeanKernelWrapper::getWriteFunction_() {
     return MeanKernelWrapper::write;
   }
 
@@ -126,7 +126,7 @@ namespace panacea {
     return settings::KernelCount::Single;
   }
 
-  void MeanKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+  std::istream & MeanKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
 
     MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
 
@@ -138,22 +138,34 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
       std::getline(is, line);
+      std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
     }
 
-    std::getline(is, line);
+    //std::getline(is, line);
+    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
     try {
-      is >> kwrapper_mean->number_pts_mean_;
+ //     int num_pts; 
+//      is >> num_pts;
+      is >> kwrapper_mean->number_pts_mean_;// = num_pts;
     } catch (...) {
       std::string error_msg = "Unable to assign total number of points to mean";
       error_msg = " kernel type from file.\n";
       error_msg += "line is: " + line;
       PANACEA_FAIL(error_msg);
     }
+  /*  std::getline(is, line);
+    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
+    std::getline(is, line);
+    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
+    std::getline(is, line);
+    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;*/
+    return is;
   }
 
-  void MeanKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
+  std::ostream & MeanKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
     MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
     os << "[Total Number Points]\n";
     os << kwrapper_mean->number_pts_mean_ << "\n";
+    return os;
   }
 }

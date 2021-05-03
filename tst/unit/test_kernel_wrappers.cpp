@@ -61,10 +61,104 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
 
 }
 
+TEST_CASE("Testing:mean kernel_wrapper write & read","[unit,panacea]") {
+
+  std::vector<std::vector<double>> data = {{1.0, 4.0},{2.0, 9.0},{6.0, 2.0}};
+  DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,2); 
+
+  MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
+  BaseKernelWrapper * kwrapper_ptr = &mean_kwrapper;
+  
+  std::fstream fs;
+  fs.open("mean_kernel_wrapper_restart.txt", std::fstream::out );
+  BaseKernelWrapper::write(settings::FileType::TXTRestart, fs, kwrapper_ptr);
+  fs.close();
+
+  MeanKernelWrapper mean_kwrapper2(test::Test::key());
+  kwrapper_ptr = &mean_kwrapper2;
+  std::fstream fs2;
+  fs2.open("mean_kernel_wrapper_restart.txt", std::fstream::in );
+  BaseKernelWrapper::read(settings::FileType::TXTRestart, fs2, kwrapper_ptr);
+  fs2.close();
+  REQUIRE(mean_kwrapper2.rows() == 1);
+  REQUIRE(mean_kwrapper2.cols() == 2);
+  REQUIRE(mean_kwrapper2.getNumberDimensions() == 2);
+  REQUIRE(mean_kwrapper2.getNumberPoints() == 3);
+  REQUIRE(mean_kwrapper2.at(0,0) == Approx(3.0));
+  REQUIRE(mean_kwrapper2.at(0,1) == Approx(5.0));
+  auto type_ind_data = std::type_index(typeid(vector<double>));
+  REQUIRE(mean_kwrapper2.getTypeIndex() == type_ind_data);
+}
+
+TEST_CASE("Testing:median kernel_wrapper write & read","[unit,panacea]") {
+
+  std::vector<std::vector<double>> data = {{1.0, 4.0},{2.0, 9.0},{6.0, 2.0}};
+  DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,2); 
+
+  MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
+  BaseKernelWrapper * kwrapper_ptr = &median_kwrapper;
+
+  std::fstream fs;
+  fs.open("median_kernel_wrapper_restart.txt", std::fstream::out );
+  BaseKernelWrapper::write(settings::FileType::TXTRestart, fs, kwrapper_ptr);
+  fs.close();
+
+  MedianKernelWrapper median_kwrapper2(test::Test::key());
+  kwrapper_ptr = &median_kwrapper2;
+  std::fstream fs2;
+  fs2.open("median_kernel_wrapper_restart.txt", std::fstream::in );
+  BaseKernelWrapper::read(settings::FileType::TXTRestart, fs2, kwrapper_ptr);
+  fs2.close();
+
+  REQUIRE(median_kwrapper2.getNumberDimensions() == 2);
+  REQUIRE(median_kwrapper2.getNumberPoints() == 3);
+  REQUIRE(median_kwrapper2.rows() == 1);
+  REQUIRE(median_kwrapper2.cols() == 2);
+  REQUIRE(median_kwrapper2.at(0,0) == Approx(2.0));
+  REQUIRE(median_kwrapper2.at(0,1) == Approx(4.0));
+  auto type_ind_data = std::type_index(typeid(vector<double>));
+  REQUIRE(median_kwrapper2.getTypeIndex() == type_ind_data);
+}
+
+TEST_CASE("Testing:template kernel_wrapper write & read","[unit,panacea]") {
+
+  std::vector<std::vector<double>> data = {{1.0, 4.0},{2.0, 9.0},{6.0, 2.0}};
+  DescriptorWrapper<vector<vector<double>>*> dwrapper(&data,3,2); 
+
+  auto type_ind_data = std::type_index(typeid(vector<vector<double>>));
+  KernelWrapper<vector<vector<double>> *> kwrapper(test::Test::key(), &dwrapper);
+  BaseKernelWrapper * kwrapper_ptr = &kwrapper;
+
+  std::fstream fs;
+  fs.open("template_kernel_wrapper_restart.txt", std::fstream::out );
+  BaseKernelWrapper::write(settings::FileType::TXTRestart, fs, kwrapper_ptr);
+  fs.close();
+
+  KernelWrapper<vector<vector<double>>> kwrapper2(test::Test::key());
+  kwrapper_ptr = &kwrapper2;
+  std::fstream fs2;
+  fs2.open("template_kernel_wrapper_restart.txt", std::fstream::in );
+  BaseKernelWrapper::read(settings::FileType::TXTRestart, fs2, kwrapper_ptr);
+  fs2.close();
+
+  REQUIRE(kwrapper2.getNumberDimensions() == 2);
+  REQUIRE(kwrapper2.getNumberPoints() == 3);
+  REQUIRE(kwrapper2.rows() == 3);
+  REQUIRE(kwrapper2.cols() == 2);
+
+  REQUIRE(kwrapper2.at(0,0) == Approx(1.0));
+  REQUIRE(kwrapper2.at(1,0) == Approx(2.0));
+  REQUIRE(kwrapper2.at(2,0) == Approx(6.0));
+  REQUIRE(kwrapper2.at(0,1) == Approx(4.0));
+  REQUIRE(kwrapper2.at(1,1) == Approx(9.0));
+  REQUIRE(kwrapper2.at(2,1) == Approx(2.0));
+  REQUIRE(kwrapper2.getTypeIndex() == type_ind_data);
+}
+
 TEST_CASE("Testing:kernel_wrapper creation with factory","[unit,panacea]") {
 
   std::vector<std::vector<double>> data = {{1.0},{2.0},{6.0}};
- 
+
   auto data_type_index = type_index(typeid(vector<vector<double>> *));
   KernelWrapperFactory kern_factory;
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,1); 

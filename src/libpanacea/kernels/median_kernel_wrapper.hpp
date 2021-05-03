@@ -43,9 +43,12 @@ namespace panacea {
       bool remove_from_front_ = true;
       int number_pts_median_; // Number of points used to calculate the median
 
-      virtual ReadOption getReadFunction_() final;
-      virtual WriteOption getWriteFunction_() final;
+      virtual ReadFunction getReadFunction_() final;
+      virtual WriteFunction getWriteFunction_() final;
     public:
+
+      explicit MedianKernelWrapper(
+          const PassKey<test::Test> &) {};
 
       MedianKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
@@ -81,14 +84,8 @@ namespace panacea {
           const int cols);
 
 
-      static void read(BaseKernelWrapper *, std::istream &);
-      static void write(BaseKernelWrapper *, std::ostream &);
-/*      static void readOptionTotalNumberPoints(BaseKernelWrapper *, std::istream &);
-      static void writeOptionTotalNumberPoints(BaseKernelWrapper *, std::ostream &);
-      static void readOptionNumberPointsStore(BaseKernelWrapper *, std::istream &);
-      static void writeOptionNumberPointsStore(BaseKernelWrapper *, std::ostream &);
-      static void readOptionPointsNearMedian(BaseKernelWrapper *, std::istream &);
-      static void writeOptionPointsNearMedian(BaseKernelWrapper *, std::ostream &);*/
+      static std::istream & read(BaseKernelWrapper *, std::istream &);
+      static std::ostream & write(BaseKernelWrapper *, std::ostream &);
   };
 
   inline std::unique_ptr<BaseKernelWrapper> MedianKernelWrapper::create(

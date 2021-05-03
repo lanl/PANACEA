@@ -21,8 +21,8 @@ namespace panacea {
 
   class BaseKernelWrapper;
 
-  typedef void (*ReadOption)(BaseKernelWrapper *, std::istream & is); 
-  typedef void (*WriteOption)(BaseKernelWrapper *, std::ostream & os); 
+  typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is); 
+  typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os); 
   /*
    * Base Kernel interface 
    */
@@ -33,8 +33,8 @@ namespace panacea {
       /**
        * Used to read and write kernel derived class specific meta data
        **/
-      virtual ReadOption getReadFunction_() = 0;
-      virtual WriteOption getWriteFunction_() = 0;
+      virtual ReadFunction getReadFunction_() = 0;
+      virtual WriteFunction getWriteFunction_() = 0;
 
     public:
 
@@ -84,12 +84,12 @@ namespace panacea {
       static std::vector<std::any> write(
           const settings::FileType & file_type,
           std::ostream &,
-          std::any vector_instance);
+          std::any kern_instance);
 
       static std::vector<std::any> read(
           const settings::FileType & file_type,
           std::istream &,
-          std::any vector_instance);
+          std::any kern_instance);
 
   };
 

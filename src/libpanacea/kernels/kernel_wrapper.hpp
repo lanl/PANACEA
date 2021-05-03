@@ -34,10 +34,13 @@ namespace panacea {
       private:
         DataPointTemplate<T> data_wrapper_;
       
-        virtual ReadOption getReadFunction_() final;
-        virtual WriteOption getWriteFunction_() final;
+        virtual ReadFunction getReadFunction_() final;
+        virtual WriteFunction getWriteFunction_() final;
 
       public:
+
+        KernelWrapper(const PassKey<test::Test> &) {};
+
         KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
 
@@ -77,8 +80,8 @@ namespace panacea {
             const int rows,
             const int cols);
 
-        static void read(BaseKernelWrapper *, std::istream &); 
-        static void write(BaseKernelWrapper *, std::ostream &); 
+        static std::istream & read(BaseKernelWrapper *, std::istream &); 
+        static std::ostream & write(BaseKernelWrapper *, std::ostream &); 
     };
 
   template<class T>
@@ -176,13 +179,13 @@ namespace panacea {
     }
 
   template<class T>
-    inline void KernelWrapper<T>::read(BaseKernelWrapper *, std::istream &) {
-      return; 
+    inline std::istream & KernelWrapper<T>::read(BaseKernelWrapper *, std::istream & is) {
+      return is; 
     }
 
   template<class T>
-    inline void KernelWrapper<T>::write(BaseKernelWrapper *, std::ostream &) {
-      return; 
+    inline std::ostream & KernelWrapper<T>::write(BaseKernelWrapper *, std::ostream & os) {
+      return os; 
     }
 
   template<class T>
@@ -192,12 +195,12 @@ namespace panacea {
 
 
   template<class T>
-    inline ReadOption KernelWrapper<T>::getReadFunction_() {
+    inline ReadFunction KernelWrapper<T>::getReadFunction_() {
       return KernelWrapper<T>::read;
     }
 
   template<class T>
-    inline WriteOption KernelWrapper<T>::getWriteFunction_() {
+    inline WriteFunction KernelWrapper<T>::getWriteFunction_() {
       return KernelWrapper<T>::write;
     }
 

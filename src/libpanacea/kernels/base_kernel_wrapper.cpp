@@ -21,6 +21,7 @@ namespace panacea {
     
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
+      std::cout << __FILE__ << ":" << __LINE__  << std::endl;
       auto kwrapper = std::any_cast<BaseKernelWrapper *>(kwrapper_instance);
       os << "[Kernel]\n";
       os << kwrapper->center() << "\n";
@@ -82,6 +83,23 @@ namespace panacea {
         std::cout << "line is: " << line  << "\n";
       }
 
+      settings::KernelCenterCalculation center_calc_method;
+      is >> center_calc_method;
+      if( center_calc_method != kwrapper->center() ) {
+        std::string error_msg = "Inconsistency between restart file kernel center ";
+        error_msg += "method and the kernel who's state is being loaded from the ";
+        error_msg += "restart file.";
+        PANACEA_FAIL(error_msg); 
+      }
+
+      settings::KernelCount kernel_count;
+      is >> kernel_count;
+      if( kernel_count != kwrapper->count() ) {
+        std::string error_msg = "Inconsistency between restart file kernel count ";
+        error_msg += "setting and the kernel who's state is being loaded from the ";
+        error_msg += "restart file.";
+        PANACEA_FAIL(error_msg); 
+      }
       // Look for derived class specific data tag
       std::getline(is, line);
       if( line.find("[Meta Data]", 0) == std::string::npos) {
@@ -95,10 +113,14 @@ namespace panacea {
 
       std::getline(is, line);
       // First line should be header
-      if( line.find("[Data]", 0) == std::string::npos) {
-        std::cout << "Warning while reading kernel section of restart file, header";
-        std::cout << " does not contain the [Data] word.";
-        std::cout << "line is: " << line  << "\n";
+      while(line.find("[Data]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Warning while reading kernel section of restart file,";
+          error_msg +=  " header does not contain the [Data] word.\n";
+          error_msg += "line is: " + line  + "\n";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
       }
 
       std::getline(is, line);
@@ -138,8 +160,9 @@ namespace panacea {
       }
   
       try { 
-
+        std::cout << "rows are " << rows << " cols are " << cols << std::endl;
         kwrapper->resize(rows,cols);
+        std::cout << "called resize line is " << line << std::endl;
         for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
           std::istringstream ss_data(line);

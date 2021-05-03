@@ -31,6 +31,10 @@ namespace panacea {
    *
    * Will by default assume template is basic of the form double *** and has 
    * therefore access to the elements is provided via double bracket notation
+   *
+   * If a single dimension type is used e.g. a vector<double> then it is assumed
+   * that it is for a single point only, and that each variable in the vector
+   * represents a different dimension.
    */ 
   template<class T> 
     class DataPointTemplate {
@@ -189,10 +193,7 @@ namespace panacea {
       assert(point_ind == 0 );
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
-        return data_.at(dim_ind);
-      }
-      return data_.at(point_ind);
+      return data_.at(dim_ind);
     }
 
   template<> 
@@ -201,10 +202,7 @@ namespace panacea {
       assert(point_ind == 0);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
-        return data_.at(dim_ind);
-      }
-      return data_.at(point_ind);
+      return data_.at(dim_ind);
     } 
 
 
@@ -260,8 +258,14 @@ namespace panacea {
         const int row, const int col) {
       assert(row == 0 );
       assert(col >= 0 && col < cols_);
+     
+      std::cout << __LINE__ << "Row and column in data wrapper " << row << " " << col << std::endl; 
+      std::cout << "Size of data_ " << data_.size() << std::endl;
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
+        return data_.at(col);
+      } 
+      return data_.at(row);
 
-      return data_.at(col);
     }
 
   template<> 
@@ -270,11 +274,16 @@ namespace panacea {
       assert(row == 0);
       assert(col >= 0 && col < cols_);
 
-      return data_.at(col);
+      std::cout << __LINE__ << "Row and column in data wrapper " << row << " " << col << std::endl; 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
+        return data_.at(col);
+      } 
+      return data_.at(row);
     } 
 
   template<class T>
     inline void DataPointTemplate<T>::resize(const int rows, const int cols) {
+      std::cout << __FILE__ << ":" << __LINE__ << " Resizing with rows and cols " << rows << " " << cols << std::endl;
       if(std::is_pointer<T>::value) {
         std::string error_msg = "Cannot resize data, it is a pointer, and is not ";
         error_msg += "owned by the underlying object.\n";
@@ -294,6 +303,24 @@ namespace panacea {
         for(int row = 0; row < rows; ++row ) {
           data_.at(row).resize(cols);
         } 
+      } else if constexpr(std::is_same<T,std::vector<double>>::value) {
+        rows_ = rows;
+        cols_ = cols;
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
+          // If have a one dimensional vector, only the dimensions are allowed to 
+          // be greater than 1
+          assert(rows_ == 1); 
+          number_points_ = rows_;
+          number_dimensions_ = cols_;
+          data_.resize(cols);
+        } else {
+          // If have a one dimensional vector, only the dimensions are allowed to 
+          // be greater than 1
+          assert(cols_ == 1); 
+          number_dimensions_ = rows;
+          number_points_ = cols;
+          data_.resize(rows);
+        }
       } else {
         std::string error_msg = "Currently resize method is ownly supported for";
         error_msg += " types of std::vector<std::vector<double>>.\n";
