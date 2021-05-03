@@ -168,8 +168,7 @@ namespace panacea {
   }
 
   void KernelDistribution::update(const BaseDescriptorWrapper * descriptor_wrapper) {
-    PrimitiveFactory prim_factory;
-    prim_factory.update(descriptor_wrapper,prim_grp_);
+    prim_grp_.update(descriptor_wrapper);
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
   }
 }

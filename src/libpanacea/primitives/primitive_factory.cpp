@@ -190,6 +190,7 @@ namespace panacea {
   }
 
   void PrimitiveFactory::update(
+      const PassKey<PrimitiveGroup> &,
       const BaseDescriptorWrapper * descriptor_wrapper, 
       PrimitiveGroup & prim_grp) const {
 

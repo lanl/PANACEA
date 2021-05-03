@@ -41,6 +41,8 @@ namespace panacea {
       std::vector<double> normalization_coeffs_;
       NormalizationMethodFactory::NormalizationMethod norm_method_ = nullptr;
       NormalizerOption norm_option_ = NormalizerOption::Strict;
+
+
     public:
       Normalizer() = default;
       Normalizer(const std::vector<double> & normalization_coeffs,
@@ -61,11 +63,26 @@ namespace panacea {
 
       void normalize(Covariance & cov) const; 
       void unnormalize(Covariance & cov) const; 
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          std::any norm_instance);
+
+      static std::vector<std::any> read(
+          const settings::FileType & file_type,
+          std::istream &,
+          std::any norm_instance);
+
+
   };
 
   template<class T>
   inline T Normalizer::get() const noexcept{
     return norm_option_;
   }
+
+  std::ostream& operator<<(std::ostream& os, const NormalizerOption &); 
+  std::istream& operator>>(std::istream& is, NormalizerOption & );
 }
 #endif // PANACEA_PRIVATE_NORMALIZER_H

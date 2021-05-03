@@ -134,12 +134,12 @@ namespace panacea {
   std::ostream& operator<<(std::ostream& os, const settings::KernelAlgorithm & );
   std::ostream& operator<<(std::ostream& os, const settings::KernelMemory &); 
 
-  std::istream& operator>>(std::istream& os, settings::CalculationType & );
-  std::istream& operator>>(std::istream& os, settings::EquationSetting & );
-  std::istream& operator>>(std::istream& os, settings::None         & );
-  std::istream& operator>>(std::istream& os, settings::GradSetting  &); 
-  std::istream& operator>>(std::istream& os, settings::KernelAlgorithm & );
-  std::istream& operator>>(std::istream& os, settings::KernelMemory &); 
+  std::istream& operator>>(std::istream& is, settings::CalculationType & );
+  std::istream& operator>>(std::istream& is, settings::EquationSetting & );
+  std::istream& operator>>(std::istream& is, settings::None         & );
+  std::istream& operator>>(std::istream& is, settings::GradSetting  &); 
+  std::istream& operator>>(std::istream& is, settings::KernelAlgorithm & );
+  std::istream& operator>>(std::istream& is, settings::KernelMemory &); 
 
 
 }

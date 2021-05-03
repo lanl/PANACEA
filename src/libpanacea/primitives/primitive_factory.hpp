@@ -80,6 +80,7 @@ namespace panacea {
        * Updates the primitive group
        **/ 
       void update(
+          const PassKey<PrimitiveGroup> &,
           const BaseDescriptorWrapper * dwrapper,
           PrimitiveGroup & primitive_grp) const;
   };

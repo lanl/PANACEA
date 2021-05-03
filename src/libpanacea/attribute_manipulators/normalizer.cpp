@@ -2,11 +2,13 @@
 // Local private PANACEA includes
 #include "normalizer.hpp"
 
+#include "error.hpp"
 #include "normalization_methods/normalization_method_factory.hpp"
 #include "passkey.hpp"
 
 // Standard includes
 #include <cassert>
+#include <iostream>
 #include <vector>
 
 namespace panacea {
@@ -105,6 +107,115 @@ namespace panacea {
     assert(norm_method_ != nullptr);
     const auto normalization_coeffs = norm_method_(dwrapper, extra_args);
     trim(normalization_coeffs, norm_option_, normalization_coeffs_);
+  }
+
+  std::vector<std::any> Normalizer::write(
+      const settings::FileType & file_type,
+      std::ostream & os,
+      std::any norm_instance) {
+
+
+    std::vector<std::any> nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto normalizer = std::any_cast<Normalizer *>(norm_instance);
+
+      os << "[Normalization]\n";
+      os << normalizer->norm_option_ << "\n";
+      os << normalizer->normalization_coeffs_.size() << "\n";
+      os << "[Normalization Coefficients]\n";
+      for( const auto & coef : normalizer->normalization_coeffs_){
+          os << std::setfill(' ') 
+            << std::setw(14) 
+            << std::setprecision(8) 
+            << std::right
+            << coef << "\n";
+      }
+    }
+    return nested_values;
+  }
+
+  std::vector<std::any> Normalizer::read(
+      const settings::FileType & file_type,
+      std::istream & is,
+      std::any norm_instance) {
+
+    std::vector<std::any> nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto normalizer = std::any_cast<Normalizer *>(norm_instance);
+      
+      std::string line;
+      std::getline(is, line);
+      // First line should be header
+      while(line.find("[Normalization]", 0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Missing [Normalization] tag while reading normalization ";
+          error_msg += "section of restart file.\n";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+      is >> normalizer->norm_option_;
+
+      int rows;
+      try { 
+        is >> rows;
+      } catch (...) {
+        std::string error_msg = "Unable to read in rows from [Normalization] section ";
+        error_msg += "of restart file.\n";
+        error_msg += "line is: " + line + "\n";
+        PANACEA_FAIL(error_msg);
+      }
+
+      while(line.find("[Normalization Coefficients]", 0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Missing [Normalization Coefficients] tag while reading";
+          error_msg += " normalization section of restart file.\n";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+      try {
+        normalizer->normalization_coeffs_.resize(rows);
+        for( int row = 0; row < rows; ++row){
+          double value;
+          is >> value;
+          normalizer->normalization_coeffs_.at(row) = value;
+        }
+      } catch (...) {
+        std::string error_msg = "Error encountered while attempting to read in normalization ";
+        error_msg += "coefficients from Normalization section of restart file.\n";
+        PANACEA_FAIL(error_msg);
+      }
+    } 
+    return nested_values;
+  }
+
+  std::ostream& operator<<(std::ostream& os, const NormalizerOption & norm_opt) {
+    if( norm_opt == NormalizerOption::Strict ) {
+      os << "Strict";
+    } else if (norm_opt == NormalizerOption::Flexible ) {
+      os << "Flexible";
+    }
+    return os;
+  }
+
+  std::istream& operator>>(std::istream& is, NormalizerOption & norm_opt) {
+    std::string line;
+    std::getline(is,line);
+    if( line.find("Strict", 0) != std::string::npos ) {
+      norm_opt = NormalizerOption::Strict;
+    }else if( line.find("Flexible", 0) != std::string::npos ) {
+      norm_opt = NormalizerOption::Flexible;
+    } else {
+      std::string error_msg = "Unrecognized normalization option while reading istream.\n";
+      error_msg += "Accepted normalization option settings are:\n";
+      error_msg += "Strict\nFlexible\n";
+      error_msg += "Line is: " + line + "\n";
+      PANACEA_FAIL(error_msg);
+    }
+    
+    return is;
   }
 }
 

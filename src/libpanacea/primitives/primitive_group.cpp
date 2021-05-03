@@ -22,5 +22,31 @@ namespace panacea {
     .reduced_covariance = this->reduced_covariance.get(),
     .reduced_inv_covariance = this->reduced_inv_covariance.get()};
   }
+
+  void PrimitiveGroup::update(
+      const BaseDescriptorWrapper * dwrapper) {
+
+    PrimitiveFactory prim_factory;
+    prim_factory.update(PassKey<PrimitiveGroup>(),dwrapper, *this);
+  }
+
+  std::vector<std::any> PrimitiveGroup::write(
+      const settings::FileType & file_type,
+      std::ostream & os,
+      std::any prim_grp_instance) {
+
+    std::vector<std::any> nested_values;
+    return nested_values;
+  }
+
+  std::vector<std::any> PrimitiveGroup::read(
+      const settings::FileType & file_type,
+      std::istream & is,
+      std::any prim_grp_instance) {
+    
+    std::vector<std::any> nested_values;
+    return nested_values;
+  }
+
 }
 

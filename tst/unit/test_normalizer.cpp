@@ -72,3 +72,28 @@ TEST_CASE("Testing:normalizer1","[unit,panacea]"){
   REQUIRE(covar(2,1) == Approx(1.0));
 
 }
+
+TEST_CASE("Testing:normalizer write & read","[unit,panacea]"){
+  std::vector<double> coeffs = { 1.0, 3.0, 2.0 };
+  Normalizer normalizer(coeffs);
+
+  std::fstream fs;
+  fs.open("test_normalizer.restart", std::fstream::out);
+  auto data_out = Normalizer::write(settings::FileType::TXTRestart, fs, &normalizer);
+  fs.close();
+
+  Normalizer normalizer2;
+  // The internal matrix and vectors will not be read in from this call
+  std::fstream fs2;
+  fs2.open("test_normalizer.restart", std::fstream::in);
+  auto data_out2 = Normalizer::read(settings::FileType::TXTRestart, fs2, &normalizer2);
+  fs2.close();
+
+  const auto & norm_coeffs = normalizer.getNormalizationCoeffs();
+  const auto & norm_coeffs2 = normalizer2.getNormalizationCoeffs();
+
+  REQUIRE(norm_coeffs.size() == norm_coeffs2.size());
+  REQUIRE(norm_coeffs.at(0) == norm_coeffs2.at(0));
+  REQUIRE(norm_coeffs.at(1) == norm_coeffs2.at(1));
+  REQUIRE(norm_coeffs.at(2) == norm_coeffs2.at(2));
+}

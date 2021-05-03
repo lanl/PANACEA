@@ -42,6 +42,21 @@ namespace panacea {
       std::vector<std::unique_ptr<Primitive>> primitives;
 
       PrimitiveAttributes createPrimitiveAttributes() noexcept;
+
+      void update(
+          const BaseDescriptorWrapper * dwrapper);
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          std::any prim_grp_instance);
+
+      static std::vector<std::any> read(
+          const settings::FileType & file_type,
+          std::istream &,
+          std::any prim_grp_instance);
+
+
   };
 }
 
