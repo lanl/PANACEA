@@ -66,7 +66,6 @@ namespace panacea {
       Share
     };
 
-
     template<class T>
       constexpr const char * toString(T setting) {
         if constexpr( std::is_same<KernelCenterCalculation,T>::value ) {

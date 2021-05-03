@@ -5,6 +5,11 @@
 // Local private PANACEA includes
 #include "data_point_template.hpp"
 
+// Standard includes
+#include <any>
+#include <iostream>
+#include <vector>
+
 namespace panacea {
 
   std::vector<std::any> BaseDescriptorWrapper::write(

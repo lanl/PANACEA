@@ -42,6 +42,9 @@ namespace panacea {
        **/
       bool remove_from_front_ = true;
       int number_pts_median_; // Number of points used to calculate the median
+
+      virtual ReadOption getReadFunction_() final;
+      virtual WriteOption getWriteFunction_() final;
     public:
 
       MedianKernelWrapper(
@@ -54,12 +57,16 @@ namespace panacea {
           const BaseDescriptorWrapper * desc_wrapper
           );
 
+      virtual const settings::KernelCenterCalculation center() const noexcept final;
+      virtual const settings::KernelCount count() const noexcept final;
       virtual double& at(const int row, const int col) final;
       virtual double at(const int row, const int col) const final;
+      virtual void resize(const int rows, const int cols) final;
       virtual int rows() const final;
       virtual int cols() const final;
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
+      virtual const Arrangement & arrangement() const noexcept final; 
       virtual void set(const Arrangement arrangement) final;
       virtual void update(const BaseDescriptorWrapper *) final;
       virtual const std::any getPointerToRawData() const noexcept final;
@@ -72,6 +79,16 @@ namespace panacea {
           std::any data, 
           const int rows,
           const int cols);
+
+
+      static void read(BaseKernelWrapper *, std::istream &);
+      static void write(BaseKernelWrapper *, std::ostream &);
+/*      static void readOptionTotalNumberPoints(BaseKernelWrapper *, std::istream &);
+      static void writeOptionTotalNumberPoints(BaseKernelWrapper *, std::ostream &);
+      static void readOptionNumberPointsStore(BaseKernelWrapper *, std::istream &);
+      static void writeOptionNumberPointsStore(BaseKernelWrapper *, std::ostream &);
+      static void readOptionPointsNearMedian(BaseKernelWrapper *, std::istream &);
+      static void writeOptionPointsNearMedian(BaseKernelWrapper *, std::ostream &);*/
   };
 
   inline std::unique_ptr<BaseKernelWrapper> MedianKernelWrapper::create(

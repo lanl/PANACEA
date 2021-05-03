@@ -10,6 +10,7 @@
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
 #include "passkey.hpp"
+#include "private_settings.hpp"
 
 // Standard includes
 #include <any>
@@ -23,6 +24,7 @@ namespace panacea {
   namespace test {
     class Test;
   }
+
   /*
    * The kernel wrapper should be flexible enough to allow
    * the underlying type to vary
@@ -31,6 +33,10 @@ namespace panacea {
     class KernelWrapper : public BaseKernelWrapper {
       private:
         DataPointTemplate<T> data_wrapper_;
+      
+        virtual ReadOption getReadFunction_() final;
+        virtual WriteOption getWriteFunction_() final;
+
       public:
         KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
@@ -41,18 +47,28 @@ namespace panacea {
         KernelWrapper(const PassKey<test::Test> &,
             const BaseDescriptorWrapper * desc_wrapper);
         
+        virtual const settings::KernelCenterCalculation center() const noexcept final;
+        virtual const settings::KernelCount count() const noexcept final;
         virtual double& at(const int row, const int col) final;
         virtual double at(const int row, const int col) const final;
+
+        virtual void resize(const int rows, const int cols) final;
+
         virtual int rows() const final;
         virtual int cols() const final;
         virtual int getNumberDimensions() const final;
         virtual int getNumberPoints() const final;
+        virtual const Arrangement & arrangement() const noexcept final; 
         virtual void set(const Arrangement arrangement) final;
 
         virtual void update(const BaseDescriptorWrapper *) final;
         virtual const std::any getPointerToRawData() const noexcept final;
         virtual std::type_index getTypeIndex() const noexcept final;
         virtual void print() const final;
+
+        /**************************************
+         * Static class funcitons
+         **************************************/
         // Standard any should not be a reference because the underlying type should
         // be a pointer
         static std::unique_ptr<BaseKernelWrapper> create(
@@ -61,6 +77,8 @@ namespace panacea {
             const int rows,
             const int cols);
 
+        static void read(BaseKernelWrapper *, std::istream &); 
+        static void write(BaseKernelWrapper *, std::ostream &); 
     };
 
   template<class T>
@@ -75,6 +93,16 @@ namespace panacea {
     }
 
   template<class T>
+      const settings::KernelCenterCalculation KernelWrapper<T>::center() const noexcept {
+        return settings::KernelCenterCalculation::None;
+      }
+
+  template<class T>
+      const settings::KernelCount KernelWrapper<T>::count() const noexcept {
+        return settings::KernelCount::OneToOne; 
+      }
+
+  template<class T>
     inline double& KernelWrapper<T>::at(const int row, const int col) {
       return data_wrapper_.at(row, col);
     }
@@ -82,6 +110,11 @@ namespace panacea {
   template<class T>
     inline double KernelWrapper<T>::at(const int row, const int col) const {
       return data_wrapper_.at(row, col);
+    }
+
+  template<class T>
+    inline void KernelWrapper<T>::resize(const int rows, const int cols) {
+      data_wrapper_.resize(rows,cols);
     }
 
   template<class T>
@@ -102,6 +135,11 @@ namespace panacea {
   template<class T>
     inline int KernelWrapper<T>::getNumberPoints() const {
       return data_wrapper_.getNumberPoints();
+    }
+
+  template<class T>
+    inline const Arrangement & KernelWrapper<T>::arrangement() const noexcept {
+      return data_wrapper_.arrangement();
     }
 
   template<class T>
@@ -138,8 +176,30 @@ namespace panacea {
     }
 
   template<class T>
+    inline void KernelWrapper<T>::read(BaseKernelWrapper *, std::istream &) {
+      return; 
+    }
+
+  template<class T>
+    inline void KernelWrapper<T>::write(BaseKernelWrapper *, std::ostream &) {
+      return; 
+    }
+
+  template<class T>
     inline std::type_index KernelWrapper<T>::getTypeIndex() const noexcept {
       return std::type_index(typeid(typename std::remove_const<T>::type));
     }
+
+
+  template<class T>
+    inline ReadOption KernelWrapper<T>::getReadFunction_() {
+      return KernelWrapper<T>::read;
+    }
+
+  template<class T>
+    inline WriteOption KernelWrapper<T>::getWriteFunction_() {
+      return KernelWrapper<T>::write;
+    }
+
 }
 #endif // PANACEA_PRIVATE_KERNELWRAPPER_H

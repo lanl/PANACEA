@@ -8,9 +8,26 @@
 #include "mean.hpp"
 
 // Standard incldues
+#include <any>
 #include <vector>
 
 namespace panacea {
+
+  /************************************************
+   * Public Methods
+   ************************************************/
+
+  ReadOption MeanKernelWrapper::getReadFunction_() {
+    return MeanKernelWrapper::read;
+  }
+
+  WriteOption MeanKernelWrapper::getWriteFunction_() {
+    return MeanKernelWrapper::write;
+  }
+
+  /************************************************
+   * Public Methods
+   ************************************************/
 
   MeanKernelWrapper::MeanKernelWrapper(
       const PassKey<KernelWrapperFactory> &,
@@ -42,6 +59,10 @@ namespace panacea {
     return data_wrapper_.at(row, col);
   }
 
+  void MeanKernelWrapper::resize(const int rows, const int cols) {
+    data_wrapper_.resize(rows,cols);
+  }
+
   int MeanKernelWrapper::rows() const {
     return data_wrapper_.rows();
   }
@@ -56,6 +77,10 @@ namespace panacea {
 
   int MeanKernelWrapper::getNumberPoints() const {
     return number_pts_mean_;
+  }
+
+  const Arrangement & MeanKernelWrapper::arrangement() const noexcept {
+    return data_wrapper_.arrangement();
   }
 
   void MeanKernelWrapper::set(const Arrangement arrangement) {
@@ -93,4 +118,42 @@ namespace panacea {
     return std::type_index(typeid(std::vector<double>));
   }
 
+  const settings::KernelCenterCalculation MeanKernelWrapper::center() const noexcept {
+    return settings::KernelCenterCalculation::Mean;
+  }
+
+  const settings::KernelCount MeanKernelWrapper::count() const noexcept {
+    return settings::KernelCount::Single;
+  }
+
+  void MeanKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+
+    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
+
+    std::string line = "";
+    while(line.find("[Total Number Points]",0) == std::string::npos) {
+      if( is.peek() == EOF ) {
+        std::string error_msg = "Did not find [Total Number Points] header while trying ";
+        error_msg += "to read in mean kernel wrapper from restart file.";
+        PANACEA_FAIL(error_msg);
+      }
+      std::getline(is, line);
+    }
+
+    std::getline(is, line);
+    try {
+      is >> kwrapper_mean->number_pts_mean_;
+    } catch (...) {
+      std::string error_msg = "Unable to assign total number of points to mean";
+      error_msg = " kernel type from file.\n";
+      error_msg += "line is: " + line;
+      PANACEA_FAIL(error_msg);
+    }
+  }
+
+  void MeanKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
+    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
+    os << "[Total Number Points]\n";
+    os << kwrapper_mean->number_pts_mean_ << "\n";
+  }
 }

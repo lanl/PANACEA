@@ -73,6 +73,18 @@ namespace panacea {
   }
 
   /*******************************************
+   * Private methods
+   *******************************************/
+
+  ReadOption MedianKernelWrapper::getReadFunction_() {
+    return MedianKernelWrapper::read;
+  }
+
+  WriteOption MedianKernelWrapper::getWriteFunction_() {
+    return MedianKernelWrapper::write;
+  }
+
+  /*******************************************
    * Public methods
    *******************************************/
 
@@ -131,6 +143,10 @@ namespace panacea {
     return data_wrapper_.at(row, col);
   }
 
+  void MedianKernelWrapper::resize(const int rows, const int cols) {
+    data_wrapper_.resize(rows,cols);
+  }
+
   int MedianKernelWrapper::rows() const {
     return data_wrapper_.rows();
   }
@@ -147,6 +163,10 @@ namespace panacea {
     return number_pts_median_;
   }
 
+  const Arrangement & MedianKernelWrapper::arrangement() const noexcept {
+    return data_wrapper_.arrangement();
+  }
+
   void MedianKernelWrapper::set(const Arrangement arrangement) {
     data_wrapper_.set(arrangement);
   }
@@ -161,6 +181,141 @@ namespace panacea {
 
   std::type_index MedianKernelWrapper::getTypeIndex() const noexcept {
     return std::type_index(typeid(std::vector<double>));
+  }
+
+  const settings::KernelCenterCalculation MedianKernelWrapper::center() const noexcept {
+    return settings::KernelCenterCalculation::Median;
+  }
+
+  const settings::KernelCount MedianKernelWrapper::count() const noexcept {
+    return settings::KernelCount::Single;
+  }
+
+  /********************************************
+   * Static methods
+   ********************************************/
+
+  void MedianKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+
+      MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);  
+      std::string line = "";
+      while(line.find("[Total Number Points]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Did not find [Total Number Points] header while trying ";
+          error_msg += "to read in median kernel wrapper from restart file.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+      std::getline(is, line);
+      try {
+        is >> kwrapper_median->number_pts_median_;
+      } catch (...) {
+        std::string error_msg = "Unable to assign total number of points to median";
+        error_msg = " kernel type from file.\n";
+        error_msg += "line is: " + line;
+        PANACEA_FAIL(error_msg);
+      }
+
+      std::getline(is, line);
+      while(line.find("[Number Points Tracked Near Median]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Did not find [Number Points Tracked Near Median]";
+          error_msg += " header while trying to read in median kernel wrapper from ";
+          error_msg += "restart file.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+      std::getline(is, line);
+      try {
+        is >> kwrapper_median->number_pts_store_;
+      } catch (...) {
+        std::string error_msg = "Did not find [Number Points Tracked Near Median] value";
+        error_msg += " while trying to read restart file.\n";
+        error_msg += "line is: " + line;
+        PANACEA_FAIL(error_msg);
+      }
+
+      std::getline(is, line);
+      while(line.find("[Points Near Median]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "Did not find [Points Near Median]";
+          error_msg += " header while trying to read in median kernel wrapper from ";
+          error_msg += "restart file.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+
+      std::istringstream ss(line);
+  
+      int rows;
+      try { 
+        ss >> rows;
+      } catch (...) {
+        std::string error_msg = "Unable to read in rows from Median Kernel section of ";
+        error_msg += "restart file.\n";
+        error_msg += "line is: " + line + "\n";
+        PANACEA_FAIL(error_msg);
+      }
+      int cols;
+      try {
+        ss >> cols;
+      } catch (...) {
+        std::string error_msg = "Unable to read in columns from Median Kernel section of ";
+        error_msg += "restart file.\n";
+        error_msg += "line is: " + line + "\n";
+        PANACEA_FAIL(error_msg);
+      }
+ 
+     try {
+      kwrapper_median->points_near_median_.clear();
+      for( int row = 0; row < rows; ++row) {
+          std::getline(is, line);
+          std::istringstream ss_data(line);
+          std::deque<double> data_row;
+          for( int col = 0; col < cols; ++col) {
+            double value;
+            ss_data >> value;
+            data_row.push_back(value);
+          }
+          kwrapper_median->points_near_median_.push_back(data_row);
+        }
+     } catch (...) {
+        std::string error_msg = "Detected an error while attempting to read in points near ";
+        error_msg += "median section from restart file.\n";
+        error_msg += "line is: " + line + "\n";
+        PANACEA_FAIL(error_msg);
+     } 
+  }
+
+  void MedianKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
+    MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);
+    os << "[Total Number Points]\n";
+    os << kwrapper_median->number_pts_median_ << "\n";
+    os << "[Number Points Tracked Near Median]\n";
+    os << kwrapper_median->number_pts_store_ << "\n";
+    os << "[Points Near Median]\n";
+    int rows = kwrapper_median->points_near_median_.size();
+    int cols = 0;
+    if( rows > 0 ) {
+      cols = kwrapper_median->points_near_median_.at(0).size();
+    }
+    os << rows << " " << cols << "\n";
+    for (int row = 0; row < rows; ++row) {
+      for( int col = 0; col < cols; ++col ) {
+        os << std::setfill(' ') 
+          << std::setw(14) 
+          << std::setprecision(8) 
+          << std::right
+          << kwrapper_median->points_near_median_.at(row).at(col) << " ";
+      } 
+      os << "\n";
+    }
   }
 
 }

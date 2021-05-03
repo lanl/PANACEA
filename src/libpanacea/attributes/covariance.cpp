@@ -336,14 +336,12 @@ namespace panacea {
       std::string line = "";
 
       while(line.find("[Covariance]",0) == std::string::npos) {
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         if( is.peek() == EOF ) {
           std::string error_msg = "Did not find [Covariance] header while trying ";
           error_msg += "to read restart file.";
           PANACEA_FAIL(error_msg);
         }
         std::getline(is, line);
-        std::cout << "line is " << line << std::endl;
       }
 
       std::getline(is, line);

@@ -12,11 +12,34 @@ namespace panacea {
 
   enum class Arrangement;
   class BaseDescriptorWrapper;
+
+  namespace settings {
+    enum class FileType;
+    enum class KernelCount;
+    enum class KernelCenterCalculation;
+  }
+
+  class BaseKernelWrapper;
+
+  typedef void (*ReadOption)(BaseKernelWrapper *, std::istream & is); 
+  typedef void (*WriteOption)(BaseKernelWrapper *, std::ostream & os); 
   /*
    * Base Kernel interface 
    */
   class BaseKernelWrapper  {
+
+    private:
+
+      /**
+       * Used to read and write kernel derived class specific meta data
+       **/
+      virtual ReadOption getReadFunction_() = 0;
+      virtual WriteOption getWriteFunction_() = 0;
+
     public:
+
+      virtual const settings::KernelCenterCalculation center() const noexcept = 0;
+      virtual const settings::KernelCount count() const noexcept = 0;
 
       /**
        * Notice this behavior is different from the descriptor wrapper here
@@ -25,6 +48,8 @@ namespace panacea {
        **/
       virtual double& at(const int row, const int col) = 0;
       virtual double at(const int row, const int col) const = 0;
+
+      virtual void resize(const int rows, const int cols) = 0;
 
       /**
        * Gets the total number of rows of data stored by the kernel
@@ -41,6 +66,7 @@ namespace panacea {
        * Returns the total number of points used to create the kernel
        **/
       virtual int getNumberPoints() const = 0; 
+      virtual const Arrangement & arrangement() const noexcept = 0; 
       virtual void set(const Arrangement arrangement) = 0;
 
       /**
@@ -54,6 +80,18 @@ namespace panacea {
       virtual std::type_index getTypeIndex() const noexcept = 0; 
       virtual void print() const = 0;
       virtual ~BaseKernelWrapper() = 0;
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          std::any vector_instance);
+
+      static std::vector<std::any> read(
+          const settings::FileType & file_type,
+          std::istream &,
+          std::any vector_instance);
+
   };
+
 }
 #endif // PANACEA_PRIVATE_BASEKERNELWRAPPER_H
