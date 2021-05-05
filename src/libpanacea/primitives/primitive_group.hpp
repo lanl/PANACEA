@@ -56,6 +56,9 @@ namespace panacea {
           std::istream &,
           std::any prim_grp_instance);
 
+      static void postReadInitialization(
+          const settings::FileType & file_type,
+          std::any prim_grp_instance);
 
   };
 }

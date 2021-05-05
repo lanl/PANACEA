@@ -21,7 +21,6 @@ namespace panacea {
     
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      std::cout << __FILE__ << ":" << __LINE__  << std::endl;
       auto kwrapper = std::any_cast<BaseKernelWrapper *>(kwrapper_instance);
       os << "[Kernel]\n";
       os << kwrapper->center() << "\n";

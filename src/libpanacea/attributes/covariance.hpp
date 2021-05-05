@@ -79,6 +79,12 @@ namespace panacea {
       int rows() const;
       int cols() const;
 
+      /**
+       * Check to ensure that the covariance instance is fully defined, e.g. 
+       * there are no nullptr's in the internal members.
+       **/
+      bool defined() const noexcept;
+
       double getDeterminant() const;
 
       double getMean(const int index) const;

@@ -77,12 +77,29 @@ namespace panacea {
           const KernelSpecification & specification) const;
 
       /**
-       * Updates the primitive group
+       * Updates the primitive group with the values from the new descriptors
+       * provided by dwrapper.
        **/ 
       void update(
           const PassKey<PrimitiveGroup> &,
           const BaseDescriptorWrapper * dwrapper,
           PrimitiveGroup & primitive_grp) const;
+
+      
+      enum class ResetOption {
+        All,
+        ReducedCovariance,
+        ReducedInvCovariance,
+        Primitives
+      };
+
+      /**
+       * Provides a means for resetting values in the primitive group 
+       **/
+      void reset(
+          const PassKey<PrimitiveGroup> &,
+          PrimitiveGroup & primitive_grp,
+          const ResetOption = ResetOption::All) const;
   };
 }
 

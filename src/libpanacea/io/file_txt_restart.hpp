@@ -16,6 +16,33 @@
 
 namespace panacea {
 
+  template<typename, typename T>
+    struct has_post_read_initialization_method {
+      static_assert(
+          std::integral_constant<T, false>::value,
+          "Second template parameter needs to be of function type.");
+    };
+
+  // specialization that does the checking
+  template<typename C, typename Ret, typename... Args>
+    struct has_post_read_initialization_method<C, Ret(Args...)> {
+      private:
+        template<typename T>
+          static constexpr auto check(T*)
+          -> typename
+          std::is_same<
+          decltype( std::declval<T>().postReadInitialization( std::declval<Args>()... ) ),
+          Ret>::type;
+
+        template<typename>
+          static constexpr std::false_type check(...);
+
+        typedef decltype(check<C>(0)) type;
+
+      public:
+        static constexpr bool value = type::value;
+    };
+
   /**
    * Writes restart files in text format
    *
@@ -43,12 +70,18 @@ namespace panacea {
         std::istream &,
         std::any ); 
 
+    using PostReadInitialization = void (*) (
+        const settings::FileType &,
+        std::any);
+
       static std::unordered_map<std::type_index,WriteMethod> write_methods_;
       static std::unordered_map<std::type_index,ReadMethod> read_methods_;
+      static std::unordered_map<std::type_index,PostReadInitialization> 
+        post_read_initialization_;
 
       void write_(std::vector<std::any> & objs, std::ostream & os);
       void read_(std::vector<std::any> & objs, std::istream & is);
-
+      
     public:
       
       FileRestartTXT();
@@ -67,6 +100,13 @@ namespace panacea {
         return true;
       }
 
+
+      /**
+       * Will register a static read method from the provided class
+       *
+       * Will also register a static postReadInitialization method if
+       * one is detected with the correct function signature.
+       **/
       template<class T>
       static bool registerReadMethod(){
         if( read_methods_.count(std::type_index(typeid(T *))) ) {
@@ -74,8 +114,29 @@ namespace panacea {
         } else {
           read_methods_[std::type_index(typeid(T *))] = T::read;
         }
+
+        if constexpr( has_post_read_initialization_method<
+            T,void(const settings::FileType &, std::any)>::value ){
+
+          if( post_read_initialization_.count(std::type_index(typeid(T *))) ) {
+            return false;
+          } else {
+            post_read_initialization_[std::type_index(typeid(T *))] = T::postReadInitialization;
+          }
+        }
+
         return true;
       }
+
+/*      template<class T>
+      static bool registerPostReadInitialization(){
+        if( post_read_initialization_.count(std::type_index(typeid(T *))) ) {
+          return false;
+        } else {
+          post_read_initialization_[std::type_index(typeid(T *))] = T::postReadInitialization;
+        }
+        return true;
+      }*/
 
       virtual void read(std::any obj, const std::string & filename) final;
       virtual void write(std::any  obj, const std::string & filename) final;

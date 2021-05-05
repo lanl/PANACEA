@@ -14,6 +14,7 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_gaussian_uncorrelated.cpp
     unit/test_inverter.cpp
     unit/test_kernel_wrappers.cpp
+    unit/test_kernel_specifications.cpp
     unit/test_mean.cpp
     unit/test_median.cpp
     unit/test_memory_manager.cpp

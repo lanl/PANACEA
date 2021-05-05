@@ -138,14 +138,9 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
       std::getline(is, line);
-      std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
     }
 
-    //std::getline(is, line);
-    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
     try {
- //     int num_pts; 
-//      is >> num_pts;
       is >> kwrapper_mean->number_pts_mean_;// = num_pts;
     } catch (...) {
       std::string error_msg = "Unable to assign total number of points to mean";
@@ -153,12 +148,6 @@ namespace panacea {
       error_msg += "line is: " + line;
       PANACEA_FAIL(error_msg);
     }
-  /*  std::getline(is, line);
-    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
-    std::getline(is, line);
-    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;
-    std::getline(is, line);
-    std::cout << __FILE__ << ":" << __LINE__ << " line is: " << line << std::endl;*/
     return is;
   }
 

@@ -262,6 +262,16 @@ namespace panacea {
     return matrix_->cols();
   }
 
+  bool Covariance::defined() const noexcept {
+    if( matrix_.get() == nullptr) {
+      return false;
+    }
+    if( mean_.get() == nullptr) {
+      return false;
+    }
+    return true;
+  }
+
   double Covariance::getDeterminant() const {
     return matrix_->getDeterminant();
   }

@@ -9,6 +9,8 @@
 #include "attributes/covariance.hpp"
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
+#include "kernels/kernel_specifications.hpp"
+#include "primitives/primitive_group.hpp"
 
 // Standard includes
 #include <fstream>
@@ -25,6 +27,9 @@ namespace panacea {
 
   std::unordered_map<std::type_index,FileRestartTXT::ReadMethod>
     FileRestartTXT::read_methods_;
+  
+  std::unordered_map<std::type_index,FileRestartTXT::PostReadInitialization> 
+    FileRestartTXT::post_read_initialization_;
 
   FileRestartTXT::FileRestartTXT() {
     // Alaways registers as a pointer
@@ -32,11 +37,15 @@ namespace panacea {
     registerWriteMethod<Matrix>();
     registerWriteMethod<Vector>();
     registerWriteMethod<BaseKernelWrapper>();
+    registerWriteMethod<KernelSpecification>();
+    registerWriteMethod<PrimitiveGroup>();
 
     registerReadMethod<Covariance>();
     registerReadMethod<Matrix>();
     registerReadMethod<Vector>();
     registerReadMethod<BaseKernelWrapper>();
+    registerReadMethod<KernelSpecification>();
+    registerReadMethod<PrimitiveGroup>();
   }
 
   void FileRestartTXT::write_(
@@ -68,6 +77,10 @@ namespace panacea {
       }
       auto data = read_methods_[obj.type()](type(), is, obj);
       read_(data, is);
+
+      if( post_read_initialization_.count(obj.type())){
+        post_read_initialization_[obj.type()](type(),obj);
+      }
     }
   }
 
@@ -105,6 +118,9 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
     fs.close();
-
+    
+    if( post_read_initialization_.count(obj.type())){
+      post_read_initialization_[obj.type()](type(),obj);
+    }
   }
 }

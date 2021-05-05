@@ -232,4 +232,47 @@ namespace panacea {
 
   }
 
+  void PrimitiveFactory::reset(
+      const PassKey<PrimitiveGroup> &,
+      PrimitiveGroup & prim_grp,
+      const ResetOption reset_opt) const {
+
+    assert(prim_grp.covariance.get() != nullptr);
+    assert(prim_grp.covariance->defined());
+    assert(prim_grp.kernel_wrapper.get() != nullptr);
+    // Cannot update the reduced covariance matrix and reduced inv covariance matrices
+    if( prim_grp.covariance->is(NormalizationState::Unnormalized) ){
+      prim_grp.normalizer.normalize(*prim_grp.covariance);
+    }
+
+    if(reset_opt == ResetOption::All || reset_opt == ResetOption::ReducedCovariance){
+      Reducer reducer;
+      prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
+          reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+    }
+
+    if(reset_opt == ResetOption::All || reset_opt == ResetOption::ReducedInvCovariance){
+    Inverter inverter;
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
+        inverter.invert(*prim_grp.reduced_covariance));
+    }
+
+    if(reset_opt == ResetOption::All || reset_opt == ResetOption::Primitives){
+      if(create_methods_.count(prim_grp.getSpecification().get<settings::KernelPrimitive>()) == 0){
+        std::string error_msg = "Kernel Primitive is not supported: ";
+        error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelPrimitive>());
+        PANACEA_FAIL(error_msg);
+      }
+
+      if( count_methods_.count(prim_grp.getSpecification().get<settings::KernelCount>()) == 0){
+        std::string error_msg = "Kernel count method is not supported: ";
+        error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelCount>());
+        PANACEA_FAIL(error_msg);
+      }
+
+      count_methods_[prim_grp.getSpecification().get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
+    }
+  }
+
+
 }

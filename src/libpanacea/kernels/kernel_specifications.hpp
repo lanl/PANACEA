@@ -6,9 +6,11 @@
 #include "private_settings.hpp"
 
 // Standard includes
+#include <any>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace panacea {
 
@@ -76,12 +78,12 @@ namespace panacea {
         } else if constexpr( std::is_same<T, std::string>::value) {
           std::stringstream string_spec("Kernel ");
           string_spec << settings::toString(kern_correlation_);
-          string_spec << "," << settings::toString(kern_count_);
-          string_spec << "," << settings::toString(kern_prim_);
-          string_spec << "," << settings::toString(kern_normalization_);
-          string_spec << "," << settings::toString(kern_memory_);
-          string_spec << "," << settings::toString(kern_center_);
-          string_spec << "," << settings::toString(kern_algorithm_);
+          string_spec << ", " << settings::toString(kern_count_);
+          string_spec << ", " << settings::toString(kern_prim_);
+          string_spec << ", " << settings::toString(kern_normalization_);
+          string_spec << ", " << settings::toString(kern_memory_);
+          string_spec << ", " << settings::toString(kern_center_);
+          string_spec << ", " << settings::toString(kern_algorithm_);
           return string_spec.str();
         }
       } 
@@ -151,6 +153,17 @@ namespace panacea {
     inline void set(const settings::KernelAlgorithm & kern_algorithm) noexcept {
       kern_algorithm_ = kern_algorithm;
     }
+
+    static std::vector<std::any> write(
+        const settings::FileType & file_type,
+        std::ostream &,
+        std::any kern_spec_instance);
+
+    static std::vector<std::any> read(
+        const settings::FileType & file_type,
+        std::istream &,
+        std::any kern_spec_instance);
+
   };
 }
 #endif // PANACEA_PRIVATE_KERNEL_SPECIFICATIONS
