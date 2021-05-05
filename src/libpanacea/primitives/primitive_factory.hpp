@@ -74,7 +74,8 @@ namespace panacea {
        **/
       PrimitiveGroup createGroup(
           const BaseDescriptorWrapper * dwrapper,
-          const KernelSpecification & specification) const;
+          const KernelSpecification & specification,
+          const std::string & name = "") const;
 
       /**
        * Updates the primitive group with the values from the new descriptors

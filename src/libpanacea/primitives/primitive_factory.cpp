@@ -152,11 +152,13 @@ namespace panacea {
 
   PrimitiveGroup PrimitiveFactory::createGroup(
       const BaseDescriptorWrapper * dwrapper,
-      const KernelSpecification & specification) const {
+      const KernelSpecification & specification,
+      const std::string & name) const {
 
     KernelWrapperFactory kfactory;
 
     PrimitiveGroup prim_grp(specification);
+    prim_grp.name = name;
     prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
   
     prim_grp.covariance = createCovariance(dwrapper, specification);
