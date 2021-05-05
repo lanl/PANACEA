@@ -17,7 +17,6 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_kernel_specifications.cpp
     unit/test_mean.cpp
     unit/test_median.cpp
-    unit/test_memory_manager.cpp
     unit/test_normalization_methods.cpp
     unit/test_normalizer.cpp
     unit/test_reducer.cpp
