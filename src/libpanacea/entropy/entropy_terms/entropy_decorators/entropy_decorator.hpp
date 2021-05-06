@@ -25,6 +25,14 @@ namespace panacea {
       explicit EntropyDecorator(std::unique_ptr<EntropyTerm> entropy_term) : 
         entropy_term_(std::move(entropy_term)) {};
 
+      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override {
+        return entropy_term_->getReadFunction(key);
+      }
+
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) override {
+        return entropy_term_->getWriteFunction(key);
+      }
+
       virtual settings::EntropyType type() const noexcept override {
         return entropy_term_->type();
       }

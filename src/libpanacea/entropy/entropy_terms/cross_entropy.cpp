@@ -22,6 +22,14 @@ namespace panacea {
     return settings::EntropyType::Cross;
   } 
 
+  EntropyTerm::ReadFunction CrossEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+    return CrossEntropy::read;
+  }
+  
+  EntropyTerm::WriteFunction CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) {
+    return CrossEntropy::write;
+  }
+
   double CrossEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper) {
 
     assert(descriptor_wrapper != nullptr);
@@ -105,5 +113,32 @@ namespace panacea {
   void CrossEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
   }
+
+  std::vector<std::any> CrossEntropy::write(
+      const settings::FileType & file_type,
+      std::ostream & os,
+      EntropyTerm * entropy_term_instance) {
+
+    std::vector<std::any> nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
+      nested_values.push_back(cross_ent->distribution_.get());
+    }
+    return nested_values;
+  }
+
+   io::ReadInstantiateVector CrossEntropy::read(
+      const settings::FileType & file_type,
+      std::istream & is,
+      EntropyTerm * entropy_term_instance) {
+
+    io::ReadInstantiateVector nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
+      nested_values.emplace_back(cross_ent->distribution_.get(), std::nullopt);
+    }
+    return nested_values;
+   }
+
 
 }

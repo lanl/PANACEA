@@ -4,10 +4,10 @@
 
 #include "error.hpp"
 #include "normalization_methods/normalization_method_factory.hpp"
-#include "passkey.hpp"
 
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <cassert>

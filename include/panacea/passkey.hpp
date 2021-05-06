@@ -1,5 +1,5 @@
-#ifndef PANACEA_PRIVATE_PASSKEY_H
-#define PANACEA_PRIVATE_PASSKEY_H
+#ifndef PANACEA_PASSKEY_H
+#define PANACEA_PASSKEY_H
 #pragma once
 
 namespace panacea {
@@ -13,4 +13,4 @@ namespace panacea {
         friend T;
     }; 
 } 
-#endif // PANACEA_PRIVATE_PASSKEY_H
+#endif // PANACEA_PASSKEY_H

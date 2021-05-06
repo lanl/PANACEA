@@ -22,7 +22,8 @@ namespace panacea {
     bool numerical_grad_ = true;
 
     public: 
-      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) : EntropyDecorator(std::move(entropy_term)) {};
+      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) : 
+        EntropyDecorator(std::move(entropy_term)) {};
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,

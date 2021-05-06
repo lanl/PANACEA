@@ -4,8 +4,10 @@
 
 // Local private includes
 #include "kernel_wrapper.hpp"
-#include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

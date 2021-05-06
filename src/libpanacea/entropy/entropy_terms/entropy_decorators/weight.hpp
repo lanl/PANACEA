@@ -18,10 +18,14 @@ namespace panacea {
 
   class Weight : public EntropyDecorator {
 
+    private:
       double weight_ = 1.0;
-    
+   
     public: 
       Weight(std::unique_ptr<EntropyTerm> entropy_term, const double & weight) : EntropyDecorator(std::move(entropy_term)), weight_(weight) {};
+
+      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) override;
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper) override;
@@ -36,6 +40,17 @@ namespace panacea {
           const EntropySettings & entropy_settings) override;
 
       virtual void set(const settings::EntropyOption & option, std::any val) override;
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          EntropyTerm *); 
+
+      static io::ReadInstantiateVector read(
+          const settings::FileType & file_type,
+          std::istream &,
+          EntropyTerm *); 
+
   };
 
 }

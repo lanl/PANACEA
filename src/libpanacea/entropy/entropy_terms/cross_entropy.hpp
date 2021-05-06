@@ -7,8 +7,10 @@
 #include "panacea/entropy_term.hpp"
 
 // Private PANACEA includes
-#include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>
@@ -21,12 +23,17 @@ namespace panacea {
   class EntropyFactory;
 
   class CrossEntropy : public EntropyTerm {
+    private:
       std::unique_ptr<Distribution> distribution_;
+
     public:
       CrossEntropy(
           const PassKey<EntropyFactory> & key, 
           std::unique_ptr<Distribution> dist) :
         distribution_(std::move(dist)) {};
+
+      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) override;
 
       virtual settings::EntropyType type() const noexcept final;
 
@@ -52,6 +59,17 @@ namespace panacea {
           const PassKey<EntropyFactory> & key,
           const BaseDescriptorWrapper * descriptor_wrapper,
           EntropySettings * settings);
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          EntropyTerm *); 
+
+      static io::ReadInstantiateVector read(
+          const settings::FileType & file_type,
+          std::istream &,
+          EntropyTerm *); 
+
 
   };
 

@@ -7,11 +7,11 @@
 
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
 #include "kernel_distribution/kernel_distribution_gradiant.hpp"
-#include "passkey.hpp"
 #include "primitives/primitive_group.hpp"
 
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

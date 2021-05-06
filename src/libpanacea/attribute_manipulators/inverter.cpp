@@ -3,10 +3,10 @@
 
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attributes/reduced_covariance.hpp"
-#include "passkey.hpp"
 
 // Local public PANACEA includes
 #include "panacea/matrix.hpp"
+#include "panacea/passkey.hpp"
 
 namespace panacea {
 

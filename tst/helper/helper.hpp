@@ -4,8 +4,10 @@
 #pragma once
 
 // Local private PANACEA includes
-#include "passkey.hpp"
 #include "primitives/primitive_attributes.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <vector>

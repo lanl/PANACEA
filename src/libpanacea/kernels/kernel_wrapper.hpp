@@ -6,13 +6,13 @@
 // Local private includes
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
-#include "passkey.hpp"
 #include "private_settings.hpp"
 #include "type_map.hpp"
 
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
 #include "panacea/file_io_types.hpp"
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

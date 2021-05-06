@@ -23,6 +23,14 @@ namespace panacea {
     return settings::EntropyType::Self;
   } 
 
+  EntropyTerm::ReadFunction SelfEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+    return SelfEntropy::read;
+  }
+  
+  EntropyTerm::WriteFunction SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) {
+    return SelfEntropy::write;
+  }
+
   double SelfEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper) {
 
     assert(descriptor_wrapper != nullptr);
@@ -97,4 +105,33 @@ namespace panacea {
   void SelfEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
   }
+
+  std::vector<std::any> SelfEntropy::write(
+      const settings::FileType & file_type,
+      std::ostream & os,
+      EntropyTerm * entropy_term_instance) {
+
+    std::vector<std::any> nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto self_ent = dynamic_cast<SelfEntropy *>(entropy_term_instance);
+      nested_values.push_back(self_ent->distribution_.get());
+    }
+    return nested_values;
+  }
+
+   io::ReadInstantiateVector SelfEntropy::read(
+      const settings::FileType & file_type,
+      std::istream & is,
+      EntropyTerm * entropy_term_instance) {
+
+    io::ReadInstantiateVector nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+      auto self_ent = dynamic_cast<SelfEntropy *>(entropy_term_instance);
+      nested_values.emplace_back(self_ent->distribution_.get(), std::nullopt);
+    }
+    return nested_values;
+   }
+
+
+
 }

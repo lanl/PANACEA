@@ -1,7 +1,3 @@
-
-// Public PANACEA includes
-#include "panacea/base_descriptor_wrapper.hpp"
-
 // Local private includes
 #include "normalization_method_factory.hpp"
 
@@ -9,9 +5,12 @@
 #include "error.hpp"
 #include "mean.hpp"
 #include "median.hpp"
-#include "passkey.hpp"
 #include "private_settings.hpp"
 #include "variance.hpp"
+
+// Local public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <memory>

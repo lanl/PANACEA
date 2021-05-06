@@ -4,8 +4,10 @@
 #pragma once
 
 // Local private includes
-#include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

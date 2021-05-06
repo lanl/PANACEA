@@ -7,7 +7,9 @@
 #include "base_kernel_wrapper.hpp"
 
 #include "data_point_template.hpp"
-#include "passkey.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

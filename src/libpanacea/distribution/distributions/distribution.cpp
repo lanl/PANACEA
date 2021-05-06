@@ -44,7 +44,6 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ) {
       auto dist = std::any_cast<Distribution *>(dist_instance);
 
-
       std::string line = "";
       while(line.find("[Distribution]",0) == std::string::npos) {
         if( is.peek() == EOF ) {

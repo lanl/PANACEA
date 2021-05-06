@@ -3,12 +3,10 @@
 #define PANACEA_PRIVATE_REDUCEDCOVARIANCE_H
 #pragma once
 
-// Local private PANACEA includes
-#include "passkey.hpp"
-
 // Local public PANACEA includes
 #include "data_settings.hpp"
 #include "panacea/matrix.hpp"
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <memory>

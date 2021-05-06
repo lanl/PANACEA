@@ -4,14 +4,14 @@
 #pragma once
 
 
-// Loca private includes
+// Local private includes
 #include "data_settings.hpp"
-#include "passkey.hpp"
 #include "private_settings.hpp"
 
-// Local PANACEA includes
+// Local public PANACEA includes
 #include "panacea/file_io_types.hpp"
 #include "panacea/matrix.hpp"
+#include "panacea/passkey.hpp"
 #include "panacea/vector.hpp"
 
 // Standard includes

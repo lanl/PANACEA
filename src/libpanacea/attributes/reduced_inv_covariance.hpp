@@ -3,10 +3,11 @@
 #define PANACEA_PRIVATE_REDUCEDINVCOVARIANCE_H
 #pragma once
 
-// Local public includes
+// Public PANACEA includes
 #include "panacea/matrix.hpp"
+#include "panacea/passkey.hpp"
 
-#include "passkey.hpp"
+// Local private PANACEA includes
 #include "data_settings.hpp"
 
 // Standard includes

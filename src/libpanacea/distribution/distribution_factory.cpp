@@ -5,7 +5,9 @@
 #include "descriptors/descriptor_wrapper.hpp"
 #include "distributions/kernel_distribution.hpp"
 #include "error.hpp"
-#include "passkey.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

@@ -8,8 +8,10 @@
 
 #include "attributes/reduced_covariance.hpp"
 #include "constants.hpp"
-#include "passkey.hpp"
 #include "primitive_attributes.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <cmath>

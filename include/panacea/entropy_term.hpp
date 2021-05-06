@@ -4,9 +4,12 @@
 
 // Local private PANACEA includes
 #include "settings.hpp"
+#include "file_io_types.hpp"
+#include "passkey.hpp"
 
 // Standard includes
 #include <any>
+#include <fstream>
 #include <vector>
 
 namespace panacea {
@@ -16,6 +19,23 @@ namespace panacea {
 
   class EntropyTerm {
     public:
+      typedef io::ReadInstantiateVector (*ReadFunction)(
+          const settings::FileType & file_type,
+          std::istream &,
+          EntropyTerm *); 
+
+      typedef std::vector<std::any> (*WriteFunction)(
+          const settings::FileType & file_type,
+          std::ostream &,
+          EntropyTerm *); 
+
+    protected:
+      const PassKey<EntropyTerm> key;
+
+    public:
+      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) = 0;
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) = 0;
+
       virtual settings::EntropyType type() const noexcept = 0;
 
       /**
@@ -49,6 +69,19 @@ namespace panacea {
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 
       virtual ~EntropyTerm() = 0;
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          std::any dwrapper_instance);
+
+      static io::ReadInstantiateVector read(
+          const settings::FileType & file_type,
+          std::istream &,
+          std::any dwrapper_instance);
+
+
+
   };
 }
 

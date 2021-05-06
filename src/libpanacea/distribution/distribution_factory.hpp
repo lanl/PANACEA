@@ -5,8 +5,10 @@
 // Local private includes
 #include "distributions/distribution.hpp"
 #include "distribution_settings/distribution_settings.hpp"
-#include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <any>

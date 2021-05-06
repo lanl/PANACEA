@@ -3,8 +3,8 @@
 #define PANACEA_PRIVATE_ENTROPY_FACTORY
 #pragma once
 
-// Local private PANACEA includes
-#include "passkey.hpp"
+// Local public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <memory>
