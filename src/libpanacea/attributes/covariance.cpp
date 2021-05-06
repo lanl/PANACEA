@@ -95,6 +95,13 @@ namespace panacea {
     }
   } // namespace correlated
 
+  Covariance::Covariance(const CovarianceBuild memory) {
+    if( memory == CovarianceBuild::Allocate) {
+      matrix_ = createMatrix(0, 0);
+      mean_ = createVector(0);
+    }  
+  }
+
   Covariance::Covariance(const BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt) {
     // Resize the covariance matrix based on the number of descriptor dimensions
     assert(desc_wrap != nullptr);

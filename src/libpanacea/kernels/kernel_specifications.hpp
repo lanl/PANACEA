@@ -46,13 +46,13 @@ namespace panacea {
     KernelSpecification() = default;
 
     KernelSpecification(
-        const settings::KernelCorrelation & kern_correlation,
-        const settings::KernelCount & kern_count,
-        const settings::KernelPrimitive & kern_prim,
-        const settings::KernelNormalization & kern_normalization,
-        const settings::KernelMemory & kern_memory,
-        const settings::KernelCenterCalculation & kern_center,
-        const settings::KernelAlgorithm & kern_algorithm) :
+        const settings::KernelCorrelation kern_correlation,
+        const settings::KernelCount kern_count,
+        const settings::KernelPrimitive kern_prim,
+        const settings::KernelNormalization kern_normalization,
+        const settings::KernelMemory kern_memory,
+        const settings::KernelCenterCalculation kern_center,
+        const settings::KernelAlgorithm kern_algorithm) :
       kern_correlation_(kern_correlation),
       kern_count_(kern_count),
       kern_prim_(kern_prim),
@@ -91,37 +91,37 @@ namespace panacea {
         }
       } 
 
-    inline bool is(const settings::KernelCorrelation & correlation) const noexcept {
+    inline bool is(const settings::KernelCorrelation correlation) const noexcept {
       if( correlation == kern_correlation_ ) return true;
       return false;
     }
 
-    inline bool is(const settings::KernelCount & kern_count) const noexcept {
+    inline bool is(const settings::KernelCount kern_count) const noexcept {
       if( kern_count == kern_count_ ) return true;
       return false;
     }
 
-    inline bool is(const settings::KernelPrimitive & kern_prim) const noexcept {
+    inline bool is(const settings::KernelPrimitive kern_prim) const noexcept {
       if( kern_prim == kern_prim_ ) return true;
       return false;
     }
 
-    inline bool is(const settings::KernelNormalization & kern_normalization) const noexcept {
+    inline bool is(const settings::KernelNormalization kern_normalization) const noexcept {
       if( kern_normalization == kern_normalization_ ) return true;
       return false;
     }
 
-    inline bool is(const settings::KernelMemory & kern_memory) const noexcept {
+    inline bool is(const settings::KernelMemory kern_memory) const noexcept {
       if( kern_memory == kern_memory_ ) return true;
       return false;
     }
 
-    inline bool is(const settings::KernelCenterCalculation & kern_center) const noexcept {
+    inline bool is(const settings::KernelCenterCalculation kern_center) const noexcept {
       if( kern_center == kern_center_ ) return true;
       return false;
     }
     
-    inline bool is(const settings::KernelAlgorithm & kern_algorithm) const noexcept {
+    inline bool is(const settings::KernelAlgorithm kern_algorithm) const noexcept {
       if( kern_algorithm == kern_algorithm_ ) return true;
       return false;
     }
@@ -129,31 +129,31 @@ namespace panacea {
     /**
      * Define setters
      **/
-    inline void set(const settings::KernelCorrelation & correlation) noexcept {
+    inline void set(const settings::KernelCorrelation correlation) noexcept {
       kern_correlation_ = correlation;
     }
 
-    inline void set(const settings::KernelCount & kern_count) noexcept {
+    inline void set(const settings::KernelCount kern_count) noexcept {
       kern_count_ = kern_count;
     }
 
-    inline void set(const settings::KernelPrimitive & kern_prim) noexcept {
+    inline void set(const settings::KernelPrimitive kern_prim) noexcept {
       kern_prim_ = kern_prim;
     }
 
-    inline void set(const settings::KernelNormalization & kern_normalization) noexcept {
+    inline void set(const settings::KernelNormalization kern_normalization) noexcept {
       kern_normalization_ = kern_normalization;
     }
 
-    inline void set(const settings::KernelMemory & kern_memory) noexcept {
+    inline void set(const settings::KernelMemory kern_memory) noexcept {
       kern_memory_ = kern_memory;
     }
 
-    inline void set(const settings::KernelCenterCalculation & kern_center) noexcept {
+    inline void set(const settings::KernelCenterCalculation kern_center) noexcept {
       kern_center_ = kern_center;
     }
     
-    inline void set(const settings::KernelAlgorithm & kern_algorithm) noexcept {
+    inline void set(const settings::KernelAlgorithm kern_algorithm) noexcept {
       kern_algorithm_ = kern_algorithm;
     }
 

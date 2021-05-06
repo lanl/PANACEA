@@ -49,6 +49,7 @@ namespace panacea {
           kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
           ++kernel_index){
 
+        std::cout << "Creating OneToOne primitive at kernel " << kernel_index << std::endl;
         prim_grp.primitives.push_back(
             create_methods_[prim_grp.getSpecification().get<settings::KernelPrimitive>()]\
             [prim_grp.getSpecification().get<settings::KernelCorrelation>()]\
@@ -65,6 +66,7 @@ namespace panacea {
       int num_prim_to_update = initial_num_prim;
       if( diff < 0 ) num_prim_to_update = prim_grp.kernel_wrapper->getNumberPoints();
       // make sure all the primitive attributes are up to date upto the initial_num_priming index
+      std::cout << "Updating primitives" << std::endl;
       for( int kernel_index = 0; kernel_index < num_prim_to_update; ++kernel_index){
         prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
       } 
@@ -124,6 +126,22 @@ namespace panacea {
         NormalizerOption::Flexible);
   }
 
+  static Normalizer createNormalizer(
+      const KernelSpecification & specification) {
+
+    if( specification.is(settings::KernelAlgorithm::Strict) ) {
+      return Normalizer(
+          specification.get<settings::KernelNormalization>(),
+          NormalizerOption::Strict);
+    }
+    // Flexible option will avoid errors if coefficients are 0.0, 
+    // e.g. if variance is 0.0, will set such coefficients to 1.0
+    return Normalizer(
+        specification.get<settings::KernelNormalization>(),
+        NormalizerOption::Flexible);
+  }
+
+
   static std::unique_ptr<Covariance> createCovariance(
       const BaseDescriptorWrapper * dwrapper,
       const KernelSpecification & specification) {
@@ -155,17 +173,80 @@ namespace panacea {
       const KernelSpecification & specification,
       const std::string & name) const {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    KernelWrapperFactory kfactory;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    PrimitiveGroup prim_grp(specification);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    prim_grp.name = name;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Calling kfactory in prim factory create group" << std::endl;
+    prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
+    std::cout << "Calling kfactory in prim factory create group success" << std::endl;
+  
+    prim_grp.covariance = createCovariance(dwrapper, specification);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    prim_grp.normalizer = createNormalizer(dwrapper, specification);
+    prim_grp.normalizer.normalize(*prim_grp.covariance); 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    Reducer reducer;
+    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
+        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    Inverter inverter;
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
+        inverter.invert(*prim_grp.reduced_covariance));
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
+      std::string error_msg = "Kernel Primitive is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
+      PANACEA_FAIL(error_msg);
+    }
+
+    if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
+      std::string error_msg = "Kernel count method is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelCount>());
+      PANACEA_FAIL(error_msg);
+    }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    return prim_grp;
+  }
+
+  PrimitiveGroup PrimitiveFactory::createGroup(
+      const KernelSpecification & specification,
+      const std::string & name) const {
+
+    // The following objects need to be allocated when reading in from a restart file
+    // kernel_wrapper
+    // covariance
+    // normalizer
+    // specifications
+    // 
+    // The remaining items in the primitive group are initialized and create while
+    // reading in the values from a restart file
     KernelWrapperFactory kfactory;
 
     PrimitiveGroup prim_grp(specification);
     prim_grp.name = name;
-    prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
-  
-    prim_grp.covariance = createCovariance(dwrapper, specification);
+    std::cout << "Calling kfactory in prim factory create group" << std::endl;
+    prim_grp.kernel_wrapper = kfactory.create(specification);
+    std::cout << "Calling kfactory in prim factory create group success" << std::endl;
+ 
+    prim_grp.covariance = std::make_unique<Covariance>(CovarianceBuild::Allocate);
 
-    prim_grp.normalizer = createNormalizer(dwrapper, specification);
-    prim_grp.normalizer.normalize(*prim_grp.covariance); 
+    prim_grp.normalizer = createNormalizer(specification);
+    //prim_grp.normalizer.normalize(*prim_grp.covariance); 
 
+    /*
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
@@ -173,7 +254,6 @@ namespace panacea {
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
-
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported: ";
       error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
@@ -188,8 +268,10 @@ namespace panacea {
 
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
+    */
     return prim_grp;
   }
+
 
   void PrimitiveFactory::update(
       const PassKey<PrimitiveGroup> &,

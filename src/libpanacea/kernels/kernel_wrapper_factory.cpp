@@ -15,6 +15,7 @@
 #include "passkey.hpp"
 #include "primitives/gaussian_uncorrelated.hpp"
 #include "private_settings.hpp"
+#include "type_map.hpp"
 
 // Standard includes
 #include <memory>
@@ -63,11 +64,6 @@ namespace panacea {
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
-      if( desc_wrapper->getTypeIndex() != std::type_index(desc_wrapper->getPointerToRawData().type()) ) {
-        std::string error_msg = "Descriptor data index and pointerToRawData are not consistent";
-        PANACEA_FAIL(error_msg);
-      }
-
       if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
         std::string error_msg = "Kernel creation method is missing for the specified internal type.";
         PANACEA_FAIL(error_msg);
@@ -77,7 +73,19 @@ namespace panacea {
         PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
       }
       if( kern_specification.is(settings::KernelMemory::Share)){
-      
+
+        std::cout << "Creating shared kernel" << std::endl;
+        // This check is only appropriate if memory is shared, the desc_wrapper type 
+        // and pointer will likley differ in the case of non shared memory 
+        // because it's likely you will not have a pointer as the underlying type
+        if( desc_wrapper->getTypeIndex() != std::type_index(desc_wrapper->getPointerToRawData().type()) ) {
+          std::string error_msg = "Descriptor data index and pointerToRawData are not consistent";
+          if( type_map.count(desc_wrapper->getTypeIndex()) ) {
+            error_msg += "\ndesc_wrapper type is: " + type_map.at(desc_wrapper->getTypeIndex());
+            error_msg += "\n";
+          }
+          PANACEA_FAIL(error_msg);
+        }
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
         if( desc_data_type_index != 
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
@@ -87,10 +95,12 @@ namespace panacea {
 
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_data_type_index](
             PassKey<KernelWrapperFactory>(),
-            desc_wrapper->getPointerToRawData(),
+            desc_wrapper,
             desc_wrapper->rows(),
             desc_wrapper->cols());
       } else {
+
+        std::cout << "Creating owned kernel" << std::endl;
         auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
         if( desc_data_type_index != 
@@ -107,7 +117,7 @@ namespace panacea {
 
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
             PassKey<KernelWrapperFactory>(),
-            desc_wrapper->getPointerToRawData(),
+            desc_wrapper,
             desc_wrapper->rows(),
             desc_wrapper->cols());        
       }

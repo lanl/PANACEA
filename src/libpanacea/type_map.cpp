@@ -7,6 +7,7 @@
 #include "kernels/base_kernel_wrapper.hpp"
 #include "kernels/kernel_specifications.hpp"
 #include "primitives/primitive.hpp"
+#include "primitives/primitive_group.hpp"
 
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
@@ -42,7 +43,30 @@ namespace panacea {
     {std::type_index(typeid(KernelSpecification)),"KernelSpecification"},
     {std::type_index(typeid(KernelSpecification *)),"KernelSpecification *"},
     {std::type_index(typeid(Primitive *)),"Primitive *"},
-    {std::type_index(typeid(EntropyTerm *)),"EntropyTerm *"}
+    {std::type_index(typeid(EntropyTerm *)),"EntropyTerm *"},
+    {std::type_index(typeid(PrimitiveGroup *)),"PrimitiveGroup *"},
+
+    {std::type_index(typeid(const std::vector<double>)),"const std::vector<double>"},
+    {std::type_index(typeid(const std::vector<double>*)),"const std::vector<double>*"},
+    {std::type_index(typeid(const std::vector<std::vector<double>>)),"const std::vector<std::vector<double>>"},
+    {std::type_index(typeid(const std::vector<std::vector<double>>*)),"const std::vector<std::vector<double>>*"},
+    {std::type_index(typeid(const double ***)),"const double ***"},
+    {std::type_index(typeid(const std::vector<std::deque<double>>)),"const std::vector<std::deque<double>>"},
+    {std::type_index(typeid(const BaseKernelWrapper *)),"const BaseKernelWrapper *"},
+    {std::type_index(typeid(const BaseDescriptorWrapper *)),"const BaseDescriptorWrapper *"},
+    {std::type_index(typeid(const Matrix *)),"const Matrix *"},
+    {std::type_index(typeid(const Vector *)),"const Vector *"},
+    {std::type_index(typeid(const Covariance *)),"const Covariance *"},
+    {std::type_index(typeid(const Covariance)),"const Covariance"},
+    {std::type_index(typeid(const ReducedCovariance *)),"const ReducedCovariance *"},
+    {std::type_index(typeid(const ReducedCovariance)),"const ReducedCovariance"},
+    {std::type_index(typeid(const ReducedInvCovariance *)),"const ReducedInvCovariance *"},
+    {std::type_index(typeid(const ReducedInvCovariance)),"const ReducedInvCovariance"},
+    {std::type_index(typeid(const KernelSpecification)),"const KernelSpecification"},
+    {std::type_index(typeid(const KernelSpecification *)),"const KernelSpecification *"},
+    {std::type_index(typeid(const Primitive *)),"const Primitive *"},
+    {std::type_index(typeid(const EntropyTerm *)),"const EntropyTerm *"},
+    {std::type_index(typeid(const PrimitiveGroup *)),"const PrimitiveGroup *"},
   };
 
 }

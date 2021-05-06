@@ -68,6 +68,14 @@ namespace panacea {
 
   }
 
+  Normalizer::Normalizer(
+      const settings::KernelNormalization & norm_method, 
+      const NormalizerOption opt) : norm_option_(opt) {
+
+    NormalizationMethodFactory norm_method_factory;
+    norm_method_ = norm_method_factory.create(norm_method);
+  }
+
   void Normalizer::normalize(Covariance & cov) const {
     assert(cov.cols() == normalization_coeffs_.size());
 

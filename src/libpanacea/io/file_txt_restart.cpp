@@ -91,7 +91,7 @@ namespace panacea {
           PANACEA_FAIL(error_msg);
         }
         auto data = read_methods_[obj.instance.type()](type(), is, obj.instance);
-        read_(parent, data, is);
+        read_(obj.instance, data, is);
 
 
         // Below we have the options to call two different functions 

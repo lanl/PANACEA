@@ -177,7 +177,11 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
   restart_file->write(dist1.get(),"distribution_restart.txt");
 
+  std::cout << "Creating Distribution shell" << std::endl;
+  // Need to switch kernel settings to own
+  kernel_settings.dist_settings.set(settings::KernelMemory::Own);
   auto dist2 = dist_factory.create(&kernel_settings);
+  std::cout << "Beginning Read" << std::endl;
 
   restart_file->read(dist2.get(),"distribution_restart.txt");
 

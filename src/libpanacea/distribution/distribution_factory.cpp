@@ -22,6 +22,10 @@ namespace panacea {
     DistributionFactory::DistributionCreateMethod>
         DistributionFactory::create_methods_;
 
+  std::unordered_map<settings::DistributionType,
+    DistributionFactory::DistributionCreateShellMethod>
+        DistributionFactory::create_shell_methods_;
+
   DistributionFactory::DistributionFactory() {
     DistributionFactory::registerDistribution<KernelDistribution,settings::DistributionType::Kernel>();
   }
@@ -30,6 +34,7 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       DistributionSettings * settings) const {
 
+    assert(descriptor_wrapper != nullptr);
     assert(settings != nullptr);
 
     if(create_methods_.count(settings->type()) == 0){
@@ -46,9 +51,9 @@ namespace panacea {
   std::unique_ptr<Distribution> DistributionFactory::create(
       DistributionSettings * settings) const {
 
-    std::vector<std::vector<double>> data;
-    DescriptorWrapper<std::vector<std::vector<double>>> dwrapper(data,0,0);
-    return create( &dwrapper, settings);
+    return create_shell_methods_.at(settings->type())(
+        PassKey<DistributionFactory>(),
+        settings);
   }
 
 }

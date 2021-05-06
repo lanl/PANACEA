@@ -47,6 +47,13 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           const KernelSpecification & settings);
 
+      /**
+       * Creates a shell of the distribution that is appropriate for loading in
+       * values from a restart file. 
+       **/
+      KernelDistribution(const PassKey<DistributionFactory> &,
+          const KernelSpecification & settings);
+
       virtual settings::DistributionType type() const noexcept final;
 
       virtual double compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) final;
@@ -73,6 +80,10 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           DistributionSettings * settings);
 
+      static std::unique_ptr<Distribution> create(
+          const PassKey<DistributionFactory> &,
+          DistributionSettings * settings);
+
       static std::vector<std::any> write(
           const settings::FileType & file_type,
           std::ostream &,
@@ -90,13 +101,28 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       DistributionSettings * settings) {
 
+    std::cout << "Calling create in KernelDistribution" << std::endl;
     assert(settings->type() == settings::DistributionType::Kernel);
 
-    KernelDistributionSettings * kern_dist_settings = static_cast<KernelDistributionSettings *>(settings);
+    KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,
         descriptor_wrapper,
+        kern_dist_settings->dist_settings);
+  }
+
+  inline std::unique_ptr<Distribution> KernelDistribution::create(
+      const PassKey<DistributionFactory> & key, 
+      DistributionSettings * settings) {
+
+    std::cout << "Calling create in KernelDistribution" << std::endl;
+    assert(settings->type() == settings::DistributionType::Kernel);
+
+    KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+    // The any must be the KernelSpecifications object
+    return std::make_unique<KernelDistribution>(
+        key,
         kern_dist_settings->dist_settings);
   }
 }

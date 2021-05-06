@@ -131,7 +131,6 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
       settings::KernelAlgorithm::Flexible);
 
   std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   PrimitiveFactory prim_factory;
   std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   
@@ -139,6 +138,7 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
       dwrapper.get(),
       specification);
 
+  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   
   REQUIRE(gauss_correlated_prim_grp.primitives.size() == 1);
   REQUIRE(gauss_correlated_prim_grp.primitives.at(0)->getId() == 0);
@@ -156,8 +156,10 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
     {2.9, 4.9},
     {3.1, 5.1}};
 
+  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   auto dwrapper_sample = std::make_unique<
     DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data_sample,3, 2);
+  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
   const int single_kernel_index = 0;
   const double sample_center = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(dwrapper_sample.get(),0);

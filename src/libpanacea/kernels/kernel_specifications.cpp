@@ -67,6 +67,7 @@ namespace panacea {
           error_msg += "to read in kernel specifications from restart file.";
           PANACEA_FAIL(error_msg);
         }
+        std::cout << "Line is " << line << std::endl;
         std::getline(is, line);
       }
       is >> kern_spec->kern_correlation_; 

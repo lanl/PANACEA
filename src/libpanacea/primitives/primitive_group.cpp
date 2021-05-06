@@ -10,6 +10,7 @@
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "primitive_attributes.hpp"
 #include "primitive_factory.hpp"
+#include "type_map.hpp"
 
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
@@ -90,7 +91,8 @@ namespace panacea {
         }
         std::getline(is, line);
       }
-      is >> prim_grp->name;
+      std::getline(is, line);
+      prim_grp->name = line;
       nested_values.emplace_back(&prim_grp->specification, std::nullopt);
       nested_values.emplace_back(&prim_grp->normalizer, postReadKernelSpecsAndNormalizerInitialization);
 
@@ -110,6 +112,9 @@ namespace panacea {
     } catch (...) {
       std::string error_msg = "Unable to cast to PrimitiveGroup * while";
       error_msg += " trying to run postReadKernelSpecInitialization method.";
+      if( type_map.count(std::type_index(prim_grp_instance.type())) ){
+        error_msg += "\nType is: " + type_map.at(prim_grp_instance.type());
+      }
       PANACEA_FAIL(error_msg);
     }
 

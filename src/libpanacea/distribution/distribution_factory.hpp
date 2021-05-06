@@ -25,9 +25,16 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           DistributionSettings * dist_settings);
 
+      using DistributionCreateShellMethod = std::unique_ptr<Distribution>(*)(
+        const PassKey<DistributionFactory> &,
+          DistributionSettings * dist_settings);
+
     private:
       static std::unordered_map<settings::DistributionType,DistributionCreateMethod>
         create_methods_;
+
+      static std::unordered_map<settings::DistributionType,DistributionCreateShellMethod>
+        create_shell_methods_;
 
     public:
       DistributionFactory();
@@ -38,6 +45,12 @@ namespace panacea {
             return false;
           } else {
             create_methods_[dist_type] = T::create;
+          }
+
+          if( create_shell_methods_.count(dist_type) ) {
+            return false;
+          } else {
+            create_shell_methods_[dist_type] = T::create;
           }
           return true;
         }

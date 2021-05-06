@@ -30,6 +30,13 @@ namespace panacea {
     Strict
   };
 
+  // Whether to allocate memory for internal structures or not
+  enum class CovarianceBuild {
+    Allocate,
+    NoAllocate
+  };
+
+
   class BaseDescriptorWrapper;
   class Normalizer;
 
@@ -62,6 +69,8 @@ namespace panacea {
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
       Covariance() = default;
+
+      explicit Covariance(const CovarianceBuild );
 
       Covariance(const BaseDescriptorWrapper * desc_wrap,
           const CovarianceOption opt = CovarianceOption::Strict);

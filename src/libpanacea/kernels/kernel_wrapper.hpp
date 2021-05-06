@@ -8,6 +8,7 @@
 #include "data_point_template.hpp"
 #include "passkey.hpp"
 #include "private_settings.hpp"
+#include "type_map.hpp"
 
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
@@ -42,7 +43,7 @@ namespace panacea {
 
         KernelWrapper(const PassKey<test::Test> &) {};
 
-        KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
+        KernelWrapper(const PassKey<KernelWrapperFactory> &,const T & data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
        
         /**
@@ -51,13 +52,19 @@ namespace panacea {
         KernelWrapper(const PassKey<KernelWrapperFactory> &, T * data, int rows, int cols) : 
           data_wrapper_(*data, rows, cols) {};
 
-        KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, const T * data, int rows, int cols) : 
+          data_wrapper_(*data, rows, cols) {};
+
+        KernelWrapper(const PassKey<test::Test> &, const T & data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
 
         /**
          * Will copy the data instead of storing it as a pointer.
          **/ 
         KernelWrapper(const PassKey<test::Test> &, T * data, int rows, int cols) : 
+          data_wrapper_(*data, rows, cols) {};
+        
+        KernelWrapper(const PassKey<test::Test> &, const T * data, int rows, int cols) : 
           data_wrapper_(*data, rows, cols) {};
 
         KernelWrapper(const PassKey<test::Test> &,
@@ -192,17 +199,52 @@ namespace panacea {
   template<class T>
     inline std::unique_ptr<BaseKernelWrapper> KernelWrapper<T>::create(
         const PassKey<KernelWrapperFactory> & key,
-        std::any data,
+        std::any data_in,
         const int rows,
         const int cols) {
 
+      std::any data;
+      if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
+        data = std::any_cast<const BaseDescriptorWrapper *>(data_in)->getPointerToRawData();
+      } else {
+        data = data_in;
+      }
+
       if( std::type_index(data.type()) == std::type_index(typeid(T *))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
+          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
-        } 
+        } else {
+          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols); 
+
+        }
+      } 
+
+      if(std::type_index(data.type()) == std::type_index(typeid(const T *))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+        if( not std::is_pointer<T>::value) {
+          // Allows conversion from a pointer type to a non pointer type
+          // That way the kernel will have ownership of the data
+          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+          return std::make_unique<KernelWrapper<T>>(key, std::any_cast<const T *>(data), rows, cols);
+        } else {
+          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols); 
+        }
+
       }
+
+      if( type_map.count(std::type_index(typeid(T))) ) {
+        std::cout << "Converting to " << type_map.at(std::type_index(typeid(T))) << std::endl;
+        std::cout << "Converting from " << type_map.at(std::type_index(data.type())) << std::endl;
+      }
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      auto val = std::any_cast<T>(data);
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
     }
 

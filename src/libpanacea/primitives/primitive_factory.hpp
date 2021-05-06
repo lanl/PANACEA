@@ -78,6 +78,16 @@ namespace panacea {
           const std::string & name = "") const;
 
       /**
+       * Create a primitive group
+       *
+       * Creates a shell of the primitive group that is appropriate for
+       * loading in values from a restart file
+       **/
+      PrimitiveGroup createGroup(
+          const KernelSpecification & specification,
+          const std::string & name = "") const;
+
+      /**
        * Updates the primitive group with the values from the new descriptors
        * provided by dwrapper.
        **/ 

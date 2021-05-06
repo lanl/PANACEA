@@ -52,6 +52,13 @@ namespace panacea {
       Normalizer(const std::vector<double> & normalization_coeffs,
           const NormalizerOption opt = NormalizerOption::Strict);
 
+      /**
+       * Appropriate for loading values from a restart file
+       **/
+      Normalizer(
+          const settings::KernelNormalization & norm_method, 
+          const NormalizerOption opt = NormalizerOption::Strict);
+
       Normalizer(const BaseDescriptorWrapper * descriptor_wrapper,
           const settings::KernelNormalization & norm_method, 
           const NormalizerOption opt = NormalizerOption::Strict);

@@ -90,7 +90,6 @@ namespace panacea {
           if( std::is_pointer<T>::value ) {
             return data_;
           } else {
-            std::cout << "Returning address to raw data" << std::endl;
             return &data_;
           }
         }
