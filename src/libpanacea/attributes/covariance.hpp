@@ -3,14 +3,16 @@
 #define PANACEA_PRIVATE_COVARIANCE_H
 #pragma once
 
-// Local PANACEA includes
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 // Loca private includes
 #include "data_settings.hpp"
 #include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Local PANACEA includes
+#include "panacea/file_io_types.hpp"
+#include "panacea/matrix.hpp"
+#include "panacea/vector.hpp"
 
 // Standard includes
 #include <any>
@@ -107,7 +109,7 @@ namespace panacea {
 
       void print() const;
 
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType & file_type,
           std::istream &,
           std::any cov_instance);

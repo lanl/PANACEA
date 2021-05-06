@@ -3,6 +3,9 @@
 #define PANACEA_PRIVATE_BASEKERNELWRAPPER_H
 #pragma once
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <any>
 #include <cstddef>
@@ -21,20 +24,21 @@ namespace panacea {
 
   class BaseKernelWrapper;
 
-  typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is); 
-  typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os); 
   /*
    * Base Kernel interface 
    */
   class BaseKernelWrapper  {
+    public: 
+      typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is); 
+      typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os); 
 
     private:
 
       /**
        * Used to read and write kernel derived class specific meta data
        **/
-      virtual ReadFunction getReadFunction_() = 0;
-      virtual WriteFunction getWriteFunction_() = 0;
+      virtual BaseKernelWrapper::ReadFunction getReadFunction_() = 0;
+      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() = 0;
 
     public:
 
@@ -86,7 +90,7 @@ namespace panacea {
           std::ostream &,
           std::any kern_instance);
 
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType & file_type,
           std::istream &,
           std::any kern_instance);

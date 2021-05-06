@@ -5,6 +5,7 @@
 
 // Public PANACEA includes
 #include "settings.hpp"
+#include "file_io_types.hpp"
 
 // Standard includes
 #include <any>
@@ -45,7 +46,7 @@ namespace panacea {
           std::ostream &,
           std::any dwrapper_instance);
 
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType & file_type,
           std::istream &,
           std::any dwrapper_instance);

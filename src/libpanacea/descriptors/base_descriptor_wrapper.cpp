@@ -5,6 +5,9 @@
 // Local private PANACEA includes
 #include "data_point_template.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <any>
 #include <iostream>
@@ -40,12 +43,11 @@ namespace panacea {
     return nested_values;
   }
 
-  std::vector<std::any> BaseDescriptorWrapper::read(
+  io::ReadInstantiateVector BaseDescriptorWrapper::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any dwrapper_instance) {
 
-    std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTDescriptors ) {
       auto dwrapper = std::any_cast<BaseDescriptorWrapper *>(dwrapper_instance);
 
@@ -130,6 +132,7 @@ namespace panacea {
       std::string error_msg = "Descriptors cannot be written to the specified file type.";
       PANACEA_FAIL(error_msg);
     }
+    io::ReadInstantiateVector nested_values;
     return nested_values;
 
   }

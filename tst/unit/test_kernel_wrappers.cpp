@@ -26,6 +26,7 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
   std::vector<std::vector<double>> data = {{1.0},{2.0},{6.0}};
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data,3,1); 
 
+
   WHEN("Testing mean kernel wrapper"){
     MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
     REQUIRE(mean_kwrapper.rows() == 1);
@@ -47,7 +48,7 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
     auto type_ind_data = std::type_index(typeid(vector<double>));
     REQUIRE(median_kwrapper.getTypeIndex() == type_ind_data);
   }
-  WHEN("Testing template kernel wrapper"){
+  WHEN("Testing template kernel wrapper with vector<vector<double>> *"){
     auto type_ind_data = std::type_index(typeid(vector<vector<double>> *));
     KernelWrapper<vector<vector<double>>*> kwrapper(test::Test::key(), &dwrapper);
     REQUIRE(kwrapper.getNumberDimensions() == 1);
@@ -60,7 +61,23 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
     REQUIRE(kwrapper.at(2,0) == Approx(6.0));
     REQUIRE(kwrapper.getTypeIndex() == type_ind_data);
   }
+  WHEN("Testing template kernel wrapper with vector<vector<double>>"){
 
+    // Here dwrapper2 will own the data
+    DescriptorWrapper<vector<vector<double>>> dwrapper2(data,3,1); 
+    auto type_ind_data = std::type_index(typeid(vector<vector<double>>));
+    KernelWrapper<vector<vector<double>>> kwrapper(test::Test::key(), &dwrapper2);
+
+    REQUIRE(kwrapper.getNumberDimensions() == 1);
+    REQUIRE(kwrapper.getNumberPoints() == 3);
+    REQUIRE(kwrapper.rows() == 3);
+    REQUIRE(kwrapper.cols() == 1);
+     
+    REQUIRE(kwrapper.at(0,0) == Approx(1.0));
+    REQUIRE(kwrapper.at(1,0) == Approx(2.0));
+    REQUIRE(kwrapper.at(2,0) == Approx(6.0));
+    REQUIRE(kwrapper.getTypeIndex() == type_ind_data);
+  }
 }
 
 TEST_CASE("Testing:mean kernel_wrapper write & read","[unit,panacea]") {
@@ -100,7 +117,7 @@ TEST_CASE("Testing:mean kernel_wrapper write & read using fileio","[integration,
   MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
   BaseKernelWrapper * kwrapper_ptr = &mean_kwrapper;
  
-  FileIOFactory file_io_factory;
+  io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
   
   restart_file->write(kwrapper_ptr, "test_kernel_mean_full.restart");

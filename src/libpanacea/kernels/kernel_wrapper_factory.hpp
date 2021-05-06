@@ -37,8 +37,21 @@ namespace panacea {
 
       KernelWrapperFactory();
 
+      /**
+       * Will create a kernel wrapper who's fields are populated based on what is 
+       * in the descriptor wrapper. 
+       **/
       std::unique_ptr<BaseKernelWrapper> create(
           const BaseDescriptorWrapper * desc_wrapper,
+          const KernelSpecification & kern_specification) const;
+
+      /**
+       * Will create a shell of a kernel wrapper that is essentially empty. This is an
+       * ideal state for reading in information from a restart file to populate the kernel
+       * wrapper. Note, that the data (Memory) setting must be set to Own to utilize this
+       * method.
+       **/
+      std::unique_ptr<BaseKernelWrapper> create(
           const KernelSpecification & kern_specification) const;
 
       template<settings::KernelCenterCalculation kernel_center, class T, class S>

@@ -13,6 +13,9 @@
 #include "primitive.hpp"
 #include "primitive_attributes.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <memory>
 #include <string>
@@ -51,7 +54,7 @@ namespace panacea {
           std::ostream &,
           std::any prim_grp_instance);
 
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType & file_type,
           std::istream &,
           std::any prim_grp_instance);
@@ -60,6 +63,7 @@ namespace panacea {
           const settings::FileType & file_type,
           std::any prim_grp_instance);
 
+      static void postReadKernelSpecsAndNormalizerInitialization(std::any obj);
   };
 }
 

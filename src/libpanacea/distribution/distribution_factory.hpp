@@ -45,6 +45,13 @@ namespace panacea {
       std::unique_ptr<Distribution> create(
           const BaseDescriptorWrapper * descriptor_wrapper,
           DistributionSettings * settings) const;
+
+      /**
+       * Will create a shell of a distribution as no descriptor wrapper was provided.
+       **/
+      std::unique_ptr<Distribution> create(
+          DistributionSettings * settings) const;
+
   };
 
 }

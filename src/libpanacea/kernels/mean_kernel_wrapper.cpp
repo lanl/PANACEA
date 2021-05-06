@@ -17,11 +17,11 @@ namespace panacea {
    * Public Methods
    ************************************************/
 
-  ReadFunction MeanKernelWrapper::getReadFunction_() {
+  BaseKernelWrapper::ReadFunction MeanKernelWrapper::getReadFunction_() {
     return MeanKernelWrapper::read;
   }
 
-  WriteFunction MeanKernelWrapper::getWriteFunction_() {
+  BaseKernelWrapper::WriteFunction MeanKernelWrapper::getWriteFunction_() {
     return MeanKernelWrapper::write;
   }
 

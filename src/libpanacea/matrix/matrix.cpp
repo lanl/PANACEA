@@ -1,10 +1,11 @@
 
-// Local public PANACEA includes
-#include "panacea/matrix.hpp"
-
 // Local private PANACEA includes
 #include "matrix_eigen.hpp"
 #include "error.hpp"
+
+// Local public PANACEA includes
+#include "panacea/file_io_types.hpp"
+#include "panacea/matrix.hpp"
 
 // Standard includes
 #include <any>
@@ -54,12 +55,11 @@ namespace panacea {
     return nested_values;
   }
 
-  std::vector<std::any> Matrix::read(
+  io::ReadInstantiateVector Matrix::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any matrix_instance) {
 
-    std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
       Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
       std::string line = "";
@@ -144,6 +144,7 @@ namespace panacea {
       std::string error_msg = "Matrix cannot be read from the specified file type.";
       PANACEA_FAIL(error_msg);
     }
+    io::ReadInstantiateVector nested_values;
     return nested_values;
   }
 

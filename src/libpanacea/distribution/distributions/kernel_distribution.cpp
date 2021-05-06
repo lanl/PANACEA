@@ -34,6 +34,14 @@ namespace panacea {
 
   }
 
+  Distribution::ReadFunction KernelDistribution::getReadFunction_() {
+    return KernelDistribution::read;
+  }
+
+  Distribution::WriteFunction KernelDistribution::getWriteFunction_() {
+    return KernelDistribution::write;
+  }
+
   settings::DistributionType KernelDistribution::type() const noexcept {
     return settings::DistributionType::Kernel;
   }
@@ -171,4 +179,46 @@ namespace panacea {
     prim_grp_.update(descriptor_wrapper);
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
   }
+
+  std::vector<std::any> KernelDistribution::write(
+          const settings::FileType & file_type,
+          std::ostream & os,
+          Distribution * dist) {
+
+    KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);
+    
+    std::vector<std::any> nested_objs;
+    if( file_type == settings::FileType::TXTRestart ) {
+      os << "[Prefactor]\n";
+      os << kern_dist->pre_factor_ << "\n";
+      nested_objs.push_back(&(kern_dist->prim_grp_));
+    }
+    return nested_objs;
+  }
+
+  io::ReadInstantiateVector KernelDistribution::read(
+          const settings::FileType & file_type,
+          std::istream & is,
+          Distribution * dist) {
+
+    io::ReadInstantiateVector nested_values;
+    if( file_type == settings::FileType::TXTRestart ) {
+
+      KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);
+      std::string line = "";
+      while(line.find("[Prefactor]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "While reading kernel distribution section of restart file";
+          error_msg += ", header does not contain the [Prefactor] tag.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+      is >> kern_dist->pre_factor_;
+      nested_values.emplace_back(&(kern_dist->prim_grp_),std::nullopt);
+    }
+    return nested_values;
+  }
+
+
 }

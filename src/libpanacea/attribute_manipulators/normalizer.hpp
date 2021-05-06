@@ -9,8 +9,12 @@
 #include "normalization_methods/normalization_method_factory.hpp"
 #include "private_settings.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <any>
+#include <optional>
 #include <vector>
 
 namespace panacea {
@@ -69,7 +73,7 @@ namespace panacea {
           std::ostream &,
           std::any norm_instance);
 
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType & file_type,
           std::istream &,
           std::any norm_instance);

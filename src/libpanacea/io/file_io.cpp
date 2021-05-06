@@ -2,5 +2,7 @@
 #include "file_io.hpp"
 
 namespace panacea {
-  FileIO::~FileIO() {};
+  namespace io {
+    FileIO::~FileIO() {};
+  }
 }

@@ -4,6 +4,7 @@
 #pragma once
 
 // Public PANACEA includes
+#include "file_io_types.hpp"
 #include "settings.hpp"
 
 // Standard includes
@@ -57,7 +58,7 @@ namespace panacea {
           std::ostream &,
           std::any vector_instance);
       
-      static std::vector<std::any> read(
+      static io::ReadInstantiateVector read(
           const settings::FileType &file_type,
           std::istream &,
           std::any vector_instance);

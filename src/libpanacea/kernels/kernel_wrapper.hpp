@@ -3,14 +3,15 @@
 #define PANACEA_PRIVATE_KERNELWRAPPER_H
 #pragma once
 
-// Public PANACEA includes
-#include "panacea/base_descriptor_wrapper.hpp"
-
 // Local private includes
 #include "base_kernel_wrapper.hpp"
 #include "data_point_template.hpp"
 #include "passkey.hpp"
 #include "private_settings.hpp"
+
+// Public PANACEA includes
+#include "panacea/base_descriptor_wrapper.hpp"
+#include "panacea/file_io_types.hpp"
 
 // Standard includes
 #include <any>
@@ -34,8 +35,8 @@ namespace panacea {
       private:
         DataPointTemplate<T> data_wrapper_;
       
-        virtual ReadFunction getReadFunction_() final;
-        virtual WriteFunction getWriteFunction_() final;
+        virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
+        virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
 
       public:
 
@@ -43,9 +44,21 @@ namespace panacea {
 
         KernelWrapper(const PassKey<KernelWrapperFactory> &, T data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
+       
+        /**
+         * Will copy the data instead of storing it as a pointer.
+         **/ 
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, T * data, int rows, int cols) : 
+          data_wrapper_(*data, rows, cols) {};
 
         KernelWrapper(const PassKey<test::Test> &, T data, int rows, int cols) : 
           data_wrapper_(data, rows, cols) {};
+
+        /**
+         * Will copy the data instead of storing it as a pointer.
+         **/ 
+        KernelWrapper(const PassKey<test::Test> &, T * data, int rows, int cols) : 
+          data_wrapper_(*data, rows, cols) {};
 
         KernelWrapper(const PassKey<test::Test> &,
             const BaseDescriptorWrapper * desc_wrapper);
@@ -89,10 +102,18 @@ namespace panacea {
         const PassKey<test::Test> &,
         const BaseDescriptorWrapper * dwrapper) {
 
-      data_wrapper_ = DataPointTemplate<T>(
-          std::any_cast<T>(dwrapper->getPointerToRawData()),
-          dwrapper->rows(),
-          dwrapper->cols());
+      if constexpr(std::is_pointer<T>::value) {
+        data_wrapper_ = DataPointTemplate<T>(
+            std::any_cast<T>(dwrapper->getPointerToRawData()),
+            dwrapper->rows(),
+            dwrapper->cols());
+      } else {
+        // Because dwrapper is const
+        data_wrapper_ = DataPointTemplate<T>(
+            *(std::any_cast<const T *>(dwrapper->getPointerToRawData())),
+            dwrapper->rows(),
+            dwrapper->cols());
+      }
     }
 
   template<class T>
@@ -175,6 +196,13 @@ namespace panacea {
         const int rows,
         const int cols) {
 
+      if( std::type_index(data.type()) == std::type_index(typeid(T *))) {
+        if( not std::is_pointer<T>::value) {
+          // Allows conversion from a pointer type to a non pointer type
+          // That way the kernel will have ownership of the data
+          return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
+        } 
+      }
       return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
     }
 
@@ -195,12 +223,12 @@ namespace panacea {
 
 
   template<class T>
-    inline ReadFunction KernelWrapper<T>::getReadFunction_() {
+    inline BaseKernelWrapper::ReadFunction KernelWrapper<T>::getReadFunction_() {
       return KernelWrapper<T>::read;
     }
 
   template<class T>
-    inline WriteFunction KernelWrapper<T>::getWriteFunction_() {
+    inline BaseKernelWrapper::WriteFunction KernelWrapper<T>::getWriteFunction_() {
       return KernelWrapper<T>::write;
     }
 

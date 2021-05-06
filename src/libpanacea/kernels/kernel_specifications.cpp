@@ -5,6 +5,9 @@
 #include "error.hpp"
 #include "private_settings.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <iostream>
 #include <string>
@@ -43,7 +46,7 @@ namespace panacea {
     return std::vector<std::any> {};
   }
 
-  std::vector<std::any> KernelSpecification::read(
+  io::ReadInstantiateVector KernelSpecification::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any kern_spec_instance) {
@@ -74,7 +77,7 @@ namespace panacea {
       is >> kern_spec->kern_center_;
       is >> kern_spec->kern_algorithm_;
     }
-    std::vector<std::any> nested_values;
+    io::ReadInstantiateVector nested_values;
     return nested_values;
   }
 

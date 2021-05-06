@@ -57,7 +57,7 @@ TEST_CASE("Testing:kernel specifications write & read using fileio","[integratio
       settings::KernelCenterCalculation::None,
       settings::KernelAlgorithm::Flexible);
 
-  FileIOFactory file_io_factory;
+  io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
 
   restart_file->write(&kern_specs, "test_kern_specs_full.restart");

@@ -43,8 +43,8 @@ namespace panacea {
       bool remove_from_front_ = true;
       int number_pts_median_; // Number of points used to calculate the median
 
-      virtual ReadFunction getReadFunction_() final;
-      virtual WriteFunction getWriteFunction_() final;
+      virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
+      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
     public:
 
       explicit MedianKernelWrapper(

@@ -38,5 +38,4 @@ target_link_libraries(panacea_tests PUBLIC panacea helper Catch2::Catch2)
 ParseAndAddCatchTests(panacea_tests)
 
 get_property(ALL_TESTS DIRECTORY . PROPERTY TESTS)
-get_property(ALL_TESTS DIRECTORY . PROPERTY TESTS)
  

@@ -11,12 +11,15 @@
 
 namespace panacea {
 
-  class FileIO;
+  namespace io {
+    class FileIO;
 
-  class FileIOFactory {
-    public:
-      std::unique_ptr<FileIO> create(const settings::FileType & type) const;
-  };
+    class FileIOFactory {
+      public:
+        std::unique_ptr<FileIO> create(const settings::FileType & type) const;
+    };
+
+  }
 }
 
 #endif // PANACEA_PRIVATE_FILEIO_FACTORY_H

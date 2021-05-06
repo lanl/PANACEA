@@ -6,6 +6,9 @@
 #include "normalization_methods/normalization_method_factory.hpp"
 #include "passkey.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <cassert>
 #include <iostream>
@@ -134,12 +137,11 @@ namespace panacea {
     return nested_values;
   }
 
-  std::vector<std::any> Normalizer::read(
+  io::ReadInstantiateVector Normalizer::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any norm_instance) {
 
-    std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
       auto normalizer = std::any_cast<Normalizer *>(norm_instance);
       
@@ -188,6 +190,7 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
     } 
+    io::ReadInstantiateVector nested_values;
     return nested_values;
   }
 

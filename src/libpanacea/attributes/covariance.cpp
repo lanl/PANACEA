@@ -1,22 +1,22 @@
-/*
- * Class for storing the covariance matrix
- */
-
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
 
 // Local private PANACEA includes
 #include "covariance.hpp"
-
 #include "error.hpp"
 
 // Local public PANACEA includes
+#include "panacea/file_io_types.hpp"
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
 
 // Standard includes
+#include <any>
 #include <cassert>
 #include <iostream>
+#include <optional>
+#include <vector>
+
 namespace panacea {
 
   namespace correlated {
@@ -334,15 +334,20 @@ namespace panacea {
     return nested_objs;
   }
  
-  std::vector<std::any> Covariance::read(
+  io::ReadInstantiateVector Covariance::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any cov_instance) {
 
-    std::vector<std::any> nested_objs; 
+    io::ReadInstantiateVector nested_objs; 
     if( file_type == settings::FileType::TXTRestart ) { 
-      auto cov_mat = std::any_cast<Covariance *>(cov_instance); 
-
+      Covariance * cov_mat = nullptr;
+      if(std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))) {
+        cov_mat = std::any_cast<Covariance *>(cov_instance); 
+      } else if(std::type_index(cov_instance.type()) == std::type_index(typeid(std::unique_ptr<Covariance> *))) {
+        cov_mat = (std::any_cast<std::unique_ptr<Covariance> *>(cov_instance))->get(); 
+      }
+      assert(cov_mat != nullptr);
       std::string line = "";
 
       while(line.find("[Covariance]",0) == std::string::npos) {
@@ -388,8 +393,8 @@ namespace panacea {
       if( cov_mat->mean_.get() == nullptr ) {
         cov_mat->mean_ = createVector(0);
       }
-      nested_objs.push_back(cov_mat->matrix_.get());
-      nested_objs.push_back(cov_mat->mean_.get());
+      nested_objs.emplace_back(cov_mat->matrix_.get(), std::nullopt);
+      nested_objs.emplace_back(cov_mat->mean_.get(),std::nullopt);
     } else {
       PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
     }

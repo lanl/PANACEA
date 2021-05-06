@@ -72,12 +72,11 @@ namespace panacea {
     return nested_values;
   }
 
-  std::vector<std::any> Vector::read(
+  io::ReadInstantiateVector Vector::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any vector_instance) {
 
-    std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
       Vector * vec = std::any_cast<Vector *>(vector_instance);
       std::string line = "";
@@ -182,6 +181,7 @@ namespace panacea {
       std::string error_msg = "Vector cannot be read from the specified file type.";
       PANACEA_FAIL(error_msg);
     }
+    io::ReadInstantiateVector nested_values;
     return nested_values;
   }
 }

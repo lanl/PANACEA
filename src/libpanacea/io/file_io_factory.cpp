@@ -7,12 +7,14 @@
 
 namespace panacea {
 
-  std::unique_ptr<FileIO> FileIOFactory::create(const settings::FileType & type) const {
-    if(type == settings::FileType::TXTRestart) {
-      return std::make_unique<FileRestartTXT>();
-    } else if ( type == settings::FileType::TXTDescriptors ) {
-      return std::make_unique<FileDescriptorTXT>();
-    } 
-    return nullptr;
+  namespace io {
+    std::unique_ptr<FileIO> FileIOFactory::create(const settings::FileType & type) const {
+      if(type == settings::FileType::TXTRestart) {
+        return std::make_unique<FileRestartTXT>();
+      } else if ( type == settings::FileType::TXTDescriptors ) {
+        return std::make_unique<FileDescriptorTXT>();
+      } 
+      return nullptr;
+    }
   }
 }

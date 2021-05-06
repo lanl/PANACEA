@@ -2,6 +2,7 @@
 // Local private PANACEA includes
 #include "distribution_factory.hpp"
 
+#include "descriptors/descriptor_wrapper.hpp"
 #include "distributions/kernel_distribution.hpp"
 #include "error.hpp"
 #include "passkey.hpp"
@@ -41,4 +42,13 @@ namespace panacea {
         descriptor_wrapper,
         settings);
   }
+
+  std::unique_ptr<Distribution> DistributionFactory::create(
+      DistributionSettings * settings) const {
+
+    std::vector<std::vector<double>> data;
+    DescriptorWrapper<std::vector<std::vector<double>>> dwrapper(data,0,0);
+    return create( &dwrapper, settings);
+  }
+
 }

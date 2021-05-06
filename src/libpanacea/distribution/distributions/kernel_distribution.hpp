@@ -10,6 +10,9 @@
 #include "passkey.hpp"
 #include "primitives/primitive_group.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <any>
 #include <memory>
@@ -35,6 +38,10 @@ namespace panacea {
       KernelDistributionGradiant kern_dist_grad;
       // For KDE 1/N value, where N is the number Kernels/primitives
       double pre_factor_;
+
+      virtual Distribution::ReadFunction getReadFunction_() final;
+      virtual Distribution::WriteFunction getWriteFunction_() final;
+
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
@@ -65,6 +72,17 @@ namespace panacea {
           const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
           DistributionSettings * settings);
+
+      static std::vector<std::any> write(
+          const settings::FileType & file_type,
+          std::ostream &,
+          Distribution *); 
+
+      static io::ReadInstantiateVector read(
+          const settings::FileType & file_type,
+          std::istream &,
+          Distribution *); 
+
   };
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(

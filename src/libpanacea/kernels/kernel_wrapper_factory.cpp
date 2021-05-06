@@ -34,6 +34,10 @@ namespace panacea {
       KernelWrapper<std::vector<std::vector<double>>*>>();
 
     registerKernel<settings::KernelCenterCalculation::None,
+      std::vector<std::vector<double>>,
+      KernelWrapper<std::vector<std::vector<double>>>>();
+
+    registerKernel<settings::KernelCenterCalculation::None,
       double ***,
       KernelWrapper<double ***>>();
 
@@ -69,6 +73,9 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
 
+      if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
+        PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
+      }
       if( kern_specification.is(settings::KernelMemory::Share)){
       
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
@@ -78,16 +85,31 @@ namespace panacea {
           PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
         }
 
-        if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
-          PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
-        }
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_data_type_index](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper->getPointerToRawData(),
             desc_wrapper->rows(),
             desc_wrapper->cols());
       } else {
-        PANACEA_FAIL("OneToOne kernels that are not shared, are not yet supported.");
+        auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
+        auto desc_data_type_index = desc_wrapper->getTypeIndex();
+        if( desc_data_type_index != 
+            std::type_index(typeid(std::vector<std::vector<double>> *)) &&
+            desc_data_type_index !=
+            std::type_index(typeid(std::vector<std::vector<double>>))) {
+          std::string error_msg = "Unsupported types detected, cannot create kernels:\n";
+          error_msg += "OneToOne\nOwn\n\n";
+          error_msg += "The only supported coversions are from:\n";
+          error_msg += "vector<vector<double>>* to vector<vector<double>>\n";
+          error_msg += "vector<vector<double>>  to vector<vector<double>>\n";
+          PANACEA_FAIL(error_msg); 
+        }
+
+        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
+            PassKey<KernelWrapperFactory>(),
+            desc_wrapper->getPointerToRawData(),
+            desc_wrapper->rows(),
+            desc_wrapper->cols());        
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
@@ -105,6 +127,52 @@ namespace panacea {
           desc_wrapper,
           1,
           desc_wrapper->getNumberDimensions());
+
+      }
+    }
+    std::string error_msg = "The combination of kernel specifications is not";
+    error_msg += " yet supported.\n";
+
+    error_msg += kern_specification.get<std::string>();
+    PANACEA_FAIL(error_msg);
+    return std::unique_ptr<BaseKernelWrapper>();
+  }
+
+  std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
+      const KernelSpecification & kern_specification) const {
+
+    // Ensure valid method exists
+    if( create_methods_.count(kern_specification.get<settings::KernelCenterCalculation>()) == 0){
+      std::string error_msg = "Kernel creation method is missing for the specified type: ";
+      error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
+      PANACEA_FAIL(error_msg);
+    }
+
+    if( kern_specification.is(settings::KernelCount::OneToOne)){
+
+      if( kern_specification.is(settings::KernelMemory::Share)){
+        std::string error_msg = "OneToOne kernels that are not owned, are not yet supported. ";
+        error_msg += "When constructed without a descriptor wrapper.\n";
+        PANACEA_FAIL(error_msg);
+      } else { 
+        auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
+        // Initialize with an empty vector of vectors
+        std::vector<std::vector<double>> data;
+        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
+            PassKey<KernelWrapperFactory>(), data, 0, 0);
+      }
+    } else if( kern_specification.is(settings::KernelCount::Single)) {
+      if( kern_specification.is(settings::KernelMemory::Own )) {
+
+        if( not kern_specification.is(settings::KernelCenterCalculation::Mean) &&
+            not kern_specification.is(settings::KernelCenterCalculation::Median)) {
+          std::string error_msg = "Kernel Center Calculation must be Mean or Median when Count is Single: ";
+          error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
+          PANACEA_FAIL(error_msg); 
+        }
+        std::vector<double> data;
+        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
+        [std::type_index(typeid(std::vector<double>))](PassKey<KernelWrapperFactory>(),data,0,0);
 
       }
     }

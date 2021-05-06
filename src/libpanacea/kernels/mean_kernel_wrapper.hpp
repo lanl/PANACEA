@@ -30,8 +30,8 @@ namespace panacea {
       DataPointTemplate<std::vector<double>> data_wrapper_;
       int number_pts_mean_; // Number of points used to calculate the mean
 
-      virtual ReadFunction getReadFunction_() final;
-      virtual WriteFunction getWriteFunction_() final;
+      virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
+      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
     public:
       explicit MeanKernelWrapper(const PassKey<test::Test> &) {};
 

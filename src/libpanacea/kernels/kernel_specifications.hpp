@@ -5,6 +5,9 @@
 // Local private PANACEA includes
 #include "private_settings.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <any>
 #include <sstream>
@@ -159,7 +162,7 @@ namespace panacea {
         std::ostream &,
         std::any kern_spec_instance);
 
-    static std::vector<std::any> read(
+    static io::ReadInstantiateVector read(
         const settings::FileType & file_type,
         std::istream &,
         std::any kern_spec_instance);

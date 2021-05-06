@@ -76,11 +76,11 @@ namespace panacea {
    * Private methods
    *******************************************/
 
-  ReadFunction MedianKernelWrapper::getReadFunction_() {
+  BaseKernelWrapper::ReadFunction MedianKernelWrapper::getReadFunction_() {
     return MedianKernelWrapper::read;
   }
 
-  WriteFunction MedianKernelWrapper::getWriteFunction_() {
+  BaseKernelWrapper::WriteFunction MedianKernelWrapper::getWriteFunction_() {
     return MedianKernelWrapper::write;
   }
 

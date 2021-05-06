@@ -48,7 +48,8 @@ namespace panacea {
       public:
   
         DataPointTemplate() = default;
-        DataPointTemplate(T data, const int & rows, const int & cols) : 
+
+        DataPointTemplate(const T & data, const int & rows, const int & cols) : 
           data_(data),
           rows_(rows),
           cols_(cols),
@@ -85,10 +86,11 @@ namespace panacea {
          * This function allows one to check if two groups of data are pointing to
          * the same data. 
          */
-        const std::any getPointerToRawData() const {
+        std::any getPointerToRawData() const {
           if( std::is_pointer<T>::value ) {
             return data_;
           } else {
+            std::cout << "Returning address to raw data" << std::endl;
             return &data_;
           }
         }
@@ -259,8 +261,6 @@ namespace panacea {
       assert(row == 0 );
       assert(col >= 0 && col < cols_);
      
-      std::cout << __LINE__ << "Row and column in data wrapper " << row << " " << col << std::endl; 
-      std::cout << "Size of data_ " << data_.size() << std::endl;
       if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_.at(col);
       } 
@@ -274,7 +274,6 @@ namespace panacea {
       assert(row == 0);
       assert(col >= 0 && col < cols_);
 
-      std::cout << __LINE__ << "Row and column in data wrapper " << row << " " << col << std::endl; 
       if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_.at(col);
       } 
@@ -283,7 +282,6 @@ namespace panacea {
 
   template<class T>
     inline void DataPointTemplate<T>::resize(const int rows, const int cols) {
-      std::cout << __FILE__ << ":" << __LINE__ << " Resizing with rows and cols " << rows << " " << cols << std::endl;
       if(std::is_pointer<T>::value) {
         std::string error_msg = "Cannot resize data, it is a pointer, and is not ";
         error_msg += "owned by the underlying object.\n";

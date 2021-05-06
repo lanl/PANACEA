@@ -7,12 +7,17 @@
 #include "attribute_manipulators/reducer.hpp"
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
+#include "kernels/kernel_wrapper_factory.hpp"
 #include "primitive_attributes.hpp"
 #include "primitive_factory.hpp"
+
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
 
 // Standard includes
 #include <any>
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -52,7 +57,6 @@ namespace panacea {
       }
       os << "[Primitive Group]\n";
       os << prim_grp->name << "\n";
-      os << "\n";
       nested_values.push_back(&prim_grp->specification);
       nested_values.push_back(&prim_grp->normalizer);
       nested_values.push_back(prim_grp->kernel_wrapper.get());
@@ -61,12 +65,12 @@ namespace panacea {
     return nested_values;
   }
 
-  std::vector<std::any> PrimitiveGroup::read(
+  io::ReadInstantiateVector PrimitiveGroup::read(
       const settings::FileType & file_type,
       std::istream & is,
       std::any prim_grp_instance) {
     
-    std::vector<std::any> nested_values;
+    io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
       PrimitiveGroup * prim_grp;
       try {
@@ -87,18 +91,54 @@ namespace panacea {
         std::getline(is, line);
       }
       is >> prim_grp->name;
-      nested_values.push_back(&prim_grp->specification);
-      nested_values.push_back(&prim_grp->normalizer);
-      nested_values.push_back(prim_grp->kernel_wrapper.get());
-      nested_values.push_back(prim_grp->covariance.get());
+      nested_values.emplace_back(&prim_grp->specification, std::nullopt);
+      nested_values.emplace_back(&prim_grp->normalizer, postReadKernelSpecsAndNormalizerInitialization);
+
+      // Data of objects created with unique pointers need to first be created but after
+      // the specifications have been read in
+      nested_values.emplace_back(&(prim_grp->kernel_wrapper),std::nullopt);
+      nested_values.emplace_back(&(prim_grp->covariance), std::nullopt);
     }
     return nested_values;
+  }
+
+  void PrimitiveGroup::postReadKernelSpecsAndNormalizerInitialization(std::any prim_grp_instance) {
+    PrimitiveGroup * prim_grp;
+    std::cout << "Reading postReadKernelSpecsAndNormalizerInitialization" << std::endl;
+    try {
+      prim_grp = std::any_cast<PrimitiveGroup *>(prim_grp_instance);
+    } catch (...) {
+      std::string error_msg = "Unable to cast to PrimitiveGroup * while";
+      error_msg += " trying to run postReadKernelSpecInitialization method.";
+      PANACEA_FAIL(error_msg);
+    }
+
+    // Now that we have read in the kernel specs we should switch the ownership of the
+    // kernel data if it is set as share to own
+    if( prim_grp->specification.template get<settings::KernelMemory>() == 
+        settings::KernelMemory::Share ) {
+      std::cout << "Note restart file indicates kernel memory was in the shared state.";
+      std::cout << " Because we do not have access to the descriptor while reading back";
+      std::cout << " the data this is being switched own.\n";
+      prim_grp->specification.set(settings::KernelMemory::Own);
+    }
+
+    // Now we need to actually create the kernels and covariance matrix because 
+    // they are allocated with unique pointers
+    prim_grp->covariance = std::make_unique<Covariance>();
+
+    KernelWrapperFactory kfactory;
+    // Essentially create a kernel wrapper shell.
+    std::cout << "Creating kernels" << std::endl;
+    prim_grp->kernel_wrapper = kfactory.create(prim_grp->specification); 
+
+    assert(prim_grp->kernel_wrapper.get() != nullptr);
   }
 
   void PrimitiveGroup::postReadInitialization(
       const settings::FileType & file_type,
       std::any prim_grp_instance) {
-    
+
     if( file_type == settings::FileType::TXTRestart ) {
       PrimitiveGroup * prim_grp;
       try {

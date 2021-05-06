@@ -186,7 +186,7 @@ TEST_CASE("Testing:covariance read & write using fileio","[integration,panacea]"
 
   cov.print(); 
 
-  FileIOFactory file_io_factory;
+  io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
   
   restart_file->write(&cov, "test_covariance_full.restart");
