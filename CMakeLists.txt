@@ -40,13 +40,13 @@ endif(ENABLE_TESTING)
 # Eigen Configuration  #
 ########################
 
-find_package(Eigen)
-if( NOT Eigen_FOUND )
+find_package(Eigen3)
+if( NOT Eigen3_FOUND )
   include(cmake/InstallEigen.cmake)
 endif()
 
 ########################################################################
-# Grab source files and set the directory where they will be installed #
+# Grab source files                                                    #
 ########################################################################
 
 file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp 
@@ -71,15 +71,24 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/vector/*
   )
 
+###############################
+# Add subdirectories
+###############################
+add_subdirectory(include/panacea)
+
+####################################################
+# Setup the directory where they will be installed #
+####################################################
+
 add_library(panacea ${SOURCES})
 set_target_properties(panacea PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(panacea Eigen3::Eigen)
-
 include(cmake/PanaceaInstall.cmake)
 
 ###############################
 # Check if unit testing is on #
 ###############################
+
 if(ENABLE_TESTING)
   enable_testing()
   add_subdirectory(tst)

@@ -3,7 +3,7 @@ target_include_directories(panacea PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/panacea>
   )
 
-message("Instal include dir ${CMAKE_INSTALL_INCLUDEDIR}/panacea")
+message("Install include dir ${CMAKE_INSTALL_INCLUDEDIR}/panacea")
 
 install(TARGETS panacea EXPORT panaceaTargets
   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"

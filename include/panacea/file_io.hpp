@@ -2,8 +2,8 @@
 #define PANACEA_FILEIO_H
 #pragma once
 
-// Local private PANACEA settings
-#include "private_settings.hpp"
+// Local public PANACEA settings
+#include "settings.hpp"
 
 // Standard includes
 #include <any>
