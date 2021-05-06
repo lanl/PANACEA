@@ -1,3 +1,6 @@
+
+set_target_properties(panacea PROPERTIES VERSION ${panacea_VERSION} SOVERSION ${SOVERSION})
+
 target_include_directories(panacea PUBLIC
   $<BUILD_INTERFACE:${panacea_SOURCE_DIR}/src/libpanacea>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/panacea>
