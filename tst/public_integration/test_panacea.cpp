@@ -128,6 +128,49 @@ TEST_CASE("Testing:panacea self entropy","[integration,panacea]"){
   }
 }
 
+TEST_CASE("Testing:panacea self entropy read & write with fileio","[integration,panacea]"){
+
+  // Creating settings for generating a self entropy term where the 
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+  PANACEASettings panacea_settings = PANACEASettings::make()
+                                        .set(EntropyType::Self)
+                                        .set(PANACEAAlgorithm::Flexible)
+                                        .distributionType(kernel)
+                                            .set(KernelPrimitive::Gaussian)
+                                            .set(KernelCount::OneToOne)
+                                            .set(KernelCorrelation::Uncorrelated)
+                                            .set(KernelCenterCalculation::None)
+                                            .set(KernelNormalization::None);
+
+  // pi - public interface
+  PANACEA panacea_pi;
+
+    // Data has the following form, where it is stacked
+    //
+    //         col1   col2   col3
+    // row1    1.0     2.0    3.0  Point 1
+    // row2    1.0     2.0    3.0  Point 2
+    test::ArrayData array_data;
+    const int rows = 2;
+    const int cols = 3;
+    auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+    std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(dwrapper.get(), panacea_settings);
+    double self_ent_val_stacked = self_ent->compute(dwrapper.get());
+
+
+    double self_ent_val = self_ent->compute(dwrapper.get());
+    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
+    restart_file->write(self_ent.get(),"self_entropy_restart.txt"); 
+
+    std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
+
+    restart_file->read(self_ent2.get(),"self_entropy_restart.txt");
+    double self_ent_val2 = self_ent2->compute(dwrapper.get());
+
+    REQUIRE(self_ent_val == Approx(self_ent_val2));
+}
+
 TEST_CASE("Testing:panacea self entropy update","[integration,panacea]"){
 
   // Creating settings for generating a self entropy term where the 

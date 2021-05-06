@@ -211,40 +211,28 @@ namespace panacea {
       }
 
       if( std::type_index(data.type()) == std::type_index(typeid(T *))) {
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
-          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
         } else {
-          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols); 
 
         }
       } 
 
       if(std::type_index(data.type()) == std::type_index(typeid(const T *))) {
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
-          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<const T *>(data), rows, cols);
         } else {
-          std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols); 
         }
 
       }
 
-      if( type_map.count(std::type_index(typeid(T))) ) {
-        std::cout << "Converting to " << type_map.at(std::type_index(typeid(T))) << std::endl;
-        std::cout << "Converting from " << type_map.at(std::type_index(data.type())) << std::endl;
-      }
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       auto val = std::any_cast<T>(data);
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
     }
 

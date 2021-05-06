@@ -12,6 +12,7 @@
 #include "type_map.hpp"
 
 // Public PANACEA includes
+#include "panacea/entropy_term.hpp"
 #include "panacea/file_io_types.hpp"
 #include "panacea/matrix.hpp"
 #include "panacea/vector.hpp"
@@ -46,6 +47,7 @@ namespace panacea {
       registerWriteMethod<Normalizer>();
       registerWriteMethod<PrimitiveGroup>();
       registerWriteMethod<Distribution>();
+      registerWriteMethod<EntropyTerm>();
 
       registerReadMethod<Covariance>();
       registerReadMethod<Matrix>();
@@ -55,6 +57,7 @@ namespace panacea {
       registerReadMethod<Normalizer>();
       registerReadMethod<PrimitiveGroup>();
       registerReadMethod<Distribution>();
+      registerReadMethod<EntropyTerm>();
     }
 
     void FileRestartTXT::write_(
@@ -62,7 +65,6 @@ namespace panacea {
         std::ostream & os) {
 
       for( auto & obj : objs ) {
-        std::cout << "writing data from objs" << std::endl;
         if( write_methods_.count(obj.type()) == 0 ) {
           std::string error_msg = "Unable to write object to restart file, write ";
           error_msg += "method is missing.";
@@ -81,10 +83,6 @@ namespace panacea {
 
       for( auto & obj : objs ) {
 
-        std::cout << "reading obj" << std::endl;
-        if(type_map.count(std::type_index(obj.instance.type()))){
-          std::cout << "Reading in " << type_map.at(std::type_index(obj.instance.type())) << std::endl;
-        }
         if( read_methods_.count(obj.instance.type()) == 0 ) {
           std::string error_msg = "Unable to read object from restart txt file, read ";
           error_msg += "method is missing.";

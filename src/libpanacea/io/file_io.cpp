@@ -1,5 +1,5 @@
-// Local private PANACEA includes
-#include "file_io.hpp"
+// Local public PANACEA includes
+#include "panacea/file_io.hpp"
 
 namespace panacea {
   namespace io {

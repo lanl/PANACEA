@@ -4,6 +4,7 @@
 #pragma once
 
 // Public PANACEA includes
+#include "file_io.hpp"
 #include "settings.hpp"
 
 // Standard includes
@@ -27,7 +28,12 @@ namespace panacea {
           const BaseDescriptorWrapper *, 
           const PANACEASettings & settings) const;
 
+      std::unique_ptr<EntropyTerm> create(
+          const PANACEASettings & settings) const;
+
       std::unique_ptr<EntropyTerm> create(const std::string & file_name) const;
+
+      std::unique_ptr<io::FileIO> create(const settings::FileType) const;
 
   };
 

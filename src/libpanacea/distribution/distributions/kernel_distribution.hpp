@@ -85,12 +85,12 @@ namespace panacea {
           DistributionSettings * settings);
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           Distribution *); 
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           Distribution *); 
 
@@ -101,7 +101,6 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       DistributionSettings * settings) {
 
-    std::cout << "Calling create in KernelDistribution" << std::endl;
     assert(settings->type() == settings::DistributionType::Kernel);
 
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
@@ -116,10 +115,13 @@ namespace panacea {
       const PassKey<DistributionFactory> & key, 
       DistributionSettings * settings) {
 
-    std::cout << "Calling create in KernelDistribution" << std::endl;
     assert(settings->type() == settings::DistributionType::Kernel);
 
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+
+    // Switch Memory to Own if set to Share, not possible to create a shell distribution
+    // that does not own it's kernels
+    kern_dist_settings->dist_settings.set(settings::KernelMemory::Own);
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,

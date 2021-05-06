@@ -76,12 +76,12 @@ namespace panacea {
       void unnormalize(Covariance & cov) const; 
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any norm_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any norm_instance);
 

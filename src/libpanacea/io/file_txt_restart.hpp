@@ -3,11 +3,9 @@
 #define PANACEA_PRIVATE_FILETXT_RESTART_H
 #pragma once
 
-// Local private PANACEA includes
-#include "file_io.hpp"
-
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
+#include "panacea/file_io.hpp"
 
 // Standard includes
 #include <any>
@@ -67,17 +65,17 @@ namespace panacea {
       private:
 
         using WriteMethod = std::vector<std::any>(*)(
-            const settings::FileType &,
+            const settings::FileType ,
             std::ostream &,
             std::any ); 
 
         using ReadMethod = io::ReadInstantiateVector(*)(
-            const settings::FileType &,
+            const settings::FileType ,
             std::istream &,
             std::any ); 
 
         using PostReadInitialization = void (*) (
-            const settings::FileType &,
+            const settings::FileType ,
             std::any);
 
         static std::unordered_map<std::type_index,WriteMethod> write_methods_;
@@ -131,7 +129,7 @@ namespace panacea {
             }
 
             if constexpr( has_post_read_initialization_method<
-                T,void(const settings::FileType &, std::any)>::value ){
+                T,void(const settings::FileType , std::any)>::value ){
 
               if( post_read_initialization_.count(std::type_index(typeid(T *))) ) {
                 return false;

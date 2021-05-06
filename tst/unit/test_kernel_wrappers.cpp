@@ -1,7 +1,6 @@
 
 // Local private includes
 #include "descriptors/descriptor_wrapper.hpp"
-#include "io/file_io.hpp"
 #include "io/file_io_factory.hpp"
 #include "kernels/kernel_wrapper.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
@@ -10,6 +9,9 @@
 #include "kernels/median_kernel_wrapper.hpp"
 
 #include "helper.hpp"
+
+// Public PANACEA includes
+#include "panacea/file_io.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

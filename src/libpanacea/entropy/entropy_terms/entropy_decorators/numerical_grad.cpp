@@ -56,7 +56,7 @@ namespace panacea {
     }
   }
 
-  void NumericalGrad::set(const settings::EntropyOption & option, std::any val) {
+  void NumericalGrad::set(const settings::EntropyOption option, std::any val) {
     if( option == settings::EntropyOption::IncrementRatio ) {
       inc_ratio_ = std::any_cast<double>(val);
     } else if(option == settings::EntropyOption::NumericalGrad ) {

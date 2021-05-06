@@ -15,7 +15,7 @@ namespace panacea {
   Distribution::~Distribution() {};
 
   std::vector<std::any> Distribution::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any dist_instance) {
 
@@ -36,7 +36,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector Distribution::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any dist_instance) {
    

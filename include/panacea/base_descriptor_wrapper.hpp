@@ -42,12 +42,12 @@ namespace panacea {
       virtual ~BaseDescriptorWrapper() = 0;
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any dwrapper_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any dwrapper_instance);
 

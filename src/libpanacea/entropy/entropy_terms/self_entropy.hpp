@@ -48,7 +48,7 @@ namespace panacea {
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 
-      virtual void set(const settings::EntropyOption & option, std::any val) override;
+      virtual void set(const settings::EntropyOption option, std::any val) override;
 
       virtual const std::vector<int> & getDimensions() const noexcept override;
 
@@ -59,13 +59,17 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           EntropySettings * settings);
 
+      static std::unique_ptr<EntropyTerm> create(
+          const PassKey<EntropyFactory> & key,
+          EntropySettings * settings);
+
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           EntropyTerm *); 
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           EntropyTerm *); 
 

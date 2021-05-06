@@ -320,7 +320,7 @@ namespace panacea {
   }
 
   std::vector<std::any> Covariance::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any cov_instance) {
 
@@ -342,7 +342,7 @@ namespace panacea {
   }
  
   io::ReadInstantiateVector Covariance::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any cov_instance) {
 

@@ -28,10 +28,17 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           EntropySettings * settings);
 
+      using EntropyCreateShellMethod = std::unique_ptr<EntropyTerm>(*)(
+          const PassKey<EntropyFactory> & key,
+          EntropySettings * settings);
+
     private:
 
       static std::unordered_map<settings::EntropyType,EntropyCreateMethod>
         create_methods_;
+
+      static std::unordered_map<settings::EntropyType,EntropyCreateShellMethod>
+        create_shell_methods_;
 
     public:
 
@@ -44,6 +51,12 @@ namespace panacea {
           } else {
             create_methods_[entropy_type] = T::create;
           }
+          if( create_shell_methods_.count(entropy_type) ) {
+            return false;
+          } else {
+            create_shell_methods_[entropy_type] = T::create;
+          }
+
           return true;
         }
 
@@ -51,6 +64,8 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           EntropySettings * settings) const;
 
+      std::unique_ptr<EntropyTerm> create(
+          EntropySettings * settings) const;
   };
 }
 

@@ -54,12 +54,12 @@ namespace panacea {
       virtual void print() const = 0;
 
       static std::vector<std::any> write(
-          const settings::FileType &file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any vector_instance);
       
       static io::ReadInstantiateVector read(
-          const settings::FileType &file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any vector_instance);
   };

@@ -26,7 +26,6 @@ namespace panacea {
           const KernelSpecification & settings) {
 
     PrimitiveFactory prim_factory;
-    std::cout << "Calling createGroup in KernelDistribution" << std::endl;
     prim_grp_ = prim_factory.createGroup(
         descriptor_wrapper,
         settings);
@@ -39,7 +38,6 @@ namespace panacea {
           const KernelSpecification & settings) {
 
     PrimitiveFactory prim_factory;
-    std::cout << "Calling createGroup in KernelDistribution" << std::endl;
     prim_grp_ = prim_factory.createGroup(settings);
   
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
@@ -193,7 +191,7 @@ namespace panacea {
   }
 
   std::vector<std::any> KernelDistribution::write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream & os,
           Distribution * dist) {
 
@@ -209,7 +207,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector KernelDistribution::read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream & is,
           Distribution * dist) {
 

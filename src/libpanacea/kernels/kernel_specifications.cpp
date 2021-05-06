@@ -16,7 +16,7 @@
 namespace panacea {
 
   std::vector<std::any> KernelSpecification::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any kern_spec_instance) {
 
@@ -47,7 +47,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector KernelSpecification::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any kern_spec_instance) {
 
@@ -67,7 +67,6 @@ namespace panacea {
           error_msg += "to read in kernel specifications from restart file.";
           PANACEA_FAIL(error_msg);
         }
-        std::cout << "Line is " << line << std::endl;
         std::getline(is, line);
       }
       is >> kern_spec->kern_correlation_; 

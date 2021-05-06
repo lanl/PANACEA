@@ -86,12 +86,12 @@ namespace panacea {
       virtual ~BaseKernelWrapper() = 0;
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any kern_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any kern_instance);
 

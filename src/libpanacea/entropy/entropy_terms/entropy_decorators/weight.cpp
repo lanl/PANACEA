@@ -31,7 +31,7 @@ namespace panacea {
     return vec;
   }
 
-  void Weight::set(const settings::EntropyOption & option, std::any val) {
+  void Weight::set(const settings::EntropyOption option, std::any val) {
     if( option == settings::EntropyOption::Weight ) {
       weight_ = std::any_cast<double>(val);
     } else {
@@ -48,7 +48,7 @@ namespace panacea {
   }
 
   std::vector<std::any> Weight::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       EntropyTerm * entropy_term_instance) {
 
@@ -64,7 +64,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector Weight::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       EntropyTerm * entropy_term_instance) {
 

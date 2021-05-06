@@ -16,7 +16,7 @@
 namespace panacea {
 
   std::vector<std::any> BaseDescriptorWrapper::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any dwrapper_instance) {
     
@@ -44,7 +44,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector BaseDescriptorWrapper::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any dwrapper_instance) {
 

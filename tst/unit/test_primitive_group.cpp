@@ -3,7 +3,6 @@
 #include "primitives/primitive_group.hpp"
 
 #include "descriptors/descriptor_wrapper.hpp"
-#include "io/file_io.hpp"
 #include "io/file_io_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
 #include "private_settings.hpp"
@@ -11,6 +10,7 @@
 
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
+#include "panacea/file_io.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

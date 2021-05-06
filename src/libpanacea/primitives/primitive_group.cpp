@@ -41,7 +41,7 @@ namespace panacea {
   }
 
   std::vector<std::any> PrimitiveGroup::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any prim_grp_instance) {
 
@@ -67,7 +67,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector PrimitiveGroup::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any prim_grp_instance) {
     
@@ -106,7 +106,6 @@ namespace panacea {
 
   void PrimitiveGroup::postReadKernelSpecsAndNormalizerInitialization(std::any prim_grp_instance) {
     PrimitiveGroup * prim_grp;
-    std::cout << "Reading postReadKernelSpecsAndNormalizerInitialization" << std::endl;
     try {
       prim_grp = std::any_cast<PrimitiveGroup *>(prim_grp_instance);
     } catch (...) {
@@ -134,14 +133,13 @@ namespace panacea {
 
     KernelWrapperFactory kfactory;
     // Essentially create a kernel wrapper shell.
-    std::cout << "Creating kernels" << std::endl;
     prim_grp->kernel_wrapper = kfactory.create(prim_grp->specification); 
 
     assert(prim_grp->kernel_wrapper.get() != nullptr);
   }
 
   void PrimitiveGroup::postReadInitialization(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::any prim_grp_instance) {
 
     if( file_type == settings::FileType::TXTRestart ) {

@@ -93,7 +93,17 @@ namespace panacea {
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 
-  void SelfEntropy::set(const settings::EntropyOption & option, std::any val) {
+  std::unique_ptr<EntropyTerm> SelfEntropy::create(
+      const PassKey<EntropyFactory> & key,
+      EntropySettings * settings) {
+
+    DistributionFactory dist_factory;
+
+    auto dist = dist_factory.create(settings->dist_settings.get());
+    return std::make_unique<SelfEntropy>(key, std::move(dist));
+  }
+
+  void SelfEntropy::set(const settings::EntropyOption option, std::any val) {
     std::string error_msg = "SelfEntropy does not contain any options that can be set";
     PANACEA_FAIL(error_msg);
   }
@@ -107,7 +117,7 @@ namespace panacea {
   }
 
   std::vector<std::any> SelfEntropy::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       EntropyTerm * entropy_term_instance) {
 
@@ -120,7 +130,7 @@ namespace panacea {
   }
 
    io::ReadInstantiateVector SelfEntropy::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       EntropyTerm * entropy_term_instance) {
 

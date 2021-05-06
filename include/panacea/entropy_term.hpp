@@ -20,12 +20,12 @@ namespace panacea {
   class EntropyTerm {
     public:
       typedef io::ReadInstantiateVector (*ReadFunction)(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           EntropyTerm *); 
 
       typedef std::vector<std::any> (*WriteFunction)(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           EntropyTerm *); 
 
@@ -33,9 +33,17 @@ namespace panacea {
       const PassKey<EntropyTerm> key;
 
     public:
+      /**
+       * These are auxillary methods used internally and are not meant to be accessible
+       **/
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) = 0;
       virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) = 0;
 
+      /**
+       * Entropy type:
+       * - Self
+       * - Cross
+       **/
       virtual settings::EntropyType type() const noexcept = 0;
 
       /**
@@ -51,12 +59,18 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind) = 0;
 
+      /**
+       * Computes the gradiant of the entropy term at the location of the
+       * descriptor given by 'desc_ind'. 
+       *
+       * The vector returned contains the gradiant in each dimension.
+       **/
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) = 0;
 
-      virtual void set(const settings::EntropyOption & option, std::any val) = 0;
+      virtual void set(const settings::EntropyOption option, std::any val) = 0;
 
       /**
        * Get the actual dimensions used by the entropy term
@@ -64,23 +78,30 @@ namespace panacea {
       virtual const std::vector<int> & getDimensions() const noexcept = 0;
 
       /**
-       * Update the internals
+       * Update the internal members. 
+       *
+       * This method is used if it is desired to change how the entropy terms
+       * are evalulating a configuration, where a configuration is determined by
+       * the values of the descriptors.
+       *
+       * Updating the entropy term with the provided descriptors will allow the entropy
+       * term to better adjust and more effectively calculate gradiants that can 
+       * lead to uniqueness or similarity in configurations depending on whether the 
+       * entropy term is to be maximized of minimized.  
        **/
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 
       virtual ~EntropyTerm() = 0;
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any dwrapper_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any dwrapper_instance);
-
-
 
   };
 }

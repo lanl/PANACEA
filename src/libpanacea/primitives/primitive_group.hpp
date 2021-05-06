@@ -50,17 +50,17 @@ namespace panacea {
           const BaseDescriptorWrapper * dwrapper);
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any prim_grp_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any prim_grp_instance);
 
       static void postReadInitialization(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::any prim_grp_instance);
 
       static void postReadKernelSpecsAndNormalizerInitialization(std::any obj);

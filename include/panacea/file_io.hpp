@@ -1,5 +1,5 @@
-#ifndef PANACEA_PRIVATE_FILEIO_H
-#define PANACEA_PRIVATE_FILEIO_H
+#ifndef PANACEA_FILEIO_H
+#define PANACEA_FILEIO_H
 #pragma once
 
 // Local private PANACEA settings
@@ -24,4 +24,4 @@ namespace panacea {
   }
 
 }
-#endif // PANACEA_PRIVATE_FILEIO_H
+#endif // PANACEA_FILEIO_H

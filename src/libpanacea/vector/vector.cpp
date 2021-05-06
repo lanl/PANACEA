@@ -32,7 +32,7 @@ namespace panacea {
   }
 
   std::vector<std::any> Vector::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any vector_instance) {
     
@@ -73,7 +73,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector Vector::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any vector_instance) {
 

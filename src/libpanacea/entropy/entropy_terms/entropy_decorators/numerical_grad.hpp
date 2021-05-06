@@ -30,7 +30,7 @@ namespace panacea {
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 
-      virtual void set(const settings::EntropyOption & option, std::any val) override;
+      virtual void set(const settings::EntropyOption option, std::any val) override;
   };
 
 }

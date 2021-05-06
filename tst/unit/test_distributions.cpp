@@ -4,9 +4,11 @@
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "distribution/distribution_factory.hpp"
 #include "distribution/distribution_settings/kernel_distribution_settings.hpp"
-#include "io/file_io.hpp"
 #include "io/file_io_factory.hpp"
 #include "private_settings.hpp"
+
+// Public PANACEA includes
+#include "panacea/file_io.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

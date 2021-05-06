@@ -3,11 +3,9 @@
 #define PANACEA_PRIVATE_FILETXT_DESCRIPTOR_H
 #pragma once
 
-// Local private PANACEA includes
-#include "file_io.hpp"
-
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
+#include "panacea/file_io.hpp"
 
 // Standard includes
 #include <any>
@@ -26,12 +24,12 @@ namespace panacea {
       private:
 
         using WriteMethod = std::vector<std::any>(*)(
-            const settings::FileType &,
+            const settings::FileType,
             std::ostream &,
             std::any ); 
 
         using ReadMethod = ReadInstantiateVector(*)(
-            const settings::FileType &,
+            const settings::FileType,
             std::istream &,
             std::any ); 
 

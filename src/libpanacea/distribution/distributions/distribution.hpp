@@ -22,12 +22,12 @@ namespace panacea {
   class Distribution {
     public:
       typedef io::ReadInstantiateVector (*ReadFunction)(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           Distribution *); 
 
       typedef std::vector<std::any> (*WriteFunction)(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           Distribution *); 
 
@@ -57,12 +57,12 @@ namespace panacea {
       virtual ~Distribution() = 0;
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           std::any dist_instance);
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           std::any dist_instance);
 

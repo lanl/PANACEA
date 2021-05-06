@@ -9,6 +9,7 @@
 #include "entropy/entropy_settings/entropy_settings.hpp"
 #include "entropy/entropy_factory.hpp"
 #include "error.hpp"
+#include "io/file_io_factory.hpp"
 
 // Standard includes
 #include <memory>
@@ -57,13 +58,23 @@ namespace panacea {
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
-    const std::string & file_name) const {
+      const PANACEASettings & settings) const {
 
+    EntropySettings entropy_settings(settings);
+
+
+    EntropyFactory entropy_factory;
+    return entropy_factory.create(&entropy_settings);
+  }
+
+  std::unique_ptr<io::FileIO> PANACEA::create(const settings::FileType type) const {
+    io::FileIOFactory file_factory;
+    return file_factory.create(type);
+  }
     // 1. Determine file type by looking at extension
     // Each object should have it's own read and write methods that are registered with the file
     // type
     // 2. Search for entropy settings in the file
     // 3. Call creation methods with file handle 
-  }
 
 }

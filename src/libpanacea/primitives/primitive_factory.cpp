@@ -49,7 +49,6 @@ namespace panacea {
           kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
           ++kernel_index){
 
-        std::cout << "Creating OneToOne primitive at kernel " << kernel_index << std::endl;
         prim_grp.primitives.push_back(
             create_methods_[prim_grp.getSpecification().get<settings::KernelPrimitive>()]\
             [prim_grp.getSpecification().get<settings::KernelCorrelation>()]\
@@ -66,7 +65,6 @@ namespace panacea {
       int num_prim_to_update = initial_num_prim;
       if( diff < 0 ) num_prim_to_update = prim_grp.kernel_wrapper->getNumberPoints();
       // make sure all the primitive attributes are up to date upto the initial_num_priming index
-      std::cout << "Updating primitives" << std::endl;
       for( int kernel_index = 0; kernel_index < num_prim_to_update; ++kernel_index){
         prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
       } 
@@ -173,35 +171,24 @@ namespace panacea {
       const KernelSpecification & specification,
       const std::string & name) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     KernelWrapperFactory kfactory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PrimitiveGroup prim_grp(specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.name = name;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Calling kfactory in prim factory create group" << std::endl;
     prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
-    std::cout << "Calling kfactory in prim factory create group success" << std::endl;
   
     prim_grp.covariance = createCovariance(dwrapper, specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
     prim_grp.normalizer.normalize(*prim_grp.covariance); 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported: ";
       error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
@@ -213,11 +200,9 @@ namespace panacea {
       error_msg += settings::toString(specification.get<settings::KernelCount>());
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return prim_grp;
   }
 
@@ -237,9 +222,7 @@ namespace panacea {
 
     PrimitiveGroup prim_grp(specification);
     prim_grp.name = name;
-    std::cout << "Calling kfactory in prim factory create group" << std::endl;
     prim_grp.kernel_wrapper = kfactory.create(specification);
-    std::cout << "Calling kfactory in prim factory create group success" << std::endl;
  
     prim_grp.covariance = std::make_unique<Covariance>(CovarianceBuild::Allocate);
 

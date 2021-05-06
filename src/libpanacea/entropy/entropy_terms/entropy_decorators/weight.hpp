@@ -39,15 +39,15 @@ namespace panacea {
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 
-      virtual void set(const settings::EntropyOption & option, std::any val) override;
+      virtual void set(const settings::EntropyOption option, std::any val) override;
 
       static std::vector<std::any> write(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::ostream &,
           EntropyTerm *); 
 
       static io::ReadInstantiateVector read(
-          const settings::FileType & file_type,
+          const settings::FileType file_type,
           std::istream &,
           EntropyTerm *); 
 

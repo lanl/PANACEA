@@ -100,7 +100,18 @@ namespace panacea {
     return std::make_unique<CrossEntropy>(key, std::move(dist));
   }
 
-  void CrossEntropy::set(const settings::EntropyOption & option, std::any val) {
+  std::unique_ptr<EntropyTerm> CrossEntropy::create(
+      const PassKey<EntropyFactory> & key,
+      EntropySettings * settings) {
+
+    // Create distribution 
+    DistributionFactory dist_factory;
+
+    auto dist = dist_factory.create(settings->dist_settings.get());
+    return std::make_unique<CrossEntropy>(key, std::move(dist));
+  }
+
+  void CrossEntropy::set(const settings::EntropyOption option, std::any val) {
     std::string error_msg = "CrossEntropy does not contain any options that can be set";
     PANACEA_FAIL(error_msg);
   }
@@ -115,7 +126,7 @@ namespace panacea {
   }
 
   std::vector<std::any> CrossEntropy::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       EntropyTerm * entropy_term_instance) {
 
@@ -128,7 +139,7 @@ namespace panacea {
   }
 
    io::ReadInstantiateVector CrossEntropy::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       EntropyTerm * entropy_term_instance) {
 

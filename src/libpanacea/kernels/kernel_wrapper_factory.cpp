@@ -73,7 +73,6 @@ namespace panacea {
       }
       if( kern_specification.is(settings::KernelMemory::Share)){
 
-        std::cout << "Creating shared kernel" << std::endl;
         // This check is only appropriate if memory is shared, the desc_wrapper type 
         // and pointer will likley differ in the case of non shared memory 
         // because it's likely you will not have a pointer as the underlying type
@@ -99,7 +98,6 @@ namespace panacea {
             desc_wrapper->cols());
       } else {
 
-        std::cout << "Creating owned kernel" << std::endl;
         auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
         if( desc_data_type_index != 

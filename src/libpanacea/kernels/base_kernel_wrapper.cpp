@@ -18,7 +18,7 @@
 namespace panacea {
 
   std::vector<std::any> BaseKernelWrapper::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any kwrapper_instance) {
 
@@ -52,7 +52,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector BaseKernelWrapper::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any kwrapper_instance) {
 
@@ -183,9 +183,7 @@ namespace panacea {
       }
 
       try { 
-        std::cout << "rows are " << rows << " cols are " << cols << std::endl;
         kwrapper->resize(rows,cols);
-        std::cout << "called resize line is " << line << std::endl;
         for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
           std::istringstream ss_data(line);

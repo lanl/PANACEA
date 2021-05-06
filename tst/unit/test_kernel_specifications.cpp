@@ -2,8 +2,10 @@
 // Local private PANACEA includes
 #include "kernels/kernel_specifications.hpp"
 
-#include "io/file_io.hpp"
 #include "io/file_io_factory.hpp"
+
+// Public PANACEA includes
+#include "panacea/file_io.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>

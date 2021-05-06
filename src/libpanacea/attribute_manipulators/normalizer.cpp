@@ -121,7 +121,7 @@ namespace panacea {
   }
 
   std::vector<std::any> Normalizer::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any norm_instance) {
 
@@ -146,7 +146,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector Normalizer::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any norm_instance) {
 

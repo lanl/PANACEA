@@ -55,7 +55,7 @@ namespace panacea {
         return entropy_term_->compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
       }
 
-      virtual void set(const settings::EntropyOption & option, std::any val) override {
+      virtual void set(const settings::EntropyOption option, std::any val) override {
         return entropy_term_->set(option, val);
       }
 

@@ -14,7 +14,7 @@ namespace panacea {
   EntropyTerm::~EntropyTerm() {};
 
   std::vector<std::any> EntropyTerm::write(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::ostream & os,
       std::any entropy_term_instance) {
 
@@ -22,7 +22,7 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ) {
       auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
       os << "[Entropy]\n";
-      os << entropy_term->type();
+      os << entropy_term->type() << "\n";
 
       // Write out derived class specific data
       nested_values = entropy_term->getWriteFunction(entropy_term->key)(file_type, os, entropy_term);
@@ -36,7 +36,7 @@ namespace panacea {
   }
 
   io::ReadInstantiateVector EntropyTerm::read(
-      const settings::FileType & file_type,
+      const settings::FileType file_type,
       std::istream & is,
       std::any entropy_term_instance) {
 
