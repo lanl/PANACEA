@@ -10,6 +10,7 @@
 #include "panacea/passkey.hpp"
 
 // Standard includes
+#include <algorithm>
 #include <any>
 #include <memory>
 #include <unordered_map>

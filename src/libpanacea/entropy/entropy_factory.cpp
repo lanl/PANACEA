@@ -15,6 +15,7 @@
 #include "private_settings.hpp"
 
 // Standard includes
+#include <cassert>
 #include <string>
 #include <unordered_map>
 

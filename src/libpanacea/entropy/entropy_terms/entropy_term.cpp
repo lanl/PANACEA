@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <any>
+#include <cassert>
 #include <fstream>
 #include <vector>
 

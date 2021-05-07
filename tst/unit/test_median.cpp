@@ -5,6 +5,9 @@
 // Third party includes
 #include <catch2/catch.hpp>
 
+// Standard includes
+#include <algorithm>
+
 using namespace std;
 using namespace panacea;
 

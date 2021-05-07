@@ -15,6 +15,7 @@
 #include <any>
 #include <cstddef>
 #include <deque>
+#include <memory>
 #include <typeindex>
 #include <vector>
 

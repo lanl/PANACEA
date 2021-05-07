@@ -13,6 +13,7 @@
 #include "error.hpp"
 
 // Standard includes
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 

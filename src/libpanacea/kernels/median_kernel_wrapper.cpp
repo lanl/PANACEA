@@ -9,6 +9,8 @@
 #include "data_point_template.hpp"
 
 // Standard incldues
+#include <algorithm>
+#include <iomanip>
 #include <vector>
 
 namespace panacea {

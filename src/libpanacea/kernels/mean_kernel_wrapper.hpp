@@ -14,6 +14,7 @@
 // Standard includes
 #include <any>
 #include <cstddef>
+#include <memory>
 #include <typeindex>
 #include <vector>
 

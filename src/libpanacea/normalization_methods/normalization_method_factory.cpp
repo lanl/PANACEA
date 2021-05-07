@@ -13,7 +13,10 @@
 #include "panacea/passkey.hpp"
 
 // Standard includes
+#include <algorithm>
+#include <cmath>
 #include <memory>
+#include <vector>
 
 namespace panacea {
 

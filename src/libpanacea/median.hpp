@@ -6,6 +6,7 @@
 #include "data_settings.hpp"
 
 // Standard includes
+#include <algorithm>
 #include <deque>
 #include <iostream>
 #include <vector>
@@ -29,21 +30,6 @@ namespace panacea {
         return local_column;
       } 
 
-    template<> 
-      std::vector<double> createSortedRow(
-          const std::vector<std::deque<double>> & data2d,
-          const int row){
-
-        std::vector<double> local_column;
-        local_column.reserve(data2d.at(0).size());
-        // Create local copy
-        for( int col = 0; col < data2d.at(0).size(); ++col) {
-          local_column.push_back(data2d.at(row).at(col)); 
-        }
-        std::sort(local_column.begin(), local_column.end());
-        return local_column;
-      } 
-
     template<class T> 
       std::vector<double> createSortedColumn(
           const T & data2d,
@@ -54,21 +40,6 @@ namespace panacea {
         // Create local copy
         for( int row = 0; row < data2d.rows(); ++row) {
           local_row.push_back(data2d(row,col)); 
-        }
-        std::sort(local_row.begin(), local_row.end());
-        return local_row;
-      } 
-
-    template<> 
-      std::vector<double> createSortedColumn(
-          const std::vector<std::deque<double>> & data2d,
-          const int col){
-
-        std::vector<double> local_row;
-        local_row.reserve(data2d.size());
-        // Create local copy
-        for( int row = 0; row < data2d.size(); ++row) {
-          local_row.push_back(data2d.at(row).at(col)); 
         }
         std::sort(local_row.begin(), local_row.end());
         return local_row;
@@ -238,6 +209,38 @@ namespace panacea {
         return median; 
       }
   };
+
+  template<> 
+  inline std::vector<double> Median::createSortedRow
+    <std::vector<std::deque<double>>>(
+        const std::vector<std::deque<double>> & data2d,
+        const int row){
+
+      std::vector<double> local_column;
+      local_column.reserve(data2d.at(0).size());
+      // Create local copy
+      for( int col = 0; col < data2d.at(0).size(); ++col) {
+        local_column.push_back(data2d.at(row).at(col)); 
+      }
+      std::sort(local_column.begin(), local_column.end());
+      return local_column;
+    } 
+
+  template<> 
+  inline std::vector<double> Median::createSortedColumn
+    <std::vector<std::deque<double>>>(
+        const std::vector<std::deque<double>> & data2d,
+        const int col){
+
+      std::vector<double> local_row;
+      local_row.reserve(data2d.size());
+      // Create local copy
+      for( int row = 0; row < data2d.size(); ++row) {
+        local_row.push_back(data2d.at(row).at(col)); 
+      }
+      std::sort(local_row.begin(), local_row.end());
+      return local_row;
+    } 
 }
 
 #endif // PANACEA_PRIVATE_MEAN_H
