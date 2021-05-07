@@ -17,3 +17,21 @@ interatomic potentials.
 
 * Eigen - matrix opertions
 * Catch2 - for unit and integration testing
+
+# Compiling & Installing
+
+PANACEA can be built and installed with CMake relatively easy.
+
+```bash
+cd PANACEA
+cmake -S. -B build
+cmake --build build --parallel
+cmake --build build --target install
+```
+
+Unit and integration tests can be run with:
+
+```bash
+cd build
+ctest
+```
