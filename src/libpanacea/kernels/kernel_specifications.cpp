@@ -20,7 +20,8 @@ namespace panacea {
       std::ostream & os,
       std::any kern_spec_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       KernelSpecification * kern_spec;
       try {
         kern_spec = std::any_cast<KernelSpecification *>(kern_spec_instance);
@@ -51,7 +52,8 @@ namespace panacea {
       std::istream & is,
       std::any kern_spec_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       KernelSpecification * kern_spec;
       try {
         kern_spec = std::any_cast<KernelSpecification *>(kern_spec_instance);

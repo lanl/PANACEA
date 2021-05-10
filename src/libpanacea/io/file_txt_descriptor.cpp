@@ -31,6 +31,10 @@ namespace panacea {
       registerReadMethod<BaseDescriptorWrapper>();
     }
 
+    /***************************************************************************
+     * Private Methods
+     ***************************************************************************/
+
     void FileDescriptorTXT::write_(
         std::vector<std::any> & objs,
         std::ostream & os) {
@@ -67,13 +71,15 @@ namespace panacea {
       }
     }
 
+    /***************************************************************************
+     * Public Methods
+     ***************************************************************************/
+
     void FileDescriptorTXT::write(std::any obj, const std::string & filename) {
 
       std::fstream fs;
       fs.open(filename, std::fstream::out);
-
       write(obj, fs);
-
       fs.close();
     }
 
@@ -107,7 +113,6 @@ namespace panacea {
 
       std::fstream fs;
       fs.open(filename, std::fstream::in);
-
       read(obj, fs);  
       fs.close();
     }

@@ -128,7 +128,8 @@ namespace panacea {
 
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto normalizer = std::any_cast<Normalizer *>(norm_instance);
 
       os << "[Normalization]\n";
@@ -151,7 +152,8 @@ namespace panacea {
       std::istream & is,
       std::any norm_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto normalizer = std::any_cast<Normalizer *>(norm_instance);
       
       std::string line;

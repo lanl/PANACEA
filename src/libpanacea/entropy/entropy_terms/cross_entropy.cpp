@@ -132,7 +132,8 @@ namespace panacea {
       EntropyTerm * entropy_term_instance) {
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
       nested_values.push_back(cross_ent->distribution_.get());
     }
@@ -145,7 +146,8 @@ namespace panacea {
       EntropyTerm * entropy_term_instance) {
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
       nested_values.emplace_back(cross_ent->distribution_.get(), std::nullopt);
     }

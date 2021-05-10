@@ -325,7 +325,8 @@ namespace panacea {
       std::any cov_instance) {
 
     std::vector<std::any> nested_objs; 
-    if( file_type == settings::FileType::TXTRestart ) { 
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) { 
       auto cov_mat = std::any_cast<Covariance *>(cov_instance); 
       os << "[Covariance]\n";
       os << cov_mat->total_number_data_pts_ << "\n\n";
@@ -347,7 +348,8 @@ namespace panacea {
       std::any cov_instance) {
 
     io::ReadInstantiateVector nested_objs; 
-    if( file_type == settings::FileType::TXTRestart ) { 
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) { 
       Covariance * cov_mat = nullptr;
       if(std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))) {
         cov_mat = std::any_cast<Covariance *>(cov_instance); 

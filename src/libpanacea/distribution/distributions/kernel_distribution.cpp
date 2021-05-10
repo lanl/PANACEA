@@ -198,7 +198,8 @@ namespace panacea {
     KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);
     
     std::vector<std::any> nested_objs;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution) {
       os << "[Prefactor]\n";
       os << kern_dist->pre_factor_ << "\n";
       nested_objs.push_back(&(kern_dist->prim_grp_));
@@ -212,7 +213,8 @@ namespace panacea {
           Distribution * dist) {
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
 
       KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);
       std::string line = "";

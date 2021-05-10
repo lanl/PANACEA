@@ -39,7 +39,12 @@ namespace panacea {
           rows,
           cols);
     }
-    
+    if(data.type() == typeid(std::vector<std::vector<double>>) ) {
+      return std::make_unique<DescriptorWrapper<std::vector<std::vector<double>>>>(
+          std::any_cast<std::vector<std::vector<double>>>(data),
+          rows,
+          cols);
+    }   
     std::string error_msg = "Tried to wrap an unsuppored data type";
     PANACEA_FAIL(error_msg);
   

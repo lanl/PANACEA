@@ -25,7 +25,8 @@ namespace panacea {
       std::any kwrapper_instance) {
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto kwrapper = std::any_cast<BaseKernelWrapper *>(kwrapper_instance);
       os << "[Kernel]\n";
       os << kwrapper->center() << "\n";
@@ -58,7 +59,8 @@ namespace panacea {
       std::istream & is,
       std::any kwrapper_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       BaseKernelWrapper * kwrapper;
       if( std::type_index(kwrapper_instance.type()) == std::type_index(typeid(BaseKernelWrapper *))){
         kwrapper = std::any_cast<BaseKernelWrapper *>(kwrapper_instance);

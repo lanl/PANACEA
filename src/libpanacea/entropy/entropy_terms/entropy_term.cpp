@@ -20,7 +20,8 @@ namespace panacea {
       std::any entropy_term_instance) {
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
       os << "[Entropy]\n";
       os << entropy_term->type() << "\n";
@@ -29,8 +30,9 @@ namespace panacea {
       nested_values = entropy_term->getWriteFunction(entropy_term->key)(file_type, os, entropy_term);
 
     } else {
-      std::string error_msg = "Descriptors cannot be written to the specified file type.";
-      PANACEA_FAIL(error_msg);
+      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
+      // Write out derived class specific data
+      nested_values = entropy_term->getWriteFunction(entropy_term->key)(file_type, os, entropy_term);
     }
     return nested_values;
 
@@ -42,7 +44,8 @@ namespace panacea {
       std::any entropy_term_instance) {
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
       
       std::string line = "";
@@ -58,6 +61,9 @@ namespace panacea {
       settings::EntropyType ent_type;
       is >> ent_type;
       assert(ent_type == entropy_term->type());
+      nested_values = entropy_term->getReadFunction(entropy_term->key)(file_type, is, entropy_term);
+    } else {
+      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
       nested_values = entropy_term->getReadFunction(entropy_term->key)(file_type, is, entropy_term);
     }
     return nested_values;

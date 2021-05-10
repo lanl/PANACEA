@@ -37,7 +37,8 @@ namespace panacea {
       std::any vector_instance) {
     
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       Vector * vec = std::any_cast<Vector *>(vector_instance);
       os << "[Vector Type]\n";
       os << vec->type() << "\n";
@@ -77,7 +78,8 @@ namespace panacea {
       std::istream & is,
       std::any vector_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       Vector * vec = std::any_cast<Vector *>(vector_instance);
       std::string line = "";
       while(line.find("[Vector Type]",0) == std::string::npos) {

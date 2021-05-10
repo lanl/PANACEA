@@ -29,8 +29,8 @@ namespace panacea {
       nested_values = dist->getWriteFunction_()(file_type, os, dist);
       
     } else {
-      std::string error_msg = "The Distribution cannot be written to the specified file type.";
-      PANACEA_FAIL(error_msg);
+      auto dist = std::any_cast<Distribution *>(dist_instance);
+      nested_values = dist->getWriteFunction_()(file_type, os, dist);
     }
     return nested_values;
   }
@@ -60,8 +60,8 @@ namespace panacea {
       nested_values = dist->getReadFunction_()(file_type, is, dist);
       
     } else {
-      std::string error_msg = "The Distribution cannot be written to the specified file type.";
-      PANACEA_FAIL(error_msg);
+      auto dist = std::any_cast<Distribution *>(dist_instance);
+      nested_values = dist->getReadFunction_()(file_type, is, dist);
     }
     return nested_values;
 

@@ -31,7 +31,8 @@ namespace panacea {
       std::any matrix_instance) {
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
       os << "[Matrix Type]\n";
       os << mat->type() << "\n\n";
@@ -60,7 +61,8 @@ namespace panacea {
       std::istream & is,
       std::any matrix_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
       std::string line = "";
       while(line.find("[Matrix Type]",0) == std::string::npos) {

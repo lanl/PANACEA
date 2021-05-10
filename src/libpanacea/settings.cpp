@@ -99,6 +99,8 @@ namespace panacea {
       os << "TXTRestart";
     } else if( file_type == settings::FileType::TXTDescriptors) {
       os << "TXTDescriptors";
+    } else if( file_type == settings::FileType::TXTKernelDistribution) {
+      os << "TXTKernelDistribution";
     }
     return os;
   }
@@ -264,6 +266,8 @@ namespace panacea {
       file_type = settings::FileType::TXTRestart;
     } else if( line.find("TXTDescriptors", 0) != std::string::npos ) {
       file_type = settings::FileType::TXTDescriptors;
+    } else if( line.find("TXTKernelDistribution", 0) != std::string::npos ) {
+      file_type = settings::FileType::TXTKernelDistribution;
     } else {
       std::string error_msg = "Unrecognized file type while reading istream.\n";
       error_msg += "Accepted file types are:\n";

@@ -47,7 +47,8 @@ namespace panacea {
 
     
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       PrimitiveGroup * prim_grp;
       try {
         prim_grp = std::any_cast<PrimitiveGroup *>(prim_grp_instance);
@@ -72,7 +73,8 @@ namespace panacea {
       std::any prim_grp_instance) {
     
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart ) {
+    if( file_type == settings::FileType::TXTRestart || 
+        file_type == settings::FileType::TXTKernelDistribution ) {
       PrimitiveGroup * prim_grp;
       try {
         prim_grp = std::any_cast<PrimitiveGroup *>(prim_grp_instance);

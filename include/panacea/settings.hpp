@@ -21,7 +21,8 @@ namespace panacea {
 
     enum class FileType {
       TXTRestart,
-      TXTDescriptors
+      TXTDescriptors,
+      TXTKernelDistribution
     };
 
     class Kernel { };

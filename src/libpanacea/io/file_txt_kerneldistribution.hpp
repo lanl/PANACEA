@@ -1,6 +1,6 @@
 
-#ifndef PANACEA_PRIVATE_FILETXT_RESTART_H
-#define PANACEA_PRIVATE_FILETXT_RESTART_H
+#ifndef PANACEA_PRIVATE_FILETXT_KERNEL_DISTRIBUTION_H
+#define PANACEA_PRIVATE_FILETXT_KERNEL_DISTRIBUTION_H
 #pragma once
 
 // Public PANACEA includes
@@ -25,7 +25,7 @@ namespace panacea {
   namespace io {
 
     /**
-     * Writes restart files in text format
+     * Writes restart files in text format only for kernel distribution
      *
      * Formatting rules, each data group must begin with a group header 
      * with the form.
@@ -37,7 +37,7 @@ namespace panacea {
      * The data must appear on the line directly under each header. 
      *
      **/
-    class FileRestartTXT : public FileIO {
+    class FileKernelDistributionTXT : public FileIO {
 
       private:
 
@@ -69,8 +69,8 @@ namespace panacea {
 
       public:
 
-        FileRestartTXT();
-        settings::FileType type() const noexcept final { return settings::FileType::TXTRestart; }
+        FileKernelDistributionTXT();
+        settings::FileType type() const noexcept final { return settings::FileType::TXTKernelDistribution; }
 
         /**
          * Will always register methods to the pointer type index
@@ -127,4 +127,4 @@ namespace panacea {
   }
 }
 
-#endif // PANACEA_PRIVATE_FILETXT_RESTART_H
+#endif // PANACEA_PRIVATE_FILETXT_KERNEL_DISTRIBUTION_H
