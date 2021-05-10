@@ -110,43 +110,53 @@ namespace panacea {
     }
 
 
-    void FileRestartTXT::write(std::any obj, const std::string & filename) {
-
-      std::fstream fs;
-      fs.open(filename, std::fstream::out);
+    void FileRestartTXT::write(std::any obj, std::ostream & os) {
 
       // Check if object type is registered
       if( write_methods_.count(obj.type()) ) {
-        auto data = write_methods_[obj.type()](type(),fs,obj);
-        write_(data, fs);
+        auto data = write_methods_[obj.type()](type(),os,obj);
+        write_(data, os);
       } else {
         std::string error_msg = "Unable to write object it does not contain ";
         error_msg += "a registered write method.";
         PANACEA_FAIL(error_msg);
       }
+    }
+
+    void FileRestartTXT::write(std::any obj, const std::string & filename) {
+
+      std::fstream fs;
+      fs.open(filename, std::fstream::out);
+
+      write(obj, fs); 
       fs.close();
     }
 
-    void FileRestartTXT::read(std::any obj, const std::string & filename) {
-      // Not implemented
-      //
-      std::fstream fs;
-      fs.open(filename, std::fstream::in);
+
+    void FileRestartTXT::read(std::any obj, std::istream & is) {
 
       // Check if object type is registered
       if( read_methods_.count(obj.type()) ) {
-        auto data = read_methods_[obj.type()](type(),fs,obj);
-        read_(obj, data, fs);
+        auto data = read_methods_[obj.type()](type(),is,obj);
+        read_(obj, data, is);
       } else {
         std::string error_msg = "Unable to read object it does not contain ";
         error_msg += "a registered read method.";
         PANACEA_FAIL(error_msg);
       }
-      fs.close();
 
       if( post_read_initialization_.count(obj.type())){
         post_read_initialization_[obj.type()](type(),obj);
       }
+    }
+   
+    void FileRestartTXT::read(std::any obj, const std::string & filename) {
+      // Not implemented
+      std::fstream fs;
+      fs.open(filename, std::fstream::in);
+
+      read(obj, fs);
+      fs.close();
     }
 
   }

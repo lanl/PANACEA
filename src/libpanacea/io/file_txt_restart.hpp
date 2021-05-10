@@ -9,6 +9,7 @@
 
 // Standard includes
 #include <any>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <typeindex>
@@ -141,6 +142,8 @@ namespace panacea {
             return true;
           }
 
+        virtual void read(std::any obj, std::istream & is) final;
+        virtual void write(std::any  obj, std::ostream & os) final;
         virtual void read(std::any obj, const std::string & filename) final;
         virtual void write(std::any  obj, const std::string & filename) final;
     };
