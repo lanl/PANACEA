@@ -84,5 +84,6 @@ int main()
 
   auto kern_dist_io = panacea_pi.create(settings::FileType::TXTKernelDistribution);
   kern_dist_io->write(cross_mean.get(), "cross_mean.txt");
+  kern_dist_io->write(cross_median.get(), "cross_median.txt");
   return 0;
 }
