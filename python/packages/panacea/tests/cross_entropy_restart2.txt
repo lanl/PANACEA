@@ -1,0 +1,57 @@
+[Entropy]
+Cross
+[Distribution]
+Kernel
+[Prefactor]
+0.5
+[Primitive Group]
+
+[Kernel Specifications]
+Uncorrelated
+Single
+Gaussian
+None
+Share
+Mean
+Flexible
+
+[Normalization]
+Flexible
+3
+[Normalization Coefficients]
+             1
+             1
+             1
+[Kernel]
+None
+Single
+[Meta Data]
+[Data]
+Points along rows dimensions along columns
+1 3
+             2.75              2              3
+[Covariance]
+4
+
+[Normalization State]
+Normalized
+
+[Matrix Type]
+Eigen
+
+[Matrix]
+3 3
+             1              0              0
+             0              1              0
+             0              0              1
+
+[Vector Type]
+Eigen
+Along Rows
+
+[Vector]
+3 1
+             2.75
+             2
+             3
+
