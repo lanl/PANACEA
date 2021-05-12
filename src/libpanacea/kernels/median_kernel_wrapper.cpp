@@ -38,8 +38,8 @@ namespace panacea {
       // Sort each of the deques
       for( int dim = 0; dim < ndim; ++dim) {
         std::sort(pts_near_median.at(dim).begin(), pts_near_median.at(dim).end());
-      } 
-    
+      }
+
     }
 
     void trim(
@@ -48,7 +48,7 @@ namespace panacea {
         bool & remove_more_from_front){
 
       const int num_pts = pts_near_median.at(0).size();
-      const int diff = max_number_pts - num_pts;
+      const int diff = std::abs(max_number_pts - num_pts);
       if( num_pts > max_number_pts ) {
         int remove_from_front = diff/2;
         int remove_from_back = diff/2;
@@ -60,15 +60,15 @@ namespace panacea {
             ++remove_from_back;
             remove_from_front = true;
           }
-        }  
-      
+        }
+
         for( int dim = 0; dim < pts_near_median.size(); ++dim){
           // Erase from end first
           auto it_end = pts_near_median.at(dim).end();
-          pts_near_median.at(dim).erase((it_end - remove_from_back), it_end); 
-  
+          pts_near_median.at(dim).erase((it_end - remove_from_back), it_end);
+
           auto it_begin = pts_near_median.at(dim).begin();
-          pts_near_median.at(dim).erase(it_begin, it_begin + remove_from_front); 
+          pts_near_median.at(dim).erase(it_begin, it_begin + remove_from_front);
         }
       }
     }
@@ -103,7 +103,7 @@ namespace panacea {
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
     update_median_point_values(dwrapper, points_near_median_);
     trim(points_near_median_, number_pts_store_, remove_from_front_);
-    
+
     number_pts_median_ = dwrapper->getNumberPoints();
   }
 
@@ -129,7 +129,7 @@ namespace panacea {
 
     Median median;
     // Because of how the points are stored, for ease of sorting we need to
-    // calculate the median here Along the Rows. 
+    // calculate the median here Along the Rows.
     auto center_ = median.calculate<
       std::vector<std::deque<double>>,Direction::AlongRows>(points_near_median_);
 
@@ -199,7 +199,7 @@ namespace panacea {
 
   std::istream & MedianKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
 
-      MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);  
+      MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);
       std::string line = "";
       while(line.find("[Total Number Points]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -252,9 +252,9 @@ namespace panacea {
 
 
       std::istringstream ss(line);
-  
+
       int rows;
-      try { 
+      try {
         ss >> rows;
       } catch (...) {
         std::string error_msg = "Unable to read in rows from Median Kernel section of ";
@@ -271,7 +271,7 @@ namespace panacea {
         error_msg += "line is: " + line + "\n";
         PANACEA_FAIL(error_msg);
       }
- 
+
      try {
       kwrapper_median->points_near_median_.clear();
       for( int row = 0; row < rows; ++row) {
@@ -290,7 +290,7 @@ namespace panacea {
         error_msg += "median section from restart file.\n";
         error_msg += "line is: " + line + "\n";
         PANACEA_FAIL(error_msg);
-     } 
+     }
      return is;
   }
 
@@ -309,12 +309,12 @@ namespace panacea {
     os << rows << " " << cols << "\n";
     for (int row = 0; row < rows; ++row) {
       for( int col = 0; col < cols; ++col ) {
-        os << std::setfill(' ') 
-          << std::setw(14) 
-          << std::setprecision(8) 
+        os << std::setfill(' ')
+          << std::setw(14)
+          << std::setprecision(8)
           << std::right
           << kwrapper_median->points_near_median_.at(row).at(col) << " ";
-      } 
+      }
       os << "\n";
     }
     return os;

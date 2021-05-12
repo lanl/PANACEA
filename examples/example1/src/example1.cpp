@@ -49,14 +49,14 @@ int main()
 {
 
   const int samples = 10000;
-  const int dims = 1;
-  auto data = createDistribution(samples,1);
+  const int dims = 2;
+  auto data = createDistribution(samples,dims);
 
   PANACEA panacea_pi;
 
   std::unique_ptr<BaseDescriptorWrapper> dwrapper = panacea_pi.wrap(data, samples, dims);
   auto desc_io = panacea_pi.create(settings::FileType::TXTDescriptors);
-  desc_io->write(dwrapper.get(),"descriptors.txt");
+  desc_io->write(dwrapper.get(),"descriptors0.txt");
 
   PANACEASettings settings_cross_mean = PANACEASettings::make()
                                       .set(EntropyType::Cross)
@@ -83,7 +83,7 @@ int main()
   auto cross_median = panacea_pi.create(dwrapper.get(), settings_cross_median);
 
   auto kern_dist_io = panacea_pi.create(settings::FileType::TXTKernelDistribution);
-  kern_dist_io->write(cross_mean.get(), "cross_mean.txt");
-  kern_dist_io->write(cross_median.get(), "cross_median.txt");
+  kern_dist_io->write(cross_mean.get(), "cross_mean0.txt");
+  kern_dist_io->write(cross_median.get(), "cross_median0.txt");
   return 0;
 }

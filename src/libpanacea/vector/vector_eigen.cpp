@@ -64,7 +64,7 @@ namespace panacea {
   }
 
   int VectorEigen::cols() const {
-    if( direction_ == Direction::AlongColumns) {
+    if( direction_ == Direction::AlongRows) {
       return 1;
     } else {
       return vector_->rows();

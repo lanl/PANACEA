@@ -46,6 +46,11 @@ if( NOT Eigen3_FOUND )
   include(cmake/InstallEigen.cmake)
 endif()
 
+##########################
+# Python3 Configuration  #
+##########################
+find_package(Python3 COMPONENTS Interpreter Development)
+
 ########################################################################
 # Grab source files                                                    #
 ########################################################################
@@ -93,5 +98,6 @@ include(cmake/PanaceaInstall.cmake)
 if(ENABLE_TESTING)
   enable_testing()
   add_subdirectory(tst)
+  add_subdirectory(python/packages)
 endif(ENABLE_TESTING)
 
