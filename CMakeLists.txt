@@ -46,11 +46,6 @@ if( NOT Eigen3_FOUND )
   include(cmake/InstallEigen.cmake)
 endif()
 
-##########################
-# Python3 Configuration  #
-##########################
-find_package(Python3 COMPONENTS Interpreter Development)
-
 ########################################################################
 # Grab source files                                                    #
 ########################################################################
