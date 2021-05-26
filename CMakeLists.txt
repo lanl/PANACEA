@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.18.3)
 
 enable_language(CXX)
 
@@ -13,8 +13,12 @@ option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(ENABLE_TESTING "Build and enable unit testing" ON)
 
 ########################################################
-# Compiler Flags                                       #
+# Includes                                             #
 ########################################################
+# This include must be placed before using the variables:
+# CMAKE_INSTALL_INCLUDEDIR
+# CMAKE_INSTALL_LIBDIR
+include(GNUInstallDirs)
 
 # Public includes
 include_directories(${panacea_SOURCE_DIR}/include)
@@ -72,11 +76,6 @@ file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/vector/*
   )
 
-###############################
-# Add subdirectories
-###############################
-add_subdirectory(include/panacea)
-
 ####################################################
 # Setup the directory where they will be installed #
 ####################################################
@@ -84,6 +83,15 @@ add_subdirectory(include/panacea)
 add_library(panacea ${SOURCES})
 set_target_properties(panacea PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(panacea Eigen3::Eigen)
+
+###############################
+# Add subdirectories
+###############################
+add_subdirectory(include/panacea)
+
+###############################
+# Setup installation 
+###############################
 include(cmake/PanaceaInstall.cmake)
 
 ###############################
