@@ -28,7 +28,7 @@ namespace panacea {
 
     public:
       CrossEntropy(
-          const PassKey<EntropyFactory> & key, 
+          const PassKey<EntropyFactory> & key,
           std::unique_ptr<Distribution> dist) :
         distribution_(std::move(dist)) {};
 
@@ -49,6 +49,11 @@ namespace panacea {
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const PANACEASettings & entropy_settings) override;
+
       virtual void set(const settings::EntropyOption option, std::any val) override;
 
       virtual const std::vector<int> & getDimensions() const noexcept override;
@@ -67,12 +72,12 @@ namespace panacea {
       static std::vector<std::any> write(
           const settings::FileType file_type,
           std::ostream &,
-          EntropyTerm *); 
+          EntropyTerm *);
 
       static io::ReadInstantiateVector read(
           const settings::FileType file_type,
           std::istream &,
-          EntropyTerm *); 
+          EntropyTerm *);
 
 
   };

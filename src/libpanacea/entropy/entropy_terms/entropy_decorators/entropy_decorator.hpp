@@ -22,7 +22,7 @@ namespace panacea {
       std::unique_ptr<EntropyTerm> entropy_term_;
 
     public:
-      explicit EntropyDecorator(std::unique_ptr<EntropyTerm> entropy_term) : 
+      explicit EntropyDecorator(std::unique_ptr<EntropyTerm> entropy_term) :
         entropy_term_(std::move(entropy_term)) {};
 
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override {
@@ -40,7 +40,7 @@ namespace panacea {
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper) override {
         return entropy_term_->compute(descriptor_wrapper);
-      } 
+      }
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
@@ -54,6 +54,11 @@ namespace panacea {
           const EntropySettings & entropy_settings) override {
         return entropy_term_->compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
       }
+
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const PANACEASettings & panacea_settings) override;
 
       virtual void set(const settings::EntropyOption option, std::any val) override {
         return entropy_term_->set(option, val);
