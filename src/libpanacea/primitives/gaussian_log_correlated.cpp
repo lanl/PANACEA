@@ -26,6 +26,7 @@ namespace panacea {
 
   void GaussLogCorrelated::update(PrimitiveAttributes && attributes) {
     assert(attributes.kernel_wrapper != nullptr);
+    std::cout << "WARNING Multivariate Log normal distribution/Gaussian Log primitive has not yet been vetted." << std::endl;
     attributes_ = std::move(attributes);
     double determinant = attributes_.reduced_covariance->getDeterminant();
     if( determinant <= 0.0 ) {
@@ -50,6 +51,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+    std::cout << "WARNING Multivariate Log normal distribution/Gaussian Log primitive has not yet been vetted." << std::endl;
 
     auto & descs  = *(descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
@@ -92,58 +94,11 @@ namespace panacea {
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
-/*
-    assert(descriptors != nullptr);
-    assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptors->getNumberPoints() );
-    assert(attributes_.kernel_wrapper != nullptr);
-    assert(kernel_index_ > -1);
-    assert(kernel_index_ < attributes_.kernel_wrapper->rows());
-    assert(attributes_.reduced_inv_covariance != nullptr);
-    assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
-    assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
-*/
+
+    throw std::runtime_error("Analytical gradiant method for Multivariate Log normal distribution/GaussLog has not yet been implemented.");
+
     auto & descs  = *(descriptors);
-/*    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-    auto & kerns = *(attributes_.kernel_wrapper);*/
     const int ndim = descs.getNumberDimensions();
-/*    auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
-    const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
-
-    const double exp_term = [&]{
-      if (prim_settings == settings::EquationSetting::IgnoreExp) {
-        return 1.0;
-      } else {
-        return compute(descriptors, descriptor_ind);
-      }
-    }();
-
-    std::vector diff(ndim, 0.0);
-    for ( const int dim : chosen_dims ) {
-      // ( a_i * (d_x_i - d_mu_i) )
-      diff.at(dim) = (descs(descriptor_ind,dim) -
-          kerns.at(kernel_index_,dim));
-    }
-
-    std::vector<double> grad(ndim,0.0);
-
-    int index1 = 0;
-    for ( const int dim : chosen_dims ) {
-      int index2 = 0;
-      for ( const int dim2 : chosen_dims ) {
-        grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) * norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
-        ++index2;
-      }
-      ++index1;
-    }
-
-    if ( grad_setting == settings::GradSetting::WRTDescriptor ) {
-      for ( const int & dim : chosen_dims ) {
-        grad.at(dim) *= -1.0;
-      }
-    }
-
-    return grad;*/
 
     std::vector<double> grad(ndim,0.0);
     return grad;
