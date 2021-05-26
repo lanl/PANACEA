@@ -22,12 +22,12 @@ namespace panacea {
       typedef io::ReadInstantiateVector (*ReadFunction)(
           const settings::FileType file_type,
           std::istream &,
-          EntropyTerm *); 
+          EntropyTerm *);
 
       typedef std::vector<std::any> (*WriteFunction)(
           const settings::FileType file_type,
           std::ostream &,
-          EntropyTerm *); 
+          EntropyTerm *);
 
     protected:
       const PassKey<EntropyTerm> key;
@@ -61,7 +61,7 @@ namespace panacea {
 
       /**
        * Computes the gradiant of the entropy term at the location of the
-       * descriptor given by 'desc_ind'. 
+       * descriptor given by 'desc_ind'.
        *
        * The vector returned contains the gradiant in each dimension.
        **/
@@ -78,18 +78,30 @@ namespace panacea {
       virtual const std::vector<int> & getDimensions() const noexcept = 0;
 
       /**
-       * Update the internal members. 
+       * Update the internal members.
        *
        * This method is used if it is desired to change how the entropy terms
        * are evalulating a configuration, where a configuration is determined by
        * the values of the descriptors.
        *
        * Updating the entropy term with the provided descriptors will allow the entropy
-       * term to better adjust and more effectively calculate gradiants that can 
-       * lead to uniqueness or similarity in configurations depending on whether the 
-       * entropy term is to be maximized of minimized.  
+       * term to better adjust and more effectively calculate gradiants that can
+       * lead to uniqueness or similarity in configurations depending on whether the
+       * entropy term is to be maximized of minimized.
        **/
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+
+      /**
+       * Some method to combine entropy terms, such that the covariance matrices are updated.
+       *
+       * By only storing a diff we can achieve a small memory footprint.
+       *
+       * Covariance and Mean and one delta object
+       *
+       * If you give me a delta I can
+       *
+       * Make test case, great
+       **/
 
       virtual ~EntropyTerm() = 0;
 

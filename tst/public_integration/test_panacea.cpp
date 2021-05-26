@@ -22,7 +22,7 @@ TEST_CASE("Testing:panacea-descriptor_wrapper","[integration,panacea]"){
 
   // pi - public interface
   PANACEA panacea_pi;
-  
+
   WHEN("Wrapping double ***"){
     // Data has the following form
     //
@@ -45,7 +45,7 @@ TEST_CASE("Testing:panacea-descriptor_wrapper","[integration,panacea]"){
     array_data.data[0][0] = 12.0;
     REQUIRE(dwrapper->operator()(0,0) == 12.0);
   }
-  
+
   WHEN("Wrapping vector<vector<double>>*"){
     // Data has the following form
     //
@@ -70,7 +70,7 @@ TEST_CASE("Testing:panacea-descriptor_wrapper","[integration,panacea]"){
 
 TEST_CASE("Testing:panacea self entropy","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -97,8 +97,8 @@ TEST_CASE("Testing:panacea self entropy","[integration,panacea]"){
 
     double self_ent_val1 = self_ent->compute(dwrapper.get());
 
-    // Because we are dealing with a single point and the self entropy term 
-    // shares the data with the descriptor changing the location of the 
+    // Because we are dealing with a single point and the self entropy term
+    // shares the data with the descriptor changing the location of the
     // descriptors should not change anything
     dwrapper->operator()(0,0) = 2.0;
 
@@ -130,7 +130,7 @@ TEST_CASE("Testing:panacea self entropy","[integration,panacea]"){
 
 TEST_CASE("Testing:panacea self entropy read & write with fileio","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -161,7 +161,7 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[integration,
 
     double self_ent_val = self_ent->compute(dwrapper.get());
     auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
-    restart_file->write(self_ent.get(),"self_entropy_restart.txt"); 
+    restart_file->write(self_ent.get(),"self_entropy_restart.txt");
 
     std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
 
@@ -173,7 +173,7 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[integration,
 
 TEST_CASE("Testing:panacea self entropy update","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -203,17 +203,17 @@ TEST_CASE("Testing:panacea self entropy update","[integration,panacea]"){
 
   // Let's try shrinking the data to a single point
   data.resize(1);
- 
-  rows = 1; 
+
+  rows = 1;
   // We have to rewrap the data
   dwrapper = panacea_pi.wrap(&(data), rows, cols);
   self_ent->update(dwrapper.get());
 
   double self_ent_single_pt = self_ent->compute(dwrapper.get());
- 
+
   std::cout << "self entropy should decrease when we move from two points spread apart";
   std::cout << " to a single point." << std::endl;
-  std::cout << "Two points " << self_ent_two_pts << " single point " << self_ent_single_pt << std::endl; 
+  std::cout << "Two points " << self_ent_two_pts << " single point " << self_ent_single_pt << std::endl;
   REQUIRE( self_ent_single_pt < self_ent_two_pts );
 
   // Increase the size and diversity the self entropy should increase
@@ -232,7 +232,7 @@ TEST_CASE("Testing:panacea self entropy update","[integration,panacea]"){
 
 TEST_CASE("Testing:panacea cross entropy single mean","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -261,7 +261,7 @@ TEST_CASE("Testing:panacea cross entropy single mean","[integration,panacea]"){
   auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
 
   // Will create a cross entropy term centered at
-  // 
+  //
   //         col1   col2   col3
   // row1    2.0     0.0    0.0  Point 1
   std::unique_ptr<EntropyTerm> cross_ent = panacea_pi.create(dwrapper.get(), panacea_settings);
@@ -278,7 +278,7 @@ TEST_CASE("Testing:panacea cross entropy single mean","[integration,panacea]"){
 
 TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -303,8 +303,8 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
   int cols = 3;
 
   auto kern_init_data = new double*[rows];
-  kern_init_data[0] = new double[cols]; 
-  kern_init_data[1] = new double[cols]; 
+  kern_init_data[0] = new double[cols];
+  kern_init_data[1] = new double[cols];
 
   kern_init_data[0][0] = 1.0;
   kern_init_data[1][0] = 1.0;
@@ -324,13 +324,13 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
   auto dwrapper_sample = panacea_pi.wrap(&sample_pts, 3, 3);
 
   // Show that cross entropy is lowest at 1.0 0.0 0.0
-  double lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0); 
-  double center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1); 
-  double upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2); 
+  double lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0);
+  double center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1);
+  double upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2);
 
   REQUIRE(lower_cross_ent > center_cross_ent );
   REQUIRE(lower_cross_ent == Approx(upper_cross_ent));
- 
+
   // Because we are calculating the mean the memory will not be shared
   // it is ok at this point to delete the initial data
 
@@ -339,24 +339,24 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
   delete[] kern_init_data;
 
   auto desc_data = new double*[1];
-  desc_data[0] = new double[cols]; 
+  desc_data[0] = new double[cols];
   desc_data[0][0] = 7.0; // The mean of three points 7 and 1 and 1 = 9/3 = 3
-  desc_data[0][1] = 0.0; 
-  desc_data[0][2] = 0.0; 
+  desc_data[0][1] = 0.0;
+  desc_data[0][2] = 0.0;
 
   // Using only a single row
   auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
-  
+
   cross_ent->update(dwrapper.get());
 
-  // move the sample points 
+  // move the sample points
   sample_pts.at(0).at(0) += 2.0; // Now at 2.95
-  sample_pts.at(1).at(0) += 2.0; // Now at 3.0 
+  sample_pts.at(1).at(0) += 2.0; // Now at 3.0
   sample_pts.at(2).at(0) += 2.0; // Now at 3.05
 
-  lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0); 
-  center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1); 
-  upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2); 
+  lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0);
+  center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1);
+  upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2);
 
   REQUIRE(lower_cross_ent > center_cross_ent );
   REQUIRE(lower_cross_ent == Approx(upper_cross_ent));
@@ -365,28 +365,28 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
   delete[] desc_data;
 
   auto desc_data2 = new double*[2];
-  desc_data2[0] = new double[cols]; 
-  desc_data2[1] = new double[cols]; 
-  desc_data2[0][0] = 1.0; 
-  desc_data2[0][1] = 0.0; 
-  desc_data2[0][2] = 0.0; 
-  desc_data2[1][0] = 10.0; 
-  desc_data2[1][1] = 0.0; 
-  desc_data2[1][2] = 0.0; 
+  desc_data2[0] = new double[cols];
+  desc_data2[1] = new double[cols];
+  desc_data2[0][0] = 1.0;
+  desc_data2[0][1] = 0.0;
+  desc_data2[0][2] = 0.0;
+  desc_data2[1][0] = 10.0;
+  desc_data2[1][1] = 0.0;
+  desc_data2[1][2] = 0.0;
 
-  // Right now the mean is at 3 
+  // Right now the mean is at 3
   dwrapper = panacea_pi.wrap(&(desc_data2), 2, cols);
 
   cross_ent->update(dwrapper.get());
   // The new mean will have moved from 3 to 20/5 = 4
-  // move the sample points 
+  // move the sample points
   sample_pts.at(0).at(0) += 1.0; // Now at 3.95
-  sample_pts.at(1).at(0) += 1.0; // Now at 4.0 
+  sample_pts.at(1).at(0) += 1.0; // Now at 4.0
   sample_pts.at(2).at(0) += 1.0; // Now at 4.05
 
-  lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0); 
-  center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1); 
-  upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2); 
+  lower_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 0);
+  center_cross_ent = cross_ent->compute(dwrapper_sample.get(), 1);
+  upper_cross_ent  = cross_ent->compute(dwrapper_sample.get(), 2);
 
   REQUIRE(lower_cross_ent > center_cross_ent );
   REQUIRE(lower_cross_ent == Approx(upper_cross_ent));
@@ -399,7 +399,7 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
 
 TEST_CASE("Testing:panacea cross entropy single median update","[integration,panacea]"){
 
-  // Creating settings for generating a self entropy term where the 
+  // Creating settings for generating a self entropy term where the
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
@@ -424,8 +424,8 @@ TEST_CASE("Testing:panacea cross entropy single median update","[integration,pan
   int cols = 3;
 
   auto kern_init_data = new double*[rows];
-  kern_init_data[0] = new double[cols]; 
-  kern_init_data[1] = new double[cols]; 
+  kern_init_data[0] = new double[cols];
+  kern_init_data[1] = new double[cols];
 
   kern_init_data[0][0] = 10.0;
   kern_init_data[1][0] = 10.0;
@@ -446,18 +446,18 @@ TEST_CASE("Testing:panacea cross entropy single median update","[integration,pan
   delete[] kern_init_data;
 
   auto desc_data = new double*[1];
-  desc_data[0] = new double[cols]; 
+  desc_data[0] = new double[cols];
   desc_data[0][0] = 70.0; // The median of three points 70 and 10 and 10 = 10
   desc_data[0][1] = 0.0; // The median of three points 70 and 10 and 10 = 10
   desc_data[0][2] = 0.0; // The median of three points 70 and 10 and 10 = 10
-  
+
   // Using only a single row
   auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
   // The mean is currently at 10 and this new point is at 70 the cross entropy should be large
   double cross_ent_val_single_pt_before_update = cross_ent->compute(dwrapper.get());
   cross_ent->update(dwrapper.get());
   // After update the mean is at 10 and this new point is at 70 the
-  // cross entropy should remain the same 
+  // cross entropy should remain the same
   double cross_ent_val_single_pt_after_update = cross_ent->compute(dwrapper.get());
   REQUIRE(cross_ent_val_single_pt_after_update == Approx(cross_ent_val_single_pt_before_update));
 
@@ -502,8 +502,8 @@ TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,p
   int cols = 3;
 
   auto kern_init_data = new double*[rows];
-  kern_init_data[0] = new double[cols]; 
-  kern_init_data[1] = new double[cols]; 
+  kern_init_data[0] = new double[cols];
+  kern_init_data[1] = new double[cols];
 
   kern_init_data[0][0] = 1.0;
   kern_init_data[1][0] = 3.0;
@@ -525,17 +525,17 @@ TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,p
   delete[] kern_init_data;
 
   auto desc_data = new double*[1];
-  desc_data[0] = new double[cols]; 
+  desc_data[0] = new double[cols];
   desc_data[0][0] = 2.0;
   desc_data[0][1] = 0.0;
   desc_data[0][2] = 0.0;
-  
+
   // Using only a single row
   auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
   // The mean is currently at 10 and this new point is at 70 the cross entropy should be large
   double val1 = cross_ent1->compute(dwrapper.get());
   double val2 = cross_ent2->compute(dwrapper.get());
- 
+
   REQUIRE(val1 > 0.0 );
   REQUIRE(val2 < 0.0 );
   REQUIRE(std::abs(val2) == Approx(val1));

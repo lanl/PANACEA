@@ -78,12 +78,22 @@ int main()
                                           .set(KernelCenterCalculation::Median)
                                           .set(KernelNormalization::None);
 
+  PANACEASettings settings_cross_median_log = PANACEASettings::make()
+                                      .set(EntropyType::Cross)
+                                      .set(PANACEAAlgorithm::Flexible)
+                                      .distributionType(kernel)
+                                          .set(KernelPrimitive::GaussianLog)
+                                          .set(KernelCount::Single)
+                                          .set(KernelCorrelation::Correlated)
+                                          .set(KernelCenterCalculation::Median);
 
   auto cross_mean = panacea_pi.create(dwrapper.get(), settings_cross_mean);
   auto cross_median = panacea_pi.create(dwrapper.get(), settings_cross_median);
+  auto cross_median_log = panacea_pi.create(dwrapper.get(), settings_cross_median_log);
 
   auto kern_dist_io = panacea_pi.create(settings::FileType::TXTKernelDistribution);
   kern_dist_io->write(cross_mean.get(), "cross_mean0.txt");
   kern_dist_io->write(cross_median.get(), "cross_median0.txt");
+  kern_dist_io->write(cross_median_log.get(), "cross_median_log0.txt");
   return 0;
 }

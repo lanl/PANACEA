@@ -139,6 +139,8 @@ namespace panacea {
       os << "Gaussian";
     }else if(kern_prim == settings::KernelPrimitive::Exponential) {
       os << "Exponential";
+    }else if(kern_prim == settings::KernelPrimitive::GaussianLog) {
+      os << "GaussianLog";
     }
     return os;
   }
@@ -233,7 +235,7 @@ namespace panacea {
       os << "Own";
     }else if(kern_mem == settings::KernelMemory::Share) {
       os << "Share";
-    } 
+    }
     return os;
   }
 
@@ -255,7 +257,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -275,7 +277,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -295,7 +297,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -313,7 +315,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -331,7 +333,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -342,14 +344,16 @@ namespace panacea {
       kern_prim =  settings::KernelPrimitive::Gaussian;
     }else if( line.find("Exponential", 0) != std::string::npos ) {
       kern_prim = settings::KernelPrimitive::Exponential;
+    }else if( line.find("GaussianLog", 0) != std::string::npos ) {
+      kern_prim = settings::KernelPrimitive::GaussianLog;
     } else {
       std::string error_msg = "Unrecognized kernel primitive while reading istream.\n";
       error_msg += "Accepted kernel primitive types are:\n";
-      error_msg += "Gaussian\nExponential\n";
+      error_msg += "Gaussian\nExponential\nGaussianLog";
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -369,7 +373,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -387,7 +391,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -406,7 +410,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -427,7 +431,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -445,7 +449,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -463,7 +467,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -476,9 +480,9 @@ namespace panacea {
       error_msg += "None\n";
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
-    } 
+    }
     none = settings::None::None;
-    
+
     return is;
   }
 
@@ -498,7 +502,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -516,7 +520,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 
@@ -536,7 +540,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 

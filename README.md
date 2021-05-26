@@ -5,7 +5,7 @@ LA-UR-21-24386
 This is the repository for PANACEA. PANACEA provides a means for generating
 unique configurations. The primary motivation for it's development was for
 generating unique configurations for the purpose of training machine learned
-interatomic potentials. 
+interatomic potentials.
 
 # The Directory structure of this repository is layed out as
 
