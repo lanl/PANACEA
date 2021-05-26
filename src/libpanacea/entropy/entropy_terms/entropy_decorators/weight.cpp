@@ -6,6 +6,7 @@
 // Standard includes
 #include <algorithm>
 #include <any>
+#include <typeindex>
 #include <vector>
 
 namespace panacea {
