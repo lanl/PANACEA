@@ -33,7 +33,11 @@ namespace panacea {
 
   void Weight::set(const settings::EntropyOption option, std::any val) {
     if( option == settings::EntropyOption::Weight ) {
-      weight_ = std::any_cast<double>(val);
+      if( std::type_index(val.type()) == std::type_index(typeid(double))){
+        weight_ = std::any_cast<double>(val);
+      } else {
+        weight_ = std::any_cast<const double>(val);
+      }
     } else {
       EntropyDecorator::set(option, val);
     }
