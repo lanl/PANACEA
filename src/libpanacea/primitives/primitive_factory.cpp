@@ -12,6 +12,7 @@
 #include "attribute_manipulators/reducer.hpp"
 #include "error.hpp"
 #include "gaussian_correlated.hpp"
+#include "gaussian_log_correlated.hpp"
 #include "gaussian_uncorrelated.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
@@ -37,11 +38,11 @@ namespace panacea {
       PrimitiveGroup & prim_grp
       ){
 
-    prim_grp.primitives.reserve(prim_grp.kernel_wrapper->getNumberPoints()); 
+    prim_grp.primitives.reserve(prim_grp.kernel_wrapper->getNumberPoints());
 
-    const int initial_num_prim = prim_grp.primitives.size(); 
+    const int initial_num_prim = prim_grp.primitives.size();
     const int diff = prim_grp.kernel_wrapper->getNumberPoints() - initial_num_prim;
-    const int new_num_prim = initial_num_prim + diff; 
+    const int new_num_prim = initial_num_prim + diff;
 
     if( diff > 0 ) {
       // Add the difference
@@ -57,7 +58,7 @@ namespace panacea {
              kernel_index));
       }
     } else {
-      // Shrink to fit 
+      // Shrink to fit
       prim_grp.primitives.resize(prim_grp.kernel_wrapper->getNumberPoints());
     }
 
@@ -67,7 +68,7 @@ namespace panacea {
       // make sure all the primitive attributes are up to date upto the initial_num_priming index
       for( int kernel_index = 0; kernel_index < num_prim_to_update; ++kernel_index){
         prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
-      } 
+      }
     }
   }
 
@@ -117,7 +118,7 @@ namespace panacea {
           specification.get<settings::KernelNormalization>(),
           NormalizerOption::Strict);
     }
-    // Flexible option will avoid errors if coefficients are 0.0, 
+    // Flexible option will avoid errors if coefficients are 0.0,
     // e.g. if variance is 0.0, will set such coefficients to 1.0
     return Normalizer(dwrapper,
         specification.get<settings::KernelNormalization>(),
@@ -132,7 +133,7 @@ namespace panacea {
           specification.get<settings::KernelNormalization>(),
           NormalizerOption::Strict);
     }
-    // Flexible option will avoid errors if coefficients are 0.0, 
+    // Flexible option will avoid errors if coefficients are 0.0,
     // e.g. if variance is 0.0, will set such coefficients to 1.0
     return Normalizer(
         specification.get<settings::KernelNormalization>(),
@@ -155,13 +156,17 @@ namespace panacea {
    ***********************************************************/
 
   PrimitiveFactory::PrimitiveFactory() {
-    
+
     registerPrimitive<GaussUncorrelated,
       settings::KernelPrimitive::Gaussian,
       settings::KernelCorrelation::Uncorrelated>();
 
     registerPrimitive<GaussCorrelated,
       settings::KernelPrimitive::Gaussian,
+      settings::KernelCorrelation::Correlated>();
+
+    registerPrimitive<GaussLogCorrelated,
+      settings::KernelPrimitive::GaussianLog,
       settings::KernelCorrelation::Correlated>();
 
   }
@@ -175,11 +180,11 @@ namespace panacea {
     PrimitiveGroup prim_grp(specification);
     prim_grp.name = name;
     prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
-  
+
     prim_grp.covariance = createCovariance(dwrapper, specification);
 
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
-    prim_grp.normalizer.normalize(*prim_grp.covariance); 
+    prim_grp.normalizer.normalize(*prim_grp.covariance);
 
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
@@ -215,7 +220,7 @@ namespace panacea {
     // covariance
     // normalizer
     // specifications
-    // 
+    //
     // The remaining items in the primitive group are initialized and create while
     // reading in the values from a restart file
     KernelWrapperFactory kfactory;
@@ -223,11 +228,11 @@ namespace panacea {
     PrimitiveGroup prim_grp(specification);
     prim_grp.name = name;
     prim_grp.kernel_wrapper = kfactory.create(specification);
- 
+
     prim_grp.covariance = std::make_unique<Covariance>(CovarianceBuild::Allocate);
 
     prim_grp.normalizer = createNormalizer(specification);
-    //prim_grp.normalizer.normalize(*prim_grp.covariance); 
+    //prim_grp.normalizer.normalize(*prim_grp.covariance);
 
     /*
     Reducer reducer;
@@ -258,15 +263,15 @@ namespace panacea {
 
   void PrimitiveFactory::update(
       const PassKey<PrimitiveGroup> &,
-      const BaseDescriptorWrapper * descriptor_wrapper, 
+      const BaseDescriptorWrapper * descriptor_wrapper,
       PrimitiveGroup & prim_grp) const {
 
     prim_grp.kernel_wrapper->update(descriptor_wrapper);
-    // Unnormalize the covariance matrix before updating 
+    // Unnormalize the covariance matrix before updating
     prim_grp.normalizer.unnormalize(*prim_grp.covariance);
     prim_grp.covariance->update(descriptor_wrapper);
     // Now we are free to update the normalization coefficients, note that the covariance
-    // matrix must be uptodate before it can be passed into the normalizer, in the 
+    // matrix must be uptodate before it can be passed into the normalizer, in the
     // case of the variance the diagonal is used to calculate the variance
     prim_grp.normalizer.update(descriptor_wrapper, prim_grp.covariance.get());
     prim_grp.normalizer.normalize(*prim_grp.covariance);

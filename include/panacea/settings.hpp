@@ -13,7 +13,7 @@
 namespace panacea {
 
   namespace settings {
-  
+
     enum class DistributionType {
       Histogram,
       Kernel
@@ -31,7 +31,7 @@ namespace panacea {
     enum class EntropyOption {
       Weight,
       IncrementRatio, // Used in numerical gradiant calculations
-      NumericalGrad   // Turn numerical gradiant on or off 
+      NumericalGrad   // Turn numerical gradiant on or off
     };
 
     enum class EntropyType {
@@ -39,22 +39,23 @@ namespace panacea {
       Cross
     };
 
-    /** 
+    /**
      * Fail if the specified kernel specifications are not satisfied
-     * the algorithm flexibility in determining best options if the 
+     * the algorithm flexibility in determining best options if the
      * ones specefied lead to non ideal conditions, i.e. if defining
      * a covariance matrix for a kernel in which the data is stacked
      * at a single point then the covariance matrix will become 0
      * everywhere which will lead to numerical problems.
      **/
     enum class PANACEAAlgorithm {
-      Strict,   
-      Flexible  
+      Strict,
+      Flexible
     };
 
     enum class KernelPrimitive {
       Gaussian,
-      Exponential    
+      GaussianLog, // Log Normal
+      Exponential
     };
 
     /**
@@ -87,22 +88,22 @@ namespace panacea {
 
   }
 
-  std::ostream& operator<<(std::ostream& os, const settings::DistributionType &); 
+  std::ostream& operator<<(std::ostream& os, const settings::DistributionType &);
   std::ostream& operator<<(std::ostream& os, const settings::FileType &);
   std::ostream& operator<<(std::ostream& os, const settings::EntropyOption &);
   std::ostream& operator<<(std::ostream& os, const settings::EntropyType &);
-  std::ostream& operator<<(std::ostream& os, const settings::PANACEAAlgorithm &); 
+  std::ostream& operator<<(std::ostream& os, const settings::PANACEAAlgorithm &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelPrimitive &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelCount &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelCorrelation &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelNormalization &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelCenterCalculation &);
 
-  std::istream& operator>>(std::istream& is, settings::DistributionType &); 
+  std::istream& operator>>(std::istream& is, settings::DistributionType &);
   std::istream& operator>>(std::istream& is, settings::FileType &);
   std::istream& operator>>(std::istream& is, settings::EntropyOption &);
   std::istream& operator>>(std::istream& is, settings::EntropyType &);
-  std::istream& operator>>(std::istream& is, settings::PANACEAAlgorithm &); 
+  std::istream& operator>>(std::istream& is, settings::PANACEAAlgorithm &);
   std::istream& operator>>(std::istream& is, settings::KernelPrimitive &);
   std::istream& operator>>(std::istream& is, settings::KernelCount &);
   std::istream& operator>>(std::istream& is, settings::KernelCorrelation &);
@@ -115,8 +116,8 @@ namespace panacea {
    * PANACEASettings designed to be used with the fluent builder pattern
    **/
   class PANACEASettings {
- 
-      friend class PANACEASettingsBuilder;  
+
+      friend class PANACEASettingsBuilder;
 
     public:
       static PANACEASettingsBuilder make();
@@ -156,7 +157,7 @@ namespace panacea {
 
     private:
       PANACEASettings() = default;
-      std::optional<settings::EntropyType> ent_type_; 
+      std::optional<settings::EntropyType> ent_type_;
       std::optional<settings::PANACEAAlgorithm> algorithm_setting_;
       std::optional<settings::KernelPrimitive> primitive_;
       std::optional<settings::KernelCount> kern_count_;

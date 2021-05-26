@@ -74,7 +74,6 @@ class DescriptorPlot:
             self.__dim_to_plot = self.__all_descriptor_files.dimensions
 
         path = kwargs.pop('path')
-        print("Path is %s " % path)
 
         self.__norm_iso_values_exist = False
         if path != 'N/A':
@@ -85,8 +84,6 @@ class DescriptorPlot:
             self.__min_vals = cache.getMinValues()
             self.__max_vals = cache.getMaxValues()
             self.__bin_widths = cache.getBinWidths()
-            print("Loading bin_widths")
-            print(self.__bin_widths)
             self.__norm_iso_max_values_exist = True
             self.__norm_iso_max_values = cache.getVmaxValues()
         else:
@@ -94,7 +91,6 @@ class DescriptorPlot:
 
     def plot(self):
 
-        print("Calling plot")
         all_restart_files = panacea.restart_file_group.RestartFileGroup(
                 self.__restart_file_path,
                 self.__restart_file_base,
@@ -108,74 +104,98 @@ class DescriptorPlot:
 
         first_iteration = True
         for i in all_restart_files.indices_files_read:
-            print("Restart file index i {}\n".format(i))
-            print("Fig start {} and fig end {}".format(self.__fig_start,self.__fig_end))
             if i >= self.__fig_start and i <= self.__fig_end:
-                print("Subplot dims to plot {} {}".format(self.__dim_to_plot-1,self.__dim_to_plot-1))
                 # Squeeze false is used so that if only a single plot is possible of shape
                 # 1 and 1 it won't collapse the axes
                 fig, axs = plt.subplots(self.__dim_to_plot-1,self.__dim_to_plot-1, figsize=(10, 10), squeeze=False)
-                print("Creting subplot")
                 if self.__plot_q_dist and all_restart_files[i].entropy_type == "Cross":
-                    print("Cross entropy plot")
-                    covar_norm_q = copy.deepcopy(all_restart_files[i].covariance)
-                    center_q = copy.deepcopy(all_restart_files[i].kernel_centers)[0]
-                    print("Center q")
-                    print(center_q)
-                    norm_vals_q = copy.deepcopy(all_restart_files[i].normalization_coefficients)
-                    print("Mean covar")
-                    print(center_q)
-                    # Normalize the covariance matrix and mean of the q distribution
-                    for dim1 in range(0,ndim):
-                        center_q[dim1] = center_q[dim1] * norm_vals_q[dim1]
-                        for dim2 in range(0,ndim):
-                            covar_norm_q[dim1][dim2] = covar_norm_q[dim1][dim2] * norm_vals_q[dim1]*norm_vals_q[dim2]
+                    if all_restart_files[i].primitive_type == "Gaussian":
+                        covar_norm_q = copy.deepcopy(all_restart_files[i].covariance)
+                        center_q = copy.deepcopy(all_restart_files[i].kernel_centers)[0]
+                        norm_vals_q = copy.deepcopy(all_restart_files[i].normalization_coefficients)
+                        # Normalize the covariance matrix and mean of the q distribution
+                        for dim1 in range(0,ndim):
+                            center_q[dim1] = center_q[dim1] * norm_vals_q[dim1]
+                            for dim2 in range(0,ndim):
+                                covar_norm_q[dim1][dim2] = covar_norm_q[dim1][dim2] * norm_vals_q[dim1]*norm_vals_q[dim2]
 
-                    # Calculate covariance determinant
-                    determin_q = np.linalg.det(covar_norm_q)
-                    inv_covar_q = np.linalg.pinv(covar_norm_q)
+                        # Calculate covariance determinant
+                        determin_q = np.linalg.det(covar_norm_q)
+                        inv_covar_q = np.linalg.pinv(covar_norm_q)
 
-                    pre_factor = 1.0 / np.sqrt(determin_q * np.power( 2.0 * np.pi,float(ndim) ))
+                        pre_factor = 1.0 / np.sqrt(determin_q * np.power( 2.0 * np.pi,float(ndim) ))
 
-                    for dim1 in range(0,self.__dim_to_plot-1):
-                        for dim2 in range(1,self.__dim_to_plot):
-                            if (dim2-1) < dim1:
-                                axs[dim1][dim2-1].axis('off')
-                            else:
-                                vals_x = np.linspace(self.__min_vals[dim1]*0.9, self.__max_vals[dim1]*1.1,self.__grid_res, endpoint=True)
-                                vals_y = np.linspace(self.__min_vals[dim2]*0.9, self.__max_vals[dim2]*1.1,self.__grid_res, endpoint=True)
-                                vals_x_norm = copy.deepcopy(vals_x) * norm_vals_q[dim1]
-                                vals_y_norm = copy.deepcopy(vals_y) * norm_vals_q[dim2]
-                                X_vals, Y_vals = np.meshgrid(vals_y, vals_x)
-                                data = np.zeros((self.__grid_res, self.__grid_res))
-                                local_inv_covar = np.zeros((2,2))
-                                local_inv_covar[0,0] = inv_covar_q[dim1,dim1]
-                                local_inv_covar[1,0] = inv_covar_q[dim2,dim1]
-                                local_inv_covar[0,1] = inv_covar_q[dim1,dim2]
-                                local_inv_covar[1,1] = inv_covar_q[dim2,dim2]
+                        for dim1 in range(0,self.__dim_to_plot-1):
+                            for dim2 in range(1,self.__dim_to_plot):
+                                if (dim2-1) < dim1:
+                                    axs[dim1][dim2-1].axis('off')
+                                else:
+                                    vals_x = np.linspace(self.__min_vals[dim1]*0.9, self.__max_vals[dim1]*1.1,self.__grid_res, endpoint=True)
+                                    vals_y = np.linspace(self.__min_vals[dim2]*0.9, self.__max_vals[dim2]*1.1,self.__grid_res, endpoint=True)
+                                    vals_x_norm = copy.deepcopy(vals_x) * norm_vals_q[dim1]
+                                    vals_y_norm = copy.deepcopy(vals_y) * norm_vals_q[dim2]
+                                    X_vals, Y_vals = np.meshgrid(vals_y, vals_x)
+                                    data = np.zeros((self.__grid_res, self.__grid_res))
+                                    local_inv_covar = np.zeros((2,2))
+                                    local_inv_covar[0,0] = inv_covar_q[dim1,dim1]
+                                    local_inv_covar[1,0] = inv_covar_q[dim2,dim1]
+                                    local_inv_covar[0,1] = inv_covar_q[dim1,dim2]
+                                    local_inv_covar[1,1] = inv_covar_q[dim2,dim2]
 
-                                center_q_new = np.zeros(2)
-                                center_q_new[0] = center_q[dim1]
-                                center_q_new[1] = center_q[dim2]
-                                for j in range(0, self.__grid_res):
-                                    for k in range(0, self.__grid_res):
-                                        pt = np.array([ vals_x_norm[j], vals_y_norm[k] ])
-                                        diff = pt-center_q_new
-                                        data[k,j] = pre_factor * np.exp(-0.5*np.matmul(np.matmul(diff, local_inv_covar),diff.transpose()) )
-                                print("X_vals")
-                                print(X_vals)
-                                print("Y_vals")
-                                print(Y_vals)
-                                print("data")
-                                print(data.transpose())
-                                print("X_vals shape")
-                                print(X_vals.shape)
-                                print("Y_vals shape")
-                                print(Y_vals.shape)
-                                print("data shape")
-                                print(data.transpose().shape)
-                                print("dim1 {} print dim2-1 {}\n".format(dim1,dim2-1))
-                                axs[dim1,dim2-1].contour(X_vals, Y_vals, data.transpose(), self.__levels)
+                                    center_q_new = np.zeros(2)
+                                    center_q_new[0] = center_q[dim1]
+                                    center_q_new[1] = center_q[dim2]
+                                    for j in range(0, self.__grid_res):
+                                        for k in range(0, self.__grid_res):
+                                            pt = np.array([ vals_x_norm[j], vals_y_norm[k] ])
+                                            diff = pt-center_q_new
+                                            data[k,j] = pre_factor * np.exp(-0.5*np.matmul(np.matmul(diff, local_inv_covar),diff.transpose()) )
+                                    axs[dim1,dim2-1].contour(X_vals, Y_vals, data.transpose(), self.__levels)
+
+                    elif all_restart_files[i].primitive_type == "GaussianLog":
+                        covar_norm_q = copy.deepcopy(all_restart_files[i].covariance)
+                        center_q = copy.deepcopy(all_restart_files[i].kernel_centers)[0]
+                        norm_vals_q = copy.deepcopy(all_restart_files[i].normalization_coefficients)
+                        # Normalize the covariance matrix and mean of the q distribution
+                        for dim1 in range(0,ndim):
+                            center_q[dim1] = center_q[dim1] * norm_vals_q[dim1]
+                            for dim2 in range(0,ndim):
+                                covar_norm_q[dim1][dim2] = covar_norm_q[dim1][dim2] * norm_vals_q[dim1]*norm_vals_q[dim2]
+
+                        # Calculate covariance determinant
+                        determin_q = np.linalg.det(covar_norm_q)
+                        inv_covar_q = np.linalg.pinv(covar_norm_q)
+
+                        pre_factor = 1.0 / np.sqrt(determin_q * np.power( 2.0 * np.pi,float(ndim) ))
+
+                        for dim1 in range(0,self.__dim_to_plot-1):
+                            for dim2 in range(1,self.__dim_to_plot):
+                                if (dim2-1) < dim1:
+                                    axs[dim1][dim2-1].axis('off')
+                                else:
+                                    vals_x = np.linspace(self.__min_vals[dim1]*0.9, self.__max_vals[dim1]*1.1,self.__grid_res, endpoint=True)
+                                    vals_y = np.linspace(self.__min_vals[dim2]*0.9, self.__max_vals[dim2]*1.1,self.__grid_res, endpoint=True)
+                                    vals_x_norm = copy.deepcopy(vals_x) * norm_vals_q[dim1]
+                                    vals_y_norm = copy.deepcopy(vals_y) * norm_vals_q[dim2]
+                                    X_vals, Y_vals = np.meshgrid(vals_y, vals_x)
+                                    data = np.zeros((self.__grid_res, self.__grid_res))
+                                    local_inv_covar = np.zeros((2,2))
+                                    local_inv_covar[0,0] = inv_covar_q[dim1,dim1]
+                                    local_inv_covar[1,0] = inv_covar_q[dim2,dim1]
+                                    local_inv_covar[0,1] = inv_covar_q[dim1,dim2]
+                                    local_inv_covar[1,1] = inv_covar_q[dim2,dim2]
+
+                                    center_q_new = np.zeros(2)
+                                    center_q_new[0] = center_q[dim1]
+                                    center_q_new[1] = center_q[dim2]
+                                    for j in range(0, self.__grid_res):
+                                        for k in range(0, self.__grid_res):
+                                            # Mean
+                                            mu = np.log( np.divide(np.power(center_q_new,2.0),np.sqrt(np.power(center_q_new,2.0) + np.power(norm_vals_q,2.0))))
+                                            pt = np.array([ vals_x_norm[j], vals_y_norm[k] ])
+                                            diff = np.log(pt) - mu
+                                            data[k,j] = pre_factor * np.exp(-0.5*np.matmul(np.matmul(diff, local_inv_covar),diff.transpose()) )
+                                    axs[dim1,dim2-1].contour(X_vals, Y_vals, data.transpose(), self.__levels)
 
                 if self.__plot_p_dist and all_restart_files[i].entropy_type == "Self":
                     covar_norm_p = copy.deepcopy(all_restart_files[i].covariance)
@@ -238,7 +258,6 @@ class DescriptorPlot:
                                     descriptors_old = np.concatenate((descriptors_old, self.__all_descriptor_files[i].descriptors))
 
                                 if self.__plot_type == "scatter":
-                                    print("Plotting scatter")
                                     axs[dim1][dim2-1].scatter(descriptors_old[:,dim2],descriptors_old[:,dim1], s=0.5, color='blue',alpha=0.1)
                                 else:
                                     descriptors_new_and_old = np.concatenate((descriptors_old, self.__all_descriptor_files[i+1].descriptors))

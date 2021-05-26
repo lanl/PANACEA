@@ -152,12 +152,15 @@ class RestartFile:
 
         # Kernel count
         line = fid.readline()
-        if "Gaussian" in line:
-            self.__primitive_type = "Gaussian"
+        print("Reading primitive type line: {}".format(line))
+        if "GaussianLog" in line:
+            self.__primitive_type = "GaussianLog"
         elif "Exponential" in line:
             self.__primitive_type = "Exponential"
+        elif "Gaussian" in line:
+            self.__primitive_type = "Gaussian"
         else:
-            raise Exception("Unrecognized primitive type in line")
+            raise Exception("Unrecognized primitive type in line {}".format(line))
 
         # Kernel normalization method
         line = fid.readline()

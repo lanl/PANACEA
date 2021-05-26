@@ -21,5 +21,8 @@ setup(
     keywords = 'panacea, entropy, plotting',
     packages = find_packages(),
     install_requires = ['matplotlib','numpy'],
-    scripts=['bin/parthenon.py']
+    scripts=['bin/plot_entropy.py',
+        'bin/plot_descriptors_correlation.py',
+        'bin/plot_descriptors.py',
+        'bin/min_max_desc_cache.py']
     )

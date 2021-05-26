@@ -52,6 +52,8 @@ class RestartFileGroup:
 
     @property
     def dimensions(self):
+        if self.__dims is None:
+            raise Exception("Dims unknown, was a file read?")
         return self.__dims
 
     def getKernelCenters(self, file_name):
