@@ -27,6 +27,7 @@ PANACEA can be built and installed with CMake relatively easy.
 cd PANACEA
 cmake -S. -B build
 cmake --build build --parallel
+cmake --build build --target test
 cmake --build build --target install
 ```
 
