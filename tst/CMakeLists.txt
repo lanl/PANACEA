@@ -8,6 +8,7 @@ set_target_properties(helper PROPERTIES LINKER_LANGUAGE CXX)
 list( APPEND UNIT_TEST_SOURCES
     unit/test_covariance.cpp
     unit/test_cross_entropy.cpp
+    unit/test_data_point_template.cpp
     unit/test_descriptor_wrappers.cpp
     unit/test_distributions.cpp
     unit/test_gaussian_correlated.cpp
