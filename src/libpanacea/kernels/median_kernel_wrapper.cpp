@@ -86,12 +86,7 @@ namespace panacea {
     return MedianKernelWrapper::write;
   }
 
-  /*******************************************
-   * Public methods
-   *******************************************/
-
   MedianKernelWrapper::MedianKernelWrapper(
-      const PassKey<KernelWrapperFactory> &,
       const BaseDescriptorWrapper * dwrapper
       ) {
 
@@ -108,20 +103,29 @@ namespace panacea {
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
-      const PassKey<test::Test> &,
-      const BaseDescriptorWrapper * dwrapper
+      const std::vector<double> & median_vec
       ) {
 
-    Median median;
-    auto center_ = median.calculate<
-      const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-
-    update_median_point_values(dwrapper, points_near_median_);
+    int num_pts = 0;
+    if( median_vec.size() == 0) {
+      data_wrapper_ = DataPointTemplate<std::vector<double>>(median_vec, num_pts, median_vec.size());
+    } else {
+      num_pts = 1;
+      data_wrapper_ = DataPointTemplate<std::vector<double>>(median_vec, num_pts, median_vec.size());
+    }
+    for( int dim = 0; dim < median_vec.size(); ++dim) {
+      for( int pt = 0; pt < num_pts; ++pt) {
+        points_near_median_.at(dim).push_back(median_vec.at(dim));
+      }
+    }
     trim(points_near_median_, number_pts_store_, remove_from_front_);
-    number_pts_median_ = dwrapper->getNumberPoints();
+
+    number_pts_median_ = num_pts;
   }
 
+  /*******************************************
+   * Public methods
+   *******************************************/
   void MedianKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
 
     update_median_point_values(dwrapper, points_near_median_);

@@ -96,9 +96,12 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       EntropySettings * settings) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     DistributionFactory dist_factory;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     auto dist = dist_factory.create(descriptor_wrapper, settings->dist_settings.get());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 
@@ -106,9 +109,13 @@ namespace panacea {
       const PassKey<EntropyFactory> & key,
       EntropySettings * settings) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     DistributionFactory dist_factory;
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  
     auto dist = dist_factory.create(settings->dist_settings.get());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 

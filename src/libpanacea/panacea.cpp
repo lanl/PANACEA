@@ -12,6 +12,7 @@
 #include "io/file_io_factory.hpp"
 
 // Standard includes
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -63,18 +64,24 @@ namespace panacea {
       const BaseDescriptorWrapper * dwrapper,
       const PANACEASettings & settings) const {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropySettings entropy_settings(settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropyFactory entropy_factory;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return entropy_factory.create(dwrapper, &entropy_settings);
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
       const PANACEASettings & settings) const {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropySettings entropy_settings(settings);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     EntropyFactory entropy_factory;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return entropy_factory.create(&entropy_settings);
   }
 

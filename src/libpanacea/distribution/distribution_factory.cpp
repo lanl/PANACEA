@@ -11,6 +11,7 @@
 
 // Standard includes
 #include <any>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -39,11 +40,13 @@ namespace panacea {
     assert(descriptor_wrapper != nullptr);
     assert(settings != nullptr);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if(create_methods_.count(settings->type()) == 0){
       std::string error_msg = "Distribution type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return create_methods_.at(settings->type())(
         PassKey<DistributionFactory>(),
         descriptor_wrapper,
@@ -52,7 +55,9 @@ namespace panacea {
 
   std::unique_ptr<Distribution> DistributionFactory::create(
       DistributionSettings * settings) const {
-
+    
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Dist type " << settings->type() << std::endl;
     return create_shell_methods_.at(settings->type())(
         PassKey<DistributionFactory>(),
         settings);

@@ -35,18 +35,35 @@ namespace panacea {
 
       virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
       virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
+
+      explicit MeanKernelWrapper(const BaseDescriptorWrapper * desc_wrapper);
+      explicit MeanKernelWrapper(const std::vector<double> &);
+
     public:
       explicit MeanKernelWrapper(const PassKey<test::Test> &) {};
 
       MeanKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
           const BaseDescriptorWrapper * desc_wrapper
-          );
+          ) : MeanKernelWrapper(desc_wrapper) {};
 
       MeanKernelWrapper(
           const PassKey<test::Test> &,
           const BaseDescriptorWrapper * desc_wrapper
-          );
+          ) : MeanKernelWrapper(desc_wrapper) {};
+
+      /**
+       * If a vector is supplied it is assumed to be the mean
+       **/
+      MeanKernelWrapper(
+          const PassKey<KernelWrapperFactory> &,
+          const std::vector<double> & data
+          ) : MeanKernelWrapper(data) {};
+
+      MeanKernelWrapper(
+          const PassKey<test::Test> &,
+          const std::vector<double> & data
+          ) : MeanKernelWrapper(data) {};
 
       virtual const settings::KernelCenterCalculation center() const noexcept final;
       virtual const settings::KernelCount count() const noexcept final;
@@ -81,8 +98,35 @@ namespace panacea {
       const int rows,
       const int cols) {
 
-    return std::make_unique<MeanKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
-  }
+    if( std::type_index(data.type()) == 
+        std::type_index(typeid(const BaseDescriptorWrapper *))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MeanKernelWrapper>(
+          key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
 
+    } else if(std::type_index(data.type()) == 
+        std::type_index(typeid(BaseDescriptorWrapper *))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MeanKernelWrapper>(key, 
+          const_cast<const BaseDescriptorWrapper *>(
+            std::any_cast<BaseDescriptorWrapper *>(data))); 
+
+    } else if(std::type_index(data.type()) == 
+        std::type_index(typeid(std::vector<double>))) {
+      return std::make_unique<MeanKernelWrapper>(
+          key, std::any_cast<std::vector<double>>(data)); 
+
+    } else if(std::type_index(data.type()) == 
+        std::type_index(typeid(const std::vector<double>))) {
+      return std::make_unique<MeanKernelWrapper>(
+          key, std::any_cast<const std::vector<double>>(data)); 
+
+    } else {
+      std::string error_msg = "Unsupported data type encountered while ";
+      error_msg += "attempting to create Kernel center mean";
+      throw std::runtime_error(error_msg);
+    }
+    return nullptr;
+  }
 }
 #endif // PANACEA_PRIVATE_MEANKERNELWRAPPER_H

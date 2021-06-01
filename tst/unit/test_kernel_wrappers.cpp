@@ -80,6 +80,32 @@ TEST_CASE("Testing:kernel_wrapper creation","[unit,panacea]") {
     REQUIRE(kwrapper.at(2,0) == Approx(6.0));
     REQUIRE(kwrapper.getTypeIndex() == type_ind_data);
   }
+  WHEN("Testing mean kernel wrapper when a raw vector is used"){
+    std::vector<double> mean = {1.0,2.0,6.0};
+    MeanKernelWrapper mean_kwrapper(test::Test::key(), mean);
+    REQUIRE(mean_kwrapper.rows() == 1);
+    REQUIRE(mean_kwrapper.cols() == 3);
+    REQUIRE(mean_kwrapper.getNumberDimensions() == 3);
+    REQUIRE(mean_kwrapper.getNumberPoints() == 1);
+    REQUIRE(mean_kwrapper.at(0,0) == Approx(1.0));
+    REQUIRE(mean_kwrapper.at(0,1) == Approx(2.0));
+    REQUIRE(mean_kwrapper.at(0,2) == Approx(6.0));
+    auto type_ind_data = std::type_index(typeid(vector<double>));
+    REQUIRE(mean_kwrapper.getTypeIndex() == type_ind_data);
+  }
+  WHEN("Testing median kernel wrapper when a raw vector is used"){
+    std::vector<double> median = {1.0,2.0,6.0};
+    MeanKernelWrapper median_kwrapper(test::Test::key(), median);
+    REQUIRE(median_kwrapper.rows() == 1);
+    REQUIRE(median_kwrapper.cols() == 3);
+    REQUIRE(median_kwrapper.getNumberDimensions() == 3);
+    REQUIRE(median_kwrapper.getNumberPoints() == 1);
+    REQUIRE(median_kwrapper.at(0,0) == Approx(1.0));
+    REQUIRE(median_kwrapper.at(0,1) == Approx(2.0));
+    REQUIRE(median_kwrapper.at(0,2) == Approx(6.0));
+    auto type_ind_data = std::type_index(typeid(vector<double>));
+    REQUIRE(median_kwrapper.getTypeIndex() == type_ind_data);
+  }
 }
 
 TEST_CASE("Testing:mean kernel_wrapper write & read","[unit,panacea]") {

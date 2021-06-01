@@ -25,32 +25,25 @@ namespace panacea {
     return MeanKernelWrapper::write;
   }
 
+  MeanKernelWrapper::MeanKernelWrapper(const BaseDescriptorWrapper * dwrapper) {
+    Mean mean;
+    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
+    number_pts_mean_ = dwrapper->getNumberPoints();
+    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
+  }
+
+  MeanKernelWrapper::MeanKernelWrapper(const std::vector<double> & mean_vec) {
+    if( mean_vec.size() == 0){
+      number_pts_mean_ = 0;
+      data_wrapper_ = DataPointTemplate<std::vector<double>>(mean_vec, 0, mean_vec.size());
+    } else {
+      number_pts_mean_ = 1;
+      data_wrapper_ = DataPointTemplate<std::vector<double>>(mean_vec, 1, mean_vec.size());
+    }
+  }
   /************************************************
    * Public Methods
    ************************************************/
-
-  MeanKernelWrapper::MeanKernelWrapper(
-      const PassKey<KernelWrapperFactory> &,
-      const BaseDescriptorWrapper * dwrapper
-      ) {
-
-    Mean mean;
-    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    number_pts_mean_ = dwrapper->getNumberPoints();
-    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-  }
-
-  MeanKernelWrapper::MeanKernelWrapper(
-      const PassKey<test::Test> &,
-      const BaseDescriptorWrapper * dwrapper
-      ) {
-
-    Mean mean;
-    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    number_pts_mean_ = dwrapper->getNumberPoints();
-    data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-  }
-
   double& MeanKernelWrapper::at(const int row, const int col) {
     return data_wrapper_.at(row, col);
   }

@@ -16,6 +16,7 @@
 
 // Standard includes
 #include <cassert>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -44,25 +45,30 @@ namespace panacea {
       const BaseDescriptorWrapper * descriptor_wrapper,
       EntropySettings * settings) const {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(settings != nullptr);
 
     if(create_methods_.count(settings->type) == 0){
       std::string error_msg = "Entropy type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     auto ent_term = create_methods_.at(settings->type)(
         PassKey<EntropyFactory>(),
         descriptor_wrapper,
         settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     // Add decorators
     if( settings->weight ) {
       ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if( settings->numerical_grad_switch ) {
       ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return ent_term;
   }
 
@@ -71,22 +77,27 @@ namespace panacea {
 
     assert(settings != nullptr);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if(create_methods_.count(settings->type) == 0){
       std::string error_msg = "Entropy type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
-
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Entropy type is " << settings->type << std::endl;
     auto ent_term = create_shell_methods_.at(settings->type)(
         PassKey<EntropyFactory>(),
         settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     // Add decorators
     if( settings->weight ) {
       ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if( settings->numerical_grad_switch ) {
       ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return ent_term;
   }
 

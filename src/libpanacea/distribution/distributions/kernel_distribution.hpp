@@ -16,6 +16,7 @@
 // Standard includes
 #include <any>
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -103,8 +104,10 @@ namespace panacea {
       DistributionSettings * settings) {
 
     assert(settings->type() == settings::DistributionType::Kernel);
-
+    
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,
@@ -117,12 +120,15 @@ namespace panacea {
       DistributionSettings * settings) {
 
     assert(settings->type() == settings::DistributionType::Kernel);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     // Switch Memory to Own if set to Share, not possible to create a shell distribution
     // that does not own it's kernels
     kern_dist_settings->dist_settings.set(settings::KernelMemory::Own);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,

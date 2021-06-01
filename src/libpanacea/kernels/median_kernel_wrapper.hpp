@@ -48,6 +48,13 @@ namespace panacea {
 
       virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
       virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
+
+      /**
+       * Private constructors
+       **/
+      explicit MedianKernelWrapper(const BaseDescriptorWrapper * desc_wrapper);
+      explicit MedianKernelWrapper(const std::vector<double> &);
+
     public:
 
       explicit MedianKernelWrapper(
@@ -56,12 +63,26 @@ namespace panacea {
       MedianKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
           const BaseDescriptorWrapper * desc_wrapper
-          );
+          ) : MedianKernelWrapper(desc_wrapper) {};
 
       MedianKernelWrapper(
           const PassKey<test::Test> &,
           const BaseDescriptorWrapper * desc_wrapper
-          );
+          ) : MedianKernelWrapper(desc_wrapper) {};
+
+      /**
+       * If initialized with a single vector the median is assumed to be the
+       * vector passed in.
+       **/
+      MedianKernelWrapper(
+          const PassKey<KernelWrapperFactory> &,
+          const std::vector<double> & data
+          ) : MedianKernelWrapper(data) {};
+
+      MedianKernelWrapper(
+          const PassKey<test::Test> &,
+          const std::vector<double> & data
+          ) : MedianKernelWrapper(data) {};
 
       virtual const settings::KernelCenterCalculation center() const noexcept final;
       virtual const settings::KernelCount count() const noexcept final;
@@ -97,7 +118,31 @@ namespace panacea {
       const int rows,
       const int cols) {
 
-    return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
+
+    if( std::type_index(data.type()) == std::type_index(typeid(const BaseDescriptorWrapper *))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
+
+    } else if(std::type_index(data.type()) == std::type_index(typeid(BaseDescriptorWrapper *))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(key, 
+          const_cast<const BaseDescriptorWrapper *>(
+            std::any_cast<BaseDescriptorWrapper *>(data))); 
+
+    } else if( std::type_index(data.type()) == std::type_index(typeid(const std::vector<double>))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const std::vector<double>>(data)); 
+
+    } else if( std::type_index(data.type()) == std::type_index(typeid(std::vector<double>))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<std::vector<double>>(data)); 
+
+    } else{
+      std::string error_msg = "Unsupported data type encountered while ";
+      error_msg += "attempting to create Kernel center median";
+      throw std::runtime_error(error_msg);
+    }
+    return nullptr;
   }
 
 }
