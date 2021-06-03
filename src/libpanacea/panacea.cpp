@@ -64,24 +64,18 @@ namespace panacea {
       const BaseDescriptorWrapper * dwrapper,
       const PANACEASettings & settings) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropySettings entropy_settings(settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropyFactory entropy_factory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return entropy_factory.create(dwrapper, &entropy_settings);
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
       const PANACEASettings & settings) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     EntropySettings entropy_settings(settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     EntropyFactory entropy_factory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return entropy_factory.create(&entropy_settings);
   }
 

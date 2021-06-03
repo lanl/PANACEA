@@ -25,13 +25,10 @@ namespace panacea {
           const BaseDescriptorWrapper * descriptor_wrapper,
           const KernelSpecification & settings) {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PrimitiveFactory prim_factory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp_ = prim_factory.createGroup(
         descriptor_wrapper,
         settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
 
@@ -40,12 +37,9 @@ namespace panacea {
   KernelDistribution::KernelDistribution(const PassKey<DistributionFactory> &,
           const KernelSpecification & settings) {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PrimitiveFactory prim_factory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp_ = prim_factory.createGroup(settings);
   
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
 
   }

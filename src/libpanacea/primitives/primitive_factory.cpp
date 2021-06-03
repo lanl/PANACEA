@@ -177,42 +177,29 @@ namespace panacea {
       const KernelSpecification & specification,
       const std::string & name) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     KernelWrapperFactory kfactory;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PrimitiveGroup prim_grp(specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.name = name;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     prim_grp.covariance = createCovariance(dwrapper, specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.normalizer.normalize(*prim_grp.covariance);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     Reducer reducer;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     Inverter inverter;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
       std::string error_msg = "Kernel Primitive is not supported: ";
       error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
       std::string error_msg = "Kernel count method is not supported: ";
@@ -220,10 +207,8 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return prim_grp;
   }
 
@@ -239,22 +224,15 @@ namespace panacea {
     //
     // The remaining items in the primitive group are initialized and create while
     // reading in the values from a restart file
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     KernelWrapperFactory kfactory;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PrimitiveGroup prim_grp(specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.name = name;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.kernel_wrapper = kfactory.create(specification);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.covariance = std::make_unique<Covariance>(CovarianceBuild::Allocate);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     prim_grp.normalizer = createNormalizer(specification);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     //prim_grp.normalizer.normalize(*prim_grp.covariance);
 
     /*
@@ -280,7 +258,6 @@ namespace panacea {
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
     */
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return prim_grp;
   }
 

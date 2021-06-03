@@ -149,58 +149,45 @@ namespace panacea {
       const KernelSpecification & kern_specification) const {
 
     // Ensure valid method exists
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if( create_methods_.count(kern_specification.get<settings::KernelCenterCalculation>()) == 0){
       std::string error_msg = "Kernel creation method is missing for the specified type: ";
       error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
       PANACEA_FAIL(error_msg);
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if( kern_specification.is(settings::KernelMemory::Share)){
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::string error_msg = "OneToOne kernels that are not owned, are not yet supported. ";
         error_msg += "When constructed without a descriptor wrapper.\n";
         PANACEA_FAIL(error_msg);
       } else { 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         // Initialize with an empty vector of vectors
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::vector<std::vector<double>> data;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
             PassKey<KernelWrapperFactory>(), data, 0, 0);
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
         if( not kern_specification.is(settings::KernelCenterCalculation::Mean) &&
             not kern_specification.is(settings::KernelCenterCalculation::Median)) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           std::string error_msg = "Kernel Center Calculation must be Mean or Median when Count is Single: ";
           error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
           PANACEA_FAIL(error_msg); 
         }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::vector<double> data;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
         [std::type_index(typeid(std::vector<double>))](PassKey<KernelWrapperFactory>(),data,0,0);
 
       }
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::string error_msg = "The combination of kernel specifications is not";
     error_msg += " yet supported.\n";
 
     error_msg += kern_specification.get<std::string>();
     PANACEA_FAIL(error_msg);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::unique_ptr<BaseKernelWrapper>();
   }
 }
