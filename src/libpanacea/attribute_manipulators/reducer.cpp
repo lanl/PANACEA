@@ -4,9 +4,7 @@
 
 #include "attribute_manipulators/row_echelon.hpp"
 #include "error.hpp"
-
-// Public PANACEA includes
-#include "panacea/matrix.hpp"
+#include "matrix/matrix.hpp"
 
 // Standard includes
 #include <algorithm>
@@ -61,9 +59,9 @@ namespace panacea {
           std::string error_msg = "Preferred dimensions are not unique ";
           error_msg += "cannot reduce matrix when specified dimensions ";
           error_msg += "have duplicates.";
-          PANACEA_FAIL(error_msg); 
+          PANACEA_FAIL(error_msg);
         }
-      } 
+      }
 
       for ( int dim = 0; dim < cov.rows(); ++dim ){
         if( cov(dim,dim) == 0.0 ) {
@@ -76,12 +74,12 @@ namespace panacea {
       }
     }
 
-    // After calling this function the matrix should be reordered such that 
+    // After calling this function the matrix should be reordered such that
     // the priorty rows columns are moved to the top and left side of the matrix
     //
-    // E.g. 
+    // E.g.
     //
-    // Mat1 
+    // Mat1
     //
     // 0 0 0 4 0
     // 0 0 0 4 0
@@ -89,7 +87,7 @@ namespace panacea {
     // 4 4 4 5 4
     // 0 0 0 4 0
     //
-    // If priority row is 3 (starts at 0) then the matrix should rearrange so 
+    // If priority row is 3 (starts at 0) then the matrix should rearrange so
     // that we have
     //
     // 5 4 4 4 4
@@ -102,7 +100,7 @@ namespace panacea {
         Matrix * mat, const std::vector<int> & priority_rows) {
 
       // Next we need to keep track of where the original rows are located in the
-      // covariance matrix 
+      // covariance matrix
       std::vector<int> ind_rows;
       ind_rows.reserve(mat->rows());
       for( int ind =0; ind< mat->rows(); ++ind){
@@ -121,7 +119,7 @@ namespace panacea {
         int chosen_row = priority_rows_tmp1.at(index);
 
         int index_of_chosen = 0;
-        for(;index_of_chosen<mat->rows();++index_of_chosen){ 
+        for(;index_of_chosen<mat->rows();++index_of_chosen){
           if(ind_rows.at(index_of_chosen) == chosen_row) { break; }
         }
 
@@ -172,7 +170,7 @@ namespace panacea {
 
     /*
      * Will detect linearly independent rows, the threshold determines
-     * what constitutes a 0. 
+     * what constitutes a 0.
      */
     std::vector<int> rowEchelonDimensionDependenceDetection_(
         Matrix * tmp,
@@ -185,19 +183,19 @@ namespace panacea {
 
     /*
      * We need to check the covariance matrix and see if it is singular
-     * if it is we need to identify the descriptors we are most interested in 
+     * if it is we need to identify the descriptors we are most interested in
      *
-     * We will then rearrange the covariance matrix to give priority to the 
-     * descriptor dimensions we are most interested in 
+     * We will then rearrange the covariance matrix to give priority to the
+     * descriptor dimensions we are most interested in
      * We will then put the covariance matrix in row echelon form, while identifying which
      * descriptor dimensions are linearly independent.
      *
      * Once we have got the descriptors we will build a smaller covariance matrix
-     * with the linearly independent descriptors. 
+     * with the linearly independent descriptors.
      *
      * When we rearrange the covariance matrix rows we will also have to rearrange the
-     * columns (because it is a covariance matrix. 
-     */ 
+     * columns (because it is a covariance matrix.
+     */
     std::vector<int> findLinearlyIndependentDescDimensions_(
         const Covariance & cov,
         const std::vector<int> & priority_rows,
@@ -216,30 +214,30 @@ namespace panacea {
       std::vector<int> order = reorderSymmetricMatrix_(tmp.get(), priority_rows);
 
       tmp->print();
-      // E.g. 
+      // E.g.
       // order.at(0) is row of reordered tmp that points back to the original tmp matrix
       // before it was changed which in this case is equivalent to covariance_
       // now we are going to get the rows that are linearly indpendent
 
       // Note that placing in row Echelon form may result in some of the rows being
       // swapped, because the diagonal may not be non zero at the dimension of interest
-      // this does not constitute an error 
+      // this does not constitute an error
       const std::vector<int> relative_independent_rows =
         rowEchelonDimensionDependenceDetection_(tmp.get(), threshold);
 
       // relative_independent_rows has not accounted for the changes in rows that occurred
       // during the call to reorderSymmetricMatrix this corrects the row indices
-      std::unordered_set<int> converted; 
+      std::unordered_set<int> converted;
       for( const auto & rel_ind : relative_independent_rows){
         converted.insert(order.at(rel_ind));
       }
-      // where  relative_independent_rows.at(0) points back to the original index in tmp 
+      // where  relative_independent_rows.at(0) points back to the original index in tmp
       // before it was put into row echelon form
 
       // We need to translate the independent rows from tmp back to the covariance matrix
       std::vector<int> independent_rows;
       for( const auto & prior : priority_rows) {
-        if(converted.count(prior) ) {  
+        if(converted.count(prior) ) {
           independent_rows.push_back(prior);
         }
       }
@@ -261,9 +259,9 @@ namespace panacea {
         for( int ind_col : independent_rows){
           reduced_covar_raw_mat->operator()(reduced_row, reduced_col) = cov(ind_row,ind_col);
           reduced_covar_raw_mat->operator()(reduced_col, reduced_row) = cov(ind_col,ind_row);
-          ++reduced_col; 
+          ++reduced_col;
         }
-        ++reduced_row; 
+        ++reduced_row;
       }
       return reduced_covar_raw_mat;
     }

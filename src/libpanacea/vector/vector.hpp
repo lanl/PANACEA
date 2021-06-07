@@ -4,8 +4,8 @@
 #pragma once
 
 // Public PANACEA includes
-#include "file_io_types.hpp"
-#include "settings.hpp"
+#include "panacea/file_io_types.hpp"
+#include "panacea/settings.hpp"
 
 // Standard includes
 #include <any>
@@ -18,7 +18,7 @@ namespace panacea {
     Default,
     Eigen
   };
-  
+
   enum class Direction;
 
   class Vector {
@@ -34,7 +34,7 @@ namespace panacea {
       virtual double operator()(const int row) const = 0;
 
       /**
-       * Is it a row or column matrix 
+       * Is it a row or column matrix
        **/
       virtual Direction direction() const = 0;
 
@@ -57,7 +57,7 @@ namespace panacea {
           const settings::FileType file_type,
           std::ostream &,
           std::any vector_instance);
-      
+
       static io::ReadInstantiateVector read(
           const settings::FileType file_type,
           std::istream &,

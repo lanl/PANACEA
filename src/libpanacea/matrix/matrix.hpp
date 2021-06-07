@@ -4,8 +4,8 @@
 #pragma once
 
 // Public PANACEA includes
-#include "file_io_types.hpp"
-#include "settings.hpp"
+#include "panacea/file_io_types.hpp"
+#include "panacea/settings.hpp"
 
 // Standard includes
 #include <any>
@@ -59,16 +59,16 @@ namespace panacea {
 
   std::ostream& operator<<(std::ostream& os, const MatrixType& mat_type);
 
-  // Will create a matrix 
-  std::unique_ptr<Matrix> 
+  // Will create a matrix
+  std::unique_ptr<Matrix>
     createMatrix(
-        const int rows, 
-        const int cols, 
+        const int rows,
+        const int cols,
         const MatrixType type = MatrixType::Default);
 
   // Create pseudo inverse of a matrix, will return matrix of the same type
   // as is passed in
-  std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat, 
+  std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat,
       const MatrixType type = MatrixType::Default );
 
 }

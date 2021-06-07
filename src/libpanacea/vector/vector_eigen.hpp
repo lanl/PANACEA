@@ -1,10 +1,9 @@
-
 #ifndef PANACEA_PRIVATE_VECTOREIGEN_H
 #define PANACEA_PRIVATE_VECTOREIGEN_H
 #pragma once
 
 // Local PANACEA includes
-#include "panacea/vector.hpp"
+#include "vector.hpp"
 
 #include "data_settings.hpp"
 
@@ -21,7 +20,7 @@ namespace panacea {
    * here.
    */
   class VectorEigen : public Vector {
-    private: 
+    private:
       Direction direction_ = Direction::AlongRows;
       std::unique_ptr<Eigen::VectorXd> vector_;
       virtual void direction(const Direction & direction) final { direction_ = direction; }

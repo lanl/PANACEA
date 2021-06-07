@@ -4,11 +4,11 @@
 // Local private PANACEA includes
 #include "covariance.hpp"
 #include "error.hpp"
+#include "matrix/matrix.hpp"
+#include "vector/vector.hpp"
 
 // Local public PANACEA includes
 #include "panacea/file_io_types.hpp"
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 // Standard includes
 #include <any>
@@ -25,12 +25,12 @@ namespace panacea {
       const int num_pts = desc_wrap->getNumberPoints();
       mean->resize(num_dims);
       for( int dim=0; dim<num_dims; ++dim){
-        double sum = 0.0;  
+        double sum = 0.0;
         for( int pt = 0; pt<num_pts; ++pt) {
           sum += (*desc_wrap)(pt, dim);
         }
         (*mean)(dim) = sum/static_cast<double>(num_pts);
-      } 
+      }
     }
 
     void updateCovariance(
@@ -52,21 +52,21 @@ namespace panacea {
         { // account for diagonal
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
-            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim); 
+            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim);
           }
-          double A_ij = (*covariance)(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) + 
+          double A_ij = (*covariance)(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) +
             static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim) + sum;
           double B_ij = static_cast<double>(total_num_pts) * (*new_mean)(dim)*(*new_mean)(dim);
 
           (*covariance)(dim,dim)  = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          (*covariance)(dim,dim) *= (A_ij - B_ij); 
+          (*covariance)(dim,dim) *= (A_ij - B_ij);
         } // end account for diagonal
         for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
           double sum = 0.0;
           for( int pt = 0; pt<num_pts; ++pt) {
-            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2); 
+            sum += (*desc_wrap)(pt,dim) * (*desc_wrap)(pt,dim2);
           }
-          double A_ij = (*covariance)(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) + 
+          double A_ij = (*covariance)(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) +
             static_cast<double>(current_num_pts) * (*current_mean)(dim)*(*current_mean)(dim2) + sum;
           double B_ij = static_cast<double>(total_num_pts) * -1.0* (*new_mean)(dim) * (*new_mean)(dim2);
           (*covariance)(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
@@ -85,7 +85,7 @@ namespace panacea {
       const int num_pts = desc_wrap->getNumberPoints();
       assert(mean->rows() == num_dims);
       for( int dim=0; dim<num_dims; ++dim){
-        double new_sum = 0.0;  
+        double new_sum = 0.0;
         for( int pt = 0; pt<num_pts; ++pt) {
           new_sum += (*desc_wrap)(pt, dim);
         }
@@ -99,7 +99,7 @@ namespace panacea {
     if( memory == CovarianceBuild::Allocate) {
       matrix_ = createMatrix(0, 0);
       mean_ = createVector(0);
-    }  
+    }
   }
 
   Covariance::Covariance(const BaseDescriptorWrapper * desc_wrap, const CovarianceOption opt) {
@@ -119,7 +119,7 @@ namespace panacea {
 
     matrix_->resize(num_dims, num_dims);
     matrix_->setZero();
-    
+
     correlated::updateCovariance(
         matrix_.get(),
         mean_.get(),
@@ -144,7 +144,7 @@ namespace panacea {
         error_msg += " Either get a better starting data set or allow flexibility in the algorithm.";
         PANACEA_FAIL(error_msg);
       }
-    } else { 
+    } else {
       for( int dim1 = 0; dim1 < desc_wrap->getNumberDimensions(); ++dim1){
 
         if( std::abs(matrix_->operator()(dim1,dim1)) < 1E-9 ){
@@ -164,7 +164,7 @@ namespace panacea {
     mean_ = std::move(new_mean);
     // Record the total number of data points used to create the covariance matrix
     total_number_data_pts_ = desc_wrap->getNumberPoints();
-    
+
   }
 
   Covariance::Covariance(
@@ -179,7 +179,7 @@ namespace panacea {
     assert(matrix_->rows() == matrix_->cols() && "Covariance matrix must be square");
     assert(mean_->rows() == matrix_->rows() && "Mean and covariance matrix must have the same dimensions.");
     assert(total_num_pts > 0 && "Total number of points must be greater than 0");
-    
+
     // Check for symmetry
     const double threshold = 1E-5;
     for( int i = 0; i < matrix_->rows(); ++i) {
@@ -189,7 +189,7 @@ namespace panacea {
           // Only check values that are not too close to 0.0
           const double diff = std::abs(matrix_->operator()(i,j) - matrix_->operator()(j,i));
           const double avg =  std::abs(matrix_->operator()(i,j) + matrix_->operator()(j,i))/2.0;
-          assert(diff/avg < threshold && "Covariance symmetry criteria not satisfied"); 
+          assert(diff/avg < threshold && "Covariance symmetry criteria not satisfied");
         }
       }
     }
@@ -205,7 +205,7 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
     }  else {
-      
+
       for( int dim1 = 0; dim1 < matrix_->rows(); ++dim1){
 
         if( std::abs(matrix_->operator()(dim1,dim1)) < 1E-9 ){
@@ -224,7 +224,7 @@ namespace panacea {
 
   bool Covariance::isZero(const double threshold ) const noexcept {
     assert(threshold > 0.0);
-    // Because it is symmetric only need to check one half    
+    // Because it is symmetric only need to check one half
     for( int i = 0; i < matrix_->rows(); ++i) {
       for( int j = i; j < matrix_->cols(); ++j) {
         if( std::abs(matrix_->operator()(i,j)) > threshold ) return false;
@@ -254,7 +254,7 @@ namespace panacea {
 
     mean_ = std::move(new_mean);
     total_number_data_pts_ += desc_wrap->getNumberPoints();
-   
+
   }
 
   double Covariance::operator()(const int row, const int col) const {
@@ -324,15 +324,15 @@ namespace panacea {
       std::ostream & os,
       std::any cov_instance) {
 
-    std::vector<std::any> nested_objs; 
-    if( file_type == settings::FileType::TXTRestart || 
-        file_type == settings::FileType::TXTKernelDistribution ) { 
-      auto cov_mat = std::any_cast<Covariance *>(cov_instance); 
+    std::vector<std::any> nested_objs;
+    if( file_type == settings::FileType::TXTRestart ||
+        file_type == settings::FileType::TXTKernelDistribution ) {
+      auto cov_mat = std::any_cast<Covariance *>(cov_instance);
       os << "[Covariance]\n";
       os << cov_mat->total_number_data_pts_ << "\n\n";
       os << "[Normalization State]\n";
       os << cov_mat->normalized_ << "\n\n";
-      // Note order of writing out the covariance matrix must be the 
+      // Note order of writing out the covariance matrix must be the
       // same as order of reading in
       nested_objs.push_back(cov_mat->matrix_.get());
       nested_objs.push_back(cov_mat->mean_.get());
@@ -341,20 +341,20 @@ namespace panacea {
     }
     return nested_objs;
   }
- 
+
   io::ReadInstantiateVector Covariance::read(
       const settings::FileType file_type,
       std::istream & is,
       std::any cov_instance) {
 
-    io::ReadInstantiateVector nested_objs; 
-    if( file_type == settings::FileType::TXTRestart || 
-        file_type == settings::FileType::TXTKernelDistribution ) { 
+    io::ReadInstantiateVector nested_objs;
+    if( file_type == settings::FileType::TXTRestart ||
+        file_type == settings::FileType::TXTKernelDistribution ) {
       Covariance * cov_mat = nullptr;
       if(std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))) {
-        cov_mat = std::any_cast<Covariance *>(cov_instance); 
+        cov_mat = std::any_cast<Covariance *>(cov_instance);
       } else if(std::type_index(cov_instance.type()) == std::type_index(typeid(std::unique_ptr<Covariance> *))) {
-        cov_mat = (std::any_cast<std::unique_ptr<Covariance> *>(cov_instance))->get(); 
+        cov_mat = (std::any_cast<std::unique_ptr<Covariance> *>(cov_instance))->get();
       }
       assert(cov_mat != nullptr);
       std::string line = "";
@@ -398,7 +398,7 @@ namespace panacea {
       // Check to see if memory has been allocated to the internal vector and matrix
       if( cov_mat->matrix_.get() == nullptr ) {
         cov_mat->matrix_ = createMatrix(0,0);
-      } 
+      }
       if( cov_mat->mean_.get() == nullptr ) {
         cov_mat->mean_ = createVector(0);
       }
@@ -408,5 +408,5 @@ namespace panacea {
       PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
     }
     return nested_objs;
-  } 
+  }
 }

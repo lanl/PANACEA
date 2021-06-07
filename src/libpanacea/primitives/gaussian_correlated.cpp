@@ -12,9 +12,7 @@
 #include "error.hpp"
 #include "primitive_attributes.hpp"
 #include "private_settings.hpp"
-
-// Public local PANACEA includes
-#include "panacea/vector.hpp"
+#include "vector/vector.hpp"
 
 // Standard includes
 #include <cmath>
@@ -26,13 +24,13 @@ namespace panacea {
 
   void GaussCorrelated::update(PrimitiveAttributes && attributes) {
     assert(attributes.kernel_wrapper != nullptr);
-    attributes_ = std::move(attributes); 
+    attributes_ = std::move(attributes);
     double determinant = attributes_.reduced_covariance->getDeterminant();
     if( determinant <= 0.0 ) {
       std::string error_msg = "Determinant is less than 0 value: " + std::to_string(determinant);
       PANACEA_FAIL(error_msg);
     }
-    pre_factor_ = 1.0/(std::pow(determinant,0.5) * 
+    pre_factor_ = 1.0/(std::pow(determinant,0.5) *
         std::pow(constants::PI_SQRT*constants::SQRT_2,
           static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
   }
@@ -54,7 +52,7 @@ namespace panacea {
     auto & descs  = *(descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-    auto & red_inv_cov = *(attributes_.reduced_inv_covariance); 
+    auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
     std::vector<double> diff;
@@ -62,7 +60,7 @@ namespace panacea {
     diff.reserve(red_ndim);
     int index = 0;
     for ( const int dim : chosen_dims ) {
-      diff.push_back((descs(descriptor_ind, dim) - 
+      diff.push_back((descs(descriptor_ind, dim) -
           kerns.at(kernel_index_,dim)) *
           norm_coeffs.at(dim));
     }
@@ -91,7 +89,7 @@ namespace panacea {
   std::vector<double> GaussCorrelated::compute_grad(
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
-      const settings::EquationSetting & prim_settings, 
+      const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
 
     assert(descriptors != nullptr);
@@ -108,7 +106,7 @@ namespace panacea {
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
     auto & kerns = *(attributes_.kernel_wrapper);
     const int ndim = descs.getNumberDimensions();
-    auto & red_inv_cov = *(attributes_.reduced_inv_covariance); 
+    auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
     const double exp_term = [&]{
@@ -122,16 +120,16 @@ namespace panacea {
     std::vector diff(ndim, 0.0);
     for ( const int dim : chosen_dims ) {
       // ( a_i * (d_x_i - d_mu_i) )
-      diff.at(dim) = (descs(descriptor_ind,dim) - 
+      diff.at(dim) = (descs(descriptor_ind,dim) -
           kerns.at(kernel_index_,dim));
-    } 
+    }
 
     std::vector<double> grad(ndim,0.0);
 
     int index1 = 0;
     for ( const int dim : chosen_dims ) {
       int index2 = 0;
-      for ( const int dim2 : chosen_dims ) { 
+      for ( const int dim2 : chosen_dims ) {
         grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) * norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
         ++index2;
       }

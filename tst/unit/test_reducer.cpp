@@ -3,13 +3,11 @@
 #include "attribute_manipulators/reducer.hpp"
 
 #include "attributes/covariance.hpp"
+#include "matrix/matrix.hpp"
+#include "vector/vector.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
-
-// Local public PANACEA includes
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 using namespace std;
 using namespace panacea;
@@ -59,7 +57,7 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
   mat->operator()(3,3) =  1.0;
 
   mat->print();
-  
+
   Covariance covar(std::move(mat),std::move(vec),num_pts);
 
   WHEN("Priority rows are sequential") {
@@ -75,7 +73,7 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     REQUIRE(reduced_covar.getReducedDimensions().at(1) == 1);
     REQUIRE(reduced_covar.getReducedDimensions().at(2) == 3);
 
-    // The reduced matrix should simply be the identity matrix 
+    // The reduced matrix should simply be the identity matrix
     //
     // 1 0 0
     // 0 1 0
@@ -103,7 +101,7 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     REQUIRE(reduced_covar.getReducedDimensions().at(1) == 1);
     REQUIRE(reduced_covar.getReducedDimensions().at(2) == 3);
 
-    // The reduced matrix should also in this case simply be the identity matrix 
+    // The reduced matrix should also in this case simply be the identity matrix
     //
     // 1 0 0
     // 0 1 0

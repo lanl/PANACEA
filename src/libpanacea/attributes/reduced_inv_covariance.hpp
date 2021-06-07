@@ -3,12 +3,12 @@
 #define PANACEA_PRIVATE_REDUCEDINVCOVARIANCE_H
 #pragma once
 
-// Public PANACEA includes
-#include "panacea/matrix.hpp"
-#include "panacea/passkey.hpp"
-
 // Local private PANACEA includes
 #include "data_settings.hpp"
+#include "matrix/matrix.hpp"
+
+// Public PANACEA includes
+#include "panacea/passkey.hpp"
 
 // Standard includes
 #include <memory>
@@ -21,7 +21,7 @@ namespace panacea {
   class ReducedInvCovariance {
     private:
       std::unique_ptr<Matrix> matrix_;
-      std::vector<int> chosen_dimension_indices_; 
+      std::vector<int> chosen_dimension_indices_;
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:

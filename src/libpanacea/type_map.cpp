@@ -6,14 +6,14 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "kernels/kernel_specifications.hpp"
+#include "matrix/matrix.hpp"
 #include "primitives/primitive.hpp"
 #include "primitives/primitive_group.hpp"
+#include "vector/vector.hpp"
 
 // Public PANACEA includes
 #include "panacea/base_descriptor_wrapper.hpp"
 #include "panacea/entropy_term.hpp"
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 // Standard includes
 #include <deque>

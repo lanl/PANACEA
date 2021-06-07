@@ -6,13 +6,11 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attributes/reduced_covariance.hpp"
 #include "attribute_manipulators/reducer.hpp"
+#include "matrix/matrix.hpp"
+#include "vector/vector.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
-
-// Local public PANACEA includes
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 using namespace std;
 using namespace panacea;
@@ -62,7 +60,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
   mat->operator()(3,3) =  1.0;
 
   mat->print();
-  
+
   Covariance covar(std::move(mat),std::move(vec),num_pts);
 
   WHEN("Priority rows are sequential") {
@@ -70,7 +68,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
 
     std::vector<int> priority_rows { 0, 1, 2, 3};
     ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
-  
+
     Inverter inverter;
     ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_covar);
 
@@ -81,7 +79,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
     REQUIRE(reduced_inv_cov.getChosenDimensionIndices().at(1) == 1);
     REQUIRE(reduced_inv_cov.getChosenDimensionIndices().at(2) == 3);
 
-    // The reduced matrix should simply be the identity matrix 
+    // The reduced matrix should simply be the identity matrix
     //
     // 1 0 0
     // 0 1 0
@@ -95,7 +93,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
         }
       }
     }
-    
+
   }
 }
 
@@ -144,7 +142,7 @@ TEST_CASE("Testing:inverter less trivial","[unit,panacea]"){
   mat->operator()(3,3) =  1.0;
 
   mat->print();
-  
+
   Covariance covar(std::move(mat),std::move(vec),num_pts);
 
   WHEN("Priority rows are sequential") {
@@ -163,9 +161,9 @@ TEST_CASE("Testing:inverter less trivial","[unit,panacea]"){
     REQUIRE(reduced_inv_cov.getChosenDimensionIndices().at(1) == 1);
     REQUIRE(reduced_inv_cov.getChosenDimensionIndices().at(2) == 3);
 
-    // The reduced matrix should simply be the identity matrix 
+    // The reduced matrix should simply be the identity matrix
     //
-    // 0.5 0.0 0.0 
+    // 0.5 0.0 0.0
     // 0.0 1.0 0.0
     // 0.0 0.0 1.0
     //
@@ -181,7 +179,7 @@ TEST_CASE("Testing:inverter less trivial","[unit,panacea]"){
         }
       }
     }
-    
+
   }
 }
 

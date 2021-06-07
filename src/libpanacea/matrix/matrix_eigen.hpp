@@ -4,7 +4,7 @@
 #pragma once
 
 // Local PANACEA includes
-#include "panacea/matrix.hpp"
+#include "matrix/matrix.hpp"
 
 // Third party includes
 #include <Eigen/Dense>
@@ -15,7 +15,7 @@
 namespace panacea {
 
   class MatrixEigen : public Matrix {
-    private: 
+    private:
       std::unique_ptr<Eigen::MatrixXd> matrix_;
     public:
       MatrixEigen();
@@ -42,7 +42,7 @@ namespace panacea {
       Eigen::MatrixXd pseudoInverse() const;
   };
 
-  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat); 
+  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat);
 
 }
 

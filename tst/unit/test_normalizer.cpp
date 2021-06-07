@@ -3,10 +3,8 @@
 #include "attribute_manipulators/normalizer.hpp"
 
 #include "attributes/covariance.hpp"
-
-// Local public PANACEA includes
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
+#include "matrix/matrix.hpp"
+#include "vector/vector.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -59,7 +57,7 @@ TEST_CASE("Testing:normalizer1","[unit,panacea]"){
 
   normalizer.unnormalize(covar);
   REQUIRE(covar.getNormalizationState() == NormalizationState::Unnormalized);
-  
+
   REQUIRE(covar(0,0) == Approx(2.0));
   REQUIRE(covar(1,1) == Approx(3.0));
   REQUIRE(covar(2,2) == Approx(4.0));

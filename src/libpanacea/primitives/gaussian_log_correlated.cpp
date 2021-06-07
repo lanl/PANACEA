@@ -12,9 +12,7 @@
 #include "error.hpp"
 #include "primitive_attributes.hpp"
 #include "private_settings.hpp"
-
-// Public local PANACEA includes
-#include "panacea/vector.hpp"
+#include "vector/vector.hpp"
 
 // Standard includes
 #include <cmath>

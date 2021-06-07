@@ -7,12 +7,12 @@
 // Local private includes
 #include "data_settings.hpp"
 #include "private_settings.hpp"
+#include "matrix/matrix.hpp"
+#include "vector/vector.hpp"
 
 // Local public PANACEA includes
 #include "panacea/file_io_types.hpp"
-#include "panacea/matrix.hpp"
 #include "panacea/passkey.hpp"
-#include "panacea/vector.hpp"
 
 // Standard includes
 #include <any>
@@ -48,9 +48,9 @@ namespace panacea {
    * is used to create the covariance matrix.
    *
    * Note, by default covariance matrix creation will adhere to a strict interpretation
-   * of what a covariance matrix is. Thus if all of your data points are stacked on 
+   * of what a covariance matrix is. Thus if all of your data points are stacked on
    * top of one another than you will end up with a covariance matrix full of 0.0's which
-   * does not make sense and is numerically instable for use with a kernel. 
+   * does not make sense and is numerically instable for use with a kernel.
    *
    * To avoid this case the CovarianceOption = Flexible can be specified this will
    * allow the covariance matrix to assign 0's on problematic diagonal elements.
@@ -59,7 +59,7 @@ namespace panacea {
     private:
       /// The covariance matrix
       std::unique_ptr<Matrix> matrix_ = nullptr;
-      
+
       /// Mean of the values used to create the covariance matrix
       std::unique_ptr<Vector> mean_ = nullptr;
 
@@ -91,7 +91,7 @@ namespace panacea {
       int cols() const;
 
       /**
-       * Check to ensure that the covariance instance is fully defined, e.g. 
+       * Check to ensure that the covariance instance is fully defined, e.g.
        * there are no nullptr's in the internal members.
        **/
       bool defined() const noexcept;
@@ -105,8 +105,8 @@ namespace panacea {
       bool is(const NormalizationState & state) const noexcept;
 
       /**
-       * Check if the covariance matrix is full of 0's, this can occur if all 
-       * data passed in is stacked on top of its self. 
+       * Check if the covariance matrix is full of 0's, this can occur if all
+       * data passed in is stacked on top of its self.
        **/
       bool isZero(const double threshold = 1E-9) const noexcept;
 

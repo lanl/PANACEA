@@ -1,11 +1,11 @@
 
 // Local private PANACEA includes
+#include "matrix.hpp"
 #include "matrix_eigen.hpp"
 #include "error.hpp"
 
 // Local public PANACEA includes
 #include "panacea/file_io_types.hpp"
-#include "panacea/matrix.hpp"
 
 // Standard includes
 #include <any>
@@ -31,7 +31,7 @@ namespace panacea {
       std::any matrix_instance) {
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
       os << "[Matrix Type]\n";
@@ -40,9 +40,9 @@ namespace panacea {
       os << mat->rows() << " " << mat->cols() << "\n";
       for( int row = 0; row < mat->rows(); ++row ) {
         for( int col = 0; col < mat->cols(); ++col ) {
-          os << std::setfill(' ') 
-            << std::setw(14) 
-            << std::setprecision(8) 
+          os << std::setfill(' ')
+            << std::setw(14)
+            << std::setprecision(8)
             << std::right
             << mat->operator()(row,col) << " ";
         }
@@ -61,7 +61,7 @@ namespace panacea {
       std::istream & is,
       std::any matrix_instance) {
 
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
       std::string line = "";
@@ -93,7 +93,7 @@ namespace panacea {
         std::cout << "Attempting to load data into a matrix of type ";
         std::cout << mat->type() << "\n";
       }
- 
+
       while(line.find("[Matrix]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
           std::string error_msg = "Did not find [Matrix] header while trying ";
@@ -125,7 +125,7 @@ namespace panacea {
         mat->resize(rows,cols);
       }
 
-      try { 
+      try {
         for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
           std::istringstream ss_data(line);
@@ -134,7 +134,7 @@ namespace panacea {
             ss_data >> value;
             mat->operator()(row,col) = value;
           }
-        } 
+        }
       } catch (...) {
         std::string error_msg = "Error encountered while attempting to read in matrix ";
         error_msg += "coefficients from restart file.\n";
@@ -162,7 +162,7 @@ namespace panacea {
 
   std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat, const MatrixType type) {
       if(MatrixType::Default != mat->type() && MatrixType::Eigen != mat->type()){
-        PANACEA_FAIL("Pseudo inverse is not supported for specified matrix type."); 
+        PANACEA_FAIL("Pseudo inverse is not supported for specified matrix type.");
       }
       auto new_mat = createMatrix(mat->rows(), mat->cols(), type);
       pseudoInverse(new_mat.get(), static_cast<const MatrixEigen *>(mat));

@@ -8,14 +8,14 @@
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "kernels/kernel_specifications.hpp"
+#include "matrix/matrix.hpp"
 #include "primitives/primitive_group.hpp"
 #include "type_map.hpp"
+#include "vector/vector.hpp"
 
 // Public PANACEA includes
 #include "panacea/entropy_term.hpp"
 #include "panacea/file_io_types.hpp"
-#include "panacea/matrix.hpp"
-#include "panacea/vector.hpp"
 
 // Standard includes
 #include <fstream>
@@ -28,13 +28,13 @@ namespace panacea {
      * Declaring private static Member function maps
      **************************************************************/
 
-    std::unordered_map<std::type_index,FileKernelDistributionTXT::WriteMethod> 
-      FileKernelDistributionTXT::write_methods_; 
+    std::unordered_map<std::type_index,FileKernelDistributionTXT::WriteMethod>
+      FileKernelDistributionTXT::write_methods_;
 
     std::unordered_map<std::type_index,FileKernelDistributionTXT::ReadMethod>
       FileKernelDistributionTXT::read_methods_;
 
-    std::unordered_map<std::type_index,FileKernelDistributionTXT::PostReadInitialization> 
+    std::unordered_map<std::type_index,FileKernelDistributionTXT::PostReadInitialization>
       FileKernelDistributionTXT::post_read_initialization_;
 
     FileKernelDistributionTXT::FileKernelDistributionTXT() {
@@ -92,8 +92,8 @@ namespace panacea {
         read_(obj.instance, data, is);
 
 
-        // Below we have the options to call two different functions 
-        // The first option allows further initialization of a object parent 
+        // Below we have the options to call two different functions
+        // The first option allows further initialization of a object parent
         // The second post read option allows further initialization of the class
         // that was just read in, it will not have access to the state of the parent
 
@@ -128,7 +128,7 @@ namespace panacea {
       std::fstream fs;
       fs.open(filename, std::fstream::out);
 
-      write(obj, fs); 
+      write(obj, fs);
       fs.close();
     }
 
@@ -149,7 +149,7 @@ namespace panacea {
         post_read_initialization_[obj.type()](type(),obj);
       }
     }
-   
+
     void FileKernelDistributionTXT::read(std::any obj, const std::string & filename) {
       // Not implemented
       std::fstream fs;

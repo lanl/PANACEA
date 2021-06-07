@@ -1,12 +1,10 @@
 
 // Local private PANACEA includes
 #include "attribute_manipulators/row_echelon.hpp"
+#include "matrix/matrix.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
-
-// Local public PANACEA includes
-#include "panacea/matrix.hpp"
 
 using namespace std;
 using namespace panacea;
@@ -54,7 +52,7 @@ TEST_CASE("Testing:row_echelon1","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get()); 
+  row_echelon.operate(mat.get());
 
   mat->print();
   // Solution should be
@@ -62,7 +60,7 @@ TEST_CASE("Testing:row_echelon1","[unit,panacea]"){
   //  2.0   3.0   2.0   5.0
   //  0.0  13.0  11.0  27.0
   //  0.0   0.0  -3.0   0.0
-  //  0.0   0.0   0.0 -11.0 
+  //  0.0   0.0   0.0 -11.0
 
   // Row 0
   REQUIRE(mat->operator()(0,0) == Approx(2.0).margin(1E-3));
@@ -127,7 +125,7 @@ TEST_CASE("Testing:row_echelon2","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get()); 
+  row_echelon.operate(mat.get());
 
   mat->print();
   // Solution should be
@@ -135,7 +133,7 @@ TEST_CASE("Testing:row_echelon2","[unit,panacea]"){
   //  2.0   3.0   2.0   5.0
   //  0.0   2.0   0.0 -18.0
   //  0.0   0.0  11.0 144.0
-  //  0.0   0.0   0.0   0.0 
+  //  0.0   0.0   0.0   0.0
 
   // Row 0
   REQUIRE(mat->operator()(0,0) == Approx(2.0).margin(1E-3));
@@ -200,7 +198,7 @@ TEST_CASE("Testing:row_echelon3","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get()); 
+  row_echelon.operate(mat.get());
 
   mat->print();
   // Solution should be
@@ -208,7 +206,7 @@ TEST_CASE("Testing:row_echelon3","[unit,panacea]"){
   //  1.0   3.0   2.0   1.0
   //  0.0   2.0   0.0   8.0
   //  0.0   0.0   0.0  -5.0
-  //  0.0   0.0   0.0   0.0 
+  //  0.0   0.0   0.0   0.0
 
   // Row 0
   REQUIRE(mat->operator()(0,0) == Approx(1.0).margin(1E-3));
@@ -246,7 +244,7 @@ TEST_CASE("Testing:row_echelon4","[unit,panacea]"){
   //   0.0   2.0   0.0 -18.0
   //  -8.0   1.0   3.0   7.0
   //  -2.0   1.0   0.0  10.0
-  
+
   // Row 0
   mat->operator()(0,0) =   0.0;
   mat->operator()(0,1) =   1.0;
@@ -280,7 +278,7 @@ TEST_CASE("Testing:row_echelon4","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get()); 
+  row_echelon.operate(mat.get());
 
   mat->print();
   // Solution should be
@@ -332,7 +330,7 @@ TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
   //   0.0   2.0   0.0 -18.0   7.0
   //  -8.0   1.0   3.0   7.0   2.0
   //   0.0   1.0   0.0  -9.0   4.0
-  
+
   // Row 0
   mat->operator()(0,0) =   2.0;
   mat->operator()(0,1) =   3.0;
@@ -364,7 +362,7 @@ TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get()); 
+  row_echelon.operate(mat.get());
 
   mat->print();
   // Solution should be
