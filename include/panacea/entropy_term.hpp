@@ -97,6 +97,14 @@ namespace panacea {
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 
       /**
+       * Initialize internal members.
+       *
+       * Similar to updating but assumes you are initializing data structures as opposed
+       * to changing values already stored in them.
+       **/
+      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+
+      /**
        * Some method to combine entropy terms, such that the covariance matrices are updated.
        *
        * By only storing a diff we can achieve a small memory footprint.

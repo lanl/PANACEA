@@ -33,12 +33,16 @@ namespace panacea {
 
   double CrossEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper) {
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(descriptor_wrapper != nullptr);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     double cross_entropy = 0.0;
     for( int desc_pt = 0; desc_pt < descriptor_wrapper->getNumberPoints(); ++desc_pt ){
+      std::cout << __FILE__ << ":" << __LINE__ << " desc_pt " << desc_pt <<  std::endl;
       cross_entropy += -1.0 * log(distribution_->compute(descriptor_wrapper, desc_pt));
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return cross_entropy;
   }
 
@@ -133,6 +137,10 @@ namespace panacea {
 
   void CrossEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
+  }
+
+  void CrossEntropy::initialize(const BaseDescriptorWrapper * descriptor_wrapper) {
+    distribution_->initialize(descriptor_wrapper);
   }
 
   std::vector<std::any> CrossEntropy::write(

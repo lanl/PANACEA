@@ -91,10 +91,10 @@ namespace panacea {
     const double new_num_pts = static_cast<double>(dwrapper->getNumberPoints());
     const double inv_total_num_pts = 1.0/static_cast<double>(number_pts_mean_ + new_num_pts);
     for( int dim = 0; dim < data_wrapper_.getNumberDimensions(); ++dim){
-      data_wrapper_(0,dim) = 
-        (data_wrapper_(0,dim) * static_cast<double>(number_pts_mean_) + 
-        new_center.at(dim) * new_num_pts) * 
-        inv_total_num_pts; 
+      data_wrapper_(0,dim) =
+        (data_wrapper_(0,dim) * static_cast<double>(number_pts_mean_) +
+        new_center.at(dim) * new_num_pts) *
+        inv_total_num_pts;
     }
     number_pts_mean_ += dwrapper->getNumberPoints();
   }
@@ -121,7 +121,7 @@ namespace panacea {
 
   std::istream & MeanKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
 
-    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
+    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);
 
     std::string line = "";
     while(line.find("[Total Number Points]",0) == std::string::npos) {
@@ -145,7 +145,7 @@ namespace panacea {
   }
 
   std::ostream & MeanKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
-    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);  
+    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);
     os << "[Total Number Points]\n";
     os << kwrapper_mean->number_pts_mean_ << "\n";
     return os;

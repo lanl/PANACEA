@@ -35,7 +35,7 @@ namespace panacea {
     class KernelWrapper : public BaseKernelWrapper {
       private:
         DataPointTemplate<T> data_wrapper_;
-      
+
         virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
         virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
 
@@ -43,33 +43,33 @@ namespace panacea {
 
         KernelWrapper(const PassKey<test::Test> &) {};
 
-        KernelWrapper(const PassKey<KernelWrapperFactory> &,const T & data, int rows, int cols) : 
-          data_wrapper_(data, rows, cols) {};
-       
-        /**
-         * Will copy the data instead of storing it as a pointer.
-         **/ 
-        KernelWrapper(const PassKey<KernelWrapperFactory> &, T * data, int rows, int cols) : 
-          data_wrapper_(*data, rows, cols) {};
-
-        KernelWrapper(const PassKey<KernelWrapperFactory> &, const T * data, int rows, int cols) : 
-          data_wrapper_(*data, rows, cols) {};
-
-        KernelWrapper(const PassKey<test::Test> &, const T & data, int rows, int cols) : 
+        KernelWrapper(const PassKey<KernelWrapperFactory> &,const T & data, int rows, int cols) :
           data_wrapper_(data, rows, cols) {};
 
         /**
          * Will copy the data instead of storing it as a pointer.
-         **/ 
-        KernelWrapper(const PassKey<test::Test> &, T * data, int rows, int cols) : 
+         **/
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, T * data, int rows, int cols) :
           data_wrapper_(*data, rows, cols) {};
-        
-        KernelWrapper(const PassKey<test::Test> &, const T * data, int rows, int cols) : 
+
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, const T * data, int rows, int cols) :
+          data_wrapper_(*data, rows, cols) {};
+
+        KernelWrapper(const PassKey<test::Test> &, const T & data, int rows, int cols) :
+          data_wrapper_(data, rows, cols) {};
+
+        /**
+         * Will copy the data instead of storing it as a pointer.
+         **/
+        KernelWrapper(const PassKey<test::Test> &, T * data, int rows, int cols) :
+          data_wrapper_(*data, rows, cols) {};
+
+        KernelWrapper(const PassKey<test::Test> &, const T * data, int rows, int cols) :
           data_wrapper_(*data, rows, cols) {};
 
         KernelWrapper(const PassKey<test::Test> &,
             const BaseDescriptorWrapper * desc_wrapper);
-        
+
         virtual const settings::KernelCenterCalculation center() const noexcept final;
         virtual const settings::KernelCount count() const noexcept final;
         virtual double& at(const int row, const int col) final;
@@ -81,7 +81,7 @@ namespace panacea {
         virtual int cols() const final;
         virtual int getNumberDimensions() const final;
         virtual int getNumberPoints() const final;
-        virtual const Arrangement & arrangement() const noexcept final; 
+        virtual const Arrangement & arrangement() const noexcept final;
         virtual void set(const Arrangement arrangement) final;
 
         virtual void update(const BaseDescriptorWrapper *) final;
@@ -95,13 +95,13 @@ namespace panacea {
         // Standard any should not be a reference because the underlying type should
         // be a pointer
         static std::unique_ptr<BaseKernelWrapper> create(
-            const PassKey<KernelWrapperFactory> &, 
-            std::any data, 
+            const PassKey<KernelWrapperFactory> &,
+            std::any data,
             const int rows,
             const int cols);
 
-        static std::istream & read(BaseKernelWrapper *, std::istream &); 
-        static std::ostream & write(BaseKernelWrapper *, std::ostream &); 
+        static std::istream & read(BaseKernelWrapper *, std::istream &);
+        static std::ostream & write(BaseKernelWrapper *, std::ostream &);
     };
 
   template<class T>
@@ -130,7 +130,7 @@ namespace panacea {
 
   template<class T>
       const settings::KernelCount KernelWrapper<T>::count() const noexcept {
-        return settings::KernelCount::OneToOne; 
+        return settings::KernelCount::OneToOne;
       }
 
   template<class T>
@@ -216,10 +216,10 @@ namespace panacea {
           // That way the kernel will have ownership of the data
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
         } else {
-          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols); 
+          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols);
 
         }
-      } 
+      }
 
       if(std::type_index(data.type()) == std::type_index(typeid(const T *))) {
         if( not std::is_pointer<T>::value) {
@@ -227,23 +227,23 @@ namespace panacea {
           // That way the kernel will have ownership of the data
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<const T *>(data), rows, cols);
         } else {
-          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols); 
+          return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols);
         }
 
       }
 
       auto val = std::any_cast<T>(data);
-      return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols); 
+      return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols);
     }
 
   template<class T>
     inline std::istream & KernelWrapper<T>::read(BaseKernelWrapper *, std::istream & is) {
-      return is; 
+      return is;
     }
 
   template<class T>
     inline std::ostream & KernelWrapper<T>::write(BaseKernelWrapper *, std::ostream & os) {
-      return os; 
+      return os;
     }
 
   template<class T>

@@ -60,10 +60,15 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
         &dwrapper_init,
         &settings);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    REQUIRE(entropy_term != nullptr);
+    REQUIRE(entropy_term.get() != nullptr);
     std::vector<std::vector<double>> data_sample_max{
     {3.0, 5.0}};
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample_max(&data_sample_max, 1, 2);
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double val1 = entropy_term->compute(&dwrapper_sample_max);
     std::cout << "Cross entropy is " << val1 << " at what should be the center of the cross entropy term." << std::endl;
 
@@ -96,6 +101,8 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
         &dwrapper_init,
         &settings);
 
+    REQUIRE(entropy_term != nullptr);
+    REQUIRE(entropy_term.get() != nullptr);
     std::vector<std::vector<double>> data_sample_max{
     {2.8, 5.0}};
     DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample_max(&data_sample_max, 1, 2);
@@ -112,5 +119,5 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
 
     REQUIRE( numer_grad.at(0) < 0.0);*/
     // Now if we use the location of the sample point such that it is a little removed
-  } 
+  }
 }

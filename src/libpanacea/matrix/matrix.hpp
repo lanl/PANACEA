@@ -32,6 +32,13 @@ namespace panacea {
 
       virtual double getDeterminant() const = 0;
 
+      /**
+       * Resize the matrix to the specified rows and columns
+       *
+       * If rows or cols is less than 0 assertions will trigger, note that no guarantees
+       * are placed on the contents of the matrix, you will need to call setZero
+       * if you want the values of the matrix to be set to 0.0.
+       **/
       virtual void resize(const int rows, const int cols) = 0;
 
       /**

@@ -72,6 +72,9 @@ namespace panacea {
         return entropy_term_->update(descriptor_wrapper);
       }
 
+      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) override {
+        return entropy_term_->initialize(descriptor_wrapper);
+      }
   };
 
 }

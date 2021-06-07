@@ -35,6 +35,14 @@ namespace panacea {
           static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
   }
 
+  const settings::KernelPrimitive GaussCorrelated::type() const noexcept {
+    return settings::KernelPrimitive::Gaussian;
+  }
+
+  const settings::KernelCorrelation GaussCorrelated::correlation() const noexcept {
+    return settings::KernelCorrelation::Correlated;
+  }
+
   double GaussCorrelated::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
       const int descriptor_ind) const {
@@ -49,24 +57,36 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto & descs  = *(descriptor_wrapper);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto & kerns = *(attributes_.kernel_wrapper);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     std::vector<double> diff;
     const int red_ndim = attributes_.reduced_inv_covariance->getNumberDimensions();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     diff.reserve(red_ndim);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     int index = 0;
     for ( const int dim : chosen_dims ) {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       diff.push_back((descs(descriptor_ind, dim) -
           kerns.at(kernel_index_,dim)) *
           norm_coeffs.at(dim));
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
 
     std::vector<double> MxV;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     MxV.reserve(red_ndim);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     for( int j=0; j<red_ndim; ++j) {
       double val = 0.0;
       for( int k=0; k<red_ndim; ++k) {
@@ -74,15 +94,18 @@ namespace panacea {
       }
       MxV.push_back(val);
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     double VxMxV = 0.0;
     for(int i=0; i<red_ndim; ++i) {
       VxMxV += diff.at(i) * MxV.at(i);
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double result = pre_factor_*std::exp(-0.5 * VxMxV );
     if( result == 0.0 ) {
       return std::numeric_limits<double>::min();
     }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return result;
   }
 

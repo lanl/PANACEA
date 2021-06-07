@@ -17,9 +17,9 @@ namespace panacea {
 
   namespace settings {
 
-    // Should attempt to make settings classes specefic to the correct 
+    // Should attempt to make settings classes specefic to the correct
     // categories so as to avoid allowing values to be passed in that shouldn't
-    // be 
+    // be
     enum class CalculationType {
       Numerical,
       Analytical
@@ -42,22 +42,22 @@ namespace panacea {
     };
 
     enum class KernelAlgorithm {
-      Strict,   
-      Flexible  
+      Strict,
+      Flexible
     };
 
     /**
      * Specifies if the kernel needs to actually create the memory
-     * or not. This is option is not always going to be viable. 
+     * or not. This is option is not always going to be viable.
      *
-     * For instance if the KernelCount is set to 0neToOne then 
+     * For instance if the KernelCount is set to 0neToOne then
      * either option is viable we could recreate all the descriptor
      * points in memory or use the passed in descriptor object as
      * the centers of the kernel.
      *
      * However, in the case that you have specified a single kernel
      * but have passed in multiple descriptors, you cannot share
-     * the descriptors raw pointer because you need different 
+     * the descriptors raw pointer because you need different
      * data.
      **/
     enum class KernelMemory {
@@ -83,7 +83,7 @@ namespace panacea {
             return "Memory=Own";
           } else if( setting == KernelMemory::Share ) {
             return "Memory=Share";
-          } 
+          }
         } else if constexpr( std::is_same<KernelNormalization,T>::value ) {
           if( setting == KernelNormalization::None ) {
             return "Normalization=None";
@@ -109,6 +109,8 @@ namespace panacea {
             return "Primitive=Gaussian";
           } else if(setting == KernelPrimitive::Exponential) {
             return "Primitive=Exponential";
+          } else if(setting == KernelPrimitive::GaussianLog) {
+            return "Primitive=GaussianLog";
           }
         } else if constexpr( std::is_same<KernelAlgorithm,T>::value ) {
           if( setting == KernelAlgorithm::Strict ) {
@@ -130,16 +132,16 @@ namespace panacea {
   std::ostream& operator<<(std::ostream& os, const settings::CalculationType & );
   std::ostream& operator<<(std::ostream& os, const settings::EquationSetting & );
   std::ostream& operator<<(std::ostream& os, const settings::None         & );
-  std::ostream& operator<<(std::ostream& os, const settings::GradSetting  &); 
+  std::ostream& operator<<(std::ostream& os, const settings::GradSetting  &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelAlgorithm & );
-  std::ostream& operator<<(std::ostream& os, const settings::KernelMemory &); 
+  std::ostream& operator<<(std::ostream& os, const settings::KernelMemory &);
 
   std::istream& operator>>(std::istream& is, settings::CalculationType & );
   std::istream& operator>>(std::istream& is, settings::EquationSetting & );
   std::istream& operator>>(std::istream& is, settings::None         & );
-  std::istream& operator>>(std::istream& is, settings::GradSetting  &); 
+  std::istream& operator>>(std::istream& is, settings::GradSetting  &);
   std::istream& operator>>(std::istream& is, settings::KernelAlgorithm & );
-  std::istream& operator>>(std::istream& is, settings::KernelMemory &); 
+  std::istream& operator>>(std::istream& is, settings::KernelMemory &);
 
 
 }

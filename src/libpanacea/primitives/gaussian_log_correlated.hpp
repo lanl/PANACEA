@@ -56,6 +56,10 @@ namespace panacea {
                 static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
     {};
 
+
+      virtual const settings::KernelPrimitive type() const noexcept final;
+      virtual const settings::KernelCorrelation correlation() const noexcept final;
+
       virtual int getId() const noexcept final { return kernel_index_; }
       // Do not make const reference
       virtual void update(PrimitiveAttributes &&) final;

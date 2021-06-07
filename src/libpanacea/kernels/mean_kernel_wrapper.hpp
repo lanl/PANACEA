@@ -74,7 +74,7 @@ namespace panacea {
       virtual int cols() const final;
       virtual int getNumberDimensions() const final;
       virtual int getNumberPoints() const final;
-      virtual const Arrangement & arrangement() const noexcept final; 
+      virtual const Arrangement & arrangement() const noexcept final;
       virtual void set(const Arrangement arrangement) final;
       virtual void update(const BaseDescriptorWrapper *) final;
       virtual const std::any getPointerToRawData() const noexcept final;
@@ -83,8 +83,8 @@ namespace panacea {
       // Standard any should not be a reference because the underlying type should
       // be a pointer
       static std::unique_ptr<BaseKernelWrapper> create(
-          const PassKey<KernelWrapperFactory> &, 
-          std::any data, 
+          const PassKey<KernelWrapperFactory> &,
+          std::any data,
           const int rows,
           const int cols);
 
@@ -98,28 +98,28 @@ namespace panacea {
       const int rows,
       const int cols) {
 
-    if( std::type_index(data.type()) == 
+    if( std::type_index(data.type()) ==
         std::type_index(typeid(const BaseDescriptorWrapper *))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MeanKernelWrapper>(
-          key, std::any_cast<const BaseDescriptorWrapper *>(data)); 
+          key, std::any_cast<const BaseDescriptorWrapper *>(data));
 
-    } else if(std::type_index(data.type()) == 
+    } else if(std::type_index(data.type()) ==
         std::type_index(typeid(BaseDescriptorWrapper *))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      return std::make_unique<MeanKernelWrapper>(key, 
+      return std::make_unique<MeanKernelWrapper>(key,
           const_cast<const BaseDescriptorWrapper *>(
-            std::any_cast<BaseDescriptorWrapper *>(data))); 
+            std::any_cast<BaseDescriptorWrapper *>(data)));
 
-    } else if(std::type_index(data.type()) == 
+    } else if(std::type_index(data.type()) ==
         std::type_index(typeid(std::vector<double>))) {
       return std::make_unique<MeanKernelWrapper>(
-          key, std::any_cast<std::vector<double>>(data)); 
+          key, std::any_cast<std::vector<double>>(data));
 
-    } else if(std::type_index(data.type()) == 
+    } else if(std::type_index(data.type()) ==
         std::type_index(typeid(const std::vector<double>))) {
       return std::make_unique<MeanKernelWrapper>(
-          key, std::any_cast<const std::vector<double>>(data)); 
+          key, std::any_cast<const std::vector<double>>(data));
 
     } else {
       std::string error_msg = "Unsupported data type encountered while ";

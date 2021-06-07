@@ -24,19 +24,19 @@ namespace panacea {
       typedef io::ReadInstantiateVector (*ReadFunction)(
           const settings::FileType file_type,
           std::istream &,
-          Distribution *); 
+          Distribution *);
 
       typedef std::vector<std::any> (*WriteFunction)(
           const settings::FileType file_type,
           std::ostream &,
-          Distribution *); 
+          Distribution *);
 
     private:
       virtual Distribution::ReadFunction getReadFunction_() = 0;
       virtual Distribution::WriteFunction getWriteFunction_() = 0;
-     
+
     public:
-      virtual settings::DistributionType type() const noexcept = 0; 
+      virtual settings::DistributionType type() const noexcept = 0;
 
       virtual double compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) = 0;
 
@@ -53,6 +53,8 @@ namespace panacea {
       virtual const std::vector<int> & getDimensions() const noexcept = 0;
 
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+
+      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 
       virtual ~Distribution() = 0;
 

@@ -36,6 +36,14 @@ namespace panacea {
           static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
   }
 
+  const settings::KernelPrimitive GaussLogCorrelated::type() const noexcept {
+    return settings::KernelPrimitive::GaussianLog;
+  }
+
+  const settings::KernelCorrelation GaussLogCorrelated::correlation() const noexcept {
+    return settings::KernelCorrelation::Correlated;
+  }
+
   double GaussLogCorrelated::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
       const int descriptor_ind) const {

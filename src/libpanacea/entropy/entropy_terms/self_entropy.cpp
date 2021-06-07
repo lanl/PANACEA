@@ -108,7 +108,7 @@ namespace panacea {
 
     DistributionFactory dist_factory;
 
-  
+
     auto dist = dist_factory.create(settings->dist_settings.get());
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
@@ -124,6 +124,10 @@ namespace panacea {
 
   void SelfEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
+  }
+
+  void SelfEntropy::initialize(const BaseDescriptorWrapper * descriptor_wrapper) {
+    distribution_->initialize(descriptor_wrapper);
   }
 
   std::vector<std::any> SelfEntropy::write(

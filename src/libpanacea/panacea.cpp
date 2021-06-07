@@ -27,7 +27,7 @@ namespace panacea {
    * method.
    **/
   std::unique_ptr<BaseDescriptorWrapper> PANACEA::wrap(std::any data, const int rows, const int cols) const {
-    
+
     if(data.type() == typeid(double ***) ) {
       return std::make_unique<DescriptorWrapper<double ***>>(
           std::any_cast<double ***>(data),
@@ -45,7 +45,7 @@ namespace panacea {
           std::any_cast<std::vector<std::vector<double>>>(data),
           rows,
           cols);
-    }   
+    }
     if(data.type() == typeid(std::vector<double>) ) {
       return std::make_unique<DescriptorWrapper<std::vector<double>>>(
           std::any_cast<std::vector<double>>(data),
@@ -54,10 +54,8 @@ namespace panacea {
     }
     std::string error_msg = "Tried to wrap an unsuppored data type";
     PANACEA_FAIL(error_msg);
-  
-    std::vector<std::vector<double>> empty_vec;
-    return std::make_unique<DescriptorWrapper<std::vector<std::vector<double>>>>(
-        empty_vec,0,0);
+
+    return nullptr;
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
@@ -87,6 +85,6 @@ namespace panacea {
     // Each object should have it's own read and write methods that are registered with the file
     // type
     // 2. Search for entropy settings in the file
-    // 3. Call creation methods with file handle 
+    // 3. Call creation methods with file handle
 
 }

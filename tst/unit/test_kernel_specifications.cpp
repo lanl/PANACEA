@@ -75,3 +75,45 @@ TEST_CASE("Testing:kernel specifications write & read using fileio","[integratio
   REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() == settings::KernelCenterCalculation::None);
   REQUIRE(kern_specs2.get<settings::KernelAlgorithm>()         == settings::KernelAlgorithm::Flexible);
 }
+
+TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit,panacea]"){
+  KernelSpecification kern_specs(
+      settings::KernelCorrelation::Uncorrelated,
+      settings::KernelCount::OneToOne,
+      settings::KernelPrimitive::Exponential,
+      settings::KernelNormalization::None,
+      settings::KernelMemory::Share,
+      settings::KernelCenterCalculation::None,
+      settings::KernelAlgorithm::Flexible);
+
+  WHEN("Testing agains same instance") {
+    REQUIRE(!(kern_specs!= kern_specs) );
+    REQUIRE(kern_specs== kern_specs);
+  }
+  WHEN("Testing agains same configuration but difference instance") {
+    KernelSpecification kern_specs2(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::OneToOne,
+        settings::KernelPrimitive::Exponential,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Share,
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible);
+
+    REQUIRE(!(kern_specs2 != kern_specs) );
+    REQUIRE(kern_specs2 == kern_specs);
+  }
+  WHEN("Testing agains different configuration and different instance") {
+    KernelSpecification kern_specs2(
+        settings::KernelCorrelation::Correlated,
+        settings::KernelCount::OneToOne,
+        settings::KernelPrimitive::Exponential,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Share,
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Flexible);
+
+    REQUIRE(kern_specs2 != kern_specs);
+    REQUIRE(!(kern_specs2 == kern_specs) );
+  }
+}

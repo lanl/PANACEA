@@ -153,6 +153,25 @@ namespace panacea {
   }
 
   /***********************************************************
+   * Declaring private methods
+   ***********************************************************/
+
+  void PrimitiveFactory::check_input_specifications_(
+      const KernelSpecification & specification) const {
+    if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
+      std::string error_msg = "Kernel Primitive is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
+      PANACEA_FAIL(error_msg);
+    }
+
+    if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
+      std::string error_msg = "Kernel count method is not supported: ";
+      error_msg += settings::toString(specification.get<settings::KernelCount>());
+      PANACEA_FAIL(error_msg);
+    }
+  }
+
+  /***********************************************************
    * Declaring public methods
    ***********************************************************/
 
@@ -195,17 +214,7 @@ namespace panacea {
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
 
-    if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
-      std::string error_msg = "Kernel Primitive is not supported: ";
-      error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
-      PANACEA_FAIL(error_msg);
-    }
-
-    if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
-      std::string error_msg = "Kernel count method is not supported: ";
-      error_msg += settings::toString(specification.get<settings::KernelCount>());
-      PANACEA_FAIL(error_msg);
-    }
+    check_input_specifications_(specification);
 
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
 
@@ -222,7 +231,7 @@ namespace panacea {
     // normalizer
     // specifications
     //
-    // The remaining items in the primitive group are initialized and create while
+    // The remaining items in the primitive group are initialized and created while
     // reading in the values from a restart file
     KernelWrapperFactory kfactory;
 
@@ -233,31 +242,7 @@ namespace panacea {
     prim_grp.covariance = std::make_unique<Covariance>(CovarianceBuild::Allocate);
 
     prim_grp.normalizer = createNormalizer(specification);
-    //prim_grp.normalizer.normalize(*prim_grp.covariance);
 
-    /*
-    Reducer reducer;
-    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
-        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
-
-    Inverter inverter;
-    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
-        inverter.invert(*prim_grp.reduced_covariance));
-    if(create_methods_.count(specification.get<settings::KernelPrimitive>()) == 0){
-      std::string error_msg = "Kernel Primitive is not supported: ";
-      error_msg += settings::toString(specification.get<settings::KernelPrimitive>());
-      PANACEA_FAIL(error_msg);
-    }
-
-    if( count_methods_.count(specification.get<settings::KernelCount>()) == 0){
-      std::string error_msg = "Kernel count method is not supported: ";
-      error_msg += settings::toString(specification.get<settings::KernelCount>());
-      PANACEA_FAIL(error_msg);
-    }
-
-    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
-
-    */
     return prim_grp;
   }
 
@@ -287,22 +272,41 @@ namespace panacea {
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
 
+    check_input_specifications_(prim_grp.getSpecification());
+
     // Now we need to update all the primitives after resizing if appropriate
-
-    if(create_methods_.count(prim_grp.getSpecification().get<settings::KernelPrimitive>()) == 0){
-      std::string error_msg = "Kernel Primitive is not supported: ";
-      error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelPrimitive>());
-      PANACEA_FAIL(error_msg);
-    }
-
-    if( count_methods_.count(prim_grp.getSpecification().get<settings::KernelCount>()) == 0){
-      std::string error_msg = "Kernel count method is not supported: ";
-      error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelCount>());
-      PANACEA_FAIL(error_msg);
-    }
-
     count_methods_[prim_grp.getSpecification().get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
+  }
 
+  void PrimitiveFactory::initialize(
+      const PassKey<PrimitiveGroup> &,
+      const BaseDescriptorWrapper * dwrapper,
+      PrimitiveGroup & prim_grp) const {
+
+
+    // Before calling initialize we need to ensure that the descriptor
+    // wrapper and the kernel wrapper are of compatible types
+    //
+    const auto & specification = prim_grp.getSpecification();
+    KernelWrapperFactory kfactory;
+    prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
+
+    prim_grp.covariance = createCovariance(dwrapper, specification);
+
+    prim_grp.normalizer = createNormalizer(dwrapper, specification);
+    prim_grp.normalizer.normalize(*prim_grp.covariance);
+
+    Reducer reducer;
+    prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
+        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+
+    Inverter inverter;
+    prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
+        inverter.invert(*prim_grp.reduced_covariance));
+
+    check_input_specifications_(specification);
+
+    count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
   }
 
   void PrimitiveFactory::reset(
@@ -331,19 +335,9 @@ namespace panacea {
     }
 
     if(reset_opt == ResetOption::All || reset_opt == ResetOption::Primitives){
-      if(create_methods_.count(prim_grp.getSpecification().get<settings::KernelPrimitive>()) == 0){
-        std::string error_msg = "Kernel Primitive is not supported: ";
-        error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelPrimitive>());
-        PANACEA_FAIL(error_msg);
-      }
-
-      if( count_methods_.count(prim_grp.getSpecification().get<settings::KernelCount>()) == 0){
-        std::string error_msg = "Kernel count method is not supported: ";
-        error_msg += settings::toString(prim_grp.getSpecification().get<settings::KernelCount>());
-        PANACEA_FAIL(error_msg);
-      }
-
-      count_methods_[prim_grp.getSpecification().get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
+      check_input_specifications_(prim_grp.getSpecification());
+      count_methods_[prim_grp.getSpecification().get<settings::KernelCount>()](
+          PassKey<PrimitiveFactory>(),prim_grp);
     }
   }
 

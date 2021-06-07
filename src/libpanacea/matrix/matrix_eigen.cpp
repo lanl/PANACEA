@@ -78,11 +78,11 @@ namespace panacea {
   void MatrixEigen::setZero() {
     matrix_->setZero();
   }
-  
+
   int MatrixEigen::rows() const {
     return matrix_->rows();
   }
-  
+
   int MatrixEigen::cols() const {
     return matrix_->cols();
   }
@@ -92,7 +92,7 @@ namespace panacea {
   }
 
   Eigen::MatrixXd MatrixEigen::pseudoInverse() const {
-    return matrix_->completeOrthogonalDecomposition().pseudoInverse(); 
+    return matrix_->completeOrthogonalDecomposition().pseudoInverse();
   }
 
   void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat) {
@@ -100,7 +100,7 @@ namespace panacea {
     assert(return_mat->rows() == mat->rows());
     assert(return_mat->cols() == mat->cols());
 
-    auto temp_mat = mat->pseudoInverse(); 
+    auto temp_mat = mat->pseudoInverse();
     for( int row = 0; row < temp_mat.rows(); ++row){
       for(int col = 0; col < temp_mat.cols(); ++col){
         return_mat->operator()(row,col) = temp_mat(row,col);

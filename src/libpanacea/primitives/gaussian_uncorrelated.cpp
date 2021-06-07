@@ -24,15 +24,23 @@ namespace panacea {
   void GaussUncorrelated::update(PrimitiveAttributes && attributes) {
     assert(attributes.normalizer.getNormalizationCoeffs().size() > 0);
     assert(attributes.kernel_wrapper != nullptr);
-    attributes_ = std::move(attributes); 
+    attributes_ = std::move(attributes);
     double determinant = attributes_.reduced_covariance->getDeterminant();
     if( determinant <= 0.0 ) {
       std::string error_msg = "Determinant is less than 0 value: " + std::to_string(determinant);
       PANACEA_FAIL(error_msg);
     }
-    pre_factor_ = 1.0/(std::pow(determinant,0.5) * 
+    pre_factor_ = 1.0/(std::pow(determinant,0.5) *
         std::pow(constants::PI_SQRT*constants::SQRT_2,
           static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
+  }
+
+  const settings::KernelPrimitive GaussUncorrelated::type() const noexcept {
+    return settings::KernelPrimitive::Gaussian;
+  }
+
+  const settings::KernelCorrelation GaussUncorrelated::correlation() const noexcept {
+    return settings::KernelCorrelation::Uncorrelated;
   }
 
   double GaussUncorrelated::compute(
@@ -49,7 +57,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
 
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-    double exponent = 0.0;   
+    double exponent = 0.0;
     int index = 0;
     for ( const int dim : attributes_.reduced_inv_covariance->getChosenDimensionIndices() ) {
       double diff = (*descriptor_wrapper)(descriptor_ind, dim) - attributes_.kernel_wrapper->at(kernel_index_,dim) * norm_coeffs.at(dim);
@@ -63,7 +71,7 @@ namespace panacea {
   std::vector<double> GaussUncorrelated::compute_grad(
       const BaseDescriptorWrapper * descriptors,
       const int descriptor_ind,
-      const settings::EquationSetting & prim_settings, 
+      const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
 
     assert(descriptors != nullptr);
@@ -86,17 +94,17 @@ namespace panacea {
 
     int index = 0;
     for ( const int & dim : chosen_dims ) {
-      const double diff =  descriptors->operator()(descriptor_ind,dim) - 
+      const double diff =  descriptors->operator()(descriptor_ind,dim) -
         attributes_.kernel_wrapper->at(kernel_index_,dim);
-      grad.at(dim) = 
-        (diff * 
+      grad.at(dim) =
+        (diff *
          norm_coeffs.at(dim) *
-         norm_coeffs.at(dim)) * 
-        attributes_.reduced_inv_covariance->operator()(index,index) * 
+         norm_coeffs.at(dim)) *
+        attributes_.reduced_inv_covariance->operator()(index,index) *
         exp_term;
       ++index;
     }
-    
+
     if ( grad_setting == settings::GradSetting::WRTDescriptor ) {
       // Multiply the gradient by negative 1
       for ( const int & dim : chosen_dims ) {

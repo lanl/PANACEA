@@ -60,6 +60,8 @@ namespace panacea {
 
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override;
 
+      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) override;
+
       static std::unique_ptr<EntropyTerm> create(
           const PassKey<EntropyFactory> & key,
           const BaseDescriptorWrapper * descriptor_wrapper,

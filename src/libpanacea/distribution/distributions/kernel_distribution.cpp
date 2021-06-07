@@ -29,7 +29,7 @@ namespace panacea {
     prim_grp_ = prim_factory.createGroup(
         descriptor_wrapper,
         settings);
-  
+
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
 
   }
@@ -39,7 +39,7 @@ namespace panacea {
 
     PrimitiveFactory prim_factory;
     prim_grp_ = prim_factory.createGroup(settings);
-  
+
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
 
   }
@@ -57,11 +57,12 @@ namespace panacea {
   }
 
   double KernelDistribution::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper, 
+      const BaseDescriptorWrapper * descriptor_wrapper,
       const int desc_ind) {
     // Cycle through the primitives and compute the density
     double density = 0.0;
     for( auto & prim_ptr : prim_grp_.primitives ) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       density += prim_ptr->compute(descriptor_wrapper, desc_ind);
     }
     return pre_factor_ * density;
@@ -82,7 +83,7 @@ namespace panacea {
     if( option.type() != typeid(settings::None) ){
       grad_setting = std::any_cast<settings::GradSetting>(option);
     }
-    auto distribution_settings = 
+    auto distribution_settings =
       dynamic_cast<const KernelDistributionSettings &>(distribution_settings_);
 
 #ifndef NDEBUG
@@ -151,7 +152,7 @@ namespace panacea {
                 distribution_settings,
                 pre_factor_);
       } else {
-        // Remaining cases should occur WRTKernel only 
+        // Remaining cases should occur WRTKernel only
         return kern_dist_grad.grad_method
           [settings::GradSetting::WRTKernel]
           [distribution_settings.equation_settings]
@@ -190,15 +191,20 @@ namespace panacea {
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
   }
 
+  void KernelDistribution::initialize(const BaseDescriptorWrapper * descriptor_wrapper) {
+    prim_grp_.initialize(descriptor_wrapper);
+    pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
+  }
+
   std::vector<std::any> KernelDistribution::write(
           const settings::FileType file_type,
           std::ostream & os,
           Distribution * dist) {
 
     KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);
-    
+
     std::vector<std::any> nested_objs;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution) {
       os << "[Prefactor]\n";
       os << kern_dist->pre_factor_ << "\n";
@@ -213,7 +219,7 @@ namespace panacea {
           Distribution * dist) {
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
 
       KernelDistribution * kern_dist = dynamic_cast<KernelDistribution *>(dist);

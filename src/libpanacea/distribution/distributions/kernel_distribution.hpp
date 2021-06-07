@@ -51,7 +51,7 @@ namespace panacea {
 
       /**
        * Creates a shell of the distribution that is appropriate for loading in
-       * values from a restart file. 
+       * values from a restart file.
        **/
       KernelDistribution(const PassKey<DistributionFactory> &,
           const KernelSpecification & settings);
@@ -69,13 +69,15 @@ namespace panacea {
           const int grad_ind,
           const DistributionSettings & distribution_settings,
           std::any grad_setting) final;
-      
+
       virtual const std::vector<int> & getDimensions() const noexcept final;
 
       /**
        * Will update the underlying data groups and ensure the prefactor is up to date.
        **/
       virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) final;
+
+      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) final;
 
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
@@ -89,22 +91,22 @@ namespace panacea {
       static std::vector<std::any> write(
           const settings::FileType file_type,
           std::ostream &,
-          Distribution *); 
+          Distribution *);
 
       static io::ReadInstantiateVector read(
           const settings::FileType file_type,
           std::istream &,
-          Distribution *); 
+          Distribution *);
 
   };
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
-      const PassKey<DistributionFactory> & key, 
+      const PassKey<DistributionFactory> & key,
       const BaseDescriptorWrapper * descriptor_wrapper,
       DistributionSettings * settings) {
 
     assert(settings->type() == settings::DistributionType::Kernel);
-    
+
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
@@ -114,7 +116,7 @@ namespace panacea {
   }
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
-      const PassKey<DistributionFactory> & key, 
+      const PassKey<DistributionFactory> & key,
       DistributionSettings * settings) {
 
     assert(settings->type() == settings::DistributionType::Kernel);

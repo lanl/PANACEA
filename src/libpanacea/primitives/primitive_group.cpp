@@ -40,14 +40,20 @@ namespace panacea {
     prim_factory.update(PassKey<PrimitiveGroup>(),dwrapper, *this);
   }
 
+  void PrimitiveGroup::initialize(
+      const BaseDescriptorWrapper * dwrapper) {
+
+    PrimitiveFactory prim_factory;
+    prim_factory.initialize(PassKey<PrimitiveGroup>(),dwrapper, *this);
+  }
+
   std::vector<std::any> PrimitiveGroup::write(
       const settings::FileType file_type,
       std::ostream & os,
       std::any prim_grp_instance) {
 
-    
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       PrimitiveGroup * prim_grp;
       try {
@@ -71,9 +77,9 @@ namespace panacea {
       const settings::FileType file_type,
       std::istream & is,
       std::any prim_grp_instance) {
-    
+
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       PrimitiveGroup * prim_grp;
       try {
@@ -82,7 +88,7 @@ namespace panacea {
         std::string error_msg = "Unable to cast to PrimitiveGroup * while";
         error_msg += " trying to read primitive group from restart file.";
         PANACEA_FAIL(error_msg);
-      }   
+      }
 
       std::string line = "";
       while(line.find("[Primitive Group]",0) == std::string::npos) {
@@ -121,7 +127,7 @@ namespace panacea {
 
     // Now that we have read in the kernel specs we should switch the ownership of the
     // kernel data if it is set as share to own
-    if( prim_grp->specification.template get<settings::KernelMemory>() == 
+    if( prim_grp->specification.template get<settings::KernelMemory>() ==
         settings::KernelMemory::Share ) {
       std::cout << "Note restart file indicates kernel memory was in the shared state.";
       std::cout << " Because we do not have access to the descriptor while reading back";
@@ -129,13 +135,13 @@ namespace panacea {
       prim_grp->specification.set(settings::KernelMemory::Own);
     }
 
-    // Now we need to actually create the kernels and covariance matrix because 
+    // Now we need to actually create the kernels and covariance matrix because
     // they are allocated with unique pointers
     prim_grp->covariance = std::make_unique<Covariance>();
 
     KernelWrapperFactory kfactory;
     // Essentially create a kernel wrapper shell.
-    prim_grp->kernel_wrapper = kfactory.create(prim_grp->specification); 
+    prim_grp->kernel_wrapper = kfactory.create(prim_grp->specification);
 
     assert(prim_grp->kernel_wrapper.get() != nullptr);
   }
@@ -153,7 +159,7 @@ namespace panacea {
         error_msg += " trying to run postReadInitialization on primitive ";
         error_msg += "group after reading restart file.";
         PANACEA_FAIL(error_msg);
-      }   
+      }
 
       PrimitiveFactory prim_factory;
       prim_factory.reset(

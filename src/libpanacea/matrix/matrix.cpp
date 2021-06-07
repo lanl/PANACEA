@@ -155,6 +155,14 @@ namespace panacea {
       const int cols,
       const MatrixType type) {
 
+    if( rows < 0 ) {
+      std::string error_msg = "Error cannot create matrix with negative rows.";
+      PANACEA_FAIL(error_msg);
+    }
+    if( cols < 0 ) {
+      std::string error_msg = "Error cannot create matrix with negative columns.";
+      PANACEA_FAIL(error_msg);
+    }
     auto mat_eig = std::unique_ptr<MatrixEigen>(new MatrixEigen);
     mat_eig->resize(rows,cols);
     return mat_eig;

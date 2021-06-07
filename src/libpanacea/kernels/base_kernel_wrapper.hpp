@@ -25,12 +25,12 @@ namespace panacea {
   class BaseKernelWrapper;
 
   /*
-   * Base Kernel interface 
+   * Base Kernel interface
    */
   class BaseKernelWrapper  {
-    public: 
-      typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is); 
-      typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os); 
+    public:
+      typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is);
+      typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os);
 
     private:
 
@@ -64,13 +64,13 @@ namespace panacea {
        * Gets the total number of cols of data stored by the kernel
        **/
       virtual int cols() const = 0;
-      virtual int getNumberDimensions() const = 0; 
+      virtual int getNumberDimensions() const = 0;
 
       /**
        * Returns the total number of points used to create the kernel
        **/
-      virtual int getNumberPoints() const = 0; 
-      virtual const Arrangement & arrangement() const noexcept = 0; 
+      virtual int getNumberPoints() const = 0;
+      virtual const Arrangement & arrangement() const noexcept = 0;
       virtual void set(const Arrangement arrangement) = 0;
 
       /**
@@ -80,8 +80,9 @@ namespace panacea {
        * dimensions as the descriptor wrapper that was used to initialize the kernel.
        **/
       virtual void update(const BaseDescriptorWrapper *) = 0;
+
       virtual const std::any getPointerToRawData() const noexcept = 0;
-      virtual std::type_index getTypeIndex() const noexcept = 0; 
+      virtual std::type_index getTypeIndex() const noexcept = 0;
       virtual void print() const = 0;
       virtual ~BaseKernelWrapper() = 0;
 

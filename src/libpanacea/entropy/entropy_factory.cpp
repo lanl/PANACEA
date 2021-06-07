@@ -22,6 +22,23 @@
 
 namespace panacea {
 
+  namespace {
+    std::unique_ptr<EntropyTerm> decorate(std::unique_ptr<EntropyTerm> ent_term, EntropySettings * settings) {
+      // Add decorators
+      if( settings->weight ) {
+        ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
+      }
+      if( settings->numerical_grad_switch ) {
+        ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
+      }
+      return ent_term;
+    }
+  } // unnamed namespace
+
+
+  /**********************************************
+   * Static members
+   **********************************************/
   std::unordered_map<settings::EntropyType,
     EntropyFactory::EntropyCreateMethod>
         EntropyFactory::create_methods_;
@@ -30,6 +47,9 @@ namespace panacea {
     EntropyFactory::EntropyCreateShellMethod>
         EntropyFactory::create_shell_methods_;
 
+  /**********************************************
+   * Public Methods
+   **********************************************/
   EntropyFactory::EntropyFactory() {
 
     EntropyFactory::registerEntropyTerm<
@@ -57,13 +77,8 @@ namespace panacea {
         descriptor_wrapper,
         settings);
 
-    // Add decorators
-    if( settings->weight ) {
-      ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
-    }
-    if( settings->numerical_grad_switch ) {
-      ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
-    }
+    ent_term = decorate(std::move(ent_term), settings);
+
     return ent_term;
   }
 
@@ -80,15 +95,9 @@ namespace panacea {
         PassKey<EntropyFactory>(),
         settings);
 
-    // Add decorators
-    if( settings->weight ) {
-      ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
-    }
-    if( settings->numerical_grad_switch ) {
-      ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
-    }
+    ent_term = decorate(std::move(ent_term), settings);
+
     return ent_term;
   }
-
 
 }

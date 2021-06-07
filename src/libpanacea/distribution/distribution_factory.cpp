@@ -20,7 +20,6 @@ namespace panacea {
   /***************************************************************
    * Declaring private Member function maps
    **************************************************************/
-
   std::unordered_map<settings::DistributionType,
     DistributionFactory::DistributionCreateMethod>
         DistributionFactory::create_methods_;
@@ -29,6 +28,9 @@ namespace panacea {
     DistributionFactory::DistributionCreateShellMethod>
         DistributionFactory::create_shell_methods_;
 
+  /***************************************************************
+   * Public Methods
+   **************************************************************/
   DistributionFactory::DistributionFactory() {
     DistributionFactory::registerDistribution<KernelDistribution,settings::DistributionType::Kernel>();
   }
@@ -53,7 +55,7 @@ namespace panacea {
 
   std::unique_ptr<Distribution> DistributionFactory::create(
       DistributionSettings * settings) const {
-    
+
     return create_shell_methods_.at(settings->type())(
         PassKey<DistributionFactory>(),
         settings);

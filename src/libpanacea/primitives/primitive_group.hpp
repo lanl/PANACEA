@@ -49,6 +49,9 @@ namespace panacea {
       void update(
           const BaseDescriptorWrapper * dwrapper);
 
+      void initialize(
+          const BaseDescriptorWrapper * dwrapper);
+
       static std::vector<std::any> write(
           const settings::FileType file_type,
           std::ostream &,
