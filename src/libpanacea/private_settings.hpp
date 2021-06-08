@@ -17,6 +17,18 @@ namespace panacea {
 
   namespace settings {
 
+    /**
+     * How the memory of the entropy terms is handled, this is different
+     * from the KernelMemory but informs how KernelMemory should be handled.
+     **/
+    enum class Memory {
+      SelfOwnIfRestartCrossOwn,
+      Own,
+      Share,
+      OwnIfRestart
+    };
+
+
     // Should attempt to make settings classes specefic to the correct
     // categories so as to avoid allowing values to be passed in that shouldn't
     // be
@@ -59,10 +71,19 @@ namespace panacea {
      * but have passed in multiple descriptors, you cannot share
      * the descriptors raw pointer because you need different
      * data.
+     *
+     * OwnIfRestart option is used in the case that an instance of
+     * an object is created without all the data. What this means
+     * is that if the rest of the data is loaded in from a restart
+     * file then the object of course must have ownership because
+     * it does not exist in memory anywhere else. In the case that
+     * the data is simply passed in after the object is created
+     * then the memory will be treated as shared.
      **/
     enum class KernelMemory {
       Default,
       Own,
+      OwnIfRestart,
       Share
     };
 
@@ -78,11 +99,11 @@ namespace panacea {
           }
         } else if constexpr( std::is_same<KernelMemory,T>::value ) {
           if( setting == KernelMemory::Default ) {
-            return "Memory=Default";
+            return "KernelMemory=Default";
           } else if( setting == KernelMemory::Own ) {
-            return "Memory=Own";
+            return "KernelMemory=Own";
           } else if( setting == KernelMemory::Share ) {
-            return "Memory=Share";
+            return "KernelMemory=Share";
           }
         } else if constexpr( std::is_same<KernelNormalization,T>::value ) {
           if( setting == KernelNormalization::None ) {

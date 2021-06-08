@@ -128,6 +128,185 @@ TEST_CASE("Testing:panacea self entropy","[integration,panacea]"){
   }
 }
 
+TEST_CASE("Testing:panacea self entropy shell + initialize","[integration,panacea]"){
+
+  // Creating settings for generating a self entropy term where the
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+  WHEN("Using OneToOne mapping."){
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Self)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::OneToOne)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::None)
+      .set(KernelNormalization::None);
+
+    // pi - public interface
+    PANACEA panacea_pi;
+
+    WHEN("Testing self entropy term with single point.") {
+
+      std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(panacea_settings);
+
+      std::vector<std::vector<double>> data = {{ 1.0, 2.0 }};
+      const int rows = 1;
+      const int cols = 2;
+
+      auto dwrapper = panacea_pi.wrap(&(data), rows, cols);
+
+      self_ent->initialize(dwrapper.get());
+      double self_ent_val1 = self_ent->compute(dwrapper.get());
+
+      // Because we are dealing with a single point and the self entropy term
+      // shares the data with the descriptor changing the location of the
+      // descriptors should not change anything,
+      //
+      // E.g. because there was initially a peak at position x = 1.0, y = 2.0 and by
+      // default the entropy of the peaks is calculated moving the peak to x = 2.0 and y = 2.0
+      // will not change anything because we will simply be calculating th entropy at the new
+      // peak location. If the entropy term did not share the data then these values would
+      // be different.
+      dwrapper->operator()(0,0) = 2.0;
+
+      double self_ent_val2 = self_ent->compute(dwrapper.get());
+      REQUIRE(self_ent_val1 ==  Approx(self_ent_val2) );
+
+    }
+    WHEN("Testing self entropy term with two points.") {
+      std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(panacea_settings);
+      // Data has the following form, where it is stacked
+      //
+      //         col1   col2   col3
+      // row1    1.0     2.0    3.0  Point 1
+      // row2    1.0     2.0    3.0  Point 2
+      test::ArrayData array_data;
+      const int rows = 2;
+      const int cols = 3;
+      auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+
+      self_ent->initialize(dwrapper.get());
+
+      double self_ent_val_stacked = self_ent->compute(dwrapper.get());
+
+      // move the data points apart and self entropy should increase
+      dwrapper->operator()(0,0) = 0.0;
+      dwrapper->operator()(1,0) = 2.0;
+
+      double self_ent_val_spread = self_ent->compute(dwrapper.get());
+      REQUIRE(self_ent_val_stacked < self_ent_val_spread );
+    }
+  }
+  WHEN("Using Single mapping."){
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Self)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::Single)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::Mean)
+      .set(KernelNormalization::None);
+
+    // pi - public interface
+    PANACEA panacea_pi;
+
+    WHEN("Testing self entropy term with single point.") {
+
+      std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(panacea_settings);
+
+      std::vector<std::vector<double>> data = {{ 1.0, 2.0 }};
+      const int rows = 1;
+      const int cols = 2;
+
+      auto dwrapper = panacea_pi.wrap(&(data), rows, cols);
+
+      // It should not be possible to create a self entropy term that is not
+      // using OneToOne mapping, at least yet, calculating the gradiant for that
+      // if the descriptors are being changed would prove difficult. E.g. if you are
+      // using the median, what would calculate_grad look like?
+      CHECK_THROWS(self_ent->initialize(dwrapper.get()));
+    }
+
+  }
+}
+
+TEST_CASE("Testing:panacea cross entropy shell + initialize","[integration,panacea]"){
+
+  // Creating settings for generating a self entropy term where the
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+  WHEN("Using OneToOne mapping."){
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Cross)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::OneToOne)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::None)
+      .set(KernelNormalization::None);
+
+    // pi - public interface
+    PANACEA panacea_pi;
+
+    WHEN("Testing cross entropy term with single point.") {
+
+      std::unique_ptr<EntropyTerm> cross_ent = panacea_pi.create(panacea_settings);
+
+      std::vector<std::vector<double>> data = {{ 1.0, 2.0 }};
+      const int rows = 1;
+      const int cols = 2;
+
+      auto dwrapper = panacea_pi.wrap(&(data), rows, cols);
+
+      cross_ent->initialize(dwrapper.get());
+      double cross_ent_val1 = cross_ent->compute(dwrapper.get());
+
+      // Because we are dealing with a single point and the cross entropy term
+      // by default does not share the data with the descriptor changing the location of the
+      // descriptors should change the cross entropy value,
+      //
+      // E.g. because there was initially a peak at position x = 1.0, y = 2.0 and by
+      // default the entropy of the peaks is calculated moving the sample point to x = 2.0 and y = 2.0
+      // will change the cross entropy. If the entropy term did share the data then these values would
+      // be the same.
+      //
+      // Cross entropy should be larger at a position displaced from the center
+      dwrapper->operator()(0,0) = 2.0;
+
+      double cross_ent_val2 = cross_ent->compute(dwrapper.get());
+      REQUIRE(cross_ent_val1 < cross_ent_val2 );
+
+    }
+    WHEN("Testing cross entropy term with two points.") {
+      std::unique_ptr<EntropyTerm> cross_ent = panacea_pi.create(panacea_settings);
+      // Data has the following form, where it is stacked
+      //
+      //         col1   col2   col3
+      // row1    1.0     2.0    3.0  Point 1
+      // row2    1.0     2.0    3.0  Point 2
+      test::ArrayData array_data;
+      const int rows = 2;
+      const int cols = 3;
+      auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+
+      cross_ent->initialize(dwrapper.get());
+
+      double cross_ent_val_stacked = cross_ent->compute(dwrapper.get());
+
+      // move the data points apart and cross entropy should increase
+      dwrapper->operator()(0,0) = 0.0;
+      dwrapper->operator()(1,0) = 2.0;
+
+      double cross_ent_val_spread = cross_ent->compute(dwrapper.get());
+      REQUIRE(cross_ent_val_stacked < cross_ent_val_spread );
+    }
+  }
+}
+
 TEST_CASE("Testing:panacea self entropy read & write with fileio","[integration,panacea]"){
 
   // Creating settings for generating a self entropy term where the

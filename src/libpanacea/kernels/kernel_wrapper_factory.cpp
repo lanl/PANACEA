@@ -23,35 +23,52 @@
 
 namespace panacea {
 
-  std::unordered_map<settings::KernelCenterCalculation, 
-    std::unordered_map<std::type_index, KernelWrapperFactory::KernelCreateMethod>>
+  std::unordered_map<settings::KernelCenterCalculation,
+    std::unordered_map<std::type_index,
+    std::unordered_map<std::type_index,
+    KernelWrapperFactory::KernelCreateMethod>>>
     KernelWrapperFactory::create_methods_;
 
   KernelWrapperFactory::KernelWrapperFactory() {
 
     registerKernel<settings::KernelCenterCalculation::None,
       std::vector<std::vector<double>>*,
+      std::vector<std::vector<double>>,
+      KernelWrapper<std::vector<std::vector<double>>>>();
+
+    registerKernel<settings::KernelCenterCalculation::None,
+      std::vector<std::vector<double>>*,
+      std::vector<std::vector<double>>*,
       KernelWrapper<std::vector<std::vector<double>>*>>();
 
     registerKernel<settings::KernelCenterCalculation::None,
+      std::vector<std::vector<double>>,
       std::vector<std::vector<double>>,
       KernelWrapper<std::vector<std::vector<double>>>>();
 
     registerKernel<settings::KernelCenterCalculation::None,
       double ***,
+      std::vector<std::vector<double>>,
+      KernelWrapper<std::vector<std::vector<double>>>>();
+
+    registerKernel<settings::KernelCenterCalculation::None,
+      double ***,
+      double ***,
       KernelWrapper<double ***>>();
 
     registerKernel<settings::KernelCenterCalculation::Mean,
+      std::vector<double>,
       std::vector<double>,
       MeanKernelWrapper>();
 
     registerKernel<settings::KernelCenterCalculation::Median,
       std::vector<double>,
+      std::vector<double>,
       MedianKernelWrapper>();
   }
 
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
-      const BaseDescriptorWrapper * desc_wrapper, 
+      const BaseDescriptorWrapper * desc_wrapper,
       const KernelSpecification & kern_specification) const {
 
     // Ensure valid method exists
@@ -69,12 +86,12 @@ namespace panacea {
       }
 
       if( not kern_specification.is(settings::KernelCenterCalculation::None )) {
-        PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne."); 
+        PANACEA_FAIL("Kernel Center Calculation must be None when Count is OneToOne.");
       }
-      if( kern_specification.is(settings::KernelMemory::Share)){
+      if( kern_specification.is(settings::KernelMemory::Share) or kern_specification.is(settings::KernelMemory::OwnIfRestart)){
 
-        // This check is only appropriate if memory is shared, the desc_wrapper type 
-        // and pointer will likley differ in the case of non shared memory 
+        // This check is only appropriate if memory is shared, the desc_wrapper type
+        // and pointer will likley differ in the case of non shared memory
         // because it's likely you will not have a pointer as the underlying type
         if( desc_wrapper->getTypeIndex() != std::type_index(desc_wrapper->getPointerToRawData().type()) ) {
           std::string error_msg = "Descriptor data index and pointerToRawData are not consistent";
@@ -85,38 +102,54 @@ namespace panacea {
           PANACEA_FAIL(error_msg);
         }
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
-        if( desc_data_type_index != 
+        auto kern_data_type_index = desc_data_type_index;
+        if( desc_data_type_index !=
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
             desc_data_type_index != std::type_index(typeid(double ***))){
-          PANACEA_FAIL("Unsupported types detected, cannot create kernels."); 
+          PANACEA_FAIL("Unsupported types detected, cannot create kernels.");
         }
 
-        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][desc_data_type_index](
+        std::cout << "Should be sharing data" << std::endl;
+        return create_methods_
+          [kern_specification.get<settings::KernelCenterCalculation>()]
+          [desc_data_type_index]
+          [kern_data_type_index](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper,
             desc_wrapper->rows(),
             desc_wrapper->cols());
-      } else {
+      } else { // If owned
 
+        std::cout << "Not sharing data" << std::endl;
         auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
-        if( desc_data_type_index != 
+        if( desc_data_type_index !=
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
             desc_data_type_index !=
-            std::type_index(typeid(std::vector<std::vector<double>>))) {
+            std::type_index(typeid(std::vector<std::vector<double>>)) &&
+            desc_data_type_index !=
+            std::type_index(typeid(double ***))) {
           std::string error_msg = "Unsupported types detected, cannot create kernels:\n";
           error_msg += "OneToOne\nOwn\n\n";
           error_msg += "The only supported coversions are from:\n";
           error_msg += "vector<vector<double>>* to vector<vector<double>>\n";
           error_msg += "vector<vector<double>>  to vector<vector<double>>\n";
-          PANACEA_FAIL(error_msg); 
+          error_msg += "double ***              to vector<vector<double>>\n";
+          if( type_map.count(desc_data_type_index) ){
+            error_msg += "\n";
+            error_msg += "The type passed in is identified as " + type_map.at(desc_data_type_index) + "\n";
+          }
+          PANACEA_FAIL(error_msg);
         }
 
-        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
+        return create_methods_
+          [kern_specification.get<settings::KernelCenterCalculation>()]
+          [desc_data_type_index]
+          [kern_data_type_index](
             PassKey<KernelWrapperFactory>(),
             desc_wrapper,
             desc_wrapper->rows(),
-            desc_wrapper->cols());        
+            desc_wrapper->cols());
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
@@ -125,16 +158,17 @@ namespace panacea {
             not kern_specification.is(settings::KernelCenterCalculation::Median)) {
           std::string error_msg = "Kernel Center Calculation must be Mean or Median when Count is Single: ";
           error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
-          PANACEA_FAIL(error_msg); 
+          PANACEA_FAIL(error_msg);
         }
 
-        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
-        [std::type_index(typeid(std::vector<double>))](
-          PassKey<KernelWrapperFactory>(),
-          desc_wrapper,
-          1,
-          desc_wrapper->getNumberDimensions());
-
+        return create_methods_
+          [kern_specification.get<settings::KernelCenterCalculation>()]
+          [std::type_index(typeid(std::vector<double>))]
+          [std::type_index(typeid(std::vector<double>))](
+              PassKey<KernelWrapperFactory>(),
+              desc_wrapper,
+              1,
+              desc_wrapper->getNumberDimensions());
       }
     }
     std::string error_msg = "The combination of kernel specifications is not";
@@ -161,25 +195,31 @@ namespace panacea {
         std::string error_msg = "OneToOne kernels that are not owned, are not yet supported. ";
         error_msg += "When constructed without a descriptor wrapper.\n";
         PANACEA_FAIL(error_msg);
-      } else { 
-        auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
+      } else {
+        auto data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         // Initialize with an empty vector of vectors
         std::vector<std::vector<double>> data;
-        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()][kern_data_type_index](
+        return create_methods_
+          [kern_specification.get<settings::KernelCenterCalculation>()]
+          [data_type_index]
+          [data_type_index](
             PassKey<KernelWrapperFactory>(), data, 0, 0);
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
-      if( kern_specification.is(settings::KernelMemory::Own )) {
+      if( kern_specification.is(settings::KernelMemory::Own ) or kern_specification.is(settings::KernelMemory::OwnIfRestart)) {
 
         if( not kern_specification.is(settings::KernelCenterCalculation::Mean) &&
             not kern_specification.is(settings::KernelCenterCalculation::Median)) {
           std::string error_msg = "Kernel Center Calculation must be Mean or Median when Count is Single: ";
           error_msg += settings::toString(kern_specification.get<settings::KernelCenterCalculation>());
-          PANACEA_FAIL(error_msg); 
+          PANACEA_FAIL(error_msg);
         }
         std::vector<double> data;
-        return create_methods_[kern_specification.get<settings::KernelCenterCalculation>()]
-        [std::type_index(typeid(std::vector<double>))](PassKey<KernelWrapperFactory>(),data,0,0);
+        return create_methods_
+          [kern_specification.get<settings::KernelCenterCalculation>()]
+          [std::type_index(typeid(std::vector<double>))]
+          [std::type_index(typeid(std::vector<double>))]
+          (PassKey<KernelWrapperFactory>(),data,0,0);
 
       }
     }

@@ -9,7 +9,7 @@ namespace panacea {
 
   struct DistributionSettings {
     settings::EquationSetting equation_settings = settings::EquationSetting::None;
-    virtual settings::DistributionType type() const noexcept = 0;   
+    virtual settings::DistributionType type() const noexcept = 0;
     virtual ~DistributionSettings() = 0;
   };
 

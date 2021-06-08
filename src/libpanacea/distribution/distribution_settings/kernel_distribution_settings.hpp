@@ -11,7 +11,7 @@
 namespace panacea {
 
   struct KernelDistributionSettings : public DistributionSettings {
-    virtual settings::DistributionType type() const noexcept final;   
+    virtual settings::DistributionType type() const noexcept final;
     KernelSpecification dist_settings;
   };
 }

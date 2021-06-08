@@ -65,11 +65,15 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
 
     auto analy_grad = entropy_term->compute_grad(&dwrapper_init,0, settings);
     std::cout << "Analytical self entropy grad of first descriptor " << analy_grad.at(0) << std::endl;
+    auto analy_grad2 = entropy_term->compute_grad(&dwrapper_init,1, settings);
+    std::cout << "Analytical self entropy grad of second descriptor " << analy_grad2.at(0) << std::endl;
 
     entropy_term = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
     auto numer_grad = entropy_term->compute_grad(&dwrapper_init, 0, settings);
     std::cout << "Numerical self entropy grad of first descriptor " << numer_grad.at(0) << std::endl;
+    auto numer_grad2 = entropy_term->compute_grad(&dwrapper_init, 1, settings);
+    std::cout << "Numerical self entropy grad of second descriptor " << numer_grad2.at(0) << std::endl;
 
     REQUIRE( numer_grad.at(0) == Approx(analy_grad.at(0)));
     REQUIRE( numer_grad.at(0) < 0.0 );

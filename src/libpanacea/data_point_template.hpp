@@ -22,7 +22,7 @@ namespace panacea {
 
   /**
    * This MemoryLayout class is used in cases where a single allocation is used
-   * for the memory, instead, of a nested array of pointers or vectors. 
+   * for the memory, instead, of a nested array of pointers or vectors.
    *
    * Cache locality for RowMajor is exploited if the inner nested loop is
    * indexed by column
@@ -32,12 +32,12 @@ namespace panacea {
    *
    * If Default is specified it is an indication row major will be chosen, but
    * it may indicate also that the layout patterns may not really apply e.g.
-   * in nested vectors there is no need to map a column and row to a single 
+   * in nested vectors there is no need to map a column and row to a single
    * index.
    **/
   enum class MemoryLayout {
     Default,
-    RowMajor, 
+    RowMajor,
     ColumnMajor
   };
 
@@ -50,21 +50,21 @@ namespace panacea {
    *
    * double ***
    *
-   * std::vector<double> * 
+   * std::vector<double> *
    *
    * If a non-nested vector is provided it is assumed that the data is present
    * in row major form, so if the Arrangement::PointsAlongRowsDimensionsAlongCols
    * then the cache locality will be exploited if the dimensions are indexed
    * within the inner loop of a nested for loop.
    *
-   * Will by default assume template is basic of the form double *** and has 
+   * Will by default assume template is basic of the form double *** and has
    * therefore access to the elements is provided via double bracket notation
    *
    * If a single dimension type is used e.g. a vector<double> then it is assumed
    * that it is for a single point only, and that each variable in the vector
    * represents a different dimension.
-   */ 
-  template<class T, MemoryLayout lay = MemoryLayout::Default> 
+   */
+  template<class T, MemoryLayout lay = MemoryLayout::Default>
     class DataPointTemplate {
       protected:
         T data_;
@@ -84,10 +84,30 @@ namespace panacea {
         }
 
       public:
-  
+
         DataPointTemplate() = default;
 
-        DataPointTemplate(const T & data, const int & rows, const int & cols) : 
+        DataPointTemplate(const int rows, const int cols) :
+          rows_(rows),
+          cols_(cols),
+          number_dimensions_(cols),
+          number_points_(rows) {
+
+            // This requires we know the underlying type to make sure
+            // memory is available.
+            if constexpr( std::is_same<T,std::vector<std::vector<double>>>::value ){
+              data_.reserve(rows);
+              for( int row = 0; row < rows; ++row) {
+                data_.emplace_back(cols, 0.0);
+              }
+            } else {
+              std::string error_msg = "Constructor without data is not supported for the";
+              error_msg += " underlying type.";
+              PANACEA_FAIL(error_msg);
+            }
+          }
+
+        DataPointTemplate(const T & data, const int rows, const int cols) :
           data_(data),
           rows_(rows),
           cols_(cols),
@@ -104,7 +124,7 @@ namespace panacea {
         const Arrangement & arrangement() const noexcept { return arrangement_; }
 
         /**
-         * Memory layout indicates whether the unerlying memory pattern is 
+         * Memory layout indicates whether the unerlying memory pattern is
          * Row or Column major if appropriate.
          *
          * Must be set at compile time
@@ -113,7 +133,7 @@ namespace panacea {
 
         /*
          * Access operator is used such that you will pass in the point and the dimension
-         * not the row and column. 
+         * not the row and column.
          */
         double& operator()(const int point_ind, const int dim_ind);
         double operator()(const int point_ind, const int dim_ind) const;
@@ -127,11 +147,11 @@ namespace panacea {
         int rows() const noexcept { return rows_; }
 
         int cols() const noexcept { return cols_; }
-        
+
         void resize(const int rows, const int cols);
         /*
          * This function allows one to check if two groups of data are pointing to
-         * the same data. 
+         * the same data.
          *
          * Be careful that you check the type with const if the template owns
          * the data
@@ -148,7 +168,7 @@ namespace panacea {
     };
 
   template<class T, MemoryLayout lay>
-    inline void DataPointTemplate<T, lay>::set(const Arrangement arrangement) { 
+    inline void DataPointTemplate<T, lay>::set(const Arrangement arrangement) {
       arrangement_ = arrangement;
       if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
         number_points_ = rows_;
@@ -156,7 +176,7 @@ namespace panacea {
       } else {
         number_dimensions_ = rows_;
         number_points_ = cols_;
-      } 
+      }
     }
 
   template<class T, MemoryLayout lay>
@@ -173,125 +193,125 @@ namespace panacea {
       }
     }
 
-  template<class T, MemoryLayout lay> 
+  template<class T, MemoryLayout lay>
     inline double& DataPointTemplate<T, lay>::operator()(const int point_ind, const int dim_ind) {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
       if constexpr(std::is_pointer<T>::value) {
-        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
           return (*data_)[point_ind][dim_ind];
         }
         return (*data_)[dim_ind][point_ind];
       } else {
-        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
           return (data_)[point_ind][dim_ind];
         }
         return (data_)[dim_ind][point_ind];
       }
     }
 
-  template<class T, MemoryLayout lay> 
+  template<class T, MemoryLayout lay>
     inline double DataPointTemplate<T, lay>::operator()(const int point_ind, const int dim_ind) const {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
       if constexpr(std::is_pointer<T>::value) {
-        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
           return (*data_)[point_ind][dim_ind];
         }
         return (*data_)[dim_ind][point_ind];
       } else {
-        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+        if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
           return (data_)[point_ind][dim_ind];
         }
         return (data_)[dim_ind][point_ind];
       }
-    } 
+    }
 
   /*
-   * Specialization of the template in the case that a nested 
+   * Specialization of the template in the case that a nested
    * vector pointer is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<std::vector<double>> *>::operator()(
         const int point_ind, const int dim_ind) {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_->at(point_ind).at(dim_ind);
       }
       return data_->at(dim_ind).at(point_ind);
     }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<std::vector<double>> *>::operator()(
         const int point_ind, const int dim_ind) const {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_->at(point_ind).at(dim_ind);
       }
       return data_->at(dim_ind).at(point_ind);
-    } 
+    }
 
   /*
    * Specialization of the template in the case that a vector pointer is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<double> *>::operator()(
         const int point_ind, const int dim_ind) {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_->at(getIndex_( point_ind, dim_ind));
       }
       return data_->at(getIndex_(dim_ind, point_ind));
     }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<double> *>::operator()(
         const int point_ind, const int dim_ind) const {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_->at(getIndex_(point_ind, dim_ind));
       }
       return data_->at(getIndex_(dim_ind, point_ind));
-    } 
+    }
 
   /*
    * Specialization of the template in the case that a vector is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<double>>::operator()(
         const int point_ind, const int dim_ind) {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_.at(getIndex_(point_ind, dim_ind));
-      } 
+      }
       return data_.at(getIndex_(dim_ind, point_ind));
-    } 
+    }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<double>>::operator()(
         const int point_ind, const int dim_ind) const {
       assert(point_ind >= 0 && point_ind < number_points_);
       assert(dim_ind >= 0 && dim_ind < number_dimensions_);
 
-      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){ 
+      if( arrangement_ == Arrangement::PointsAlongRowsDimensionsAlongCols){
         return data_.at(getIndex_(point_ind, dim_ind));
-      } 
+      }
       return data_.at(getIndex_(dim_ind, point_ind));
-    } 
+    }
 
 
-  template<class T, MemoryLayout lay> 
+  template<class T, MemoryLayout lay>
     inline double& DataPointTemplate<T, lay>::at(const int row, const int col) {
       assert(row >= 0 && row < rows_);
       assert(col >= 0 && col < cols_);
@@ -302,7 +322,7 @@ namespace panacea {
       }
     }
 
-  template<class T, MemoryLayout lay> 
+  template<class T, MemoryLayout lay>
     inline double DataPointTemplate<T, lay>::at(const int row, const int col) const {
       assert(row >= 0 && row < rows_);
       assert(col >= 0 && col < cols_);
@@ -312,13 +332,13 @@ namespace panacea {
       } else {
         return (data_)[row][col];
       }
-    } 
+    }
 
   /*
    * Specialization of the template in the case that a nested
    * vector pointer is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<std::vector<double>> *>::at(
         const int row, const int col) {
       assert(row >= 0 && row < rows_);
@@ -327,20 +347,20 @@ namespace panacea {
       return data_->at(row).at(col);
     }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<std::vector<double>> *>::at(
         const int row, const int col) const {
       assert(row >= 0 && row < rows_);
       assert(col >= 0 && col < cols_);
 
       return data_->at(row).at(col);
-    } 
+    }
 
   /*
-   * Specialization of the template in the case that a 
+   * Specialization of the template in the case that a
    * vector pointer is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<double> *>::at(
         const int row, const int col) {
       assert(row >= 0 && row < rows_);
@@ -349,37 +369,37 @@ namespace panacea {
       return data_->at(getIndex_(row, col));
     }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<double> *>::at(
         const int row, const int col) const {
       assert(row >= 0 && row < rows_);
       assert(col >= 0 && col < cols_);
 
       return data_->at(getIndex_(row, col));
-    } 
+    }
 
   /*
    * Specialization of the template in the case that a vector is used
    */
-  template<> 
+  template<>
     inline double& DataPointTemplate<std::vector<double>>::at(
         const int row, const int col) {
       assert(col >= 0 && col < cols_);
       assert(col >= 0 && col < cols_);
-     
+
       return data_.at(getIndex_(row,col));
     }
 
-  template<> 
+  template<>
     inline double DataPointTemplate<std::vector<double>>::at(
         const int row, const int col) const {
       assert(row >= 0 && row < rows_);
       assert(col >= 0 && col < cols_);
 
       return data_.at(getIndex_(row,col));
-    } 
+    }
 
-  template<class T, MemoryLayout lay> 
+  template<class T, MemoryLayout lay>
     inline void DataPointTemplate<T, lay>::resize(const int rows, const int cols) {
       assert(rows > 0);
       assert(cols > 0);
@@ -401,11 +421,11 @@ namespace panacea {
         data_.resize(rows);
         for(int row = 0; row < rows; ++row ) {
           data_.at(row).resize(cols);
-        } 
+        }
       } else if constexpr(std::is_same<T,std::vector<double>>::value) {
         rows_ = rows;
         cols_ = cols;
-        // If have a one dimensional vector, only the dimensions are allowed to 
+        // If have a one dimensional vector, only the dimensions are allowed to
         // be greater than 1
         number_points_ = rows_;
         number_dimensions_ = cols_;

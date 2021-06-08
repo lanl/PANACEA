@@ -62,8 +62,8 @@ namespace panacea {
         kern_algorithm_(kern_algorithm)
       {};
 
-      friend bool operator== (const KernelSpecification &spec1, const KernelSpecification &spec2);
-      friend bool operator!= (const KernelSpecification &spec1, const KernelSpecification &spec2);
+      friend bool operator==(const KernelSpecification &spec1, const KernelSpecification &spec2);
+      friend bool operator!=(const KernelSpecification &spec1, const KernelSpecification &spec2);
 
       template<class T>
         inline T get() const {

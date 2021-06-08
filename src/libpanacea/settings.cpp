@@ -233,6 +233,8 @@ namespace panacea {
       os << "Default";
     }else if(kern_mem == settings::KernelMemory::Own) {
       os << "Own";
+    }else if(kern_mem == settings::KernelMemory::OwnIfRestart) {
+      os << "OwnIfRestart";
     }else if(kern_mem == settings::KernelMemory::Share) {
       os << "Share";
     }
@@ -529,6 +531,8 @@ namespace panacea {
     std::getline(is,line);
     if( line.find("Default", 0) != std::string::npos ) {
       kern_mem = settings::KernelMemory::Default;
+    }else if( line.find("OwnIfRestart", 0) != std::string::npos ) {
+      kern_mem = settings::KernelMemory::OwnIfRestart;
     }else if( line.find("Own", 0) != std::string::npos ) {
       kern_mem = settings::KernelMemory::Own;
     }else if( line.find("Share", 0) != std::string::npos ) {
@@ -536,7 +540,7 @@ namespace panacea {
     }  else {
       std::string error_msg = "Unrecognized kernek memory option while reading istream.\n";
       error_msg += "Accepted kernel memory options are:\n";
-      error_msg += "Default\nOwn\nShare\n";
+      error_msg += "Default\nOwnIfRestart\nOwn\nShare\n";
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }

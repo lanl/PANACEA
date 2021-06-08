@@ -100,7 +100,8 @@ namespace panacea {
        * Initialize internal members.
        *
        * Similar to updating but assumes you are initializing data structures as opposed
-       * to changing values already stored in them.
+       * to changing values already stored in them. With update the internal datastructures
+       * should already exist in memory, initialize will allocate memory on the heap if needed.
        **/
       virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
 

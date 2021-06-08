@@ -9,7 +9,7 @@ using namespace panacea::settings;
 
 namespace panacea {
 
-  EntropySettings::EntropySettings(const PANACEASettings & in) {
+  EntropySettings::EntropySettings(const PANACEASettings & in, const Memory memory_policy) {
     if(auto val = in.get<EntropyType>() ) {
       this->type = *val;
     }
@@ -25,8 +25,8 @@ namespace panacea {
     }
     if(auto dist_type = in.get<DistributionType>() ) {
       if( dist_type == DistributionType::Kernel ){
-        auto kern_dist_settings = std::make_unique<KernelDistributionSettings>(); 
-   
+        auto kern_dist_settings = std::make_unique<KernelDistributionSettings>();
+
         if( auto val = in.get<KernelCorrelation>() ) {
           kern_dist_settings->dist_settings.set(*val);
         }
@@ -50,12 +50,15 @@ namespace panacea {
           }
         }
         if( this->type == EntropyType::Self ) {
-          // Make the kernels share the data from the descriptors if it is a 
-          // Self entropy term
-          kern_dist_settings->dist_settings.set(KernelMemory::Share);
+          // Make the kernels share the data from the descriptors if it is a
+          // Self entropy term, the only time this switches to ownership is if
+          // data is loaded from a restart file.
+          kern_dist_settings->dist_settings.set(KernelMemory::OwnIfRestart);
+        } else {
+          kern_dist_settings->dist_settings.set(KernelMemory::Own);
         }
         this->dist_settings = std::move(kern_dist_settings);
       }
     }
-  } 
+  }
 }

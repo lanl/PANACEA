@@ -288,9 +288,32 @@ namespace panacea {
     // wrapper and the kernel wrapper are of compatible types
     //
     const auto & specification = prim_grp.getSpecification();
-    KernelWrapperFactory kfactory;
-    prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
 
+    // Here we are going to overwrite the kernels
+    //
+    // 1. We will overwrite instead of attempting to expand existing kernels
+    // because we do not know if the kernel wrapper type is compatible with the
+    // descriptor wrapper type.
+    //
+    // 2. If ownership is set to OwnIfRestart then we are going to temporarily switch
+    // the ownership specification to shared so we can create the kernels, this is
+    // allowed because if we were going to load from a restart file we would not be
+    // calling initialize with an existing descriptor wrapper. By default we should
+    // prefer to have shared ownership if the OwnIfRestart setting is specified.
+    KernelWrapperFactory kfactory;
+    if(specification.is(settings::KernelMemory::OwnIfRestart)) {
+      auto local_spec = KernelSpecification(
+          specification.get<settings::KernelCorrelation>(),
+          specification.get<settings::KernelCount>(),
+          specification.get<settings::KernelPrimitive>(),
+          specification.get<settings::KernelNormalization>(),
+          settings::KernelMemory::Share, // This is the only thing that is changed
+          specification.get<settings::KernelCenterCalculation>(),
+          specification.get<settings::KernelAlgorithm>());
+      prim_grp.kernel_wrapper = kfactory.create(dwrapper, local_spec);
+    } else {
+      prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
+    }
     prim_grp.covariance = createCovariance(dwrapper, specification);
 
     prim_grp.normalizer = createNormalizer(dwrapper, specification);

@@ -9,4 +9,5 @@ namespace panacea {
   settings::DistributionType KernelDistributionSettings::type() const noexcept {
     return settings::DistributionType::Kernel;
   }
+
 }

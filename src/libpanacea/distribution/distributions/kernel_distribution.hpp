@@ -108,6 +108,7 @@ namespace panacea {
     assert(settings->type() == settings::DistributionType::Kernel);
 
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,
@@ -123,9 +124,10 @@ namespace panacea {
 
     KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
 
-    // Switch Memory to Own if set to Share, not possible to create a shell distribution
-    // that does not own it's kernels
-    kern_dist_settings->dist_settings.set(settings::KernelMemory::Own);
+    // Switch default Memory to OwnIfRestart, not possible to create a shell distribution
+    // that does not own it's kernels if loading from a restart file. If the distribution
+    // is later initialized then we can use the shared approach instead
+    //kern_dist_settings->dist_settings.set(settings::KernelMemory::OwnIfRestart);
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,

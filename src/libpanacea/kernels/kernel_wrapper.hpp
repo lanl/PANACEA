@@ -46,6 +46,8 @@ namespace panacea {
         KernelWrapper(const PassKey<KernelWrapperFactory> &,const T & data, int rows, int cols) :
           data_wrapper_(data, rows, cols) {};
 
+        KernelWrapper(const PassKey<KernelWrapperFactory> &, const int rows, const int cols) :
+          data_wrapper_(rows, cols) {};
         /**
          * Will copy the data instead of storing it as a pointer.
          **/
@@ -229,11 +231,35 @@ namespace panacea {
         } else {
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols);
         }
-
       }
 
-      auto val = std::any_cast<T>(data);
-      return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols);
+      if(std::type_index(data.type()) == std::type_index(typeid(T))) {
+        return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols);
+      }
+
+      // In the case that the underlying data is not the same. E.g. if we have a pointer
+      // e.g. double ***  but we want to store the data as a vector, then what we need to do
+      // is make a copy of the data
+      if(not std::is_pointer<T>::value) {
+        // We can only do this if the data is passed in as a BaseDescriptorWrapper otherwise
+        // we do not know the interface for getting the data out
+        if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
+          auto kwrapper = std::make_unique<KernelWrapper<T>>(key, rows, cols);
+          auto base_desc_wrapper = std::any_cast<const BaseDescriptorWrapper *>(data_in);
+          for( int row = 0; row < rows; ++row){
+            for( int col = 0; col < cols; ++col) {
+              if( base_desc_wrapper->arrangement() == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
+                kwrapper->at(row,col) = base_desc_wrapper->operator()(row,col);
+              } else {
+                kwrapper->at(row,col) = base_desc_wrapper->operator()(col,row);
+              }
+            }
+          }
+          return kwrapper;
+        } // if data_in is a BaseDescWrapper
+      } // if T is not a pointer
+
+      return nullptr;
     }
 
   template<class T>
