@@ -12,27 +12,27 @@
 
 namespace panacea {
 
-  class BaseDescriptorWrapper;
-  class EntropySettings;
-  class EntropyTerm;
+class BaseDescriptorWrapper;
+class EntropySettings;
+class EntropyTerm;
 
-  class NumericalGrad : public EntropyDecorator {
+class NumericalGrad : public EntropyDecorator {
 
-    double inc_ratio_ = 0.0001;
-    bool numerical_grad_ = true;
+  double inc_ratio_ = 0.0001;
+  bool numerical_grad_ = true;
 
-    public: 
-      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) : 
-        EntropyDecorator(std::move(entropy_term)) {};
+public:
+  explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term)
+      : EntropyDecorator(std::move(entropy_term)){};
 
-      virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
-          const int desc_ind,
-          const EntropySettings & entropy_settings) override;
+  virtual std::vector<double>
+  compute_grad(const BaseDescriptorWrapper *descriptor_wrapper,
+               const int desc_ind,
+               const EntropySettings &entropy_settings) override;
 
-      virtual void set(const settings::EntropyOption option, std::any val) override;
-  };
+  virtual void set(const settings::EntropyOption option, std::any val) override;
+};
 
-}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_ENTROPYDECORATOR_NUMERICALGRAD_H

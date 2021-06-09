@@ -13,16 +13,14 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:kernel specifications write & read","[unit,panacea]"){
+TEST_CASE("Testing:kernel specifications write & read", "[unit,panacea]") {
 
   // Use values that are not default so can be sure when read in it is not
   // simply from construction
   KernelSpecification kern_specs(
       settings::KernelCorrelation::Uncorrelated,
-      settings::KernelCount::OneToOne,
-      settings::KernelPrimitive::Exponential,
-      settings::KernelNormalization::None,
-      settings::KernelMemory::Share,
+      settings::KernelCount::OneToOne, settings::KernelPrimitive::Exponential,
+      settings::KernelNormalization::None, settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
       settings::KernelAlgorithm::Flexible);
 
@@ -37,25 +35,31 @@ TEST_CASE("Testing:kernel specifications write & read","[unit,panacea]"){
   KernelSpecification::read(settings::FileType::TXTRestart, fs2, &kern_specs2);
   fs2.close();
 
-  REQUIRE(kern_specs2.get<settings::KernelCorrelation>()       == settings::KernelCorrelation::Uncorrelated);
-  REQUIRE(kern_specs2.get<settings::KernelCount>()             == settings::KernelCount::OneToOne);
-  REQUIRE(kern_specs2.get<settings::KernelPrimitive>()         == settings::KernelPrimitive::Exponential);
-  REQUIRE(kern_specs2.get<settings::KernelNormalization>()     == settings::KernelNormalization::None);
-  REQUIRE(kern_specs2.get<settings::KernelMemory>()            == settings::KernelMemory::Share);
-  REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() == settings::KernelCenterCalculation::None);
-  REQUIRE(kern_specs2.get<settings::KernelAlgorithm>()         == settings::KernelAlgorithm::Flexible);
+  REQUIRE(kern_specs2.get<settings::KernelCorrelation>() ==
+          settings::KernelCorrelation::Uncorrelated);
+  REQUIRE(kern_specs2.get<settings::KernelCount>() ==
+          settings::KernelCount::OneToOne);
+  REQUIRE(kern_specs2.get<settings::KernelPrimitive>() ==
+          settings::KernelPrimitive::Exponential);
+  REQUIRE(kern_specs2.get<settings::KernelNormalization>() ==
+          settings::KernelNormalization::None);
+  REQUIRE(kern_specs2.get<settings::KernelMemory>() ==
+          settings::KernelMemory::Share);
+  REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() ==
+          settings::KernelCenterCalculation::None);
+  REQUIRE(kern_specs2.get<settings::KernelAlgorithm>() ==
+          settings::KernelAlgorithm::Flexible);
 }
 
-TEST_CASE("Testing:kernel specifications write & read using fileio","[integration,panacea]"){
+TEST_CASE("Testing:kernel specifications write & read using fileio",
+          "[integration,panacea]") {
 
   // Use values that are not default so can be sure when read in it is not
   // simply from construction
   KernelSpecification kern_specs(
       settings::KernelCorrelation::Uncorrelated,
-      settings::KernelCount::OneToOne,
-      settings::KernelPrimitive::Exponential,
-      settings::KernelNormalization::None,
-      settings::KernelMemory::Share,
+      settings::KernelCount::OneToOne, settings::KernelPrimitive::Exponential,
+      settings::KernelNormalization::None, settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
       settings::KernelAlgorithm::Flexible);
 
@@ -67,53 +71,55 @@ TEST_CASE("Testing:kernel specifications write & read using fileio","[integratio
   KernelSpecification kern_specs2;
   restart_file->read(&kern_specs2, "test_kern_specs_full.restart");
 
-  REQUIRE(kern_specs2.get<settings::KernelCorrelation>()       == settings::KernelCorrelation::Uncorrelated);
-  REQUIRE(kern_specs2.get<settings::KernelCount>()             == settings::KernelCount::OneToOne);
-  REQUIRE(kern_specs2.get<settings::KernelPrimitive>()         == settings::KernelPrimitive::Exponential);
-  REQUIRE(kern_specs2.get<settings::KernelNormalization>()     == settings::KernelNormalization::None);
-  REQUIRE(kern_specs2.get<settings::KernelMemory>()            == settings::KernelMemory::Share);
-  REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() == settings::KernelCenterCalculation::None);
-  REQUIRE(kern_specs2.get<settings::KernelAlgorithm>()         == settings::KernelAlgorithm::Flexible);
+  REQUIRE(kern_specs2.get<settings::KernelCorrelation>() ==
+          settings::KernelCorrelation::Uncorrelated);
+  REQUIRE(kern_specs2.get<settings::KernelCount>() ==
+          settings::KernelCount::OneToOne);
+  REQUIRE(kern_specs2.get<settings::KernelPrimitive>() ==
+          settings::KernelPrimitive::Exponential);
+  REQUIRE(kern_specs2.get<settings::KernelNormalization>() ==
+          settings::KernelNormalization::None);
+  REQUIRE(kern_specs2.get<settings::KernelMemory>() ==
+          settings::KernelMemory::Share);
+  REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() ==
+          settings::KernelCenterCalculation::None);
+  REQUIRE(kern_specs2.get<settings::KernelAlgorithm>() ==
+          settings::KernelAlgorithm::Flexible);
 }
 
-TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit,panacea]"){
+TEST_CASE("Testing:kernel specifications equivalence operators == and !=",
+          "[unit,panacea]") {
   KernelSpecification kern_specs(
       settings::KernelCorrelation::Uncorrelated,
-      settings::KernelCount::OneToOne,
-      settings::KernelPrimitive::Exponential,
-      settings::KernelNormalization::None,
-      settings::KernelMemory::Share,
+      settings::KernelCount::OneToOne, settings::KernelPrimitive::Exponential,
+      settings::KernelNormalization::None, settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
       settings::KernelAlgorithm::Flexible);
 
   WHEN("Testing agains same instance") {
-    REQUIRE(!(kern_specs!= kern_specs) );
-    REQUIRE(kern_specs== kern_specs);
+    REQUIRE(!(kern_specs != kern_specs));
+    REQUIRE(kern_specs == kern_specs);
   }
   WHEN("Testing agains same configuration but difference instance") {
     KernelSpecification kern_specs2(
         settings::KernelCorrelation::Uncorrelated,
-        settings::KernelCount::OneToOne,
-        settings::KernelPrimitive::Exponential,
-        settings::KernelNormalization::None,
-        settings::KernelMemory::Share,
+        settings::KernelCount::OneToOne, settings::KernelPrimitive::Exponential,
+        settings::KernelNormalization::None, settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
         settings::KernelAlgorithm::Flexible);
 
-    REQUIRE(!(kern_specs2 != kern_specs) );
+    REQUIRE(!(kern_specs2 != kern_specs));
     REQUIRE(kern_specs2 == kern_specs);
   }
   WHEN("Testing agains different configuration and different instance") {
     KernelSpecification kern_specs2(
         settings::KernelCorrelation::Correlated,
-        settings::KernelCount::OneToOne,
-        settings::KernelPrimitive::Exponential,
-        settings::KernelNormalization::None,
-        settings::KernelMemory::Share,
+        settings::KernelCount::OneToOne, settings::KernelPrimitive::Exponential,
+        settings::KernelNormalization::None, settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
         settings::KernelAlgorithm::Flexible);
 
     REQUIRE(kern_specs2 != kern_specs);
-    REQUIRE(!(kern_specs2 == kern_specs) );
+    REQUIRE(!(kern_specs2 == kern_specs));
   }
 }

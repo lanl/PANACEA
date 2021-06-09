@@ -3,5 +3,5 @@
 #include "distribution_settings.hpp"
 
 namespace panacea {
-  DistributionSettings::~DistributionSettings() { };
+DistributionSettings::~DistributionSettings(){};
 }

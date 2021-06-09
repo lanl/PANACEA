@@ -14,36 +14,37 @@
 
 namespace panacea {
 
-  class MatrixEigen : public Matrix {
-    private:
-      std::unique_ptr<Eigen::MatrixXd> matrix_;
-    public:
-      MatrixEigen();
-      virtual ~MatrixEigen() final {};
-      virtual const MatrixType type() const final;
-      virtual MatrixEigen & operator=(const MatrixEigen & mat) final;
-      virtual MatrixEigen & operator=(const Matrix * mat) final;
-      virtual double& operator()(const int row, const int col) final;
-      virtual double operator()(const int row, const int col) const final;
+class MatrixEigen : public Matrix {
+private:
+  std::unique_ptr<Eigen::MatrixXd> matrix_;
 
-      virtual double getDeterminant() const final;
+public:
+  MatrixEigen();
+  virtual ~MatrixEigen() final{};
+  virtual const MatrixType type() const final;
+  virtual MatrixEigen &operator=(const MatrixEigen &mat) final;
+  virtual MatrixEigen &operator=(const Matrix *mat) final;
+  virtual double &operator()(const int row, const int col) final;
+  virtual double operator()(const int row, const int col) const final;
 
-      virtual void resize(const int rows, const int cols) final;
+  virtual double getDeterminant() const final;
 
-      virtual void makeIdentity() final;
-      virtual void setZero() final;
+  virtual void resize(const int rows, const int cols) final;
 
-      virtual int rows() const final;
-      virtual int cols() const final;
+  virtual void makeIdentity() final;
+  virtual void setZero() final;
 
-      virtual void print() const final;
+  virtual int rows() const final;
+  virtual int cols() const final;
 
-      // Local method should not be part of the interface
-      Eigen::MatrixXd pseudoInverse() const;
-  };
+  virtual void print() const final;
 
-  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat);
+  // Local method should not be part of the interface
+  Eigen::MatrixXd pseudoInverse() const;
+};
 
-}
+void pseudoInverse(Matrix *return_mat, const MatrixEigen *mat);
+
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_MATRIXEIGEN_H

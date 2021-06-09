@@ -12,64 +12,63 @@
 #include <vector>
 
 namespace panacea {
-  EntropyTerm::~EntropyTerm() {};
+EntropyTerm::~EntropyTerm(){};
 
-  std::vector<std::any> EntropyTerm::write(
-      const settings::FileType file_type,
-      std::ostream & os,
-      std::any entropy_term_instance) {
+std::vector<std::any> EntropyTerm::write(const settings::FileType file_type,
+                                         std::ostream &os,
+                                         std::any entropy_term_instance) {
 
-    std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
-        file_type == settings::FileType::TXTKernelDistribution ) {
-      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
-      os << "[Entropy]\n";
-      os << entropy_term->type() << "\n";
+  std::vector<std::any> nested_values;
+  if (file_type == settings::FileType::TXTRestart ||
+      file_type == settings::FileType::TXTKernelDistribution) {
+    auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
+    os << "[Entropy]\n";
+    os << entropy_term->type() << "\n";
 
-      // Write out derived class specific data
-      nested_values = entropy_term->getWriteFunction(entropy_term->key)(file_type, os, entropy_term);
+    // Write out derived class specific data
+    nested_values = entropy_term->getWriteFunction(entropy_term->key)(
+        file_type, os, entropy_term);
 
-    } else {
-      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
-      // Write out derived class specific data
-      nested_values = entropy_term->getWriteFunction(entropy_term->key)(file_type, os, entropy_term);
-    }
-    return nested_values;
-
+  } else {
+    auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
+    // Write out derived class specific data
+    nested_values = entropy_term->getWriteFunction(entropy_term->key)(
+        file_type, os, entropy_term);
   }
-
-  io::ReadInstantiateVector EntropyTerm::read(
-      const settings::FileType file_type,
-      std::istream & is,
-      std::any entropy_term_instance) {
-
-    io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
-        file_type == settings::FileType::TXTKernelDistribution ) {
-      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
-      
-      std::string line = "";
-      while(line.find("[Entropy]",0) == std::string::npos) {
-        if( is.peek() == EOF ) {
-          std::string error_msg = "While reading entropy_term section of restart file";
-          error_msg += ", file does not contain the [Entropy] tag.";
-          PANACEA_FAIL(error_msg);
-        }
-        std::getline(is, line);
-      }
-
-      settings::EntropyType ent_type;
-      is >> ent_type;
-      assert(ent_type == entropy_term->type());
-      nested_values = entropy_term->getReadFunction(entropy_term->key)(file_type, is, entropy_term);
-    } else {
-      auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
-      nested_values = entropy_term->getReadFunction(entropy_term->key)(file_type, is, entropy_term);
-    }
-    return nested_values;
-  }
-
-
-
-
+  return nested_values;
 }
+
+io::ReadInstantiateVector EntropyTerm::read(const settings::FileType file_type,
+                                            std::istream &is,
+                                            std::any entropy_term_instance) {
+
+  io::ReadInstantiateVector nested_values;
+  if (file_type == settings::FileType::TXTRestart ||
+      file_type == settings::FileType::TXTKernelDistribution) {
+    auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
+
+    std::string line = "";
+    while (line.find("[Entropy]", 0) == std::string::npos) {
+      if (is.peek() == EOF) {
+        std::string error_msg =
+            "While reading entropy_term section of restart file";
+        error_msg += ", file does not contain the [Entropy] tag.";
+        PANACEA_FAIL(error_msg);
+      }
+      std::getline(is, line);
+    }
+
+    settings::EntropyType ent_type;
+    is >> ent_type;
+    assert(ent_type == entropy_term->type());
+    nested_values = entropy_term->getReadFunction(entropy_term->key)(
+        file_type, is, entropy_term);
+  } else {
+    auto entropy_term = std::any_cast<EntropyTerm *>(entropy_term_instance);
+    nested_values = entropy_term->getReadFunction(entropy_term->key)(
+        file_type, is, entropy_term);
+  }
+  return nested_values;
+}
+
+} // namespace panacea

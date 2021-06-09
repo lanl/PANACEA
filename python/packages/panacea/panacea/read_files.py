@@ -1,10 +1,11 @@
-
 import glob
 from os import path
 
+
 def getIndex(file_name, base):
-    base_plus_index = file_name.split(".",1)[0]
-    return int(base_plus_index.split(base,1)[1])
+    base_plus_index = file_name.split(".", 1)[0]
+    return int(base_plus_index.split(base, 1)[1])
+
 
 # Designed to read in a group of files as long as they have a format similar to:
 # file_base_name_number.extension
@@ -16,7 +17,7 @@ def getIndex(file_name, base):
 # to the files that will be readin
 # The class that is actually able to parse the file also needs to be provided
 class ReadFiles:
-    def __init__(self,path_to_files, base,extension, read_class):
+    def __init__(self, path_to_files, base, extension, read_class):
 
         # Check if path exists
         if not path.exists(path_to_files):
@@ -25,14 +26,14 @@ class ReadFiles:
         if not path.isdir(path_to_files):
             raise Exception("Provided path is not a folder.")
 
-        if extension[0] != '.':
-            extension = '.' + extension
+        if extension[0] != ".":
+            extension = "." + extension
 
-        if not path_to_files.endswith('/'):
-            path_to_files = path_to_files + '/'
+        if not path_to_files.endswith("/"):
+            path_to_files = path_to_files + "/"
 
         # Seach for a list of files with the base and extension
-        glob_str = "{}{}[0-9]{}".format(path_to_files,base,extension)
+        glob_str = "{}{}[0-9]{}".format(path_to_files, base, extension)
         potential_files = glob.glob(glob_str)
 
         # Ensure that the named contents are actually files
@@ -63,7 +64,7 @@ class ReadFiles:
     def indices_files_read(self):
         indices = []
         for file_name in self.__file_readers:
-            indices.append(getIndex(file_name,self.__base))
+            indices.append(getIndex(file_name, self.__base))
         return indices
 
     # The names of the files that were found in the specified folder
@@ -82,7 +83,6 @@ class ReadFiles:
             file_base_names.append(file_name)
         return file_base_names
 
-
     # index_start is inclusive
     # index_end is exclusive
     def read(self, index_start=0, index_end=None):
@@ -91,7 +91,9 @@ class ReadFiles:
         self.__file_readers = {}
         for file_in in self.__files:
             file_in_base = path.basename(file_in)
-            index_file_in = int(file_in_base.replace(self.__base,'').replace(self.__extension,''))
+            index_file_in = int(
+                file_in_base.replace(self.__base, "").replace(self.__extension, "")
+            )
             if index_file_in >= index_start:
                 if index_end != None:
                     if index_file_in < index_end:
@@ -106,7 +108,7 @@ class ReadFiles:
     # Was the file indicated with file_name read
     def exists(self, file_name_or_index):
 
-        if isinstance(file_name_or_index,int):
+        if isinstance(file_name_or_index, int):
             file_name = self.base + str(file_name_or_index) + self.extension
         else:
             file_name = file_name_or_index
@@ -119,7 +121,7 @@ class ReadFiles:
     # or can pass in the full file name
     def __getitem__(self, file_name_or_index):
 
-        if isinstance(file_name_or_index,int):
+        if isinstance(file_name_or_index, int):
             file_name = self.base + str(file_name_or_index) + self.extension
         else:
             file_name = file_name_or_index
@@ -127,4 +129,3 @@ class ReadFiles:
         if file_name in self.__file_readers.keys():
             return self.__file_readers.get(file_name)
         return None
-

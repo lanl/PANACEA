@@ -16,40 +16,40 @@
 
 namespace panacea {
 
-  class Inverter;
-  class Reducer;
+class Inverter;
+class Reducer;
 
-  class ReducedCovariance {
-    private:
-      std::unique_ptr<Matrix> matrix_;
-      std::vector<int> chosen_dimension_indices_;
+class ReducedCovariance {
+private:
+  std::unique_ptr<Matrix> matrix_;
+  std::vector<int> chosen_dimension_indices_;
 
-      NormalizationState normalized_ = NormalizationState::Unnormalized;
-    public:
-      ReducedCovariance(PassKey<Reducer>);
-      ReducedCovariance(PassKey<Reducer> key,
-          std::unique_ptr<Matrix> matrix,
-          const std::vector<int> & chosen_dimension_indices,
-          const NormalizationState & normalized) :
-        matrix_(std::move(matrix)),
+  NormalizationState normalized_ = NormalizationState::Unnormalized;
+
+public:
+  ReducedCovariance(PassKey<Reducer>);
+  ReducedCovariance(PassKey<Reducer> key, std::unique_ptr<Matrix> matrix,
+                    const std::vector<int> &chosen_dimension_indices,
+                    const NormalizationState &normalized)
+      : matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices),
-        normalized_(normalized) {};
+        normalized_(normalized){};
 
-      const Matrix * get(PassKey<Inverter>) const;
+  const Matrix *get(PassKey<Inverter>) const;
 
-      ReducedCovariance() = delete;
+  ReducedCovariance() = delete;
 
-      double operator()(const int row, const int col) const;
+  double operator()(const int row, const int col) const;
 
-      void print() const;
+  void print() const;
 
-      bool is(const NormalizationState & state) const noexcept;
-      const NormalizationState & getNormalizationState() const noexcept;
+  bool is(const NormalizationState &state) const noexcept;
+  const NormalizationState &getNormalizationState() const noexcept;
 
-      double getDeterminant() const;
-      int getNumberDimensions() const;
-      const std::vector<int> & getReducedDimensions() const noexcept;
-  };
-}
+  double getDeterminant() const;
+  int getNumberDimensions() const;
+  const std::vector<int> &getReducedDimensions() const noexcept;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_REDUCEDCOVARIANCE_H

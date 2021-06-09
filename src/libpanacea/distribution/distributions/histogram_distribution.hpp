@@ -4,10 +4,8 @@
 
 namespace panacea {
 
-  class HistogramDistribution {
+class HistogramDistribution {};
 
-  };
-
-}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_HISTOGRAMDISTRIBUTION_H

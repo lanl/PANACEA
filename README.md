@@ -7,6 +7,9 @@ unique configurations. The primary motivation for it's development was for
 generating unique configurations for the purpose of training machine learned
 interatomic potentials.
 
+Under the hood PANACEA makes use of information entropy to drive uniqueness or
+similarity.
+
 # The Directory structure of this repository is layed out as
 
 * include - public interface, where the header files are stored

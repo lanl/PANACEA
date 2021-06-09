@@ -8,8 +8,8 @@
 #include "attributes/reduced_covariance.hpp"
 #include "attributes/reduced_inv_covariance.hpp"
 #include "constants.hpp"
-#include "kernels/kernel_wrapper.hpp"
 #include "error.hpp"
+#include "kernels/kernel_wrapper.hpp"
 #include "primitive_attributes.hpp"
 #include "private_settings.hpp"
 #include "vector/vector.hpp"
@@ -22,151 +22,156 @@
 
 namespace panacea {
 
-  void GaussCorrelated::update(PrimitiveAttributes && attributes) {
-    assert(attributes.kernel_wrapper != nullptr);
-    attributes_ = std::move(attributes);
-    double determinant = attributes_.reduced_covariance->getDeterminant();
-    if( determinant <= 0.0 ) {
-      std::string error_msg = "Determinant is less than 0 value: " + std::to_string(determinant);
-      PANACEA_FAIL(error_msg);
-    }
-    pre_factor_ = 1.0/(std::pow(determinant,0.5) *
-        std::pow(constants::PI_SQRT*constants::SQRT_2,
-          static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
+void GaussCorrelated::update(PrimitiveAttributes &&attributes) {
+  assert(attributes.kernel_wrapper != nullptr);
+  attributes_ = std::move(attributes);
+  double determinant = attributes_.reduced_covariance->getDeterminant();
+  if (determinant <= 0.0) {
+    std::string error_msg =
+        "Determinant is less than 0 value: " + std::to_string(determinant);
+    PANACEA_FAIL(error_msg);
   }
-
-  const settings::KernelPrimitive GaussCorrelated::type() const noexcept {
-    return settings::KernelPrimitive::Gaussian;
-  }
-
-  const settings::KernelCorrelation GaussCorrelated::correlation() const noexcept {
-    return settings::KernelCorrelation::Correlated;
-  }
-
-  double GaussCorrelated::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
-      const int descriptor_ind) const {
-
-    assert(descriptor_wrapper != nullptr);
-    assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
-    assert(attributes_.kernel_wrapper != nullptr);
-    assert(kernel_index_ > -1);
-    assert(kernel_index_ < attributes_.kernel_wrapper->rows());
-    assert(attributes_.reduced_inv_covariance != nullptr);
-    assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
-    assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
-
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    auto & descs  = *(descriptor_wrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    auto & kerns = *(attributes_.kernel_wrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-
-    std::vector<double> diff;
-    const int red_ndim = attributes_.reduced_inv_covariance->getNumberDimensions();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    diff.reserve(red_ndim);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    int index = 0;
-    for ( const int dim : chosen_dims ) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      diff.push_back((descs(descriptor_ind, dim) -
-          kerns.at(kernel_index_,dim)) *
-          norm_coeffs.at(dim));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    }
-
-    std::vector<double> MxV;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    MxV.reserve(red_ndim);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    for( int j=0; j<red_ndim; ++j) {
-      double val = 0.0;
-      for( int k=0; k<red_ndim; ++k) {
-        val += red_inv_cov(j,k) * diff.at(k);
-      }
-      MxV.push_back(val);
-    }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-
-    double VxMxV = 0.0;
-    for(int i=0; i<red_ndim; ++i) {
-      VxMxV += diff.at(i) * MxV.at(i);
-    }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    double result = pre_factor_*std::exp(-0.5 * VxMxV );
-    if( result == 0.0 ) {
-      return std::numeric_limits<double>::min();
-    }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    return result;
-  }
-
-  std::vector<double> GaussCorrelated::compute_grad(
-      const BaseDescriptorWrapper * descriptors,
-      const int descriptor_ind,
-      const settings::EquationSetting & prim_settings,
-      const settings::GradSetting & grad_setting) const {
-
-    assert(descriptors != nullptr);
-    assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptors->getNumberPoints() );
-    assert(attributes_.kernel_wrapper != nullptr);
-    assert(kernel_index_ > -1);
-    assert(kernel_index_ < attributes_.kernel_wrapper->rows());
-    assert(attributes_.reduced_inv_covariance != nullptr);
-    assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
-    assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
-
-    auto & descs  = *(descriptors);
-    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-    auto & kerns = *(attributes_.kernel_wrapper);
-    const int ndim = descs.getNumberDimensions();
-    auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
-    const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
-
-    const double exp_term = [&]{
-      if (prim_settings == settings::EquationSetting::IgnoreExp) {
-        return 1.0;
-      } else {
-        return compute(descriptors, descriptor_ind);
-      }
-    }();
-
-    std::vector diff(ndim, 0.0);
-    for ( const int dim : chosen_dims ) {
-      // ( a_i * (d_x_i - d_mu_i) )
-      diff.at(dim) = (descs(descriptor_ind,dim) -
-          kerns.at(kernel_index_,dim));
-    }
-
-    std::vector<double> grad(ndim,0.0);
-
-    int index1 = 0;
-    for ( const int dim : chosen_dims ) {
-      int index2 = 0;
-      for ( const int dim2 : chosen_dims ) {
-        grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) * norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
-        ++index2;
-      }
-      ++index1;
-    }
-
-    if ( grad_setting == settings::GradSetting::WRTDescriptor ) {
-      for ( const int & dim : chosen_dims ) {
-        grad.at(dim) *= -1.0;
-      }
-    }
-
-    return grad;
-  }
-
+  pre_factor_ =
+      1.0 /
+      (std::pow(determinant, 0.5) *
+       std::pow(constants::PI_SQRT * constants::SQRT_2,
+                static_cast<double>(
+                    attributes_.reduced_covariance->getNumberDimensions())));
 }
 
+const settings::KernelPrimitive GaussCorrelated::type() const noexcept {
+  return settings::KernelPrimitive::Gaussian;
+}
+
+const settings::KernelCorrelation GaussCorrelated::correlation() const
+    noexcept {
+  return settings::KernelCorrelation::Correlated;
+}
+
+double GaussCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
+                                const int descriptor_ind) const {
+
+  assert(descriptor_wrapper != nullptr);
+  assert(descriptor_ind > -1);
+  assert(descriptor_ind < descriptor_wrapper->getNumberPoints());
+  assert(attributes_.kernel_wrapper != nullptr);
+  assert(kernel_index_ > -1);
+  assert(kernel_index_ < attributes_.kernel_wrapper->rows());
+  assert(attributes_.reduced_inv_covariance != nullptr);
+  assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
+  assert(
+      attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  auto &descs = *(descriptor_wrapper);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  auto &kerns = *(attributes_.kernel_wrapper);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  const auto &norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  auto &red_inv_cov = *(attributes_.reduced_inv_covariance);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  const auto &chosen_dims = red_inv_cov.getChosenDimensionIndices();
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+  std::vector<double> diff;
+  const int red_ndim =
+      attributes_.reduced_inv_covariance->getNumberDimensions();
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  diff.reserve(red_ndim);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  int index = 0;
+  for (const int dim : chosen_dims) {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    diff.push_back((descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim)) *
+                   norm_coeffs.at(dim));
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  }
+
+  std::vector<double> MxV;
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  MxV.reserve(red_ndim);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  for (int j = 0; j < red_ndim; ++j) {
+    double val = 0.0;
+    for (int k = 0; k < red_ndim; ++k) {
+      val += red_inv_cov(j, k) * diff.at(k);
+    }
+    MxV.push_back(val);
+  }
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+  double VxMxV = 0.0;
+  for (int i = 0; i < red_ndim; ++i) {
+    VxMxV += diff.at(i) * MxV.at(i);
+  }
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  double result = pre_factor_ * std::exp(-0.5 * VxMxV);
+  if (result == 0.0) {
+    return std::numeric_limits<double>::min();
+  }
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  return result;
+}
+
+std::vector<double>
+GaussCorrelated::compute_grad(const BaseDescriptorWrapper *descriptors,
+                              const int descriptor_ind,
+                              const settings::EquationSetting &prim_settings,
+                              const settings::GradSetting &grad_setting) const {
+
+  assert(descriptors != nullptr);
+  assert(descriptor_ind > -1);
+  assert(descriptor_ind < descriptors->getNumberPoints());
+  assert(attributes_.kernel_wrapper != nullptr);
+  assert(kernel_index_ > -1);
+  assert(kernel_index_ < attributes_.kernel_wrapper->rows());
+  assert(attributes_.reduced_inv_covariance != nullptr);
+  assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
+  assert(
+      attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+
+  auto &descs = *(descriptors);
+  const auto &norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+  auto &kerns = *(attributes_.kernel_wrapper);
+  const int ndim = descs.getNumberDimensions();
+  auto &red_inv_cov = *(attributes_.reduced_inv_covariance);
+  const auto &chosen_dims = red_inv_cov.getChosenDimensionIndices();
+
+  const double exp_term = [&] {
+    if (prim_settings == settings::EquationSetting::IgnoreExp) {
+      return 1.0;
+    } else {
+      return compute(descriptors, descriptor_ind);
+    }
+  }();
+
+  std::vector diff(ndim, 0.0);
+  for (const int dim : chosen_dims) {
+    // ( a_i * (d_x_i - d_mu_i) )
+    diff.at(dim) = (descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim));
+  }
+
+  std::vector<double> grad(ndim, 0.0);
+
+  int index1 = 0;
+  for (const int dim : chosen_dims) {
+    int index2 = 0;
+    for (const int dim2 : chosen_dims) {
+      grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) *
+                      norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
+      ++index2;
+    }
+    ++index1;
+  }
+
+  if (grad_setting == settings::GradSetting::WRTDescriptor) {
+    for (const int &dim : chosen_dims) {
+      grad.at(dim) *= -1.0;
+    }
+  }
+
+  return grad;
+}
+
+} // namespace panacea

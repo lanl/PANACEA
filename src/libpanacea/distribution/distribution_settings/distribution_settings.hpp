@@ -7,12 +7,12 @@
 
 namespace panacea {
 
-  struct DistributionSettings {
-    settings::EquationSetting equation_settings = settings::EquationSetting::None;
-    virtual settings::DistributionType type() const noexcept = 0;
-    virtual ~DistributionSettings() = 0;
-  };
+struct DistributionSettings {
+  settings::EquationSetting equation_settings = settings::EquationSetting::None;
+  virtual settings::DistributionType type() const noexcept = 0;
+  virtual ~DistributionSettings() = 0;
+};
 
-}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_DISTRIBUTIONSETTINGS_H
