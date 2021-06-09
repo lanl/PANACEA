@@ -6,21 +6,21 @@
 // Standard includes
 #include <sstream>
 
-#define PANACEA_FAIL(message)                                                          \
+#define PANACEA_FAIL(message)                                                  \
   ::panacea::error::fail(message, __FILE__, __LINE__);
 
 namespace panacea {
-  namespace error {
-    template<typename T>
-    inline void fail(T message, const char *const filename, int const linenumber) {
-      std::stringstream stream;
-      stream << "PANACEA ERROR" << std::endl;
-      stream << "  File:        " << filename << std::endl;
-      stream << "  Line number: " << linenumber << std::endl;
-      stream << "  Message:     " << message << std::endl;
-      throw std::runtime_error(stream.str());
-    }
-  } // error
-} // panacea
+namespace error {
+template <typename T>
+inline void fail(T message, const char *const filename, int const linenumber) {
+  std::stringstream stream;
+  stream << "PANACEA ERROR" << std::endl;
+  stream << "  File:        " << filename << std::endl;
+  stream << "  Line number: " << linenumber << std::endl;
+  stream << "  Message:     " << message << std::endl;
+  throw std::runtime_error(stream.str());
+}
+} // namespace error
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_ERROR_H

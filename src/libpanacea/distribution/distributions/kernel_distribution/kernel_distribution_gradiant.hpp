@@ -11,30 +11,29 @@
 
 namespace panacea {
 
-  class BaseDescriptorWrapper;
-  class KernelDistributionSettings;
-  class PrimitiveGroup;
+class BaseDescriptorWrapper;
+class KernelDistributionSettings;
+class PrimitiveGroup;
 
-  class KernelDistributionGradiant {
-    public:
+class KernelDistributionGradiant {
+public:
+  using GradiantMethod = std::vector<double> (*)(
+      const BaseDescriptorWrapper *descriptor_wrapper,
+      const int &descriptor_index, const int &grad_index,
+      const PrimitiveGroup &prim_grp,
+      const KernelDistributionSettings &distribution_settings,
+      const double pre_factor);
 
-      using GradiantMethod = std::vector<double>(*)(
-          const BaseDescriptorWrapper * descriptor_wrapper,
-          const int & descriptor_index,
-          const int & grad_index,
-          const PrimitiveGroup & prim_grp,
-          const KernelDistributionSettings & distribution_settings,
-          const double pre_factor
-          );
-   
-      static std::unordered_map<settings::GradSetting,
-        std::unordered_map<settings::EquationSetting,
-        std::unordered_map<settings::KernelCount,
-        GradiantMethod>>> grad_method;
+  static std::unordered_map<
+      settings::GradSetting,
+      std::unordered_map<
+          settings::EquationSetting,
+          std::unordered_map<settings::KernelCount, GradiantMethod>>>
+      grad_method;
 
-      KernelDistributionGradiant();
-  };
+  KernelDistributionGradiant();
+};
 
-}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_KERNELDISTRIBUTION_GRADIANT_H

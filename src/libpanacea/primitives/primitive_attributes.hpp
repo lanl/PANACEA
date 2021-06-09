@@ -7,23 +7,24 @@
 #include "attribute_manipulators/normalizer.hpp"
 
 namespace panacea {
-  
-  class BaseKernelWrapper;
-  class Covariance;
-  class ReducedCovariance;
-  class ReducedInvCovariance;
 
-  /*
-   * Class provides a generic means of passing in common attributes needed by the primitives
-   */
-  class PrimitiveAttributes {
-    public:
-      Normalizer normalizer;
-      BaseKernelWrapper * kernel_wrapper = nullptr;
-      Covariance * covariance = nullptr;
-      ReducedCovariance * reduced_covariance = nullptr;
-      ReducedInvCovariance * reduced_inv_covariance = nullptr;       
-  };
-}
+class BaseKernelWrapper;
+class Covariance;
+class ReducedCovariance;
+class ReducedInvCovariance;
+
+/*
+ * Class provides a generic means of passing in common attributes needed by the
+ * primitives
+ */
+class PrimitiveAttributes {
+public:
+  Normalizer normalizer;
+  BaseKernelWrapper *kernel_wrapper = nullptr;
+  Covariance *covariance = nullptr;
+  ReducedCovariance *reduced_covariance = nullptr;
+  ReducedInvCovariance *reduced_inv_covariance = nullptr;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_PRIMITIVEATTRIBUTES_H

@@ -14,17 +14,26 @@ def getRowsAndCols(line):
             try:
                 rows = int(word)
             except:
-                raise Exception("Unable to convert first field to int, field is {}, line is {}".format(word, line))
+                raise Exception(
+                    "Unable to convert first field to int, field is {}, line is {}".format(
+                        word, line
+                    )
+                )
         elif index == 1:
             try:
                 cols = int(word)
             except:
-                raise Exception("Unable to convert second field to int, field is {}, line is {}".format(word, line))
+                raise Exception(
+                    "Unable to convert second field to int, field is {}, line is {}".format(
+                        word, line
+                    )
+                )
         else:
             error_msg = "Only expected two fields for rows and columns"
             raise Exception(error_msg)
         index = index + 1
     return rows, cols
+
 
 class RestartFile:
 
@@ -40,12 +49,13 @@ class RestartFile:
         self.__normalization_method = "None"
 
         self.__normalization_coefficients = np.zeros(0)
-        self.__kernel_centers = np.zeros((0,0))
+        self.__kernel_centers = np.zeros((0, 0))
         self.__covariance_total_pts = 0
-        self.__covariance = np.zeros((0,0))
+        self.__covariance = np.zeros((0, 0))
         self.__covariance_norm_state = "Unnormalized"
         # Needed to update the covariance matrix
         self.__covariance_mean = np.zeros(0)
+
     # Getters
     @property
     def entropy_type(self):
@@ -198,7 +208,7 @@ class RestartFile:
     def __readSectionNormalizationCoefficients(self, fid):
         self.__normalization_coefficients.resize(self.__number_norm_coefficients)
 
-        for index in range(0,self.__number_norm_coefficients):
+        for index in range(0, self.__number_norm_coefficients):
             line = fid.readline()
             try:
                 self.__normalization_coefficients[index] = float(line)
@@ -232,7 +242,7 @@ class RestartFile:
                 # Rows and columns
                 line = fid.readline()
                 rows, cols = getRowsAndCols(line)
-                self.__kernel_centers.resize(rows,cols)
+                self.__kernel_centers.resize(rows, cols)
                 for row in range(0, rows):
                     line = fid.readline()
                     col = 0
@@ -273,17 +283,19 @@ class RestartFile:
             if "[Matrix]" in line:
                 line = fid.readline()
                 rows, cols = getRowsAndCols(line)
-                self.__covariance.resize((rows,cols))
+                self.__covariance.resize((rows, cols))
                 for row in range(0, rows):
                     line = fid.readline()
                     words = line.split()
                     col = 0
                     for word in words:
                         try:
-                            self.__covariance[row,col] = float(word)
+                            self.__covariance[row, col] = float(word)
                         except:
-                            raise Exception("Unable to convert field {} to float, at line {}"\
-                                    ", row {} and col {}".format(word,line,row,col))
+                            raise Exception(
+                                "Unable to convert field {} to float, at line {}"
+                                ", row {} and col {}".format(word, line, row, col)
+                            )
                         col = col + 1
 
             # Blank line
@@ -310,12 +322,12 @@ class RestartFile:
             rows, cols = getRowsAndCols(line)
             self.__covariance_mean.resize(rows)
 
-            for row in range(0,rows):
+            for row in range(0, rows):
                 line = fid.readline()
                 self.__covariance_mean[row] = float(line)
 
-    def read(self,file_name):
-        with open(file_name,"r") as file1:
+    def read(self, file_name):
+        with open(file_name, "r") as file1:
             for line in file1:
                 # Check for heading
                 if "[Entropy]" in line:
@@ -334,4 +346,3 @@ class RestartFile:
                     self.__readSectionKernel(file1)
                 elif "[Covariance]" in line:
                     self.__readSectionCovariance(file1)
-

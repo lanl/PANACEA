@@ -1,5 +1,3 @@
-
-
 import panacea.read_restart
 import panacea.read_files
 
@@ -7,9 +5,10 @@ import numpy as np
 
 # Class provides a means of reading multiple restart files
 class RestartFileGroup:
-    def __init__(self,path_to_files, base,extension):
+    def __init__(self, path_to_files, base, extension):
         self.__file_grp_reader = panacea.read_files.ReadFiles(
-                path_to_files, base, extension, panacea.read_restart.RestartFile)
+            path_to_files, base, extension, panacea.read_restart.RestartFile
+        )
         self.__file_name_to_index = {}
 
     def read(self, index_start=0, index_end=None):
@@ -22,9 +21,11 @@ class RestartFileGroup:
             if not first_file:
                 if dims != self.__dims:
 
-                    raise Exception("Different numbers of dimensions detected while "\
-                        "reading in a group of restart files. Inconsistency in the "\
-                        "dimensions is problematic.")
+                    raise Exception(
+                        "Different numbers of dimensions detected while "
+                        "reading in a group of restart files. Inconsistency in the "
+                        "dimensions is problematic."
+                    )
             else:
                 first_file = False
                 self.__dims = dims

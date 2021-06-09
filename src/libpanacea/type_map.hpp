@@ -11,9 +11,8 @@
 
 namespace panacea {
 
-  extern const std::unordered_map<std::type_index,std::string> type_map; 
+extern const std::unordered_map<std::type_index, std::string> type_map;
 
 }
 
 #endif // PANACEA_PRIVATE_TYPEMAP_H
-

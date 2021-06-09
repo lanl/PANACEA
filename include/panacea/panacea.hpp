@@ -13,31 +13,25 @@
 
 namespace panacea {
 
-  class BaseDescriptorWrapper;
-  class EntropyTerm;
+class BaseDescriptorWrapper;
+class EntropyTerm;
 
-  class PANACEA {
+class PANACEA {
 
-    public:
+public:
+  std::unique_ptr<BaseDescriptorWrapper> wrap(std::any, const int rows,
+                                              const int cols) const;
 
-      std::unique_ptr<BaseDescriptorWrapper> wrap(
-          std::any ,
-          const int rows,
-          const int cols) const;
+  std::unique_ptr<EntropyTerm> create(const BaseDescriptorWrapper *,
+                                      const PANACEASettings &settings) const;
 
-      std::unique_ptr<EntropyTerm> create(
-          const BaseDescriptorWrapper *,
-          const PANACEASettings & settings) const;
+  std::unique_ptr<EntropyTerm> create(const PANACEASettings &settings) const;
 
-      std::unique_ptr<EntropyTerm> create(
-          const PANACEASettings & settings) const;
+  std::unique_ptr<EntropyTerm> create(const std::string &file_name) const;
 
-      std::unique_ptr<EntropyTerm> create(const std::string & file_name) const;
-
-      std::unique_ptr<io::FileIO> create(const settings::FileType) const;
-
-  };
-
+  std::unique_ptr<io::FileIO> create(const settings::FileType) const;
 };
+
+}; // namespace panacea
 
 #endif // PANACEA_H

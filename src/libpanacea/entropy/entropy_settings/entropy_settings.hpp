@@ -11,19 +11,19 @@
 
 namespace panacea {
 
-  struct EntropySettings {
-    EntropySettings() = default;
-    EntropySettings(
-        const PANACEASettings &,
-        const settings::Memory = settings::Memory::SelfOwnIfRestartCrossOwn );
-    settings::EntropyType type = settings::EntropyType::Self;
-    settings::Memory memory_policy = settings::Memory::SelfOwnIfRestartCrossOwn;
-    std::optional<double> weight;
-    std::optional<bool> numerical_grad_switch;
-    std::optional<double> numerical_grad_inc;
-    std::unique_ptr<DistributionSettings> dist_settings = nullptr;
-  };
+struct EntropySettings {
+  EntropySettings() = default;
+  EntropySettings(
+      const PANACEASettings &,
+      const settings::Memory = settings::Memory::SelfOwnIfRestartCrossOwn);
+  settings::EntropyType type = settings::EntropyType::Self;
+  settings::Memory memory_policy = settings::Memory::SelfOwnIfRestartCrossOwn;
+  std::optional<double> weight;
+  std::optional<bool> numerical_grad_switch;
+  std::optional<double> numerical_grad_inc;
+  std::unique_ptr<DistributionSettings> dist_settings = nullptr;
+};
 
-}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_ENTROPYSETTINGS_H

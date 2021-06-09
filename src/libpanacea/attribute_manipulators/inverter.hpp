@@ -4,13 +4,13 @@
 
 namespace panacea {
 
-  class ReducedCovariance;
-  class ReducedInvCovariance;
+class ReducedCovariance;
+class ReducedInvCovariance;
 
-  class Inverter {
-    public:
-      ReducedInvCovariance invert(const ReducedCovariance & reduced_cov) const;
-  };
-}
+class Inverter {
+public:
+  ReducedInvCovariance invert(const ReducedCovariance &reduced_cov) const;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_INVERTER_H

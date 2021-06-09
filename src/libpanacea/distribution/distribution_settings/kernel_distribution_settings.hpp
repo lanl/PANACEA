@@ -10,10 +10,10 @@
 
 namespace panacea {
 
-  struct KernelDistributionSettings : public DistributionSettings {
-    virtual settings::DistributionType type() const noexcept final;
-    KernelSpecification dist_settings;
-  };
-}
+struct KernelDistributionSettings : public DistributionSettings {
+  virtual settings::DistributionType type() const noexcept final;
+  KernelSpecification dist_settings;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_KERNELDISTRIBUTIONSETTINGS_H
