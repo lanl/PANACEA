@@ -28,7 +28,6 @@ namespace panacea {
       OwnIfRestart
     };
 
-
     // Should attempt to make settings classes specefic to the correct
     // categories so as to avoid allowing values to be passed in that shouldn't
     // be
@@ -39,7 +38,8 @@ namespace panacea {
 
     enum class EquationSetting {
       None,
-      IgnoreExp
+      IgnoreExp,
+      IgnoreExpAndPrefactor
     };
 
     enum class None {

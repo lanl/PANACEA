@@ -56,9 +56,36 @@ namespace panacea {
           kern_dist_settings->dist_settings.set(KernelMemory::OwnIfRestart);
         } else {
           kern_dist_settings->dist_settings.set(KernelMemory::Own);
+
+          // If a cross entropy term that is single where the primitive is set
+          // to Gaussian or Exponential we are going to Ignore the exponential
+          // part when calculating the gradiant because makes the gradiant
+          // unstable
+          if(in.get<KernelCount>() == KernelCount::Single ) {
+            grad_equation_settings = EquationSetting::IgnoreExpAndPrefactor;
+          }
+
         }
         this->dist_settings = std::move(kern_dist_settings);
       }
     }
+  }
+
+  void EntropySettings::setDistributionSettings(
+      std::unique_ptr<DistributionSettings> dist_settings_in) {
+    dist_settings = std::move(dist_settings_in);
+  }
+  // We can make method const because we not changing the pointer
+  const DistributionSettings & EntropySettings::getDistributionSettings(const Method method) const {
+    assert(dist_settings != nullptr);
+    if( method == Method::Compute ) {
+      dist_settings->set(compute_equation_settings);
+    } else if(method == Method::ComputeGradiant ) {
+      dist_settings->set(grad_equation_settings);
+    }
+    // If it is Method::Create it doesn't matter
+    // equation settings are not needed
+
+    return *dist_settings;
   }
 }

@@ -23,12 +23,12 @@
 namespace panacea {
 
   namespace {
-    std::unique_ptr<EntropyTerm> decorate(std::unique_ptr<EntropyTerm> ent_term, EntropySettings * settings) {
+    std::unique_ptr<EntropyTerm> decorate(std::unique_ptr<EntropyTerm> ent_term, const EntropySettings & settings) {
       // Add decorators
-      if( settings->weight ) {
-        ent_term = std::make_unique<Weight>(std::move(ent_term), settings->weight.value_or(1.0) );
+      if( settings.weight ) {
+        ent_term = std::make_unique<Weight>(std::move(ent_term), settings.weight.value_or(1.0) );
       }
-      if( settings->numerical_grad_switch ) {
+      if( settings.numerical_grad_switch ) {
         ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
       }
       return ent_term;
@@ -63,16 +63,14 @@ namespace panacea {
 
   std::unique_ptr<EntropyTerm> EntropyFactory::create(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      EntropySettings * settings) const {
+      const EntropySettings & settings) const {
 
-    assert(settings != nullptr);
-
-    if(create_methods_.count(settings->type) == 0){
+    if(create_methods_.count(settings.type) == 0){
       std::string error_msg = "Entropy type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
 
-    auto ent_term = create_methods_.at(settings->type)(
+    auto ent_term = create_methods_.at(settings.type)(
         PassKey<EntropyFactory>(),
         descriptor_wrapper,
         settings);
@@ -83,15 +81,13 @@ namespace panacea {
   }
 
   std::unique_ptr<EntropyTerm> EntropyFactory::create(
-      EntropySettings * settings) const {
+      const EntropySettings & settings) const {
 
-    assert(settings != nullptr);
-
-    if(create_methods_.count(settings->type) == 0){
+    if(create_methods_.count(settings.type) == 0){
       std::string error_msg = "Entropy type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
-    auto ent_term = create_shell_methods_.at(settings->type)(
+    auto ent_term = create_shell_methods_.at(settings.type)(
         PassKey<EntropyFactory>(),
         settings);
 

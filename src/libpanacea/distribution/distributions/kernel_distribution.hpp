@@ -44,6 +44,12 @@ namespace panacea {
       virtual Distribution::ReadFunction getReadFunction_() final;
       virtual Distribution::WriteFunction getWriteFunction_() final;
 
+      double compute_(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const settings::EquationSetting & equation_settings
+          );
+
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
@@ -58,7 +64,11 @@ namespace panacea {
 
       virtual settings::DistributionType type() const noexcept final;
 
-      virtual double compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) final;
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const DistributionSettings & distribution_settings
+          ) final;
 
       /**
        * Keep in mind the default grad_setting is inherited from distribution base class.
@@ -82,11 +92,11 @@ namespace panacea {
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          DistributionSettings * settings);
+          const DistributionSettings & settings);
 
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
-          DistributionSettings * settings);
+          const DistributionSettings & settings);
 
       static std::vector<std::any> write(
           const settings::FileType file_type,
@@ -103,26 +113,26 @@ namespace panacea {
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key,
       const BaseDescriptorWrapper * descriptor_wrapper,
-      DistributionSettings * settings) {
+      const DistributionSettings & settings) {
 
-    assert(settings->type() == settings::DistributionType::Kernel);
+    assert(settings.type() == settings::DistributionType::Kernel);
 
-    KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+    const KernelDistributionSettings & kern_dist_settings = dynamic_cast<const KernelDistributionSettings &>(settings);
 
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,
         descriptor_wrapper,
-        kern_dist_settings->dist_settings);
+        kern_dist_settings.dist_settings);
   }
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key,
-      DistributionSettings * settings) {
+      const DistributionSettings & settings) {
 
-    assert(settings->type() == settings::DistributionType::Kernel);
+    assert(settings.type() == settings::DistributionType::Kernel);
 
-    KernelDistributionSettings * kern_dist_settings = dynamic_cast<KernelDistributionSettings *>(settings);
+    const KernelDistributionSettings & kern_dist_settings = dynamic_cast<const KernelDistributionSettings &>(settings);
 
     // Switch default Memory to OwnIfRestart, not possible to create a shell distribution
     // that does not own it's kernels if loading from a restart file. If the distribution
@@ -131,7 +141,7 @@ namespace panacea {
     // The any must be the KernelSpecifications object
     return std::make_unique<KernelDistribution>(
         key,
-        kern_dist_settings->dist_settings);
+        kern_dist_settings.dist_settings);
   }
 }
 

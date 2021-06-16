@@ -1,6 +1,7 @@
 // Local private PANACEA includes
 #include "weight.hpp"
 
+#include "entropy/entropy_settings/entropy_settings.hpp"
 #include "error.hpp"
 
 // Standard includes
@@ -12,14 +13,29 @@
 namespace panacea {
 
   double Weight::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper) {
-    return EntropyDecorator::compute(descriptor_wrapper) * weight_;
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const EntropySettings & entropy_settings) {
+    return EntropyDecorator::compute(descriptor_wrapper, entropy_settings) * weight_;
   }
 
   double Weight::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      const int desc_ind) {
-    return EntropyDecorator::compute(descriptor_wrapper, desc_ind) * weight_;
+      const int desc_ind,
+      const EntropySettings & entropy_settings) {
+    return EntropyDecorator::compute(descriptor_wrapper, desc_ind, entropy_settings) * weight_;
+  }
+
+  double Weight::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const PANACEASettings & panacea_settings) {
+    return EntropyDecorator::compute(descriptor_wrapper, panacea_settings) * weight_;
+  }
+
+  double Weight::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const int desc_ind,
+      const PANACEASettings & panacea_settings) {
+    return EntropyDecorator::compute(descriptor_wrapper, desc_ind, panacea_settings) * weight_;
   }
 
   std::vector<double> Weight::compute_grad(
@@ -30,6 +46,13 @@ namespace panacea {
     auto vec = EntropyDecorator::compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
     std::transform(vec.begin(), vec.end(), vec.begin(), std::bind(std::multiplies<double>(), std::placeholders::_1, weight_) );
     return vec;
+  }
+
+  std::vector<double> Weight::compute_grad(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const int desc_ind,
+      const PANACEASettings & panacea_settings) {
+    return compute_grad(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
   }
 
   void Weight::set(const settings::EntropyOption option, std::any val) {

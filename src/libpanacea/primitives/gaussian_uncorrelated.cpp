@@ -45,7 +45,9 @@ namespace panacea {
 
   double GaussUncorrelated::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      const int descriptor_ind) const {
+      const int descriptor_ind,
+      const settings::EquationSetting & prim_settings
+      ) const {
 
     assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
@@ -56,15 +58,20 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
 
+    if(prim_settings == settings::EquationSetting::IgnoreExpAndPrefactor){
+      return 1.0;
+    }
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
     double exponent = 0.0;
     int index = 0;
+    std::cout << "Chosen number of dimensions " << attributes_.reduced_inv_covariance->getChosenDimensionIndices().size() << std::endl;
     for ( const int dim : attributes_.reduced_inv_covariance->getChosenDimensionIndices() ) {
       double diff = (*descriptor_wrapper)(descriptor_ind, dim) - attributes_.kernel_wrapper->at(kernel_index_,dim) * norm_coeffs.at(dim);
       exponent += diff * diff * attributes_.reduced_inv_covariance->operator()(index, index);
       ++index;
     }
     exponent *= -0.5;
+    std::cout << "compute pre_factor_ " << pre_factor_ << " exponent " << exponent << std::endl;
     return pre_factor_ * std::exp(exponent);
   }
 
@@ -79,13 +86,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(grad_setting != settings::GradSetting::WRTBoth && "Terms will cancel should avoid calling grad method at all");
 
-    const double exp_term = [&]{
-      if (prim_settings == settings::EquationSetting::IgnoreExp) {
-        return 1.0;
-      } else {
-        return compute(descriptors, descriptor_ind);
-      }
-    }();
+    const double exp_term = compute(descriptors, descriptor_ind, prim_settings);
 
     std::vector<double> grad(descriptors->getNumberDimensions(),0.0);
 
@@ -93,6 +94,9 @@ namespace panacea {
     const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
 
     int index = 0;
+    std::cout << "exponential term " << exp_term << std::endl;
+    std::cout << "Uncorrelated Gaussian" << std::endl;
+    std::cout << "Diff    norm coef   red_inv_cov   " << std::endl;
     for ( const int & dim : chosen_dims ) {
       const double diff =  descriptors->operator()(descriptor_ind,dim) -
         attributes_.kernel_wrapper->at(kernel_index_,dim);
@@ -102,6 +106,7 @@ namespace panacea {
          norm_coeffs.at(dim)) *
         attributes_.reduced_inv_covariance->operator()(index,index) *
         exp_term;
+        std::cout << diff << "     " << norm_coeffs.at(dim) << "    " << attributes_.reduced_inv_covariance->operator()(index,index) << std::endl;
       ++index;
     }
 

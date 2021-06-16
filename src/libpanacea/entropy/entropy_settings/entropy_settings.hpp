@@ -11,7 +11,17 @@
 
 namespace panacea {
 
-  struct EntropySettings {
+  enum class Method {
+    Compute,
+    ComputeGradiant,
+    Create
+  };
+
+  class EntropySettings {
+    private:
+      std::unique_ptr<DistributionSettings> dist_settings = nullptr;
+
+    public:
     EntropySettings() = default;
     EntropySettings(
         const PANACEASettings &,
@@ -21,7 +31,17 @@ namespace panacea {
     std::optional<double> weight;
     std::optional<bool> numerical_grad_switch;
     std::optional<double> numerical_grad_inc;
-    std::unique_ptr<DistributionSettings> dist_settings = nullptr;
+
+    settings::EquationSetting compute_equation_settings = settings::EquationSetting::None;
+    settings::EquationSetting grad_equation_settings = settings::EquationSetting::None;
+
+    /**
+     * Return settings specefic to the method to be used
+     * E.g. if the distribution settings are to be passed into a compute method
+     * vs a compute_grad method there me be some adjustments that should be made
+     **/
+    void setDistributionSettings(std::unique_ptr<DistributionSettings> dist_settings);
+    const DistributionSettings & getDistributionSettings(const Method) const;
   };
 
 }

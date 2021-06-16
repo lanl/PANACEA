@@ -26,6 +26,7 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_reducer.cpp
     unit/test_row_echelon.cpp
     unit/test_self_entropy.cpp
+    unit/test_settings.cpp
     unit/test_variance.cpp
     )
 

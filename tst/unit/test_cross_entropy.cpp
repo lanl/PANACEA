@@ -50,7 +50,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
 
   EntropySettings settings;
   settings.type = settings::EntropyType::Cross;
-  settings.dist_settings = std::make_unique<KernelDistributionSettings>(kernel_settings);
+  settings.setDistributionSettings(std::move(std::make_unique<KernelDistributionSettings>(kernel_settings)));
 
   EntropyFactory entropy_factory;
 
@@ -58,7 +58,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
         &dwrapper_init,
-        &settings);
+        settings);
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     REQUIRE(entropy_term != nullptr);
@@ -69,11 +69,11 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample_max(&data_sample_max, 1, 2);
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    double val1 = entropy_term->compute(&dwrapper_sample_max);
+    double val1 = entropy_term->compute(&dwrapper_sample_max, settings);
     std::cout << "Cross entropy is " << val1 << " at what should be the center of the cross entropy term." << std::endl;
 
     data_sample_max.at(0).at(0) = 2.8;
-    double val2 = entropy_term->compute(&dwrapper_sample_max);
+    double val2 = entropy_term->compute(&dwrapper_sample_max, settings);
     std::cout << "Cross entropy should increase when descriptors move away from the center of the cross entropy term: " << val2 << std::endl;
 
     REQUIRE( val2 > val1 );
@@ -99,7 +99,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
         &dwrapper_init,
-        &settings);
+        settings);
 
     REQUIRE(entropy_term != nullptr);
     REQUIRE(entropy_term.get() != nullptr);

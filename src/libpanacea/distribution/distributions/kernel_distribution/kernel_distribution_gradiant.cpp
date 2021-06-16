@@ -18,7 +18,7 @@ namespace panacea {
   namespace {
 
     /**
-     * Will calculate the gradiant at the location of the desc_index, 
+     * Will calculate the gradiant at the location of the desc_index,
      * assumes we are taking the gradiant with respect to the decriptor
      * thus each kernel will add a contribution.
      **/
@@ -34,19 +34,23 @@ namespace panacea {
       // We want the gradiant at the location of the sample
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
       assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
       for( auto & prim_ptr : prim_grp.primitives ) {
 
         std::vector<double> grad_temp = prim_ptr->compute_grad(
             descriptor_wrapper,
             descriptor_index,
-            distribution_settings.equation_settings,
+            distribution_settings.eq_settings,
             settings::GradSetting::WRTDescriptor);
 
         std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
 
       }
 
+      std::cout << "Pre factor " << pre_factor << std::endl;
+      std::cout << "grad" << std::endl;
+      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
 
@@ -54,10 +58,10 @@ namespace panacea {
     }
 
     /**
-     * Will calculate the gradiant at the location of the desc_index, 
-     * assumes we are taking the gradiant with respect to the decriptor
+     * Will calculate the gradiant at the location of the desc_index,
+     * assumes we are taking the gradiant with respect to the descriptor
      * with a single kernel, thus the gradient will not need to effect
-     * any changes to the kernel. 
+     * any changes to the kernel.
      **/
     std::vector<double> gradiant_single_wrt_desc_only(
         const BaseDescriptorWrapper * descriptor_wrapper,
@@ -68,6 +72,7 @@ namespace panacea {
         const double pre_factor
         ) {
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       // We want the gradiant at the location of the sample
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
       assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
@@ -75,9 +80,12 @@ namespace panacea {
       std::vector<double> grad = prim_grp.primitives.at(0)->compute_grad(
           descriptor_wrapper,
           descriptor_index,
-          distribution_settings.equation_settings,
+          distribution_settings.eq_settings,
           settings::GradSetting::WRTDescriptor);
 
+      std::cout << "Pre factor " << pre_factor << std::endl;
+      std::cout << "grad" << std::endl;
+      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
 
@@ -87,11 +95,11 @@ namespace panacea {
     /**
      * One to one mapping between the descriptors and the kernels, this
      * means that the kernels and descriptors are the same. We are interested
-     * in the gradiant at the location of the descriptor index if we were to 
+     * in the gradiant at the location of the descriptor index if we were to
      * change the kernel center.
      *
      * Hence there will only be one kernel that is relevant, all the other kernels
-     * will not add a contribution. 
+     * will not add a contribution.
      **/
     std::vector<double> gradiant_one_to_one_wrt_kern_only(
         const BaseDescriptorWrapper * descriptor_wrapper,
@@ -102,28 +110,36 @@ namespace panacea {
         const double pre_factor
         ) {
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::cout << "Number of primitives " << prim_grp.primitives.size() << std::endl;
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
 
       auto grad = prim_grp.primitives.at(grad_index)->compute_grad(
             descriptor_wrapper,
             descriptor_index,
-            distribution_settings.equation_settings,
+            distribution_settings.eq_settings,
             settings::GradSetting::WRTKernel);
 
+      std::cout << "Pre factor " << pre_factor << std::endl;
+      std::cout << "grad" << std::endl;
+      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
+
       return grad;
     }
 
     std::vector<double> gradiant_one_to_one_wrt_both(
         const BaseDescriptorWrapper * descriptor_wrapper,
         const int & descriptor_index,
-        const int & grad_index, 
+        const int & grad_index,
         const PrimitiveGroup & prim_grp,
         const KernelDistributionSettings & distribution_settings,
         const double pre_factor
         ) {
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::cout << "Number of primitives " << prim_grp.primitives.size() << std::endl;
       assert(descriptor_index < descriptor_wrapper->getNumberPoints() );
       assert(descriptor_index == grad_index);
 
@@ -134,13 +150,16 @@ namespace panacea {
           std::vector<double> grad_temp = prim_ptr->compute_grad(
               descriptor_wrapper,
               descriptor_index,
-              distribution_settings.equation_settings,
+              distribution_settings.eq_settings,
               settings::GradSetting::WRTDescriptor);
 
           std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
         }
       }
 
+      std::cout << "Pre factor " << pre_factor << std::endl;
+      std::cout << "grad" << std::endl;
+      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
       return grad;
@@ -154,7 +173,7 @@ namespace panacea {
   std::unordered_map<settings::GradSetting,
         std::unordered_map<settings::EquationSetting,
         std::unordered_map<settings::KernelCount,
-        KernelDistributionGradiant::GradiantMethod>>> 
+        KernelDistributionGradiant::GradiantMethod>>>
           KernelDistributionGradiant::grad_method;
 
   KernelDistributionGradiant::KernelDistributionGradiant() {
@@ -178,6 +197,12 @@ namespace panacea {
       [settings::GradSetting::WRTDescriptor]
       [settings::EquationSetting::None]
       [settings::KernelCount::Single] = gradiant_single_wrt_desc_only;
+
+    grad_method
+      [settings::GradSetting::WRTDescriptor]
+      [settings::EquationSetting::IgnoreExpAndPrefactor]
+      [settings::KernelCount::Single] = gradiant_single_wrt_desc_only;
+
   }
 
 }

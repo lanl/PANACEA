@@ -3,6 +3,9 @@
 #define PANACEA_PRIVATE_PRIMITIVE_H
 #pragma once
 
+// Local PANACEA includes
+#include "private_settings.hpp"
+
 // Standard includes
 #include <vector>
 
@@ -10,13 +13,6 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class PrimitiveAttributes;
-
-  namespace settings {
-    enum class EquationSetting;
-    enum class GradSetting;
-    enum class KernelCorrelation;
-    enum class KernelPrimitive;
-  }
 
   class Primitive {
 
@@ -40,7 +36,9 @@ namespace panacea {
        */
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          const int sample_ind) const = 0;
+          const int sample_ind,
+          const settings::EquationSetting & prim_settings = settings::EquationSetting::None
+          ) const = 0;
 
       /*
        * Computes the gradient of the density

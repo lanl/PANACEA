@@ -25,11 +25,11 @@ namespace panacea {
       using DistributionCreateMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
           const BaseDescriptorWrapper * descriptor_wrapper,
-          DistributionSettings * dist_settings);
+          const DistributionSettings & dist_settings);
 
       using DistributionCreateShellMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
-          DistributionSettings * dist_settings);
+          const DistributionSettings & dist_settings);
 
     private:
       static std::unordered_map<settings::DistributionType,DistributionCreateMethod>
@@ -59,13 +59,13 @@ namespace panacea {
 
       std::unique_ptr<Distribution> create(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          DistributionSettings * settings) const;
+          const DistributionSettings & settings) const;
 
       /**
        * Will create a shell of a distribution as no descriptor wrapper was provided.
        **/
       std::unique_ptr<Distribution> create(
-          DistributionSettings * settings) const;
+          const DistributionSettings & settings) const;
 
   };
 

@@ -213,7 +213,6 @@ namespace panacea {
       // Next we are going to reorder the covariance matrix
       std::vector<int> order = reorderSymmetricMatrix_(tmp.get(), priority_rows);
 
-      tmp->print();
       // E.g.
       // order.at(0) is row of reordered tmp that points back to the original tmp matrix
       // before it was changed which in this case is equivalent to covariance_

@@ -38,7 +38,11 @@ namespace panacea {
     public:
       virtual settings::DistributionType type() const noexcept = 0;
 
-      virtual double compute(const BaseDescriptorWrapper * descriptor_wrapper, const int desc_ind) = 0;
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const DistributionSettings & distribution_settings
+          ) = 0;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper * descriptor_wrapper,

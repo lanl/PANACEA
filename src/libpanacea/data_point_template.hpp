@@ -187,7 +187,7 @@ namespace panacea {
       std::cout << "\nData\n";
       for( int row = 0; row < rows(); ++row) {
         for( int col = 0; col < cols(); ++col) {
-          std::cout << "\n";
+          std::cout << at(row,col) << "\n";
         }
         std::cout << std::endl;
       }

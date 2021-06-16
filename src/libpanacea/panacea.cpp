@@ -64,7 +64,7 @@ namespace panacea {
 
     EntropySettings entropy_settings(settings);
     EntropyFactory entropy_factory;
-    return entropy_factory.create(dwrapper, &entropy_settings);
+    return entropy_factory.create(dwrapper, entropy_settings);
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
@@ -74,7 +74,7 @@ namespace panacea {
 
 
     EntropyFactory entropy_factory;
-    return entropy_factory.create(&entropy_settings);
+    return entropy_factory.create(entropy_settings);
   }
 
   std::unique_ptr<io::FileIO> PANACEA::create(const settings::FileType type) const {

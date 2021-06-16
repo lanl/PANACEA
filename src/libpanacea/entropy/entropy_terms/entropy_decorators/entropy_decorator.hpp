@@ -38,14 +38,33 @@ namespace panacea {
       }
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper) override {
-        return entropy_term_->compute(descriptor_wrapper);
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const EntropySettings & entropy_settings
+          ) override {
+        return entropy_term_->compute(descriptor_wrapper, entropy_settings);
       }
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          const int desc_ind) override {
-        return entropy_term_->compute(descriptor_wrapper, desc_ind);
+          const int desc_ind,
+          const EntropySettings & entropy_settings
+          ) override {
+        return entropy_term_->compute(descriptor_wrapper, desc_ind, entropy_settings);
+      }
+
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const PANACEASettings & panacea_settings
+          ) override {
+        return entropy_term_->compute(descriptor_wrapper, panacea_settings);
+      }
+
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const PANACEASettings & panacea_settings
+          ) override {
+        return entropy_term_->compute(descriptor_wrapper, desc_ind, panacea_settings);
       }
 
       virtual std::vector<double> compute_grad(

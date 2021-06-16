@@ -65,7 +65,9 @@ namespace panacea {
 
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          const int sample_ind) const final;
+          const int sample_ind,
+          const settings::EquationSetting & prim_settings
+          ) const final;
 
       /*
        * Compute the gradient of the primitive

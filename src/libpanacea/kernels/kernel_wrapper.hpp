@@ -206,18 +206,22 @@ namespace panacea {
         const int cols) {
 
       std::any data;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
         data = std::any_cast<const BaseDescriptorWrapper *>(data_in)->getPointerToRawData();
       } else {
         data = data_in;
       }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       if( std::type_index(data.type()) == std::type_index(typeid(T *))) {
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
         } else {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols);
 
         }
@@ -227,13 +231,18 @@ namespace panacea {
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<const T *>(data), rows, cols);
         } else {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols);
         }
       }
 
       if(std::type_index(data.type()) == std::type_index(typeid(T))) {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "rows " << rows << " cols " << cols << std::endl;
+    std::cout << "Type is " + type_map.at(std::type_index(typeid(T))) << std::endl;
         return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols);
       }
 
@@ -241,20 +250,25 @@ namespace panacea {
       // e.g. double ***  but we want to store the data as a vector, then what we need to do
       // is make a copy of the data
       if(not std::is_pointer<T>::value) {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         // We can only do this if the data is passed in as a BaseDescriptorWrapper otherwise
         // we do not know the interface for getting the data out
         if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           auto kwrapper = std::make_unique<KernelWrapper<T>>(key, rows, cols);
           auto base_desc_wrapper = std::any_cast<const BaseDescriptorWrapper *>(data_in);
           for( int row = 0; row < rows; ++row){
             for( int col = 0; col < cols; ++col) {
               if( base_desc_wrapper->arrangement() == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                 kwrapper->at(row,col) = base_desc_wrapper->operator()(row,col);
               } else {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
                 kwrapper->at(row,col) = base_desc_wrapper->operator()(col,row);
               }
             }
           }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return kwrapper;
         } // if data_in is a BaseDescWrapper
       } // if T is not a pointer

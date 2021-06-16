@@ -5,10 +5,13 @@
 // Local private PANACEA includes
 #include "private_settings.hpp"
 
+// Standard includes
+#include <any>
+
 namespace panacea {
 
   struct DistributionSettings {
-    settings::EquationSetting equation_settings = settings::EquationSetting::None;
+    virtual void set(std::any) = 0;
     virtual settings::DistributionType type() const noexcept = 0;
     virtual ~DistributionSettings() = 0;
   };

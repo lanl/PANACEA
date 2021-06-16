@@ -33,7 +33,7 @@ TEST_CASE("Testing:data_point_template constructors","[unit,panacea]"){
     REQUIRE(data5.arrangement() == Arrangement::PointsAlongRowsDimensionsAlongCols);
     REQUIRE(data5.layout() == MemoryLayout::Default);
   }
-  
+
   WHEN("Using ColumnMajor memory layout") {
     DataPointTemplate<std::vector<double>, MemoryLayout::ColumnMajor> data1;
     REQUIRE(data1.arrangement() == Arrangement::PointsAlongRowsDimensionsAlongCols);
@@ -43,8 +43,8 @@ TEST_CASE("Testing:data_point_template constructors","[unit,panacea]"){
 
 TEST_CASE("Testing:data template wrapper test with nested vector","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data = test::generateVecData(); 
-  
+  std::vector<std::vector<double>> data = test::generateVecData();
+
   DataPointTemplate<std::vector<std::vector<double>>*> data_template(&data,2, 3);
   auto data_type_index = type_index(typeid(vector<vector<double>> *));
   REQUIRE(data_type_index == std::type_index(data_template.getPointerToRawData().type()));
@@ -64,3 +64,26 @@ TEST_CASE("Testing:data template wrapper test with nested vector","[unit,panacea
   REQUIRE(data_template2.getNumberDimensions() == 3);
 }
 
+TEST_CASE("Testing:data template wrapper test with nested double ***","[unit,panacea]"){
+
+  test::ArrayData2 arr;
+  // 1.0 4.0
+  // 2.0 5.0
+  // 3.0 6.0
+
+  DataPointTemplate<double ***> data_template(&arr.data,3, 2);
+  auto data_type_index = type_index(typeid(double ***));
+  REQUIRE(data_type_index == std::type_index(data_template.getPointerToRawData().type()));
+  REQUIRE(data_template.rows() == 3);
+  REQUIRE(data_template.cols() == 2);
+
+  REQUIRE(data_template.getNumberPoints() == 3);
+  REQUIRE(data_template.getNumberDimensions() == 2);
+
+  REQUIRE(data_template.at(0,0) == 1.0);
+  REQUIRE(data_template.at(1,0) == 2.0);
+  REQUIRE(data_template.at(2,0) == 3.0);
+  REQUIRE(data_template.at(0,1) == 4.0);
+  REQUIRE(data_template.at(1,1) == 5.0);
+  REQUIRE(data_template.at(2,1) == 6.0);
+}

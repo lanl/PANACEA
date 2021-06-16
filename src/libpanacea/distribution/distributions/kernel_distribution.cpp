@@ -58,13 +58,26 @@ namespace panacea {
 
   double KernelDistribution::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      const int desc_ind) {
-    // Cycle through the primitives and compute the density
+      const int desc_ind,
+      const DistributionSettings & distribution_settings_
+      ) {
+    assert(distribution_settings_.type() == settings::DistributionType::Kernel );
+
+    auto distribution_settings =
+      dynamic_cast<const KernelDistributionSettings &>(distribution_settings_);
+
+    std::cout << "Kernel count" << std::endl;
+    std::cout << distribution_settings.dist_settings.get<settings::KernelCount>() << std::endl;
+    std::cout << "Equation settings" << std::endl;
+
     double density = 0.0;
     for( auto & prim_ptr : prim_grp_.primitives ) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      density += prim_ptr->compute(descriptor_wrapper, desc_ind);
+      density += prim_ptr->compute(
+          descriptor_wrapper,
+          desc_ind,
+          distribution_settings.eq_settings);
     }
+    std::cout << "pre_factor_ " << pre_factor_ << " density " << density << std::endl;
     return pre_factor_ * density;
   }
 
@@ -99,23 +112,23 @@ namespace panacea {
       }
       if(kern_dist_grad.grad_method
           [settings::GradSetting::WRTBoth]
-          .count(distribution_settings.equation_settings) == 0) {
+          .count(distribution_settings.eq_settings) == 0) {
         PANACEA_FAIL(error_msg);
       }
       if(kern_dist_grad.grad_method
           [settings::GradSetting::WRTKernel]
-          .count(distribution_settings.equation_settings) == 0) {
+          .count(distribution_settings.eq_settings) == 0) {
         PANACEA_FAIL(error_msg);
       }
       if(kern_dist_grad.grad_method
           [settings::GradSetting::WRTBoth]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
           .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
         PANACEA_FAIL(error_msg);
       }
       if(kern_dist_grad.grad_method
           [settings::GradSetting::WRTKernel]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
           .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
         PANACEA_FAIL(error_msg);
       }
@@ -126,12 +139,12 @@ namespace panacea {
       }
       if(kern_dist_grad.grad_method
           [grad_setting]
-          .count(distribution_settings.equation_settings) == 0) {
+          .count(distribution_settings.eq_settings) == 0) {
         PANACEA_FAIL(error_msg);
       }
       if(kern_dist_grad.grad_method
           [grad_setting]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
           .count(distribution_settings.dist_settings.get<settings::KernelCount>()) == 0) {
         PANACEA_FAIL(error_msg);
       }
@@ -143,7 +156,7 @@ namespace panacea {
 
         return kern_dist_grad.grad_method
           [settings::GradSetting::WRTBoth]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
             [distribution_settings.dist_settings.get<settings::KernelCount>()](
                 descriptor_wrapper,
                 desc_ind,
@@ -155,7 +168,7 @@ namespace panacea {
         // Remaining cases should occur WRTKernel only
         return kern_dist_grad.grad_method
           [settings::GradSetting::WRTKernel]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
             [distribution_settings.dist_settings.get<settings::KernelCount>()](
                 descriptor_wrapper,
                 desc_ind,
@@ -168,7 +181,7 @@ namespace panacea {
 
       return kern_dist_grad.grad_method
           [grad_setting]
-          [distribution_settings.equation_settings]
+          [distribution_settings.eq_settings]
             [distribution_settings.dist_settings.get<settings::KernelCount>()](
                 descriptor_wrapper,
                 desc_ind,

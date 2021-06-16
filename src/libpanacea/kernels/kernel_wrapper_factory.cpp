@@ -80,6 +80,7 @@ namespace panacea {
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
         std::string error_msg = "Kernel creation method is missing for the specified internal type.";
         PANACEA_FAIL(error_msg);
@@ -102,7 +103,9 @@ namespace panacea {
           PANACEA_FAIL(error_msg);
         }
         auto desc_data_type_index = desc_wrapper->getTypeIndex();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         auto kern_data_type_index = desc_data_type_index;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         if( desc_data_type_index !=
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
             desc_data_type_index != std::type_index(typeid(double ***))){
@@ -110,6 +113,7 @@ namespace panacea {
         }
 
         std::cout << "Should be sharing data" << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return create_methods_
           [kern_specification.get<settings::KernelCenterCalculation>()]
           [desc_data_type_index]
@@ -191,13 +195,17 @@ namespace panacea {
 
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if( kern_specification.is(settings::KernelMemory::Share)){
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::string error_msg = "OneToOne kernels that are not owned, are not yet supported. ";
         error_msg += "When constructed without a descriptor wrapper.\n";
         PANACEA_FAIL(error_msg);
       } else {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         auto data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
         // Initialize with an empty vector of vectors
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         std::vector<std::vector<double>> data;
         return create_methods_
           [kern_specification.get<settings::KernelCenterCalculation>()]

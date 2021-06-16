@@ -32,23 +32,52 @@ namespace panacea {
     return SelfEntropy::write;
   }
 
-  double SelfEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper) {
+  double SelfEntropy::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const EntropySettings & entropy_settings
+      ) {
 
     assert(descriptor_wrapper != nullptr);
 
     double self_entropy = 0.0;
     for( int desc_pt = 0; desc_pt < descriptor_wrapper->getNumberPoints(); ++desc_pt ){
-      self_entropy += -1.0 * log(distribution_->compute(descriptor_wrapper, desc_pt));
+      self_entropy += -1.0 * log(distribution_->compute(
+            descriptor_wrapper,
+            desc_pt,
+            entropy_settings.getDistributionSettings(Method::Compute)));
+      std::cout << "desc_pt " << desc_pt << " self " << self_entropy << std::endl;
     }
     return self_entropy;
   }
 
-  double SelfEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper,
-      const int desc_ind) {
+  double SelfEntropy::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const int desc_ind,
+      const EntropySettings & entropy_settings
+      ) {
 
     assert(descriptor_wrapper != nullptr);
 
-    return -1.0 * log(distribution_->compute(descriptor_wrapper, desc_ind));
+    return -1.0 * log(distribution_->compute(
+          descriptor_wrapper,
+          desc_ind,
+          entropy_settings.getDistributionSettings(Method::Compute)
+          ));
+  }
+
+  double SelfEntropy::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const PANACEASettings & panacea_settings
+      ) {
+    return compute(descriptor_wrapper, EntropySettings(panacea_settings));
+  }
+
+  double SelfEntropy::compute(
+      const BaseDescriptorWrapper * descriptor_wrapper,
+      const int desc_ind,
+      const PANACEASettings & panacea_settings
+      ) {
+    return compute(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
   }
 
   std::vector<double> SelfEntropy::compute_grad(
@@ -57,20 +86,24 @@ namespace panacea {
           const EntropySettings & entropy_settings
           ) {
 
-      assert(entropy_settings.dist_settings != nullptr);
-
       std::vector<double> inv_distribution;
       inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
       for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
-        inv_distribution.push_back(-1.0/distribution_->compute(descriptor_wrapper, desc_ind2));
+        inv_distribution.push_back(-1.0/distribution_->compute(
+              descriptor_wrapper,
+              desc_ind2,
+              entropy_settings.getDistributionSettings(Method::ComputeGradiant)));
       }
       // Compute the gradiant with respect to the Descriptors
       std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
 
-      const DistributionSettings * dist_settings = entropy_settings.dist_settings.get();
       // Compute the gradiant with respect to each of the Kernels
       for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
-        std::vector<double> grad_temp = distribution_->compute_grad(descriptor_wrapper, desc_ind2, desc_ind, *dist_settings);
+        std::vector<double> grad_temp = distribution_->compute_grad(
+            descriptor_wrapper,
+            desc_ind2, // desc_ind
+            desc_ind,  // where we are taking gradiant wrt
+            entropy_settings.getDistributionSettings(Method::ComputeGradiant));
 
         std::transform(grad_temp.begin(), grad_temp.end(), grad_temp.begin(),
           std::bind(std::multiplies<double>(),
@@ -80,6 +113,12 @@ namespace panacea {
         std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
 
       }
+
+        std::cout << "grad values " << std::endl;
+      for( auto & val : grad) {
+        std::cout << val << " ";
+      }
+      std::cout << std::endl;
       return grad;
   }
 
@@ -94,22 +133,22 @@ namespace panacea {
   std::unique_ptr<EntropyTerm> SelfEntropy::create(
       const PassKey<EntropyFactory> & key,
       const BaseDescriptorWrapper * descriptor_wrapper,
-      EntropySettings * settings) {
+      const EntropySettings & settings) {
 
     DistributionFactory dist_factory;
 
-    auto dist = dist_factory.create(descriptor_wrapper, settings->dist_settings.get());
+    auto dist = dist_factory.create(descriptor_wrapper, settings.getDistributionSettings(Method::Create));
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 
   std::unique_ptr<EntropyTerm> SelfEntropy::create(
       const PassKey<EntropyFactory> & key,
-      EntropySettings * settings) {
+      const EntropySettings & settings) {
 
     DistributionFactory dist_factory;
 
 
-    auto dist = dist_factory.create(settings->dist_settings.get());
+    auto dist = dist_factory.create(settings.getDistributionSettings(Method::Create));
     return std::make_unique<SelfEntropy>(key, std::move(dist));
   }
 

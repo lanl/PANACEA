@@ -47,10 +47,10 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
 
   DistributionFactory dist_factory;
 
-  auto dist = dist_factory.create(&dwrapper_init, &kernel_settings);
+  auto dist = dist_factory.create(&dwrapper_init, kernel_settings);
 
-  REQUIRE(dist->compute(&dwrapper_init,0) == Approx(dist->compute(&dwrapper_init,2)));
-  REQUIRE(dist->compute(&dwrapper_init,1) > dist->compute(&dwrapper_init,0));
+  REQUIRE(dist->compute(&dwrapper_init,0,kernel_settings) == Approx(dist->compute(&dwrapper_init,2,kernel_settings)));
+  REQUIRE(dist->compute(&dwrapper_init,1,kernel_settings) > dist->compute(&dwrapper_init,0,kernel_settings));
 
   const DistributionSettings * dist_settings = &kernel_settings;
 
@@ -72,7 +72,7 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
   std::transform(grad0_wrt_kern.begin(), grad0_wrt_kern.end(), grad2_wrt_kern.begin(), grad0_wrt_kern.begin(), std::plus<double>());
 
   std::cout << "Sum of gradiants WRT kernel Assuming we are sampling from a location removed from kernel " << grad0_wrt_kern.at(0) << std::endl;
-  
+
   grad_setting = settings::GradSetting::WRTDescriptor;
   auto grad0_wrt_desc = dist->compute_grad(&dwrapper_sample,0,0, *dist_settings, grad_setting);
 
@@ -80,7 +80,7 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
   REQUIRE(grad0_wrt_desc.at(0) == Approx(-1.0 * grad0_wrt_kern.at(0)));
 
   grad_setting = settings::GradSetting::WRTBoth;
-  
+
   auto grad0 = dist->compute_grad(&dwrapper_init,0,0, *dist_settings, grad_setting);
   auto grad1 = dist->compute_grad(&dwrapper_init,1,1, *dist_settings, grad_setting);
   auto grad2 = dist->compute_grad(&dwrapper_init,2,2, *dist_settings, grad_setting);
@@ -126,17 +126,17 @@ TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
   DistributionFactory dist_factory;
 
   std::cout << "Creating dist1" << std::endl;
-  auto dist1 = dist_factory.create(&dwrapper1, &kernel_settings);
+  auto dist1 = dist_factory.create(&dwrapper1, kernel_settings);
   std::cout << "Creating dist2" << std::endl;
-  auto dist2 = dist_factory.create(&dwrapper2, &kernel_settings);
-  
+  auto dist2 = dist_factory.create(&dwrapper2, kernel_settings);
+
   std::cout << "Computing distribution 1" << std::endl;
-  std::cout << dist1->compute(&dwrapper1,0) << std::endl;
+  std::cout << dist1->compute(&dwrapper1,0,kernel_settings) << std::endl;
   std::cout << "Computing distribution 2" << std::endl;
-  std::cout << dist2->compute(&dwrapper2,0) << std::endl;
-  // Check that the values are equivalent despite one being made up of three kernels and 
-  // the other composed of a single kernel 
-  REQUIRE(dist1->compute(&dwrapper1,0) == Approx(dist2->compute(&dwrapper2,0)));
+  std::cout << dist2->compute(&dwrapper2,0,kernel_settings) << std::endl;
+  // Check that the values are equivalent despite one being made up of three kernels and
+  // the other composed of a single kernel
+  REQUIRE(dist1->compute(&dwrapper1,0,kernel_settings) == Approx(dist2->compute(&dwrapper2,0,kernel_settings)));
 }
 
 TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea]"){
@@ -169,9 +169,9 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
 
   DistributionFactory dist_factory;
 
-  auto dist1 = dist_factory.create(&dwrapper1, &kernel_settings);
-  
-  double value1 = dist1->compute(&dwrapper1,0);
+  auto dist1 = dist_factory.create(&dwrapper1, kernel_settings);
+
+  double value1 = dist1->compute(&dwrapper1,0, *distribution_settings);
   auto dims1 = dist1->getDimensions();
   auto grad1 = dist1->compute_grad(&dwrapper1,0,0,*distribution_settings);
 
@@ -182,12 +182,12 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
   std::cout << "Creating Distribution shell" << std::endl;
   // Need to switch kernel settings to own
   kernel_settings.dist_settings.set(settings::KernelMemory::Own);
-  auto dist2 = dist_factory.create(&kernel_settings);
+  auto dist2 = dist_factory.create(kernel_settings);
   std::cout << "Beginning Read" << std::endl;
 
   restart_file->read(dist2.get(),"distribution_restart.txt");
 
-  double value2 = dist2->compute(&dwrapper1,0);
+  double value2 = dist2->compute(&dwrapper1,0, *distribution_settings);
   auto dims2 = dist2->getDimensions();
   auto grad2 = dist2->compute_grad(&dwrapper1,0,0,*distribution_settings);
 
@@ -196,7 +196,7 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
   for(int i = 0; i < dims1.size(); ++i){
     REQUIRE(dims1.at(i) == dims2.at(i));
   }
- 
+
   REQUIRE(grad1.size() == grad2.size());
   for(int i = 0; i < grad1.size(); ++i){
     REQUIRE(grad1.at(i) == grad2.at(i));

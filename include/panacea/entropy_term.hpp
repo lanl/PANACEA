@@ -50,14 +50,35 @@ namespace panacea {
        * Computes entropy if all points are used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const EntropySettings & entropy_settings
+          ) = 0;
 
       /**
        * Computes the entropy if a single point is used to sample the entropy
        **/
       virtual double compute(
           const BaseDescriptorWrapper * descriptor_wrapper,
-          const int desc_ind) = 0;
+          const int desc_ind,
+          const EntropySettings & entropy_settings
+          ) = 0;
+
+      /**
+       * Computes entropy if all points are used to sample the entropy
+       **/
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const PANACEASettings & panacea_settings
+          ) = 0;
+
+      /**
+       * Computes the entropy if a single point is used to sample the entropy
+       **/
+      virtual double compute(
+          const BaseDescriptorWrapper * descriptor_wrapper,
+          const int desc_ind,
+          const PANACEASettings & panacea_settings
+          ) = 0;
 
       /**
        * Computes the gradiant of the entropy term at the location of the

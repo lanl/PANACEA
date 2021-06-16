@@ -46,7 +46,9 @@ namespace panacea {
 
   double GaussLogCorrelated::compute(
       const BaseDescriptorWrapper * descriptor_wrapper,
-      const int descriptor_ind) const {
+      const int descriptor_ind,
+      const settings::EquationSetting & prim_settings
+      ) const {
 
     assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
