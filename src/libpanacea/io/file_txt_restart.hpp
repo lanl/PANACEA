@@ -27,14 +27,14 @@ namespace panacea {
     /**
      * Writes restart files in text format
      *
-     * Formatting rules, each data group must begin with a group header 
+     * Formatting rules, each data group must begin with a group header
      * with the form.
      *
      * [Header name]
      * Data
      *
      * The spaces between the headers are not important but the order they appear in is.
-     * The data must appear on the line directly under each header. 
+     * The data must appear on the line directly under each header.
      *
      **/
     class FileRestartTXT : public FileIO {
@@ -44,12 +44,12 @@ namespace panacea {
         using WriteMethod = std::vector<std::any>(*)(
             const settings::FileType ,
             std::ostream &,
-            std::any ); 
+            std::any );
 
         using ReadMethod = io::ReadInstantiateVector(*)(
             const settings::FileType ,
             std::istream &,
-            std::any ); 
+            std::any );
 
         using PostReadInitialization = void (*) (
             const settings::FileType ,
@@ -57,7 +57,7 @@ namespace panacea {
 
         static std::unordered_map<std::type_index,WriteMethod> write_methods_;
         static std::unordered_map<std::type_index,ReadMethod> read_methods_;
-        static std::unordered_map<std::type_index,PostReadInitialization> 
+        static std::unordered_map<std::type_index,PostReadInitialization>
           post_read_initialization_;
 
         void write_(std::vector<std::any> & objs, std::ostream & os);

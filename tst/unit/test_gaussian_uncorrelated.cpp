@@ -48,24 +48,24 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelAlgorithm::Flexible);
 
   PrimitiveFactory prim_factory;
-  
+
   auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
       dwrapper.get(),
       specification);
 
-  // There should be two primitives sense it is a one to one ratio and there 
+  // There should be two primitives sense it is a one to one ratio and there
   // are two descriptors
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.size() == 2);
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->getId() == 0);
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->getId() == 1);
   // Get the density located at the center of both primitives
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) == Approx(0.282095));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),1) == Approx(0.282095));
-  
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),1) == Approx(0.103777));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),0) == Approx(0.103777));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) == Approx(0.0795774715));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),1) == Approx(0.0795774715));
 
-  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),1) == Approx(0.0107696397));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),0) == Approx(0.0107696397));
+
+  settings::EquationSetting eq_settings = settings::EquationSetting::None;
 
   {
     const int descriptor_ind = 0;
@@ -113,15 +113,15 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
 TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panacea]"){
 
   // Set of numbers to test the gradient at
-  std::vector<double> numbers1 = { 1.0, 2.0, 5.5, -3.0, 12.0 }; 
-  std::vector<double> numbers2 = { 1.5, -2.0, 0.0, -6.0, 0.0 }; 
-  std::vector<double> numbers3 = { 0.0, 0.0, 0.0, 0.0, 12.0 }; 
-  std::vector<double> numbers4 = { -1.0, -1.0, -1.0, 5.0, 5.0 }; 
+  std::vector<double> numbers1 = { 1.0, 2.0, 5.5, -3.0, 12.0 };
+  std::vector<double> numbers2 = { 1.5, -2.0, 0.0, -6.0, 0.0 };
+  std::vector<double> numbers3 = { 0.0, 0.0, 0.0, 0.0, 12.0 };
+  std::vector<double> numbers4 = { -1.0, -1.0, -1.0, 5.0, 5.0 };
 
   const int descriptor_ind = 1;
   const int kernel_ind = 0;
 
-  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
+  settings::EquationSetting eq_settings = settings::EquationSetting::None;
 
   for( int index = 0; index < numbers1.size(); ++index ) {
     // Assumes we are dealing with two dimensions and two points
@@ -170,29 +170,29 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
 
     const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper3.get(),descriptor_ind);
 
-    const double grad_val = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));
+    const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));
 
-    REQUIRE( grad_val == Approx(grad_wrt_desc.at(0))); 
+    REQUIRE( grad_val_numer == Approx(grad_wrt_desc.at(0)));
 
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
     const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
-    
-    REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0))); 
+
+    REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop
 }
 
 TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normalization","[unit,panacea]"){
 
   // Set of numbers to test the gradient at
-  std::vector<double> numbers1 = {  1.0,  2.0,  5.5, -3.0, 12.0 }; 
-  std::vector<double> numbers2 = {  1.5, -2.0,  0.0, -6.0,  0.0 }; 
-  std::vector<double> numbers3 = {  0.0,  0.0,  0.0,  0.0, 12.0 }; 
-  std::vector<double> numbers4 = { -1.0, -1.0, -1.0,  5.0,  5.0 }; 
+  std::vector<double> numbers1 = {  1.0,  2.0,  5.5, -3.0, 12.0 };
+  std::vector<double> numbers2 = {  1.5, -2.0,  0.0, -6.0,  0.0 };
+  std::vector<double> numbers3 = {  0.0,  0.0,  0.0,  0.0, 12.0 };
+  std::vector<double> numbers4 = { -1.0, -1.0, -1.0,  5.0,  5.0 };
 
   const int descriptor_ind = 1;
   const int kernel_ind = 0;
 
-  settings::EquationSetting eq_settings = settings::EquationSetting::None; 
+  settings::EquationSetting eq_settings = settings::EquationSetting::None;
   for( int index = 0; index < numbers1.size(); ++index ) {
     // Assumes we are dealing with two dimensions and two points
     // The dimensions are linearly dependent so only one will ultimately be used
@@ -203,7 +203,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     auto dwrapper = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
 
-    std::cout << "Descriptor Wrapper " << std::endl; 
+    std::cout << "Descriptor Wrapper " << std::endl;
     dwrapper->print();
 
     KernelSpecification specification(
@@ -221,35 +221,41 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         dwrapper.get(),
         specification);
 
+    std::cout << "\n*********************Analytical begin***************" << std::endl;
     std::vector<double> grad_wrt_desc;
     const settings::GradSetting setting1 = settings::GradSetting::WRTDescriptor;
     grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting1 );
 
-    // Compare with numerical result
+    std::cout << "*********************Analytical end***************\n" << std::endl;
+    // Compare with numerical resul
     std::vector<std::vector<double>> raw_desc_data2{
       {numbers1.at(index)           , numbers2.at(index)},
-      {numbers3.at(index) + 0.000001, numbers3.at(index)}};
+      {numbers3.at(index) + 0.000001, numbers4.at(index)}};
     auto dwrapper2 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,2, 2);
 
+    std::cout << "\n*********************Numerical begin***************" << std::endl;
     const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper2.get(),descriptor_ind);
 
     std::vector<std::vector<double>> raw_desc_data3{
       {numbers1.at(index)           , numbers2.at(index)},
-      {numbers3.at(index) - 0.000001, numbers3.at(index)}};
+      {numbers3.at(index) - 0.000001, numbers4.at(index)}};
 
     auto dwrapper3 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data3,2, 2);
 
     const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper3.get(),descriptor_ind);
 
+    std::cout << "\n*********************Numerical end***************" << std::endl;
     const std::vector<double> norm_coeffs =  gauss_uncorrelated_prim_grp.normalizer.getNormalizationCoeffs();
-    const double grad_val = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0)) * norm_coeffs.at(0);
+    const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));// * norm_coeffs.at(0);
 
-    REQUIRE( grad_val == Approx(grad_wrt_desc.at(0))); 
+    std::cout << "Grad val diff top " << (val2-val3) << std::endl;
+    std::cout << "Grad val diff bottom " << (raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0)) << std::endl;
+    REQUIRE( grad_val_numer == Approx(grad_wrt_desc.at(0)));
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
     const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
-    
+
     REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop
 }

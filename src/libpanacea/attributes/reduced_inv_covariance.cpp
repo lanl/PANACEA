@@ -27,7 +27,7 @@ namespace panacea {
     std::cout << "Reduced Inverse Covariance Dimensions\n";
     for( int dim : chosen_dimension_indices_) {
       std::cout << dim << " ";
-    } 
+    }
     std::cout << std::endl;
   }
 

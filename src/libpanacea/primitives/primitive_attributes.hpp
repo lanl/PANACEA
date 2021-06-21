@@ -7,7 +7,7 @@
 #include "attribute_manipulators/normalizer.hpp"
 
 namespace panacea {
-  
+
   class BaseKernelWrapper;
   class Covariance;
   class ReducedCovariance;
@@ -18,11 +18,11 @@ namespace panacea {
    */
   class PrimitiveAttributes {
     public:
-      Normalizer normalizer;
+      Normalizer * normalizer = nullptr; // Cannot be a copy
       BaseKernelWrapper * kernel_wrapper = nullptr;
       Covariance * covariance = nullptr;
       ReducedCovariance * reduced_covariance = nullptr;
-      ReducedInvCovariance * reduced_inv_covariance = nullptr;       
+      ReducedInvCovariance * reduced_inv_covariance = nullptr;
   };
 }
 

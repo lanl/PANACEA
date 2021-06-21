@@ -63,7 +63,7 @@ namespace panacea {
 
     auto & descs  = *(descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
-    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+    //const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
@@ -72,8 +72,8 @@ namespace panacea {
     diff.reserve(red_ndim);
     int index = 0;
     for ( const int dim : chosen_dims ) {
-      diff.push_back(std::log(descs(descriptor_ind, dim)*norm_coeffs.at(dim)) -
-                     std::log(kerns.at(kernel_index_,dim)*norm_coeffs.at(dim)));
+      diff.push_back(std::log(descs(descriptor_ind, dim)) -
+                     std::log(kerns.at(kernel_index_,dim)));
     }
 
     std::vector<double> MxV;

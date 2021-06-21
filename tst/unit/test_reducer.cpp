@@ -58,7 +58,13 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
 
   mat->print();
 
-  Covariance covar(std::move(mat),std::move(vec),num_pts);
+  auto cov_ptr = Covariance::create(
+      settings::KernelCorrelation::Correlated,
+      std::move(mat),
+      std::move(vec),
+      num_pts);
+
+  auto & covar = *cov_ptr;
 
   WHEN("Priority rows are sequential") {
     Reducer reducer;

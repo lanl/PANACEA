@@ -51,11 +51,11 @@ TEST_CASE("Testing:primitive group write & read using fileio","[integration,pana
   io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
   restart_file->write(&prim_grp, "test_prim_group_full.restart");
- 
-  PrimitiveGroup prim_grp2; 
+
+  PrimitiveGroup prim_grp2;
   restart_file->read(&prim_grp2, "test_prim_group_full.restart");
 
-  REQUIRE(prim_grp2.name == "test_prim_group"); 
+  REQUIRE(prim_grp2.name == "test_prim_group");
 
 
   REQUIRE(prim_grp2.kernel_wrapper.get() != nullptr);
@@ -72,26 +72,26 @@ TEST_CASE("Testing:primitive group write & read using fileio","[integration,pana
   REQUIRE(prim_grp2.covariance.get() != nullptr);
   REQUIRE(prim_grp.covariance->getMean(0) == Approx(prim_grp2.covariance->getMean(0)));
   REQUIRE(prim_grp.covariance->getMean(1) == Approx(prim_grp2.covariance->getMean(1)));
-  REQUIRE(prim_grp.covariance->getCummulativeDescPoints() == 
+  REQUIRE(prim_grp.covariance->getCummulativeDescPoints() ==
       prim_grp2.covariance->getCummulativeDescPoints());
-  REQUIRE(prim_grp.covariance->getNormalizationState() == 
+  REQUIRE(prim_grp.covariance->getNormalizationState() ==
       prim_grp2.covariance->getNormalizationState());
   REQUIRE(prim_grp.covariance->getDeterminant() == Approx(prim_grp2.covariance->getDeterminant()));
 
   REQUIRE(prim_grp2.reduced_covariance.get() != nullptr);
-  REQUIRE(prim_grp.reduced_covariance->operator()(0,0) == Approx(prim_grp2.reduced_covariance->operator()(0,0)));  
+  REQUIRE(prim_grp.reduced_covariance->operator()(0,0) == Approx(prim_grp2.reduced_covariance->operator()(0,0)));
   REQUIRE(prim_grp.reduced_covariance->getNormalizationState() == prim_grp2.reduced_covariance->getNormalizationState());
-  REQUIRE(prim_grp.reduced_covariance->getDeterminant() == Approx(prim_grp2.reduced_covariance->getDeterminant())); 
- 
+  REQUIRE(prim_grp.reduced_covariance->getDeterminant() == Approx(prim_grp2.reduced_covariance->getDeterminant()));
+
   REQUIRE(prim_grp2.reduced_inv_covariance.get() != nullptr);
   REQUIRE(prim_grp2.reduced_inv_covariance->getNumberDimensions() == prim_grp.reduced_inv_covariance->getNumberDimensions());
   REQUIRE(prim_grp2.reduced_inv_covariance->operator()(0,0) == Approx(prim_grp2.reduced_inv_covariance->operator()(0,0)));
 
   REQUIRE(prim_grp2.primitives.size() == 3);
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,0) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,0))); 
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,1) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,1))); 
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,2) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,2))); 
- 
+  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,0) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,0)));
+  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,1) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,1)));
+  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,2) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,2)));
+
 }
 
 TEST_CASE("Testing:primitive group write & read","[unit,panacea]"){
@@ -124,13 +124,13 @@ TEST_CASE("Testing:primitive group write & read","[unit,panacea]"){
   fs.open("test_prim_group.restart", std::fstream::out);
   PrimitiveGroup::write(settings::FileType::TXTRestart, fs, &prim_grp);
   fs.close();
- 
-  PrimitiveGroup prim_grp2; 
+
+  PrimitiveGroup prim_grp2;
   std::fstream fs2;
   fs2.open("test_prim_group.restart", std::fstream::in);
   PrimitiveGroup::read(settings::FileType::TXTRestart, fs2, &prim_grp2);
   fs2.close();
 
-  REQUIRE(prim_grp2.name == "test_prim_group"); 
+  REQUIRE(prim_grp2.name == "test_prim_group");
 }
 

@@ -71,8 +71,6 @@ namespace panacea {
       const PANACEASettings & settings) const {
 
     EntropySettings entropy_settings(settings);
-
-
     EntropyFactory entropy_factory;
     return entropy_factory.create(entropy_settings);
   }

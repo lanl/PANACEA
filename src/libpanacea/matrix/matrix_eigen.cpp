@@ -23,6 +23,17 @@ namespace panacea {
     return matrix_->determinant();
   }
 
+  bool MatrixEigen::isZero(const double threshold) const noexcept {
+    assert(threshold > 0.0);
+    // Because it is symmetric only need to check one half
+    for( int i = 0; i < matrix_->rows(); ++i) {
+      for( int j = i; j < matrix_->cols(); ++j) {
+        if( std::abs(matrix_->operator()(i,j)) > threshold ) return false;
+      }
+    }
+    return true;
+  }
+
   void MatrixEigen::resize(const int rows, const int cols) {
     assert(rows>=0);
     assert(cols>=0);

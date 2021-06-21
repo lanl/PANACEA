@@ -28,6 +28,8 @@ namespace panacea {
 
       virtual double getDeterminant() const final;
 
+      virtual bool isZero(const double threshold) const noexcept final;
+
       virtual void resize(const int rows, const int cols) final;
 
       virtual void makeIdentity() final;

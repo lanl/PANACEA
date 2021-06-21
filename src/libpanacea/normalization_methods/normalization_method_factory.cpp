@@ -23,7 +23,7 @@ namespace panacea {
   namespace {
 
     static std::vector<int> findStackedDimensions(const BaseDescriptorWrapper * desc_wrapper) {
-    
+
       std::vector<int> stacked_dims;
       for( int dim = 0; dim < desc_wrapper->getNumberDimensions(); ++dim ) {
         const double init_pt_val = desc_wrapper->operator()(0,dim);
@@ -31,9 +31,9 @@ namespace panacea {
         for( int pt = 1; pt < desc_wrapper->getNumberPoints(); ++pt ) {
           diff += init_pt_val -  desc_wrapper->operator()(pt,dim);
         }
-        // if the diff in any of the dimensions is 0.0 it is problematic for counting 
+        // if the diff in any of the dimensions is 0.0 it is problematic for counting
         // the variance in that dimension, because all the points in that dimension are
-        // stacked on top of each other. 
+        // stacked on top of each other.
         if( diff == 0.0 ) {
           stacked_dims.push_back(dim);
         }
@@ -42,10 +42,10 @@ namespace panacea {
     }
 
     /**
-     * It can be problematic to use data points that are stacked directly on top of 
+     * It can be problematic to use data points that are stacked directly on top of
      * one another when using the variance as the normalization coefficients. This
-     * method checks that the data is of good quality, if not it will spit out a 
-     * warning. 
+     * method checks that the data is of good quality, if not it will spit out a
+     * warning.
      **/
     static bool printDataQualityMessage1() {
       std::string warning = "WARNING you are attempting to calculate normalization ";
@@ -59,7 +59,7 @@ namespace panacea {
       warning += "varied.";
       std::cout << warning << std::endl;
       // Return true in both cases, because we do not want to crash just send out
-      // an warning message if assertions are on. 
+      // an warning message if assertions are on.
       return true;
     }
 
@@ -71,23 +71,23 @@ namespace panacea {
       warning += "assume the variance is 1.0.";
       std::cout << warning << std::endl;
       // Return true in both cases, because we do not want to crash just send out
-      // an warning message if assertions are on. 
+      // an warning message if assertions are on.
       return true;
     }
 
     /**
-     * Note that using this with the covariance matrix assumes the covariance 
+     * Note that using this with the covariance matrix assumes the covariance
      * matrix already up to date with the latest set of descriptor dimensions.
      *
      * The actual coefficients returned are not the variance but the sqrt of the
-     * variance. The sqrt is required in order to appropriate calculate the 
+     * variance. The sqrt is required in order to appropriate calculate the
      * off diagonal normalization coefficients of the covariance matrix.
      **/
     std::vector<double> normalization_method_variance(
         const BaseDescriptorWrapper * desc_wrapper,
         std::any extra_args){
 
-      if(extra_args.type() != typeid(settings::None) && 
+      if(extra_args.type() != typeid(settings::None) &&
          extra_args.type() != typeid(Covariance *)) {
         std::string error_msg = "Unrecognized types encountered as extra arguments to ";
         error_msg += "variance normalization method.";
@@ -105,12 +105,12 @@ namespace panacea {
         if(desc_wrapper->rows() == 1) {
           assert(printDataQualityMessage2());
           return std::vector<double>(desc_wrapper->getNumberDimensions(), 1.0);
-        }  
+        }
         Variance variance;
         auto vec_variance = variance.calculate<const BaseDescriptorWrapper *>(desc_wrapper);
         for( const auto & dim : stacked_dims ) {
           vec_variance.at(dim) = 1.0;
-        } 
+        }
 
         // Really we want to return the sqrt of the variance
         for( auto & elem : vec_variance ) {
@@ -119,7 +119,7 @@ namespace panacea {
         return vec_variance;
       }
 
-      Covariance * cov = std::any_cast<Covariance *>(extra_args); 
+      Covariance * cov = std::any_cast<Covariance *>(extra_args);
       assert(cov != nullptr);
       assert(cov->rows() == desc_wrapper->getNumberDimensions() );
       assert(cov->getNormalizationState() == NormalizationState::Unnormalized);
@@ -159,7 +159,10 @@ namespace panacea {
       std::string error_msg = "Normalization Method is not supported.";
       PANACEA_FAIL(error_msg);
     }
-   
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Norm method is " << std::endl;
+    std::cout << norm_method << std::endl;
     return normalization_methods_[norm_method];
   }
 }

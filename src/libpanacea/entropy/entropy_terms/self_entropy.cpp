@@ -86,6 +86,16 @@ namespace panacea {
           const EntropySettings & entropy_settings
           ) {
 
+    std::cout << "Descriptor wrapper called from compute_grad in self entropy" << std::endl;
+      for( int i = 0; i < descriptor_wrapper->getNumberPoints(); ++i){
+        for( int j = 0; j< descriptor_wrapper->getNumberDimensions(); ++j) {
+          std::cout << descriptor_wrapper->operator()(i,j) << " ";
+        }
+        std::cout << "\n";
+      }
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+
       std::vector<double> inv_distribution;
       inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
       for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){

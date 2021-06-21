@@ -5,6 +5,7 @@
 #include "attribute_manipulators/inverter.hpp"
 #include "attribute_manipulators/normalizer.hpp"
 #include "attribute_manipulators/reducer.hpp"
+#include "attributes/covariance.hpp"
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "kernels/kernel_wrapper_factory.hpp"
@@ -26,7 +27,7 @@ namespace panacea {
 
   PrimitiveAttributes PrimitiveGroup::createPrimitiveAttributes() noexcept {
     return PrimitiveAttributes {
-    .normalizer = this->normalizer,
+    .normalizer = &this->normalizer, // must return address and not copy
     .kernel_wrapper = this->kernel_wrapper.get(),
     .covariance = this->covariance.get(),
     .reduced_covariance = this->reduced_covariance.get(),
@@ -78,6 +79,8 @@ namespace panacea {
       std::istream & is,
       std::any prim_grp_instance) {
 
+    std::cout << __FILE__ <<":"<<__LINE__ << std::endl;
+    std::cout << "Primitive group read" << std::endl;
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
@@ -101,12 +104,19 @@ namespace panacea {
       }
       std::getline(is, line);
       prim_grp->name = line;
+    std::cout << __FILE__ <<":"<<__LINE__ << " add spec read " <<  std::endl;
       nested_values.emplace_back(&prim_grp->specification, std::nullopt);
+    std::cout << __FILE__ <<":"<<__LINE__ << " adding normalizer read " << std::endl;
       nested_values.emplace_back(&prim_grp->normalizer, postReadKernelSpecsAndNormalizerInitialization);
 
       // Data of objects created with unique pointers need to first be created but after
       // the specifications have been read in
+    std::cout << __FILE__ <<":"<<__LINE__ << " adding kernel_wrapper read " << std::endl;
       nested_values.emplace_back(&(prim_grp->kernel_wrapper),std::nullopt);
+    std::cout << __FILE__ <<":"<<__LINE__ << " adding covar read" << std::endl;
+
+      // Note we must use pointers to the unique_pointers because the memory has not yet
+      // been allocated
       nested_values.emplace_back(&(prim_grp->covariance), std::nullopt);
     }
     return nested_values;
@@ -137,7 +147,8 @@ namespace panacea {
 
     // Now we need to actually create the kernels and covariance matrix because
     // they are allocated with unique pointers
-    prim_grp->covariance = std::make_unique<Covariance>();
+    prim_grp->covariance = Covariance::create(
+        prim_grp->specification.get<settings::KernelCorrelation>());
 
     KernelWrapperFactory kfactory;
     // Essentially create a kernel wrapper shell.

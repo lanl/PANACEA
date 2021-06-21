@@ -33,6 +33,12 @@ namespace panacea {
       virtual double getDeterminant() const = 0;
 
       /**
+       * Check if all elements in a matrix are 0, a threshold value can be
+       * specefied to help define what constitutes 0.
+       **/
+      virtual bool isZero(const double threshold) const noexcept = 0;
+
+      /**
        * Resize the matrix to the specified rows and columns
        *
        * If rows or cols is less than 0 assertions will trigger, note that no guarantees

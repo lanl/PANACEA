@@ -25,35 +25,67 @@ using namespace panacea;
  **/
 TEST_CASE("Testing:covariance test trivial constructor","[unit,panacea]"){
 
-  // 3 points 2 dimensions
-  std::vector<std::vector<double>> data{
-    {1.0, 4.0},
-    {2.0, 5.0},
-    {3.0, 6.0}};
+  GIVEN("A descriptor wrapper consisting of three points."){
+    // 3 points 2 dimensions
+    std::vector<std::vector<double>> data{
+      {1.0, 4.0},
+      {2.0, 5.0},
+      {3.0, 6.0}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data, 3, 2);
+    DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data, 3, 2);
 
-  Covariance cov(&dwrapper);
+    WHEN("Creating a correlated covariance matrix."){
+      auto cov_ptr = Covariance::create(
+          dwrapper, settings::KernelCorrelation::Correlated);
 
-  REQUIRE(cov.rows() == 2);
-  REQUIRE(cov.cols() == 2);
+      Covariance & cov = *cov_ptr;
 
-  REQUIRE(cov.getMean(0) == Approx(2.0));
-  REQUIRE(cov.getMean(1) == Approx(5.0));
+      REQUIRE(cov.rows() == 2);
+      REQUIRE(cov.cols() == 2);
 
-  REQUIRE(cov.getCummulativeDescPoints() == 3);
+      REQUIRE(cov.getMean(0) == Approx(2.0));
+      REQUIRE(cov.getMean(1) == Approx(5.0));
 
-  REQUIRE( cov(0,0) == Approx(1.0) );
-  REQUIRE( cov(0,1) == Approx(1.0) );
-  REQUIRE( cov(1,0) == Approx(1.0) );
-  REQUIRE( cov(1,1) == Approx(1.0) );
+      REQUIRE(cov.getCummulativeDescPoints() == 3);
 
-  REQUIRE( cov.getDeterminant() == Approx(0.0) );
+      REQUIRE( cov(0,0) == Approx(1.0) );
+      REQUIRE( cov(0,1) == Approx(1.0) );
+      REQUIRE( cov(1,0) == Approx(1.0) );
+      REQUIRE( cov(1,1) == Approx(1.0) );
+
+      REQUIRE( cov.getDeterminant() == Approx(0.0) );
+    }
+    WHEN("Creating an uncorrelated covariance matrix."){
+      auto cov_ptr = Covariance::create(
+          dwrapper, settings::KernelCorrelation::Uncorrelated);
+
+      Covariance & cov = *cov_ptr;
+
+      REQUIRE(cov.rows() == 2);
+      REQUIRE(cov.cols() == 2);
+
+      REQUIRE(cov.getMean(0) == Approx(2.0));
+      REQUIRE(cov.getMean(1) == Approx(5.0));
+
+      REQUIRE(cov.getCummulativeDescPoints() == 3);
+
+      // Off diagonal matrix elements should be 0.0 because
+      // it is not correlated
+      REQUIRE( cov(0,0) == Approx(1.0) );
+      REQUIRE( cov(0,1) == Approx(0.0) );
+      REQUIRE( cov(1,0) == Approx(0.0) );
+      REQUIRE( cov(1,1) == Approx(1.0) );
+
+      // Determinant should now be 1.0
+      REQUIRE( cov.getDeterminant() == Approx(1.0) );
+    }
+  }
 }
 
 TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data {
+  GIVEN("A non trivial set of points to create a descriptor wrapper."){
+    std::vector<std::vector<double>> data {
       {0.6787,    0.6948,    0.7094},
       {0.7577,    0.3171,    0.7547},
       {0.7431,    0.9502,    0.2760},
@@ -61,65 +93,69 @@ TEST_CASE("Testing:covariance non-trivial","[unit,panacea]"){
       {0.6555,    0.4387,    0.6551},
       {0.1712,    0.3816,    0.1626}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> 
-    dwrapper(&data, data.size(), data.at(0).size());
+    DescriptorWrapper<std::vector<std::vector<double>>*>
+      dwrapper(&data, data.size(), data.at(0).size());
 
-  Covariance cov(&dwrapper);
+    auto cov_ptr = Covariance::create(
+        dwrapper, settings::KernelCorrelation::Correlated);
 
-  WHEN("Testing after initialization") {
-    const int number_of_dimensions = 3;
-    REQUIRE(cov.rows() == number_of_dimensions);
-    REQUIRE(cov.cols() == number_of_dimensions);
+    auto & cov = *cov_ptr;
 
-    REQUIRE(cov.getMean(0) == Approx(0.5664).margin(1e-3));
-    REQUIRE(cov.getMean(1) == Approx(0.4695).margin(1e-3));
-    REQUIRE(cov.getMean(2) == Approx(0.5396).margin(1e-3));
+    WHEN("Testing after initialization") {
+      const int number_of_dimensions = 3;
+      REQUIRE(cov.rows() == number_of_dimensions);
+      REQUIRE(cov.cols() == number_of_dimensions);
 
-    REQUIRE(cov.getCummulativeDescPoints() == data.size());
+      REQUIRE(cov.getMean(0) == Approx(0.5664).margin(1e-3));
+      REQUIRE(cov.getMean(1) == Approx(0.4695).margin(1e-3));
+      REQUIRE(cov.getMean(2) == Approx(0.5396).margin(1e-3));
 
-    REQUIRE( cov(0,0) == Approx(0.055).margin(1e-3) );
-    REQUIRE( cov(0,1) == Approx(0.0378).margin(1e-3) );
-    REQUIRE( cov(0,2) == Approx(0.0297).margin(1e-3) );
-    REQUIRE( cov(1,0) == Approx(0.0378).margin(1e-3) );
-    REQUIRE( cov(1,1) == Approx(0.1006).margin(1e-3) );
-    REQUIRE( cov(1,2) == Approx(-0.0305).margin(1e-3) );
-    REQUIRE( cov(2,0) == Approx(0.0297).margin(1e-3) );
-    REQUIRE( cov(2,1) == Approx(-0.0305).margin(1e-3) );
-    REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
-  }
-  
-  std::vector<std::vector<double>> update_data {
-	 {0.0318, 0.7952, 0.4984},
-	 {0.2769, 0.1869, 0.9597},
-	 {0.0462, 0.4898, 0.3404},
-	 {0.0971, 0.4456, 0.5853},
-	 {0.8235, 0.6463, 0.2238}};
+      REQUIRE(cov.getCummulativeDescPoints() == data.size());
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> 
-    dwrapper2(&update_data, update_data.size(), update_data.at(0).size());
+      REQUIRE( cov(0,0) == Approx(0.055).margin(1e-3) );
+      REQUIRE( cov(0,1) == Approx(0.0378).margin(1e-3) );
+      REQUIRE( cov(0,2) == Approx(0.0297).margin(1e-3) );
+      REQUIRE( cov(1,0) == Approx(0.0378).margin(1e-3) );
+      REQUIRE( cov(1,1) == Approx(0.1006).margin(1e-3) );
+      REQUIRE( cov(1,2) == Approx(-0.0305).margin(1e-3) );
+      REQUIRE( cov(2,0) == Approx(0.0297).margin(1e-3) );
+      REQUIRE( cov(2,1) == Approx(-0.0305).margin(1e-3) );
+      REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
+    }
 
-  cov.update(&dwrapper2);
+    std::vector<std::vector<double>> update_data {
+      {0.0318, 0.7952, 0.4984},
+        {0.2769, 0.1869, 0.9597},
+        {0.0462, 0.4898, 0.3404},
+        {0.0971, 0.4456, 0.5853},
+        {0.8235, 0.6463, 0.2238}};
 
-  WHEN("Testing after update") {
-    const int number_of_dimensions = 3;
-    REQUIRE(cov.rows() == number_of_dimensions);
-    REQUIRE(cov.cols() == number_of_dimensions);
+    DescriptorWrapper<std::vector<std::vector<double>>*>
+      dwrapper2(&update_data, update_data.size(), update_data.at(0).size());
 
-    REQUIRE(cov.getMean(0) == Approx(0.4249).margin(1e-3));
-    REQUIRE(cov.getMean(1) == Approx(0.4891).margin(1e-3));
-    REQUIRE(cov.getMean(2) == Approx(0.5314).margin(1e-3));
+    cov.update(dwrapper2);
 
-    REQUIRE(cov.getCummulativeDescPoints() == (data.size()+update_data.size()));
+    WHEN("Testing after update") {
+      const int number_of_dimensions = 3;
+      REQUIRE(cov.rows() == number_of_dimensions);
+      REQUIRE(cov.cols() == number_of_dimensions);
 
-    REQUIRE( cov(0,0) == Approx(0.0981).margin(1e-3) );
-    REQUIRE( cov(0,1) == Approx(0.0173).margin(1e-3) );
-    REQUIRE( cov(0,2) == Approx(0.0037).margin(1e-3) );
-    REQUIRE( cov(1,0) == Approx(0.0173).margin(1e-3) );
-    REQUIRE( cov(1,1) == Approx(0.0717).margin(1e-3) );
-    REQUIRE( cov(1,2) == Approx(-0.0344).margin(1e-3) );
-    REQUIRE( cov(2,0) == Approx(0.0037).margin(1e-3) );
-    REQUIRE( cov(2,1) == Approx(-0.0344).margin(1e-3) );
-    REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
+      REQUIRE(cov.getMean(0) == Approx(0.4249).margin(1e-3));
+      REQUIRE(cov.getMean(1) == Approx(0.4891).margin(1e-3));
+      REQUIRE(cov.getMean(2) == Approx(0.5314).margin(1e-3));
+
+      REQUIRE(cov.getCummulativeDescPoints() == (data.size()+update_data.size()));
+
+      REQUIRE( cov(0,0) == Approx(0.0981).margin(1e-3) );
+      REQUIRE( cov(0,1) == Approx(0.0173).margin(1e-3) );
+      REQUIRE( cov(0,2) == Approx(0.0037).margin(1e-3) );
+      REQUIRE( cov(1,0) == Approx(0.0173).margin(1e-3) );
+      REQUIRE( cov(1,1) == Approx(0.0717).margin(1e-3) );
+      REQUIRE( cov(1,2) == Approx(-0.0344).margin(1e-3) );
+      REQUIRE( cov(2,0) == Approx(0.0037).margin(1e-3) );
+      REQUIRE( cov(2,1) == Approx(-0.0344).margin(1e-3) );
+      REQUIRE( cov(2,2) == Approx(0.0639).margin(1e-3) );
+    }
   }
 }
 
@@ -132,12 +168,21 @@ TEST_CASE("Testing:covariance stacked data","[unit,panacea]"){
       {2.3,  1.3,  4.9},
       {2.3,  1.3,  4.9}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> 
+  DescriptorWrapper<std::vector<std::vector<double>>*>
     dwrapper(&data, data.size(), data.at(0).size());
 
-  CHECK_THROWS(Covariance(&dwrapper, CovarianceOption::Strict));
 
-  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+  CHECK_THROWS(
+      Covariance::create(
+      dwrapper,
+      settings::KernelCorrelation::Correlated,
+      CovarianceOption::Strict)
+      );
+
+  Covariance::create(
+      dwrapper,
+      settings::KernelCorrelation::Correlated,
+      CovarianceOption::Flexible);
 }
 
 TEST_CASE("Testing:covariance read & write","[unit,panacea]"){
@@ -149,10 +194,15 @@ TEST_CASE("Testing:covariance read & write","[unit,panacea]"){
       {1.2,  1.3,  4.1},
       {0.3,  3.3,  5.9}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> 
+  DescriptorWrapper<std::vector<std::vector<double>>*>
     dwrapper(&data, data.size(), data.at(0).size());
 
-  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+  auto cov_ptr = Covariance::create(
+      dwrapper,
+      settings::KernelCorrelation::Correlated,
+      CovarianceOption::Flexible);
+
+  auto & cov = *cov_ptr;
 
   REQUIRE(cov.getCummulativeDescPoints() == 6);
   REQUIRE(cov.getNormalizationState() == NormalizationState::Unnormalized);
@@ -161,7 +211,12 @@ TEST_CASE("Testing:covariance read & write","[unit,panacea]"){
   auto data_out = cov.write(settings::FileType::TXTRestart, fs, &cov);
   fs.close();
 
-  Covariance cov2;
+  auto cov_ptr2 = Covariance::create(
+      settings::KernelCorrelation::Correlated
+      );
+
+  auto & cov2 = *cov_ptr2;
+
   // The internal matrix and vectors will not be read in from this call
   std::fstream fs2;
   fs2.open("test_covariance.restart", std::fstream::in);
@@ -173,7 +228,9 @@ TEST_CASE("Testing:covariance read & write","[unit,panacea]"){
 }
 
 TEST_CASE("Testing:covariance read & write using fileio","[integration,panacea]"){
-  std::vector<std::vector<double>> data {
+
+  GIVEN("Some non trivial descriptor wrapper."){
+    std::vector<std::vector<double>> data {
       {7.3,  1.9,  4.9},
       {0.3,  3.2,  1.8},
       {2.9,  4.3,  9.2},
@@ -181,40 +238,130 @@ TEST_CASE("Testing:covariance read & write using fileio","[integration,panacea]"
       {1.2,  1.3,  4.1},
       {0.3,  3.3,  5.9}};
 
-  DescriptorWrapper<std::vector<std::vector<double>>*> 
-    dwrapper(&data, data.size(), data.at(0).size());
+    DescriptorWrapper<std::vector<std::vector<double>>*>
+      dwrapper(&data, data.size(), data.at(0).size());
 
-  Covariance cov(&dwrapper, CovarianceOption::Flexible);
+    WHEN("The covariance matrix is correlated.") {
+      auto cov_ptr = Covariance::create(
+          dwrapper,
+          settings::KernelCorrelation::Correlated,
+          CovarianceOption::Flexible);
 
-  cov.print(); 
+      auto & cov = *cov_ptr;
 
-  io::FileIOFactory file_io_factory;
-  auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
-  
-  restart_file->write(&cov, "test_covariance_full.restart");
+      cov.print();
 
-  Covariance cov2;
-  restart_file->read(&cov2, "test_covariance_full.restart");
+      io::FileIOFactory file_io_factory;
+      auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
 
-  cov2.print();
+      restart_file->write(&cov, "test_covariance_correlated_full.restart");
 
-  REQUIRE(cov.rows() == cov2.rows());
-  REQUIRE(cov.cols() == cov2.cols());
-  REQUIRE(cov.getMean(0) == Approx(cov2.getMean(0)));
-  REQUIRE(cov.getMean(1) == Approx(cov2.getMean(1)));
-  REQUIRE(cov.getMean(2) == Approx(cov2.getMean(2)));
-  REQUIRE(cov.getNormalizationState() == cov2.getNormalizationState());
-  REQUIRE(cov(0,0) == Approx(cov2(0,0))); 
-  REQUIRE(cov(1,0) == Approx(cov2(1,0))); 
-  REQUIRE(cov(2,0) == Approx(cov2(2,0))); 
+      auto cov_ptr2 = Covariance::create(
+          settings::KernelCorrelation::Correlated
+          );
 
-  REQUIRE(cov(0,1) == Approx(cov2(0,1))); 
-  REQUIRE(cov(1,1) == Approx(cov2(1,1))); 
-  REQUIRE(cov(2,1) == Approx(cov2(2,1))); 
+      auto & cov2 = *cov_ptr2;
 
-  REQUIRE(cov(0,2) == Approx(cov2(0,2))); 
-  REQUIRE(cov(1,2) == Approx(cov2(1,2))); 
-  REQUIRE(cov(2,2) == Approx(cov2(2,2))); 
+      restart_file->read(&cov2, "test_covariance_correlated_full.restart");
 
-  REQUIRE(cov.getCummulativeDescPoints() == cov2.getCummulativeDescPoints());
+      cov2.print();
+
+      REQUIRE(cov.rows() == cov2.rows());
+      REQUIRE(cov.cols() == cov2.cols());
+      REQUIRE(cov.getMean(0) == Approx(cov2.getMean(0)));
+      REQUIRE(cov.getMean(1) == Approx(cov2.getMean(1)));
+      REQUIRE(cov.getMean(2) == Approx(cov2.getMean(2)));
+      REQUIRE(cov.getNormalizationState() == cov2.getNormalizationState());
+      REQUIRE(cov(0,0) == Approx(cov2(0,0)));
+      REQUIRE(cov(1,0) == Approx(cov2(1,0)));
+      REQUIRE(cov(2,0) == Approx(cov2(2,0)));
+
+      REQUIRE(cov(0,1) == Approx(cov2(0,1)));
+      REQUIRE(cov(1,1) == Approx(cov2(1,1)));
+      REQUIRE(cov(2,1) == Approx(cov2(2,1)));
+
+      REQUIRE(cov(0,2) == Approx(cov2(0,2)));
+      REQUIRE(cov(1,2) == Approx(cov2(1,2)));
+      REQUIRE(cov(2,2) == Approx(cov2(2,2)));
+
+      REQUIRE(cov.getCummulativeDescPoints() == cov2.getCummulativeDescPoints());
+
+      restart_file->write(&cov2, "test_covariance_correlated_full2.restart");
+
+      auto cov_ptr3 = Covariance::create(
+          settings::KernelCorrelation::Correlated
+          );
+
+      auto & cov3 = *cov_ptr3;
+
+      restart_file->read(&cov3, "test_covariance_correlated_full2.restart");
+
+      REQUIRE(cov.rows() == cov3.rows());
+      REQUIRE(cov.cols() == cov3.cols());
+      REQUIRE(cov.getMean(0) == Approx(cov3.getMean(0)));
+      REQUIRE(cov.getMean(1) == Approx(cov3.getMean(1)));
+      REQUIRE(cov.getMean(2) == Approx(cov3.getMean(2)));
+      REQUIRE(cov.getNormalizationState() == cov3.getNormalizationState());
+      REQUIRE(cov(0,0) == Approx(cov3(0,0)));
+      REQUIRE(cov(1,0) == Approx(cov3(1,0)));
+      REQUIRE(cov(2,0) == Approx(cov3(2,0)));
+
+      REQUIRE(cov(0,1) == Approx(cov3(0,1)));
+      REQUIRE(cov(1,1) == Approx(cov3(1,1)));
+      REQUIRE(cov(2,1) == Approx(cov3(2,1)));
+
+      REQUIRE(cov(0,2) == Approx(cov3(0,2)));
+      REQUIRE(cov(1,2) == Approx(cov3(1,2)));
+      REQUIRE(cov(2,2) == Approx(cov3(2,2)));
+
+      REQUIRE(cov.getCummulativeDescPoints() == cov3.getCummulativeDescPoints());
+    }
+
+    WHEN("The covariance matrix is uncorrelated.") {
+      auto cov_ptr = Covariance::create(
+          dwrapper,
+          settings::KernelCorrelation::Uncorrelated,
+          CovarianceOption::Flexible);
+
+      auto & cov = *cov_ptr;
+
+      cov.print();
+
+      io::FileIOFactory file_io_factory;
+      auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
+
+      restart_file->write(&cov, "test_covariance_uncorrelated_full.restart");
+
+      auto cov_ptr2 = Covariance::create(
+          settings::KernelCorrelation::Uncorrelated
+          );
+
+      auto & cov2 = *cov_ptr2;
+
+      restart_file->read(&cov2, "test_covariance_uncorrelated_full.restart");
+
+      cov2.print();
+
+      REQUIRE(cov.rows() == cov2.rows());
+      REQUIRE(cov.cols() == cov2.cols());
+      REQUIRE(cov.getMean(0) == Approx(cov2.getMean(0)));
+      REQUIRE(cov.getMean(1) == Approx(cov2.getMean(1)));
+      REQUIRE(cov.getMean(2) == Approx(cov2.getMean(2)));
+      REQUIRE(cov.getNormalizationState() == cov2.getNormalizationState());
+      REQUIRE(cov(0,0) == Approx(cov2(0,0)));
+      REQUIRE(cov(1,0) == Approx(cov2(1,0)));
+      REQUIRE(cov(2,0) == Approx(cov2(2,0)));
+
+      REQUIRE(cov(0,1) == Approx(cov2(0,1)));
+      REQUIRE(cov(1,1) == Approx(cov2(1,1)));
+      REQUIRE(cov(2,1) == Approx(cov2(2,1)));
+
+      REQUIRE(cov(0,2) == Approx(cov2(0,2)));
+      REQUIRE(cov(1,2) == Approx(cov2(1,2)));
+      REQUIRE(cov(2,2) == Approx(cov2(2,2)));
+
+      REQUIRE(cov.getCummulativeDescPoints() == cov2.getCummulativeDescPoints());
+    }
+
+  }
 }

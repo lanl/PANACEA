@@ -34,7 +34,13 @@ TEST_CASE("Testing:normalizer1","[unit,panacea]"){
     }
   }
 
-  Covariance covar(std::move(matrix), std::move(vector), total_num_pts);
+  auto cov_ptr = Covariance::create(
+      settings::KernelCorrelation::Correlated,
+      std::move(matrix),
+      std::move(vector),
+      total_num_pts);
+
+  auto & covar = *cov_ptr;
 
   std::vector<double> coeffs = { 1.0, 3.0, 2.0 };
   Normalizer normalizer(coeffs);

@@ -58,6 +58,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+    assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if (prim_settings == settings::EquationSetting::IgnoreExpAndPrefactor) {
@@ -67,7 +68,7 @@ namespace panacea {
 
     auto & descs  = *(descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
-    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+    const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
@@ -77,8 +78,7 @@ namespace panacea {
     int index = 0;
     for ( const int dim : chosen_dims ) {
       diff.push_back((descs(descriptor_ind, dim) -
-          kerns.at(kernel_index_,dim)) *
-          norm_coeffs.at(dim));
+          kerns.at(kernel_index_,dim)) / norm_coeffs.at(dim));
     }
 
     std::vector<double> MxV;
@@ -119,9 +119,10 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+    assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
     auto & descs  = *(descriptors);
-    const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+    const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
     auto & kerns = *(attributes_.kernel_wrapper);
     const int ndim = descs.getNumberDimensions();
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
@@ -129,14 +130,13 @@ namespace panacea {
 
     const double exp_term = compute(descriptors, descriptor_ind, prim_settings);
 
-
     std::vector diff(ndim, 0.0);
     std::cout << "exponential term " << exp_term << std::endl;
     std::cout << "Correlated Gaussian Diff" << std::endl;
     for ( const int dim : chosen_dims ) {
       // ( a_i * (d_x_i - d_mu_i) )
-      diff.at(dim) = (descs(descriptor_ind,dim) -
-          kerns.at(kernel_index_,dim));
+      diff.at(dim) = ((descs(descriptor_ind,dim) -
+          kerns.at(kernel_index_,dim))) / norm_coeffs.at(dim);
       std::cout << diff.at(dim) << " ";
     }
     std::cout << std::endl;
@@ -148,9 +148,9 @@ namespace panacea {
     for ( const int dim : chosen_dims ) {
       int index2 = 0;
       for ( const int dim2 : chosen_dims ) {
-        grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) * norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
+        grad.at(dim) += exp_term * diff.at(dim2) * red_inv_cov(index1, index2) * 1.0/ norm_coeffs.at(dim);
 
-        std::cout << norm_coeffs.at(dim) << "    " << red_inv_cov(index1,index2) << " " << grad.at(dim) << std::endl;
+        std::cout <<  red_inv_cov(index1,index2) << " " << grad.at(dim) << std::endl;
         ++index2;
       }
       ++index1;

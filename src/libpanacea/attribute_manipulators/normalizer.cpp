@@ -19,7 +19,7 @@ namespace panacea {
 
   /********************************************************
    * Local functions
-   ********************************************************/ 
+   ********************************************************/
   namespace {
 
     /**
@@ -50,7 +50,7 @@ namespace panacea {
 
   /********************************************************
    * Public methods
-   ********************************************************/ 
+   ********************************************************/
 
   Normalizer::Normalizer(const std::vector<double> & normalization_coeffs,
       const NormalizerOption opt) : norm_option_(opt) {
@@ -58,7 +58,7 @@ namespace panacea {
   }
 
   Normalizer::Normalizer(const BaseDescriptorWrapper * dwrapper,
-      const settings::KernelNormalization & norm_method, 
+      const settings::KernelNormalization & norm_method,
       const NormalizerOption opt) : norm_option_(opt) {
 
     NormalizationMethodFactory norm_method_factory;
@@ -70,7 +70,7 @@ namespace panacea {
   }
 
   Normalizer::Normalizer(
-      const settings::KernelNormalization & norm_method, 
+      const settings::KernelNormalization & norm_method,
       const NormalizerOption opt) : norm_option_(opt) {
 
     NormalizationMethodFactory norm_method_factory;
@@ -78,6 +78,14 @@ namespace panacea {
   }
 
   void Normalizer::normalize(Covariance & cov) const {
+
+    if( cov.getNormalizationState() == NormalizationState::Normalized) {
+      return;
+    }
+
+    std::cout << "Calling normalize " << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "cov cols " << cov.cols() << " norm size " << normalization_coeffs_.size() << std::endl;
     assert(cov.cols() == normalization_coeffs_.size());
 
     // Division is expensive so do it once and then use the inverse
@@ -86,20 +94,27 @@ namespace panacea {
     for(int col = 0; col < cov.cols(); ++col) {
       assert(normalization_coeffs_.at(col) != 0.0);
       inv_coeffs.push_back(1.0/normalization_coeffs_.at(col));
+      std::cout << "Norm coeff is " << normalization_coeffs_.at(col) << std::endl;
     }
-    
+
     for( int row = 0; row < cov.rows(); ++row){
       for(int col = row; col < cov.cols(); ++col) {
         cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(col);
         cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(row);
         cov(PassKey<Normalizer>(), col,row) = cov(row,col);
+
+        std::cout << "Normalized cov value is " << cov(row,col) << std::endl;
       }
     }
     cov.set(PassKey<Normalizer>(), NormalizationState::Normalized);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   void Normalizer::unnormalize(Covariance & cov) const {
 
+    if( cov.getNormalizationState() == NormalizationState::Unnormalized) {
+      return;
+    }
     assert(cov.cols() == normalization_coeffs_.size());
     for( int row = 0; row < cov.rows(); ++row){
       for(int col = 0; col < cov.cols(); ++col) {
@@ -128,7 +143,7 @@ namespace panacea {
 
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       auto normalizer = std::any_cast<Normalizer *>(norm_instance);
 
@@ -137,9 +152,9 @@ namespace panacea {
       os << normalizer->normalization_coeffs_.size() << "\n";
       os << "[Normalization Coefficients]\n";
       for( const auto & coef : normalizer->normalization_coeffs_){
-          os << std::setfill(' ') 
-            << std::setw(14) 
-            << std::setprecision(8) 
+          os << std::setfill(' ')
+            << std::setw(14)
+            << std::setprecision(8)
             << std::right
             << coef << "\n";
       }
@@ -152,10 +167,10 @@ namespace panacea {
       std::istream & is,
       std::any norm_instance) {
 
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       auto normalizer = std::any_cast<Normalizer *>(norm_instance);
-      
+
       std::string line;
       std::getline(is, line);
       // First line should be header
@@ -170,7 +185,7 @@ namespace panacea {
       is >> normalizer->norm_option_;
 
       int rows;
-      try { 
+      try {
         is >> rows;
       } catch (...) {
         std::string error_msg = "Unable to read in rows from [Normalization] section ";
@@ -200,7 +215,7 @@ namespace panacea {
         error_msg += "coefficients from Normalization section of restart file.\n";
         PANACEA_FAIL(error_msg);
       }
-    } 
+    }
     io::ReadInstantiateVector nested_values;
     return nested_values;
   }
@@ -228,7 +243,7 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
-    
+
     return is;
   }
 }
