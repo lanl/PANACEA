@@ -298,9 +298,6 @@ namespace panacea {
           cov.getNormalizationState());
 
       if( reduced_covar.getDeterminant() > 0.0 ) {
-        std::cout << "Creation of reduced covar" << std::endl;
-        reduced_covar.print();
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         return reduced_covar;
       }
 

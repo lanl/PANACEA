@@ -30,9 +30,6 @@ namespace panacea {
         descriptor_wrapper,
         settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "norm coeffs " << prim_grp_.normalizer->getNormalizationCoeffs().size() << std::endl;
-
     pre_factor_ = 1.0/static_cast<double>(prim_grp_.primitives.size());
 
   }
@@ -69,23 +66,6 @@ namespace panacea {
     auto distribution_settings =
       dynamic_cast<const KernelDistributionSettings &>(distribution_settings_);
 
-    std::cout << "Kernel count" << std::endl;
-    std::cout << distribution_settings.dist_settings.get<settings::KernelCount>() << std::endl;
-    std::cout << "Equation settings" << std::endl;
-
-
-    std::cout << "Descriptor wrapper called from compute in kernel distribution" << std::endl;
-      for( int i = 0; i < descriptor_wrapper.getNumberPoints(); ++i){
-        for( int j = 0; j< descriptor_wrapper.getNumberDimensions(); ++j) {
-          std::cout << descriptor_wrapper(i,j) << " ";
-        }
-        std::cout << "\n";
-      }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-
-
-
-
     double density = 0.0;
     for( auto & prim_ptr : prim_grp_.primitives ) {
       density += prim_ptr->compute(
@@ -94,14 +74,11 @@ namespace panacea {
           distribution_settings.eq_settings);
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double result = pre_factor_ * density;
     if( result == 0.0 ) {
       return std::numeric_limits<double>::min();
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "pre_factor_ " << pre_factor_ << " density " << density << std::endl;
     return result;
   }
 

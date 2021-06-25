@@ -96,13 +96,10 @@ namespace panacea {
       return std::any_cast<Covariance &>(cov_instance);
     }();
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-
     io::ReadInstantiateVector nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       std::string line;
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
       // Find header tag
       while(line.find("[Covariance]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -113,7 +110,6 @@ namespace panacea {
         std::getline(is, line);
       }
 
-    std::cout << __FILE__ <<":" << __LINE__ << std::endl;
       // Determine the covariance matrix type
       while(line.find("[Covariance]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -130,19 +126,15 @@ namespace panacea {
       // Check that correlation specified in restart file is consistent with the
       // correlation of the covariance matrix passed into this function
       if(correlation != cov.correlation()) {
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         std::string error_msg = "Correlation matrix store in memory is not ";
         error_msg += "consistent with matrix read in from restart file.";
         PANACEA_FAIL(error_msg);
       }
       if( cov.correlation() == settings::KernelCorrelation::Correlated){
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         nested_objs = CovarianceCorrelated::read(file_type, is, cov_instance);
       }else if( cov.correlation() == settings::KernelCorrelation::Uncorrelated){
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         nested_objs = CovarianceUncorrelated::read(file_type, is, cov_instance);
       } else {
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         std::string error_msg = "Unrecognized covariance matrix type, ";
         error_msg += "recognized types that can be written and read are:\n";
         error_msg += "CovarianceCorrelated *\nCovarianceUncorrelated *\n";
@@ -150,7 +142,7 @@ namespace panacea {
       }
 
     }
-    
+
     return nested_objs;
   }
 

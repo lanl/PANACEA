@@ -34,7 +34,6 @@ namespace panacea {
       // We want the gradiant at the location of the sample
       assert(descriptor_index < descriptor_wrapper.getNumberPoints() );
       assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::vector<double> grad(descriptor_wrapper.getNumberDimensions(),0.0);
       for( auto & prim_ptr : prim_grp.primitives ) {
 
@@ -48,9 +47,6 @@ namespace panacea {
 
       }
 
-      std::cout << "Pre factor " << pre_factor << std::endl;
-      std::cout << "grad" << std::endl;
-      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
 
@@ -72,7 +68,6 @@ namespace panacea {
         const double pre_factor
         ) {
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       // We want the gradiant at the location of the sample
       assert(descriptor_index < descriptor_wrapper.getNumberPoints() );
       assert(grad_index == descriptor_index && "It doesn't make sense to have the gradiant with respect to a different index");
@@ -83,9 +78,6 @@ namespace panacea {
           distribution_settings.eq_settings,
           settings::GradSetting::WRTDescriptor);
 
-      std::cout << "Pre factor " << pre_factor << std::endl;
-      std::cout << "grad" << std::endl;
-      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
 
@@ -110,8 +102,6 @@ namespace panacea {
         const double pre_factor
         ) {
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cout << "Number of primitives " << prim_grp.primitives.size() << std::endl;
       assert(descriptor_index < descriptor_wrapper.getNumberPoints() );
 
       auto grad = prim_grp.primitives.at(grad_index)->compute_grad(
@@ -120,9 +110,6 @@ namespace panacea {
             distribution_settings.eq_settings,
             settings::GradSetting::WRTKernel);
 
-      std::cout << "Pre factor " << pre_factor << std::endl;
-      std::cout << "grad" << std::endl;
-      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
 
@@ -138,8 +125,6 @@ namespace panacea {
         const double pre_factor
         ) {
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cout << "Number of primitives " << prim_grp.primitives.size() << std::endl;
       assert(descriptor_index < descriptor_wrapper.getNumberPoints() );
       assert(descriptor_index == grad_index);
 
@@ -157,9 +142,6 @@ namespace panacea {
         }
       }
 
-      std::cout << "Pre factor " << pre_factor << std::endl;
-      std::cout << "grad" << std::endl;
-      for(auto & val : grad) std::cout << val << " ";
       std::transform(grad.begin(), grad.end(), grad.begin(),
           std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
       return grad;

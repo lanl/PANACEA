@@ -235,7 +235,7 @@ namespace panacea {
       std::any cov_instance) {
 
     const CovarianceCorrelated & cov_mat = [&]() -> const CovarianceCorrelated & {
-      if( std::type_index(cov_instance.type()) == 
+      if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(Covariance *))){
 
         return const_cast<const CovarianceCorrelated &>(
@@ -244,7 +244,7 @@ namespace panacea {
 
       }else if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(Covariance &))){
-        
+
         return const_cast<const CovarianceCorrelated &>(
             dynamic_cast<CovarianceCorrelated &>(
               std::any_cast<Covariance &>(cov_instance)));

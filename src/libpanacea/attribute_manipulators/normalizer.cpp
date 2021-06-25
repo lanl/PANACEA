@@ -85,9 +85,6 @@ namespace panacea {
       return;
     }
 
-    std::cout << "Calling normalize " << std::endl;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "cov cols " << cov.cols() << " norm size " << normalization_coeffs_.size() << std::endl;
     assert(cov.cols() == normalization_coeffs_.size());
 
     // Division is expensive so do it once and then use the inverse
@@ -96,7 +93,6 @@ namespace panacea {
     for(int col = 0; col < cov.cols(); ++col) {
       assert(normalization_coeffs_.at(col) != 0.0);
       inv_coeffs.push_back(1.0/normalization_coeffs_.at(col));
-      std::cout << "Norm coeff is " << normalization_coeffs_.at(col) << std::endl;
     }
 
     for( int row = 0; row < cov.rows(); ++row){
@@ -105,11 +101,9 @@ namespace panacea {
         cov(PassKey<Normalizer>(), row,col) *= inv_coeffs.at(row);
         cov(PassKey<Normalizer>(), col,row) = cov(row,col);
 
-        std::cout << "Normalized cov value is " << cov(row,col) << std::endl;
       }
     }
     cov.set(PassKey<Normalizer>(), NormalizationState::Normalized);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   void Normalizer::unnormalize(Covariance & cov) const {
@@ -128,8 +122,6 @@ namespace panacea {
   }
 
   const std::vector<double> Normalizer::getNormalizationCoeffs() const {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Number of normalization coefficients " << normalization_coeffs_.size() << std::endl;
     return normalization_coeffs_;
   }
 
@@ -146,36 +138,36 @@ namespace panacea {
       std::any norm_instance) {
 
     const Normalizer & normalizer = [&]() -> const Normalizer & {
-      if(std::type_index(norm_instance.type()) == 
+      if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(Normalizer &))){
 
         return const_cast<const Normalizer &>(
             std::any_cast<Normalizer &>(norm_instance));
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(std::unique_ptr<Normalizer> *))){
 
         return const_cast<const Normalizer &>(
             *(std::any_cast<std::unique_ptr<Normalizer> *>(
                 norm_instance))->get());
 
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(std::unique_ptr<const Normalizer> *))){
 
         return *(std::any_cast<std::unique_ptr<const Normalizer> *>(
               norm_instance))->get();
 
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(Normalizer *))){
 
         return const_cast<const Normalizer &>(
             *std::any_cast<Normalizer *>(norm_instance));
 
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(const Normalizer &))){
 
         return std::any_cast<const Normalizer &>(norm_instance);
 
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(const Normalizer *))){
 
         return *std::any_cast<const Normalizer *>(norm_instance);
@@ -215,19 +207,17 @@ namespace panacea {
       std::istream & is,
       std::any norm_instance) {
 
-    std::cout << "Reading in normalizer" << std::endl;
-
     Normalizer & normalizer = [&]() -> Normalizer & {
-      if(std::type_index(norm_instance.type()) == 
+      if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(Normalizer &))){
 
         return std::any_cast<Normalizer &>(norm_instance);
 
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(Normalizer *))){
 
         return *std::any_cast<Normalizer *>(norm_instance);
-      } else if(std::type_index(norm_instance.type()) == 
+      } else if(std::type_index(norm_instance.type()) ==
           std::type_index(typeid(std::unique_ptr<Normalizer> *))){
 
         return *(std::any_cast<std::unique_ptr<Normalizer> *>(
@@ -247,12 +237,9 @@ namespace panacea {
 
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-     
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
+
       std::string line;
       std::getline(is, line);
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
-      std::cout << "Line is " << line << std::endl;
       // First line should be header
       while(line.find("[Normalization]", 0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -261,11 +248,9 @@ namespace panacea {
           PANACEA_FAIL(error_msg);
         }
         std::getline(is, line);
-      std::cout << "Line is " << line << std::endl;
       }
       is >> normalizer.norm_option_;
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
       int rows;
       try {
         is >> rows;
@@ -276,7 +261,6 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
       while(line.find("[Normalization Coefficients]", 0) == std::string::npos) {
         if( is.peek() == EOF ) {
           std::string error_msg = "Missing [Normalization Coefficients] tag while reading";
@@ -299,7 +283,6 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
     }
     return io::ReadInstantiateVector();
   }
@@ -316,16 +299,11 @@ namespace panacea {
   std::istream& operator>>(std::istream& is, NormalizerOption & norm_opt) {
     std::string line;
     std::getline(is,line);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Reading in line " << line << std::endl;
     if( line.find("Strict", 0) != std::string::npos ) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       norm_opt = NormalizerOption::Strict;
     }else if( line.find("Flexible", 0) != std::string::npos ) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       norm_opt = NormalizerOption::Flexible;
     } else {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::string error_msg = "Unrecognized normalization option while reading istream.\n";
       error_msg += "Accepted normalization option settings are:\n";
       error_msg += "Strict\nFlexible\n";
@@ -333,7 +311,6 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return is;
   }
 }

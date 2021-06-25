@@ -159,10 +159,6 @@ namespace panacea {
       std::string error_msg = "Normalization Method is not supported.";
       PANACEA_FAIL(error_msg);
     }
-
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Norm method is " << std::endl;
-    std::cout << norm_method << std::endl;
     return normalization_methods_[norm_method];
   }
 }

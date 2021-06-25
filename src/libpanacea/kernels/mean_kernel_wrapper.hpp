@@ -100,27 +100,23 @@ namespace panacea {
 
     if( std::type_index(data.type()) ==
         std::type_index(typeid(const BaseDescriptorWrapper *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MeanKernelWrapper>(
           key, *std::any_cast<const BaseDescriptorWrapper *>(data));
 
     } else if(std::type_index(data.type()) ==
         std::type_index(typeid(BaseDescriptorWrapper *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MeanKernelWrapper>(key,
           const_cast<const BaseDescriptorWrapper &>(
             *std::any_cast<BaseDescriptorWrapper *>(data)));
 
     } else if(std::type_index(data.type()) ==
         std::type_index(typeid(BaseDescriptorWrapper &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MeanKernelWrapper>(key,
           const_cast<const BaseDescriptorWrapper &>(
             std::any_cast<BaseDescriptorWrapper &>(data)));
 
     } else if(std::type_index(data.type()) ==
         std::type_index(typeid(const BaseDescriptorWrapper &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MeanKernelWrapper>(key,
             std::any_cast<const BaseDescriptorWrapper &>(data));
 

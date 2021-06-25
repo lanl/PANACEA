@@ -309,7 +309,7 @@ namespace panacea {
     io::ReadInstantiateVector nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      
+
       std::string line = "";
 
       std::getline(is, line);
@@ -346,7 +346,6 @@ namespace panacea {
       if( cov_mat.mean_.get() == nullptr ) {
         cov_mat.mean_ = createVector(0);
       }
-      std::cout << "Uncorrelated Covariance read in matrix added" << std::endl;
       nested_objs.emplace_back(cov_mat.matrix_.get(), std::nullopt);
       nested_objs.emplace_back(cov_mat.mean_.get(),std::nullopt);
     }

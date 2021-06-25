@@ -16,10 +16,6 @@ namespace panacea {
         Inverter::invert(const ReducedCovariance & reduced_cov) const {
           auto inv_matrix = pseudoInverse(reduced_cov.get(PassKey<Inverter>()));
 
-          inv_matrix->print();
-
-          std::cout << __FILE__ << ":" << __LINE__<< std::endl;
-
           ReducedInvCovariance reduced_inv_cov(
               PassKey<Inverter>(),
               std::move(inv_matrix),

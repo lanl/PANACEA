@@ -59,9 +59,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
     assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if (prim_settings == settings::EquationSetting::IgnoreExpAndPrefactor) {
-      std::cout << "Ignoring returning 1.0" << std::endl;
       return 1.0;
     }
 
@@ -76,7 +74,6 @@ namespace panacea {
     diff.reserve(red_ndim);
     int index = 0;
     for ( const int dim : chosen_dims ) {
-      std::cout << "dim " << dim << " norm_coeffs.size " << norm_coeffs.size() << std::endl;
       diff.push_back((descs(descriptor_ind, dim) -
           kerns.at(kernel_index_,dim)) / norm_coeffs.at(dim));
     }
@@ -95,12 +92,10 @@ namespace panacea {
     for(int i=0; i<red_ndim; ++i) {
       VxMxV += diff.at(i) * MxV.at(i);
     }
-    std::cout << "VxMxV " << VxMxV << std::endl;
     double result = pre_factor_*std::exp(-0.5 * VxMxV );
     if( result == 0.0 ) {
       return std::numeric_limits<double>::min();
     }
-    std::cout << "Result is " << result << std::endl;
     return result;
   }
 
@@ -130,26 +125,20 @@ namespace panacea {
     const double exp_term = compute(descriptors, descriptor_ind, prim_settings);
 
     std::vector diff(ndim, 0.0);
-    std::cout << "exponential term " << exp_term << std::endl;
-    std::cout << "Correlated Gaussian Diff" << std::endl;
     for ( const int dim : chosen_dims ) {
       // ( a_i * (d_x_i - d_mu_i) )
       diff.at(dim) = ((descs(descriptor_ind,dim) -
           kerns.at(kernel_index_,dim))) / norm_coeffs.at(dim);
-      std::cout << diff.at(dim) << " ";
     }
-    std::cout << std::endl;
 
     std::vector<double> grad(ndim,0.0);
 
     int index1 = 0;
-    std::cout << "norm coef   red_inv_cov  grad " << std::endl;
     for ( const int dim : chosen_dims ) {
       int index2 = 0;
       for ( const int dim2 : chosen_dims ) {
         grad.at(dim) += exp_term * diff.at(dim2) * red_inv_cov(index1, index2) * 1.0/ norm_coeffs.at(dim);
 
-        std::cout <<  red_inv_cov(index1,index2) << " " << grad.at(dim) << std::endl;
         ++index2;
       }
       ++index1;

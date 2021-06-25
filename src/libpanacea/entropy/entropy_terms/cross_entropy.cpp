@@ -81,10 +81,6 @@ namespace panacea {
 
       std::vector<double> inv_distribution;
       inv_distribution.reserve(descriptor_wrapper.getNumberPoints());
-      std::cout << std::endl;
-      std::cout << "Calling inverse" << std::endl;
-      std::cout << std::endl;
-      std::cout << std::endl;
       for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper.getNumberPoints(); ++desc_ind2 ){
 
         /***
@@ -98,12 +94,6 @@ namespace panacea {
 
       }
 
-      std::cout << "Number of points " << descriptor_wrapper.getNumberPoints() << std::endl;
-      std::cout << "Inverse distribution should be 1" << std::endl;
-      for( auto & inv_val : inv_distribution ) {
-        std::cout << inv_val << " ";
-      }
-      std::cout << std::endl;
       // Compute the gradiant with respect to the Descriptors
       //std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
 
