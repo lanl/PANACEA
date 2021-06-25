@@ -38,7 +38,7 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
     PrimitiveFactory prim_factory;
 
     auto prim_grp = prim_factory.createGroup(
-        dwrapper.get(),
+        *dwrapper,
         specification);
 
     // Check that the specifications are equivalent
@@ -67,7 +67,7 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
     PrimitiveFactory prim_factory;
 
     auto prim_grp = prim_factory.createGroup(
-        dwrapper.get(),
+        *dwrapper,
         specification);
 
     // Check that the specifications are equivalent
@@ -96,7 +96,7 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
     PrimitiveFactory prim_factory;
 
     auto prim_grp = prim_factory.createGroup(
-        dwrapper.get(),
+        *dwrapper,
         specification);
 
     // Check that the specifications are equivalent
@@ -213,7 +213,7 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         specification);
 
     // Fill in shell
-    prim_grp.initialize(dwrapper.get());
+    prim_grp.initialize(*dwrapper);
 
     REQUIRE(prim_grp.primitives.size() == 2);
     REQUIRE(prim_grp.kernel_wrapper != nullptr);
@@ -243,7 +243,7 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         specification);
 
     // Fill in shell
-    prim_grp.initialize(dwrapper.get());
+    prim_grp.initialize(*dwrapper);
 
     REQUIRE(prim_grp.primitives.size() == 2);
     REQUIRE(prim_grp.kernel_wrapper != nullptr);
@@ -274,7 +274,7 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         specification);
 
     // Fill in shell
-    prim_grp.initialize(dwrapper.get());
+    prim_grp.initialize(*dwrapper);
 
     REQUIRE(prim_grp.primitives.size() == 2);
     REQUIRE(prim_grp.kernel_wrapper != nullptr);

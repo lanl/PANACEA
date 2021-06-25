@@ -22,14 +22,14 @@ namespace panacea {
 
   namespace {
 
-    static std::vector<int> findStackedDimensions(const BaseDescriptorWrapper * desc_wrapper) {
+    static std::vector<int> findStackedDimensions(const BaseDescriptorWrapper & desc_wrapper) {
 
       std::vector<int> stacked_dims;
-      for( int dim = 0; dim < desc_wrapper->getNumberDimensions(); ++dim ) {
-        const double init_pt_val = desc_wrapper->operator()(0,dim);
+      for( int dim = 0; dim < desc_wrapper.getNumberDimensions(); ++dim ) {
+        const double init_pt_val = desc_wrapper(0,dim);
         double diff = 0.0;
-        for( int pt = 1; pt < desc_wrapper->getNumberPoints(); ++pt ) {
-          diff += init_pt_val -  desc_wrapper->operator()(pt,dim);
+        for( int pt = 1; pt < desc_wrapper.getNumberPoints(); ++pt ) {
+          diff += init_pt_val -  desc_wrapper(pt,dim);
         }
         // if the diff in any of the dimensions is 0.0 it is problematic for counting
         // the variance in that dimension, because all the points in that dimension are
@@ -84,7 +84,7 @@ namespace panacea {
      * off diagonal normalization coefficients of the covariance matrix.
      **/
     std::vector<double> normalization_method_variance(
-        const BaseDescriptorWrapper * desc_wrapper,
+        const BaseDescriptorWrapper & desc_wrapper,
         std::any extra_args){
 
       if(extra_args.type() != typeid(settings::None) &&
@@ -102,12 +102,12 @@ namespace panacea {
         if(stacked_dims.size() != 0) {
           assert(printDataQualityMessage1());
         }
-        if(desc_wrapper->rows() == 1) {
+        if(desc_wrapper.rows() == 1) {
           assert(printDataQualityMessage2());
-          return std::vector<double>(desc_wrapper->getNumberDimensions(), 1.0);
+          return std::vector<double>(desc_wrapper.getNumberDimensions(), 1.0);
         }
         Variance variance;
-        auto vec_variance = variance.calculate<const BaseDescriptorWrapper *>(desc_wrapper);
+        auto vec_variance = variance.calculate<const BaseDescriptorWrapper &>(desc_wrapper);
         for( const auto & dim : stacked_dims ) {
           vec_variance.at(dim) = 1.0;
         }
@@ -121,10 +121,10 @@ namespace panacea {
 
       Covariance * cov = std::any_cast<Covariance *>(extra_args);
       assert(cov != nullptr);
-      assert(cov->rows() == desc_wrapper->getNumberDimensions() );
+      assert(cov->rows() == desc_wrapper.getNumberDimensions() );
       assert(cov->getNormalizationState() == NormalizationState::Unnormalized);
       std::vector<double> cov_diagonal;
-      cov_diagonal.reserve(desc_wrapper->getNumberDimensions());
+      cov_diagonal.reserve(desc_wrapper.getNumberDimensions());
       for( int row = 0; row < cov->rows(); ++row) {
         assert(cov->operator()(row,row)>0.0);
         cov_diagonal.emplace_back(std::sqrt(cov->operator()(row,row)));
@@ -133,10 +133,10 @@ namespace panacea {
     }
 
     std::vector<double> normalization_method_none(
-        const BaseDescriptorWrapper * desc_wrapper,
+        const BaseDescriptorWrapper & desc_wrapper,
         std::any){
 
-      std::vector<double> coeffs(desc_wrapper->getNumberDimensions(), 1.0);
+      std::vector<double> coeffs(desc_wrapper.getNumberDimensions(), 1.0);
       return coeffs;
     }
   }

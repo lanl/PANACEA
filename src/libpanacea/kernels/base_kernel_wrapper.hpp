@@ -29,8 +29,8 @@ namespace panacea {
    */
   class BaseKernelWrapper  {
     public:
-      typedef std::istream & (*ReadFunction)(BaseKernelWrapper *, std::istream & is);
-      typedef std::ostream & (*WriteFunction)(BaseKernelWrapper *, std::ostream & os);
+      typedef std::istream & (*ReadFunction)(BaseKernelWrapper &, std::istream & is);
+      typedef std::ostream & (*WriteFunction)(const BaseKernelWrapper &, std::ostream & os);
 
     private:
 
@@ -38,7 +38,7 @@ namespace panacea {
        * Used to read and write kernel derived class specific meta data
        **/
       virtual BaseKernelWrapper::ReadFunction getReadFunction_() = 0;
-      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() = 0;
+      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() const = 0;
 
     public:
 
@@ -79,7 +79,7 @@ namespace panacea {
        * The BaseDescriptorWrapper used to update the kernel must have the same number of
        * dimensions as the descriptor wrapper that was used to initialize the kernel.
        **/
-      virtual void update(const BaseDescriptorWrapper *) = 0;
+      virtual void update(const BaseDescriptorWrapper &) = 0;
 
       virtual const std::any getPointerToRawData() const noexcept = 0;
       virtual std::type_index getTypeIndex() const noexcept = 0;

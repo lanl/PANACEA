@@ -52,31 +52,31 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
   EntropyFactory entropy_factory;
 
   auto entropy_term = entropy_factory.create(
-      &dwrapper_init,
+      dwrapper_init,
       settings);
 
   std::cout << "Entropy type " << entropy_term->type() << std::endl;
 
   WHEN("Testing Numerical Decorator") {
-    double val1 = entropy_term->compute(&dwrapper_init, settings);
+    double val1 = entropy_term->compute(dwrapper_init, settings);
     std::cout << "Self entropy is " << val1 << " at initial positions." << std::endl;
 
     data.at(0).at(0) = 1.5;
-    double val2 = entropy_term->compute(&dwrapper_init, settings);
+    double val2 = entropy_term->compute(dwrapper_init, settings);
     std::cout << "Self entropy should decrease when descriptors moved closer to each other " << val2 << std::endl;
 
     REQUIRE( val2 < val1 );
 
-    auto analy_grad = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    auto analy_grad = entropy_term->compute_grad(dwrapper_init,0, settings);
     std::cout << "Analytical self entropy grad of first descriptor " << analy_grad.at(0) << std::endl;
-    auto analy_grad2 = entropy_term->compute_grad(&dwrapper_init,1, settings);
+    auto analy_grad2 = entropy_term->compute_grad(dwrapper_init,1, settings);
     std::cout << "Analytical self entropy grad of second descriptor " << analy_grad2.at(0) << std::endl;
 
     entropy_term = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
-    auto numer_grad = entropy_term->compute_grad(&dwrapper_init, 0, settings);
+    auto numer_grad = entropy_term->compute_grad(dwrapper_init, 0, settings);
     std::cout << "Numerical self entropy grad of first descriptor " << numer_grad.at(0) << std::endl;
-    auto numer_grad2 = entropy_term->compute_grad(&dwrapper_init, 1, settings);
+    auto numer_grad2 = entropy_term->compute_grad(dwrapper_init, 1, settings);
     std::cout << "Numerical self entropy grad of second descriptor " << numer_grad2.at(0) << std::endl;
 
     REQUIRE( numer_grad.at(0) == Approx(analy_grad.at(0)));
@@ -84,13 +84,13 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
   }
   WHEN("Testing Numerical Decorator with Weighting Decorator") {
 
-    double val1 = entropy_term->compute(&dwrapper_init, settings);
-    auto grad1 = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    double val1 = entropy_term->compute(dwrapper_init, settings);
+    auto grad1 = entropy_term->compute_grad(dwrapper_init,0, settings);
 
     // Just flip the sign
     entropy_term = std::make_unique<Weight>(std::move(entropy_term),-1.0);
-    double val2 = entropy_term->compute(&dwrapper_init, settings);
-    auto grad2 = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    double val2 = entropy_term->compute(dwrapper_init, settings);
+    auto grad2 = entropy_term->compute_grad(dwrapper_init,0, settings);
 
     REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
     REQUIRE(val1 != Approx(val2));
@@ -127,29 +127,29 @@ TEST_CASE("Testing:self entropy with Array Data2","[unit,panacea]"){
   EntropyFactory entropy_factory;
 
   auto entropy_term = entropy_factory.create(
-      &dwrapper_init,
+      dwrapper_init,
       settings);
 
   WHEN("Testing Numerical Decorator") {
-    double val1 = entropy_term->compute(&dwrapper_init, settings);
+    double val1 = entropy_term->compute(dwrapper_init, settings);
     std::cout << "Self entropy is " << val1 << " at initial positions." << std::endl;
 
     arr.data[0][0] = 1.5;
-    double val2 = entropy_term->compute(&dwrapper_init, settings);
+    double val2 = entropy_term->compute(dwrapper_init, settings);
     std::cout << "Self entropy should decrease when descriptors moved closer to each other " << val2 << std::endl;
 
     REQUIRE( val2 < val1 );
 
-    auto analy_grad = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    auto analy_grad = entropy_term->compute_grad(dwrapper_init,0, settings);
     std::cout << "Analytical self entropy grad of first descriptor " << analy_grad.at(0) << std::endl;
-    auto analy_grad2 = entropy_term->compute_grad(&dwrapper_init,1, settings);
+    auto analy_grad2 = entropy_term->compute_grad(dwrapper_init,1, settings);
     std::cout << "Analytical self entropy grad of second descriptor " << analy_grad2.at(0) << std::endl;
 
     entropy_term = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
-    auto numer_grad = entropy_term->compute_grad(&dwrapper_init, 0, settings);
+    auto numer_grad = entropy_term->compute_grad(dwrapper_init, 0, settings);
     std::cout << "Numerical self entropy grad of first descriptor " << numer_grad.at(0) << std::endl;
-    auto numer_grad2 = entropy_term->compute_grad(&dwrapper_init, 1, settings);
+    auto numer_grad2 = entropy_term->compute_grad(dwrapper_init, 1, settings);
     std::cout << "Numerical self entropy grad of second descriptor " << numer_grad2.at(0) << std::endl;
 
     REQUIRE( numer_grad.at(0) == Approx(analy_grad.at(0)));
@@ -157,13 +157,13 @@ TEST_CASE("Testing:self entropy with Array Data2","[unit,panacea]"){
   }
   WHEN("Testing Numerical Decorator with Weighting Decorator") {
 
-    double val1 = entropy_term->compute(&dwrapper_init, settings);
-    auto grad1 = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    double val1 = entropy_term->compute(dwrapper_init, settings);
+    auto grad1 = entropy_term->compute_grad(dwrapper_init,0, settings);
 
     // Just flip the sign
     entropy_term = std::make_unique<Weight>(std::move(entropy_term),-1.0);
-    double val2 = entropy_term->compute(&dwrapper_init, settings);
-    auto grad2 = entropy_term->compute_grad(&dwrapper_init,0, settings);
+    double val2 = entropy_term->compute(dwrapper_init, settings);
+    auto grad2 = entropy_term->compute_grad(dwrapper_init,0, settings);
 
     REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
     REQUIRE(val1 != Approx(val2));

@@ -29,7 +29,7 @@ namespace panacea {
     public:
       virtual ~Vector() {};
       virtual const VectorType type() const = 0;
-      virtual Vector& operator=(const Vector * vec) = 0;
+      virtual Vector& operator=(const Vector & vec) = 0;
       virtual double& operator()(const int row) = 0;
       virtual double operator()(const int row) const = 0;
 

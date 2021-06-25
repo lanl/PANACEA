@@ -35,7 +35,7 @@ namespace panacea {
        * Computes the density
        */
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int sample_ind,
           const settings::EquationSetting & prim_settings = settings::EquationSetting::None
           ) const = 0;
@@ -49,7 +49,7 @@ namespace panacea {
        * either be the descriptor or the kernel otherwise the gradient is 0.0)
        */
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptors,
+          const BaseDescriptorWrapper & descriptors,
           const int descriptor_ind,
           const settings::EquationSetting & prim_settings,
           const settings::GradSetting & grad_setting) const = 0;

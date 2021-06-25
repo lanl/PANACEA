@@ -30,11 +30,10 @@ namespace panacea {
     vector_->resize(size);
   }
 
-  VectorEigen& VectorEigen::operator=(const Vector * vec) {
-    assert(vec!=nullptr);
-    this->resize(vec->rows());
-    for(int row = 0; row < vec->rows(); ++row) {
-      this->operator()(row) = vec->operator()(row);
+  VectorEigen& VectorEigen::operator=(const Vector & vec) {
+    this->resize(vec.rows());
+    for(int row = 0; row < vec.rows(); ++row) {
+      this->operator()(row) = vec(row);
     }
     return *this;
   }

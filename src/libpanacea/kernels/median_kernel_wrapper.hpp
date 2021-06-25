@@ -47,12 +47,12 @@ namespace panacea {
       int number_pts_median_; // Number of points used to calculate the median
 
       virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
-      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
+      virtual BaseKernelWrapper::WriteFunction getWriteFunction_() const final;
 
       /**
        * Private constructors
        **/
-      explicit MedianKernelWrapper(const BaseDescriptorWrapper * desc_wrapper);
+      explicit MedianKernelWrapper(const BaseDescriptorWrapper & desc_wrapper);
       explicit MedianKernelWrapper(const std::vector<double> &);
 
     public:
@@ -62,12 +62,12 @@ namespace panacea {
 
       MedianKernelWrapper(
           const PassKey<KernelWrapperFactory> &,
-          const BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper & desc_wrapper
           ) : MedianKernelWrapper(desc_wrapper) {};
 
       MedianKernelWrapper(
           const PassKey<test::Test> &,
-          const BaseDescriptorWrapper * desc_wrapper
+          const BaseDescriptorWrapper & desc_wrapper
           ) : MedianKernelWrapper(desc_wrapper) {};
 
       /**
@@ -95,7 +95,7 @@ namespace panacea {
       virtual int getNumberPoints() const final;
       virtual const Arrangement & arrangement() const noexcept final;
       virtual void set(const Arrangement arrangement) final;
-      virtual void update(const BaseDescriptorWrapper *) final;
+      virtual void update(const BaseDescriptorWrapper &) final;
       virtual const std::any getPointerToRawData() const noexcept final;
       virtual std::type_index getTypeIndex() const noexcept final;
       virtual void print() const final;
@@ -108,8 +108,8 @@ namespace panacea {
           const int cols);
 
 
-      static std::istream & read(BaseKernelWrapper *, std::istream &);
-      static std::ostream & write(BaseKernelWrapper *, std::ostream &);
+      static std::istream & read(BaseKernelWrapper &, std::istream &);
+      static std::ostream & write(const BaseKernelWrapper &, std::ostream &);
   };
 
   inline std::unique_ptr<BaseKernelWrapper> MedianKernelWrapper::create(
@@ -119,23 +119,43 @@ namespace panacea {
       const int cols) {
 
 
-    if( std::type_index(data.type()) == std::type_index(typeid(const BaseDescriptorWrapper *))) {
+    if( std::type_index(data.type()) == 
+        std::type_index(typeid(const BaseDescriptorWrapper *))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const BaseDescriptorWrapper *>(data));
+      return std::make_unique<MedianKernelWrapper>(
+          key, *std::any_cast<const BaseDescriptorWrapper *>(data));
 
-    } else if(std::type_index(data.type()) == std::type_index(typeid(BaseDescriptorWrapper *))) {
+    } else if(std::type_index(data.type()) ==
+        std::type_index(typeid(BaseDescriptorWrapper *))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<MedianKernelWrapper>(key,
-          const_cast<const BaseDescriptorWrapper *>(
+          *const_cast<const BaseDescriptorWrapper *>(
             std::any_cast<BaseDescriptorWrapper *>(data)));
 
-    } else if( std::type_index(data.type()) == std::type_index(typeid(const std::vector<double>))) {
+    }else if( std::type_index(data.type()) ==
+        std::type_index(typeid(const BaseDescriptorWrapper &))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<const std::vector<double>>(data));
+      return std::make_unique<MedianKernelWrapper>(
+          key, std::any_cast<const BaseDescriptorWrapper &>(data));
 
-    } else if( std::type_index(data.type()) == std::type_index(typeid(std::vector<double>))) {
+    } else if(std::type_index(data.type()) ==
+        std::type_index(typeid(BaseDescriptorWrapper &))) {
       std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      return std::make_unique<MedianKernelWrapper>(key, std::any_cast<std::vector<double>>(data));
+      return std::make_unique<MedianKernelWrapper>(key,
+          const_cast<const BaseDescriptorWrapper &>(
+            std::any_cast<BaseDescriptorWrapper &>(data)));
+
+    } else if( std::type_index(data.type()) ==
+        std::type_index(typeid(const std::vector<double>))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(
+          key, std::any_cast<const std::vector<double>>(data));
+
+    } else if( std::type_index(data.type()) ==
+        std::type_index(typeid(std::vector<double>))) {
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      return std::make_unique<MedianKernelWrapper>(
+          key, std::any_cast<std::vector<double>>(data));
 
     } else{
       std::string error_msg = "Unsupported data type encountered while ";

@@ -57,7 +57,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
   WHEN("Testing Numerical Decorator centered over kernel") {
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
-        &dwrapper_init,
+        dwrapper_init,
         settings);
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
@@ -69,23 +69,23 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample_max(&data_sample_max, 1, 2);
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    double val1 = entropy_term->compute(&dwrapper_sample_max, settings);
+    double val1 = entropy_term->compute(dwrapper_sample_max, settings);
     std::cout << "Cross entropy is " << val1 << " at what should be the center of the cross entropy term." << std::endl;
 
     data_sample_max.at(0).at(0) = 2.8;
-    double val2 = entropy_term->compute(&dwrapper_sample_max, settings);
+    double val2 = entropy_term->compute(dwrapper_sample_max, settings);
     std::cout << "Cross entropy should increase when descriptors move away from the center of the cross entropy term: " << val2 << std::endl;
 
     REQUIRE( val2 > val1 );
 
     // Recenter the sample data point
     data_sample_max.at(0).at(0) = 3.0;
-    auto analy_grad = entropy_term->compute_grad(&dwrapper_sample_max,0, settings);
+    auto analy_grad = entropy_term->compute_grad(dwrapper_sample_max,0, settings);
     std::cout << "Analytical cross entropy grad of sample point should be located at the kernel center should be 0.0 it is: " << analy_grad.at(0) << std::endl;
 
     auto entropy_term_numer = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
-    auto numer_grad = entropy_term_numer->compute_grad(&dwrapper_sample_max, 0, settings);
+    auto numer_grad = entropy_term_numer->compute_grad(dwrapper_sample_max, 0, settings);
     std::cout << "Numerical cross entropy grad of sample point located at the kernel center is: " << numer_grad.at(0) << std::endl;
 
     REQUIRE( numer_grad.at(0) == Approx(analy_grad.at(0)));
@@ -98,7 +98,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
 
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(
-        &dwrapper_init,
+        dwrapper_init,
         settings);
 
     REQUIRE(entropy_term != nullptr);
@@ -107,7 +107,7 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     {2.8, 5.0}};
     DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample_max(&data_sample_max, 1, 2);
 
-    auto analy_grad = entropy_term->compute_grad(&dwrapper_sample_max,0, settings);
+    auto analy_grad = entropy_term->compute_grad(dwrapper_sample_max,0, settings);
     std::cout << "Analytical cross entropy grad of sample point should to the side of the kernel center should be negative: " << analy_grad.at(0) << std::endl;
 
     /*auto entropy_term_numer2 = std::make_unique<NumericalGrad>(std::move(entropy_term));

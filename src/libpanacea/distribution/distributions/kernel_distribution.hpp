@@ -42,17 +42,17 @@ namespace panacea {
       double pre_factor_;
 
       virtual Distribution::ReadFunction getReadFunction_() final;
-      virtual Distribution::WriteFunction getWriteFunction_() final;
+      virtual Distribution::WriteFunction getWriteFunction_() const final;
 
       double compute_(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const settings::EquationSetting & equation_settings
           );
 
     public:
       KernelDistribution(const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const KernelSpecification & settings);
 
       /**
@@ -65,7 +65,7 @@ namespace panacea {
       virtual settings::DistributionType type() const noexcept final;
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const DistributionSettings & distribution_settings
           ) final;
@@ -74,7 +74,7 @@ namespace panacea {
        * Keep in mind the default grad_setting is inherited from distribution base class.
        **/
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const int grad_ind,
           const DistributionSettings & distribution_settings,
@@ -85,13 +85,13 @@ namespace panacea {
       /**
        * Will update the underlying data groups and ensure the prefactor is up to date.
        **/
-      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) final;
+      virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) final;
 
-      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) final;
+      virtual void initialize(const BaseDescriptorWrapper & descriptor_wrapper) final;
 
       static std::unique_ptr<Distribution> create(
           const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const DistributionSettings & settings);
 
       static std::unique_ptr<Distribution> create(
@@ -101,18 +101,18 @@ namespace panacea {
       static std::vector<std::any> write(
           const settings::FileType file_type,
           std::ostream &,
-          Distribution *);
+          const Distribution &);
 
       static io::ReadInstantiateVector read(
           const settings::FileType file_type,
           std::istream &,
-          Distribution *);
+          Distribution &);
 
   };
 
   inline std::unique_ptr<Distribution> KernelDistribution::create(
       const PassKey<DistributionFactory> & key,
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const DistributionSettings & settings) {
 
     assert(settings.type() == settings::DistributionType::Kernel);

@@ -35,7 +35,7 @@ namespace panacea {
         chosen_dimension_indices_(chosen_dimension_indices),
         normalized_(normalized) {};
 
-      const Matrix * get(PassKey<Inverter>) const;
+      const Matrix & get(PassKey<Inverter>) const;
 
       ReducedCovariance() = delete;
 

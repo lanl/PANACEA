@@ -24,7 +24,7 @@ namespace panacea {
     public:
       using DistributionCreateMethod = std::unique_ptr<Distribution>(*)(
         const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const DistributionSettings & dist_settings);
 
       using DistributionCreateShellMethod = std::unique_ptr<Distribution>(*)(
@@ -58,7 +58,7 @@ namespace panacea {
         }
 
       std::unique_ptr<Distribution> create(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const DistributionSettings & settings) const;
 
       /**

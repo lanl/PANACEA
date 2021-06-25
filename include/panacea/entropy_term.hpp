@@ -22,12 +22,12 @@ namespace panacea {
       typedef io::ReadInstantiateVector (*ReadFunction)(
           const settings::FileType file_type,
           std::istream &,
-          EntropyTerm *);
+          EntropyTerm &);
 
       typedef std::vector<std::any> (*WriteFunction)(
           const settings::FileType file_type,
           std::ostream &,
-          EntropyTerm *);
+          const EntropyTerm &);
 
     protected:
       const PassKey<EntropyTerm> key;
@@ -37,7 +37,7 @@ namespace panacea {
        * These are auxillary methods used internally and are not meant to be accessible
        **/
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) = 0;
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) = 0;
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const = 0;
 
       /**
        * Entropy type:
@@ -50,7 +50,7 @@ namespace panacea {
        * Computes entropy if all points are used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & entropy_settings
           ) = 0;
 
@@ -58,7 +58,7 @@ namespace panacea {
        * Computes the entropy if a single point is used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings
           ) = 0;
@@ -67,7 +67,7 @@ namespace panacea {
        * Computes entropy if all points are used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const PANACEASettings & panacea_settings
           ) = 0;
 
@@ -75,7 +75,7 @@ namespace panacea {
        * Computes the entropy if a single point is used to sample the entropy
        **/
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings
           ) = 0;
@@ -87,12 +87,12 @@ namespace panacea {
        * The vector returned contains the gradiant in each dimension.
        **/
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) = 0;
 
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings) = 0;
 
@@ -115,7 +115,7 @@ namespace panacea {
        * lead to uniqueness or similarity in configurations depending on whether the
        * entropy term is to be maximized of minimized.
        **/
-      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+      virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) = 0;
 
       /**
        * Initialize internal members.
@@ -124,7 +124,7 @@ namespace panacea {
        * to changing values already stored in them. With update the internal datastructures
        * should already exist in memory, initialize will allocate memory on the heap if needed.
        **/
-      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) = 0;
+      virtual void initialize(const BaseDescriptorWrapper & descriptor_wrapper) = 0;
 
       /**
        * Some method to combine entropy terms, such that the covariance matrices are updated.
@@ -143,12 +143,12 @@ namespace panacea {
       static std::vector<std::any> write(
           const settings::FileType file_type,
           std::ostream &,
-          std::any dwrapper_instance);
+          std::any entropy_instance);
 
       static io::ReadInstantiateVector read(
           const settings::FileType file_type,
           std::istream &,
-          std::any dwrapper_instance);
+          std::any entropy_instance);
 
   };
 }

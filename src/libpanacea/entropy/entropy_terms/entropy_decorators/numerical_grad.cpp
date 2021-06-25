@@ -11,7 +11,7 @@
 namespace panacea {
 
   std::vector<double> NumericalGrad::compute_grad(
-      const BaseDescriptorWrapper * const_descriptor_wrapper,
+      const BaseDescriptorWrapper & const_descriptor_wrapper,
       const int wrt_pt,
       const EntropySettings & entropy_settings) {
 
@@ -27,7 +27,7 @@ namespace panacea {
        * Though we are making changes to the descriptor wrapper within this
        * method, it is being returned to it's original state before returning.
        **/
-      auto descriptor_wrapper = const_cast<BaseDescriptorWrapper *>(const_descriptor_wrapper);
+      BaseDescriptorWrapper & descriptor_wrapper = const_cast<BaseDescriptorWrapper &>(const_descriptor_wrapper);
 
       const int ndim = getDimensions().size();
       std::vector<double> grad(ndim,0.0);
@@ -35,20 +35,20 @@ namespace panacea {
       // Cycle through dimensions
       for( const int & dim : getDimensions() ){
         assert(dim < ndim);
-        const double orig_x_val = descriptor_wrapper->operator()(wrt_pt,dim);
+        const double orig_x_val = descriptor_wrapper(wrt_pt,dim);
         const double diff = orig_x_val*inc_ratio_;
         // Change in this dimention
         const std::vector<double> new_x_vals = {orig_x_val-diff, orig_x_val+diff};
 
         // Temporarily alter the input value
         std::vector<double> new_y_vals(2,0.0);
-        descriptor_wrapper->operator()(wrt_pt, dim) = new_x_vals.at(0);
+        descriptor_wrapper(wrt_pt, dim) = new_x_vals.at(0);
         new_y_vals.at(0) += EntropyDecorator::compute(descriptor_wrapper,entropy_settings);
-        descriptor_wrapper->operator()(wrt_pt, dim) = new_x_vals.at(1);
+        descriptor_wrapper(wrt_pt, dim) = new_x_vals.at(1);
         new_y_vals.at(1) += EntropyDecorator::compute(descriptor_wrapper,entropy_settings);
         grad.at(dim) = (new_y_vals.at(1) - new_y_vals.at(0))/(2.0*diff);
         // Reset to the original value
-        descriptor_wrapper->operator()(wrt_pt,dim) = orig_x_val;
+        descriptor_wrapper(wrt_pt,dim) = orig_x_val;
       }
       return grad;
     } else {

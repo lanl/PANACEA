@@ -44,14 +44,13 @@ namespace panacea {
   }
 
   double GaussCorrelated::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings
       ) const {
 
-    assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
+    assert(descriptor_ind < descriptor_wrapper.getNumberPoints() );
     assert(attributes_.kernel_wrapper != nullptr);
     assert(kernel_index_ > -1);
     assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -66,9 +65,9 @@ namespace panacea {
       return 1.0;
     }
 
-    auto & descs  = *(descriptor_wrapper);
+    auto & descs  = (descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
-    const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
+    const std::vector<double> & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
     const auto & chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
@@ -77,6 +76,7 @@ namespace panacea {
     diff.reserve(red_ndim);
     int index = 0;
     for ( const int dim : chosen_dims ) {
+      std::cout << "dim " << dim << " norm_coeffs.size " << norm_coeffs.size() << std::endl;
       diff.push_back((descs(descriptor_ind, dim) -
           kerns.at(kernel_index_,dim)) / norm_coeffs.at(dim));
     }
@@ -105,14 +105,13 @@ namespace panacea {
   }
 
   std::vector<double> GaussCorrelated::compute_grad(
-      const BaseDescriptorWrapper * descriptors,
+      const BaseDescriptorWrapper & descriptors,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
 
-    assert(descriptors != nullptr);
     assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptors->getNumberPoints() );
+    assert(descriptor_ind < descriptors.getNumberPoints() );
     assert(attributes_.kernel_wrapper != nullptr);
     assert(kernel_index_ > -1);
     assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -121,7 +120,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
     assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
-    auto & descs  = *(descriptors);
+    auto & descs  = (descriptors);
     const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
     auto & kerns = *(attributes_.kernel_wrapper);
     const int ndim = descs.getNumberDimensions();

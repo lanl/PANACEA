@@ -44,30 +44,49 @@ namespace panacea {
   }
 
   double GaussUncorrelated::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings
       ) const {
 
-    assert(descriptor_wrapper != nullptr);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    assert(descriptor_ind < descriptor_wrapper.getNumberPoints() );
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(attributes_.kernel_wrapper != nullptr);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(kernel_index_ > -1);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(kernel_index_ < attributes_.kernel_wrapper->rows());
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(attributes_.reduced_inv_covariance != nullptr);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     if(prim_settings == settings::EquationSetting::IgnoreExpAndPrefactor){
       return 1.0;
     }
-    const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
-
-    assert(norm_coeffs.size() >=attributes_.reduced_inv_covariance->getNumberDimensions());
-
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Address is " << attributes_.normalizer << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    const std::vector<double> norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    const int num_dims = attributes_.reduced_inv_covariance->getNumberDimensions();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::cout << "Norm_coeffs size " << norm_coeffs.size() << std::endl;
-    std::cout << "Bool should be false " << (norm_coeffs.size() >=attributes_.reduced_inv_covariance->getNumberDimensions()) << std::endl;
+    std::cout << "number dims " << num_dims << std::endl;
+    std::cout << "Bool should be false " << (norm_coeffs.size() >= num_dims) << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    assert(norm_coeffs.size() >= num_dims);
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Norm_coeffs size " << norm_coeffs.size() << std::endl;
+    std::cout << "Bool should be false " << (norm_coeffs.size() >= num_dims) << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     /*std::cout << "Norm coeffs" << std::endl;
     for ( auto & val : norm_coeffs) {
@@ -80,7 +99,7 @@ namespace panacea {
     std::cout << "Chosen number of dimensions " << attributes_.reduced_inv_covariance->getChosenDimensionIndices().size() << std::endl;
     std::cout << "Differences reduced_inv_covar exponent val" << std::endl;
     for ( const int dim : attributes_.reduced_inv_covariance->getChosenDimensionIndices() ) {
-      std::cout << "part 1 " << (*descriptor_wrapper)(descriptor_ind, dim) << std::endl;
+      std::cout << "part 1 " << descriptor_wrapper(descriptor_ind, dim) << std::endl;
       std::cout << "part 2 " <<  attributes_.kernel_wrapper->at(kernel_index_,dim) << std::endl;
       std::cout << "dim is " << dim << std::endl;
       std::cout << "size " << norm_coeffs.size() << std::endl;
@@ -90,7 +109,7 @@ namespace panacea {
       std::cout << "part 4 " << attributes_.reduced_inv_covariance->operator()(index, index) << std::endl;
 
 
-      double diff = ((*descriptor_wrapper)(descriptor_ind, dim) - attributes_.kernel_wrapper->at(kernel_index_,dim)) / norm_coeffs.at(dim);
+      double diff = (descriptor_wrapper(descriptor_ind, dim) - attributes_.kernel_wrapper->at(kernel_index_,dim)) / norm_coeffs.at(dim);
       exponent += diff * diff * attributes_.reduced_inv_covariance->operator()(index, index);
 
 
@@ -110,12 +129,11 @@ namespace panacea {
   }
 
   std::vector<double> GaussUncorrelated::compute_grad(
-      const BaseDescriptorWrapper * descriptors,
+      const BaseDescriptorWrapper & descriptors,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
 
-    assert(descriptors != nullptr);
     assert(attributes_.kernel_wrapper != nullptr);
     assert(attributes_.reduced_inv_covariance != nullptr);
     assert(grad_setting != settings::GradSetting::WRTBoth && "Terms will cancel should avoid calling grad method at all");
@@ -123,7 +141,7 @@ namespace panacea {
     const auto & norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
     const double exp_term = compute(descriptors, descriptor_ind, prim_settings);
 
-    std::vector<double> grad(descriptors->getNumberDimensions(),0.0);
+    std::vector<double> grad(descriptors.getNumberDimensions(),0.0);
 
     const auto & chosen_dims = attributes_.reduced_inv_covariance->getChosenDimensionIndices();
     //const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
@@ -133,7 +151,7 @@ namespace panacea {
     std::cout << "Uncorrelated Gaussian" << std::endl;
     std::cout << "Diff    red_inv_cov   " << std::endl;
     for ( const int & dim : chosen_dims ) {
-      const double diff =  (descriptors->operator()(descriptor_ind,dim) -
+      const double diff =  (descriptors(descriptor_ind,dim) -
         attributes_.kernel_wrapper->at(kernel_index_,dim)) / (norm_coeffs.at(dim) * norm_coeffs.at(dim));
       grad.at(dim) =
         diff *

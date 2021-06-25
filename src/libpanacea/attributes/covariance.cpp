@@ -7,8 +7,8 @@
 #include "covariance/covariance_uncorrelated.hpp"
 #include "covariance/covariance_correlated.hpp"
 #include "error.hpp"
-#include "type_map.hpp"
 #include "matrix/matrix.hpp"
+#include "type_map.hpp"
 #include "vector/vector.hpp"
 
 // Local public PANACEA includes
@@ -30,28 +30,41 @@ namespace panacea {
       std::ostream & os,
       std::any cov_instance) {
 
-    std::vector<std::any> nested_objs;
+    const Covariance & cov = [&]() -> const Covariance & {
+      if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance *))){
+        return const_cast<const Covariance &>(
+            *std::any_cast<Covariance *>(cov_instance));
 
-    if( file_type == settings::FileType::TXTRestart ||
-        file_type == settings::FileType::TXTKernelDistribution ) {
-      if( std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))){
-        os << "[Covariance]\n";
-        Covariance * cov = std::any_cast<Covariance *>(cov_instance);
-        os << cov->correlation() << "\n";
-        if( cov->correlation() == settings::KernelCorrelation::Correlated ) {
-          nested_objs = CovarianceCorrelated::write(file_type, os, cov);
-        }else if( cov->correlation() == settings::KernelCorrelation::Uncorrelated ) {
-          nested_objs = CovarianceUncorrelated::write(file_type, os, cov);
-        }
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance &))){
+        return const_cast<const Covariance &>(
+            std::any_cast<Covariance &>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance *))){
+        return *std::any_cast<const Covariance *>(cov_instance);
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance &))){
+        return std::any_cast<const Covariance &>(cov_instance);
       } else {
         std::string error_msg = "Unrecognized covariance matrix type.\n";
         PANACEA_FAIL(error_msg);
       }
+      return std::any_cast<const Covariance &>(cov_instance);
+    }();
 
-    } else {
-      std::string error_msg = "Covariance matrix cannot be written to specified file type ";
-      error_msg += "not supported.";
-      PANACEA_FAIL(error_msg);
+    std::vector<std::any> nested_objs;
+    if( file_type == settings::FileType::TXTRestart ||
+        file_type == settings::FileType::TXTKernelDistribution ) {
+      os << "[Covariance]\n";
+      os << cov.correlation() << "\n";
+      if( cov.correlation() == settings::KernelCorrelation::Correlated ) {
+        nested_objs = CovarianceCorrelated::write(file_type, os, cov_instance);
+      }else if( cov.correlation() == settings::KernelCorrelation::Uncorrelated ) {
+        nested_objs = CovarianceUncorrelated::write(file_type, os, cov_instance);
+      }
     }
     return nested_objs;
   }
@@ -61,7 +74,30 @@ namespace panacea {
       std::istream & is,
       std::any cov_instance) {
 
+    Covariance & cov = [&]() -> Covariance & {
+      if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance *))){
+        return *std::any_cast<Covariance *>(cov_instance);
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance &))){
+        return std::any_cast<Covariance &>(cov_instance);
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(std::unique_ptr<Covariance> *))){
+        return *(std::any_cast<std::unique_ptr<Covariance> *>(cov_instance))->get();
+      } else {
+        std::string error_msg = "Unrecognized covariance matrix type.\n";
+        if( type_map.count(std::type_index(cov_instance.type()))){
+          error_msg += "Type identified as: ";
+          error_msg += type_map.at(std::type_index(cov_instance.type()));
+          error_msg += "\n";
+        }
+        PANACEA_FAIL(error_msg);
+      }
+      return std::any_cast<Covariance &>(cov_instance);
+    }();
+
     std::cout << __FILE__ <<":" << __LINE__ << std::endl;
+
     io::ReadInstantiateVector nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
@@ -91,42 +127,20 @@ namespace panacea {
       settings::KernelCorrelation correlation;
       is >> correlation;
 
-      std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-      Covariance * cov;
-      if( std::type_index(cov_instance.type()) ==
-          std::type_index(typeid(Covariance *))){
-
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-        cov = std::any_cast<Covariance *>(cov_instance);
-      } else if(std::type_index(cov_instance.type()) ==
-          std::type_index(typeid(std::unique_ptr<Covariance> *))) {
-        std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-        cov = (std::any_cast<std::unique_ptr<Covariance> *>(cov_instance))->get();
-      } else {
-        std::string error_msg = "Unrecognized covariance matrix.\n";
-        if(type_map.count(std::type_index(cov_instance.type()))){
-          error_msg += "Type identified as: " + type_map.at(std::type_index(cov_instance.type())) + "\n";
-        }
-        PANACEA_FAIL(error_msg);
-      }
-
-
       // Check that correlation specified in restart file is consistent with the
       // correlation of the covariance matrix passed into this function
-      if(correlation != cov->correlation()) {
+      if(correlation != cov.correlation()) {
         std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         std::string error_msg = "Correlation matrix store in memory is not ";
         error_msg += "consistent with matrix read in from restart file.";
         PANACEA_FAIL(error_msg);
       }
-
-      if( cov->correlation() == settings::KernelCorrelation::Correlated){
+      if( cov.correlation() == settings::KernelCorrelation::Correlated){
         std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-        nested_objs = CovarianceCorrelated::read(file_type, is, cov);
-      }else if( cov->correlation() == settings::KernelCorrelation::Uncorrelated){
+        nested_objs = CovarianceCorrelated::read(file_type, is, cov_instance);
+      }else if( cov.correlation() == settings::KernelCorrelation::Uncorrelated){
         std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-        nested_objs = CovarianceUncorrelated::read(file_type, is, cov);
+        nested_objs = CovarianceUncorrelated::read(file_type, is, cov_instance);
       } else {
         std::cout << __FILE__ <<":" << __LINE__ << std::endl;
         std::string error_msg = "Unrecognized covariance matrix type, ";
@@ -134,12 +148,9 @@ namespace panacea {
         error_msg += "CovarianceCorrelated *\nCovarianceUncorrelated *\n";
         PANACEA_FAIL(error_msg);
       }
-      std::cout << __FILE__ <<":" << __LINE__ << std::endl;
-    } else {
-      std::string error_msg = "Covariance matrix cannot be read from specified file type ";
-      error_msg += "not supported.";
-      PANACEA_FAIL(error_msg);
+
     }
+    
     return nested_objs;
   }
 

@@ -26,7 +26,7 @@ namespace panacea {
         EntropyDecorator(std::move(entropy_term)) {};
 
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
 

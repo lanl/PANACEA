@@ -21,9 +21,9 @@ namespace panacea {
 
   namespace {
 
-    void update_median_point_values(const BaseDescriptorWrapper * dwrapper, std::vector<std::deque<double>> & pts_near_median ){
-      const int num_pts = dwrapper->getNumberPoints();
-      const int ndim = dwrapper->getNumberDimensions();
+    void update_median_point_values(const BaseDescriptorWrapper & dwrapper, std::vector<std::deque<double>> & pts_near_median ){
+      const int num_pts = dwrapper.getNumberPoints();
+      const int ndim = dwrapper.getNumberDimensions();
 
       if( pts_near_median.size() != ndim ) {
         pts_near_median.resize(ndim);
@@ -31,7 +31,7 @@ namespace panacea {
 
       for( int dim = 0; dim < ndim; ++dim) {
         for( int pt = 0; pt < num_pts; ++pt) {
-          pts_near_median.at(dim).push_back(dwrapper->operator()(pt, dim));
+          pts_near_median.at(dim).push_back(dwrapper(pt, dim));
         }
       }
 
@@ -82,24 +82,24 @@ namespace panacea {
     return MedianKernelWrapper::read;
   }
 
-  BaseKernelWrapper::WriteFunction MedianKernelWrapper::getWriteFunction_() {
+  BaseKernelWrapper::WriteFunction MedianKernelWrapper::getWriteFunction_() const {
     return MedianKernelWrapper::write;
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
-      const BaseDescriptorWrapper * dwrapper
+      const BaseDescriptorWrapper & dwrapper
       ) {
 
     Median median;
     auto center_ = median.calculate<
-      const BaseDescriptorWrapper *,
+      const BaseDescriptorWrapper &,
             Direction::AlongColumns>(dwrapper);
 
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
     update_median_point_values(dwrapper, points_near_median_);
     trim(points_near_median_, number_pts_store_, remove_from_front_);
 
-    number_pts_median_ = dwrapper->getNumberPoints();
+    number_pts_median_ = dwrapper.getNumberPoints();
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
@@ -126,7 +126,7 @@ namespace panacea {
   /*******************************************
    * Public methods
    *******************************************/
-  void MedianKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
+  void MedianKernelWrapper::update(const BaseDescriptorWrapper & dwrapper) {
 
     update_median_point_values(dwrapper, points_near_median_);
     trim(points_near_median_, number_pts_store_, remove_from_front_);
@@ -138,7 +138,7 @@ namespace panacea {
       std::vector<std::deque<double>>,Direction::AlongRows>(points_near_median_);
 
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
-    number_pts_median_ += dwrapper->getNumberPoints();
+    number_pts_median_ += dwrapper.getNumberPoints();
   }
 
   double& MedianKernelWrapper::at(const int row, const int col) {
@@ -201,9 +201,9 @@ namespace panacea {
    * Static methods
    ********************************************/
 
-  std::istream & MedianKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+  std::istream & MedianKernelWrapper::read(BaseKernelWrapper & kwrapper_instance, std::istream & is) {
 
-      MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);
+      MedianKernelWrapper & kwrapper_median = dynamic_cast<MedianKernelWrapper &>(kwrapper_instance);
       std::string line = "";
       while(line.find("[Total Number Points]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -215,7 +215,7 @@ namespace panacea {
       }
 
       try {
-        is >> kwrapper_median->number_pts_median_;
+        is >> kwrapper_median.number_pts_median_;
       } catch (...) {
         std::string error_msg = "Unable to assign total number of points to median";
         error_msg = " kernel type from file.\n";
@@ -235,7 +235,7 @@ namespace panacea {
       }
 
       try {
-        is >> kwrapper_median->number_pts_store_;
+        is >> kwrapper_median.number_pts_store_;
       } catch (...) {
         std::string error_msg = "Did not find [Number Points Tracked Near Median] value";
         error_msg += " while trying to read restart file.\n";
@@ -277,7 +277,7 @@ namespace panacea {
       }
 
      try {
-      kwrapper_median->points_near_median_.clear();
+      kwrapper_median.points_near_median_.clear();
       for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
           std::istringstream ss_data(line);
@@ -287,7 +287,7 @@ namespace panacea {
             ss_data >> value;
             data_row.push_back(value);
           }
-          kwrapper_median->points_near_median_.push_back(data_row);
+          kwrapper_median.points_near_median_.push_back(data_row);
         }
      } catch (...) {
         std::string error_msg = "Detected an error while attempting to read in points near ";
@@ -298,17 +298,17 @@ namespace panacea {
      return is;
   }
 
-  std::ostream & MedianKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
-    MedianKernelWrapper * kwrapper_median = dynamic_cast<MedianKernelWrapper *>(kwrapper_instance);
+  std::ostream & MedianKernelWrapper::write(const BaseKernelWrapper & kwrapper_instance, std::ostream & os) {
+    const MedianKernelWrapper & kwrapper_median = dynamic_cast<const MedianKernelWrapper &>(kwrapper_instance);
     os << "[Total Number Points]\n";
-    os << kwrapper_median->number_pts_median_ << "\n";
+    os << kwrapper_median.number_pts_median_ << "\n";
     os << "[Number Points Tracked Near Median]\n";
-    os << kwrapper_median->number_pts_store_ << "\n";
+    os << kwrapper_median.number_pts_store_ << "\n";
     os << "[Points Near Median]\n";
-    int rows = kwrapper_median->points_near_median_.size();
+    int rows = kwrapper_median.points_near_median_.size();
     int cols = 0;
     if( rows > 0 ) {
-      cols = kwrapper_median->points_near_median_.at(0).size();
+      cols = kwrapper_median.points_near_median_.at(0).size();
     }
     os << rows << " " << cols << "\n";
     for (int row = 0; row < rows; ++row) {
@@ -317,7 +317,7 @@ namespace panacea {
           << std::setw(14)
           << std::setprecision(8)
           << std::right
-          << kwrapper_median->points_near_median_.at(row).at(col) << " ";
+          << kwrapper_median.points_near_median_.at(row).at(col) << " ";
       }
       os << "\n";
     }

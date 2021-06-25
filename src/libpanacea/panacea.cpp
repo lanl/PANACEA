@@ -59,7 +59,7 @@ namespace panacea {
   }
 
   std::unique_ptr<EntropyTerm> PANACEA::create(
-      const BaseDescriptorWrapper * dwrapper,
+      const BaseDescriptorWrapper & dwrapper,
       const PANACEASettings & settings) const {
 
     EntropySettings entropy_settings(settings);

@@ -36,10 +36,8 @@ namespace panacea {
   }
 
   std::unique_ptr<Distribution> DistributionFactory::create(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const DistributionSettings & settings) const {
-
-    assert(descriptor_wrapper != nullptr);
 
     if(create_methods_.count(settings.type()) == 0){
       std::string error_msg = "Distribution type is not registered with the factory.";

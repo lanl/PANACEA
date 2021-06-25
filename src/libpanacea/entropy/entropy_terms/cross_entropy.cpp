@@ -27,19 +27,17 @@ namespace panacea {
     return CrossEntropy::read;
   }
 
-  EntropyTerm::WriteFunction CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) {
+  EntropyTerm::WriteFunction CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
     return CrossEntropy::write;
   }
 
   double CrossEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & entropy_settings
       ) {
 
-    assert(descriptor_wrapper != nullptr);
-
     double cross_entropy = 0.0;
-    for( int desc_pt = 0; desc_pt < descriptor_wrapper->getNumberPoints(); ++desc_pt ){
+    for( int desc_pt = 0; desc_pt < descriptor_wrapper.getNumberPoints(); ++desc_pt ){
       cross_entropy += -1.0 * log(distribution_->compute(
             descriptor_wrapper,
             desc_pt,
@@ -48,12 +46,10 @@ namespace panacea {
     return cross_entropy;
   }
 
-  double CrossEntropy::compute(const BaseDescriptorWrapper * descriptor_wrapper,
+  double CrossEntropy::compute(const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const EntropySettings & entropy_settings
       ) {
-
-    assert(descriptor_wrapper != nullptr);
 
     return -1.0 * log(distribution_->compute(
           descriptor_wrapper,
@@ -62,14 +58,14 @@ namespace panacea {
   }
 
   double CrossEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const PANACEASettings & panacea_settings
       ) {
     return compute( descriptor_wrapper, EntropySettings(panacea_settings));
   }
 
   double CrossEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings
       ) {
@@ -77,19 +73,19 @@ namespace panacea {
   }
 
   std::vector<double> CrossEntropy::compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind, // Where the gradiant is being calculated at
           const EntropySettings & entropy_settings
           ) {
 
 
       std::vector<double> inv_distribution;
-      inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
+      inv_distribution.reserve(descriptor_wrapper.getNumberPoints());
       std::cout << std::endl;
       std::cout << "Calling inverse" << std::endl;
       std::cout << std::endl;
       std::cout << std::endl;
-      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
+      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper.getNumberPoints(); ++desc_ind2 ){
 
         /***
          * Here is the problem I'm calling compute from within the gradiant method
@@ -102,7 +98,7 @@ namespace panacea {
 
       }
 
-      std::cout << "Number of points " << descriptor_wrapper->getNumberPoints() << std::endl;
+      std::cout << "Number of points " << descriptor_wrapper.getNumberPoints() << std::endl;
       std::cout << "Inverse distribution should be 1" << std::endl;
       for( auto & inv_val : inv_distribution ) {
         std::cout << inv_val << " ";
@@ -138,7 +134,7 @@ namespace panacea {
 
 
   std::vector<double> CrossEntropy::compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind, // Where the gradiant is being calculated at
           const PANACEASettings & panacea_settings
           ) {
@@ -147,7 +143,7 @@ namespace panacea {
 
   std::unique_ptr<EntropyTerm> CrossEntropy::create(
       const PassKey<EntropyFactory> & key,
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & settings) {
 
     // Create distribution
@@ -178,24 +174,29 @@ namespace panacea {
     return distribution_->getDimensions();
   }
 
-  void CrossEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
+  void CrossEntropy::update(const BaseDescriptorWrapper & descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
   }
 
-  void CrossEntropy::initialize(const BaseDescriptorWrapper * descriptor_wrapper) {
+  void CrossEntropy::initialize(const BaseDescriptorWrapper & descriptor_wrapper) {
     distribution_->initialize(descriptor_wrapper);
   }
 
   std::vector<std::any> CrossEntropy::write(
       const settings::FileType file_type,
       std::ostream & os,
-      EntropyTerm * entropy_term_instance) {
+      const EntropyTerm & entropy_term_instance) {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
-      nested_values.push_back(cross_ent->distribution_.get());
+      if( entropy_term_instance.type() == settings::EntropyType::Cross ){
+        const CrossEntropy & cross_ent = dynamic_cast<const CrossEntropy &>(
+            entropy_term_instance);
+        nested_values.push_back(cross_ent.distribution_.get());
+      } else {
+        PANACEA_FAIL("Unsupported entropy term encountered.");
+      }
     }
     return nested_values;
   }
@@ -203,13 +204,18 @@ namespace panacea {
    io::ReadInstantiateVector CrossEntropy::read(
       const settings::FileType file_type,
       std::istream & is,
-      EntropyTerm * entropy_term_instance) {
+      EntropyTerm & entropy_term_instance) {
 
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      auto cross_ent = dynamic_cast<CrossEntropy *>(entropy_term_instance);
-      nested_values.emplace_back(cross_ent->distribution_.get(), std::nullopt);
+      if( entropy_term_instance.type() == settings::EntropyType::Cross){
+        CrossEntropy & cross_ent = dynamic_cast<CrossEntropy &>(
+            entropy_term_instance);
+        nested_values.emplace_back(cross_ent.distribution_.get(), std::nullopt);
+      } else {
+        PANACEA_FAIL("Unsupported entropy term encountered.");
+      }
     }
     return nested_values;
    }

@@ -5,6 +5,9 @@
 #include "kernels/kernel_specifications.hpp"
 #include "private_settings.hpp"
 
+// Standard includes
+#include <cassert>
+
 using namespace panacea::settings;
 
 namespace panacea {

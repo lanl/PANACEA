@@ -68,7 +68,7 @@ namespace panacea {
   }
 
   std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
-      const BaseDescriptorWrapper * desc_wrapper,
+      const BaseDescriptorWrapper & desc_wrapper,
       const KernelSpecification & kern_specification) const {
 
     // Ensure valid method exists
@@ -81,7 +81,7 @@ namespace panacea {
     if( kern_specification.is(settings::KernelCount::OneToOne)){
 
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper->getTypeIndex()) == 0){
+      if( create_methods_[kern_specification.get<settings::KernelCenterCalculation>()].count(desc_wrapper.getTypeIndex()) == 0){
         std::string error_msg = "Kernel creation method is missing for the specified internal type.";
         PANACEA_FAIL(error_msg);
       }
@@ -94,15 +94,15 @@ namespace panacea {
         // This check is only appropriate if memory is shared, the desc_wrapper type
         // and pointer will likley differ in the case of non shared memory
         // because it's likely you will not have a pointer as the underlying type
-        if( desc_wrapper->getTypeIndex() != std::type_index(desc_wrapper->getPointerToRawData().type()) ) {
+        if( desc_wrapper.getTypeIndex() != std::type_index(desc_wrapper.getPointerToRawData().type()) ) {
           std::string error_msg = "Descriptor data index and pointerToRawData are not consistent";
-          if( type_map.count(desc_wrapper->getTypeIndex()) ) {
-            error_msg += "\ndesc_wrapper type is: " + type_map.at(desc_wrapper->getTypeIndex());
+          if( type_map.count(desc_wrapper.getTypeIndex()) ) {
+            error_msg += "\ndesc_wrapper type is: " + type_map.at(desc_wrapper.getTypeIndex());
             error_msg += "\n";
           }
           PANACEA_FAIL(error_msg);
         }
-        auto desc_data_type_index = desc_wrapper->getTypeIndex();
+        auto desc_data_type_index = desc_wrapper.getTypeIndex();
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         auto kern_data_type_index = desc_data_type_index;
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
@@ -119,14 +119,14 @@ namespace panacea {
           [desc_data_type_index]
           [kern_data_type_index](
             PassKey<KernelWrapperFactory>(),
-            desc_wrapper,
-            desc_wrapper->rows(),
-            desc_wrapper->cols());
+            &desc_wrapper,
+            desc_wrapper.rows(),
+            desc_wrapper.cols());
       } else { // If owned
 
         std::cout << "Not sharing data" << std::endl;
         auto kern_data_type_index = std::type_index(typeid(std::vector<std::vector<double>>));
-        auto desc_data_type_index = desc_wrapper->getTypeIndex();
+        auto desc_data_type_index = desc_wrapper.getTypeIndex();
         if( desc_data_type_index !=
             std::type_index(typeid(std::vector<std::vector<double>> *)) &&
             desc_data_type_index !=
@@ -151,9 +151,9 @@ namespace panacea {
           [desc_data_type_index]
           [kern_data_type_index](
             PassKey<KernelWrapperFactory>(),
-            desc_wrapper,
-            desc_wrapper->rows(),
-            desc_wrapper->cols());
+            &desc_wrapper,
+            desc_wrapper.rows(),
+            desc_wrapper.cols());
       }
     } else if( kern_specification.is(settings::KernelCount::Single)) {
       if( kern_specification.is(settings::KernelMemory::Own )) {
@@ -170,9 +170,9 @@ namespace panacea {
           [std::type_index(typeid(std::vector<double>))]
           [std::type_index(typeid(std::vector<double>))](
               PassKey<KernelWrapperFactory>(),
-              desc_wrapper,
+              &desc_wrapper,
               1,
-              desc_wrapper->getNumberDimensions());
+              desc_wrapper.getNumberDimensions());
       }
     }
     std::string error_msg = "The combination of kernel specifications is not";

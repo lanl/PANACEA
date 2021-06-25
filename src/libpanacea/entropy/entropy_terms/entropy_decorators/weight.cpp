@@ -13,33 +13,33 @@
 namespace panacea {
 
   double Weight::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & entropy_settings) {
     return EntropyDecorator::compute(descriptor_wrapper, entropy_settings) * weight_;
   }
 
   double Weight::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const EntropySettings & entropy_settings) {
     return EntropyDecorator::compute(descriptor_wrapper, desc_ind, entropy_settings) * weight_;
   }
 
   double Weight::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const PANACEASettings & panacea_settings) {
     return EntropyDecorator::compute(descriptor_wrapper, panacea_settings) * weight_;
   }
 
   double Weight::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings) {
     return EntropyDecorator::compute(descriptor_wrapper, desc_ind, panacea_settings) * weight_;
   }
 
   std::vector<double> Weight::compute_grad(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const EntropySettings & entropy_settings) {
 
@@ -49,7 +49,7 @@ namespace panacea {
   }
 
   std::vector<double> Weight::compute_grad(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings) {
     return compute_grad(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
@@ -71,34 +71,33 @@ namespace panacea {
     return read;
   }
 
-  EntropyTerm::WriteFunction Weight::getWriteFunction(const PassKey<EntropyTerm> &) {
+  EntropyTerm::WriteFunction Weight::getWriteFunction(const PassKey<EntropyTerm> &) const {
     return write;
   }
 
   std::vector<std::any> Weight::write(
       const settings::FileType file_type,
       std::ostream & os,
-      EntropyTerm * entropy_term_instance) {
+      const EntropyTerm & entropy_term_instance) {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      auto weight = dynamic_cast<Weight *>(entropy_term_instance);
+      const auto & weight = dynamic_cast<const Weight &>(entropy_term_instance);
       os << "[Weight]\n";
-      os << weight->weight_ << "\n";
-      nested_values = entropy_term_instance->getWriteFunction(weight->key)(file_type, os, entropy_term_instance);
+      os << weight.weight_ << "\n";
+      nested_values = entropy_term_instance.getWriteFunction(weight.key)(file_type, os, entropy_term_instance);
     }
-
     return nested_values;
   }
 
   io::ReadInstantiateVector Weight::read(
       const settings::FileType file_type,
       std::istream & is,
-      EntropyTerm * entropy_term_instance) {
+      EntropyTerm & entropy_term_instance) {
 
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      auto weight = dynamic_cast<Weight *>(entropy_term_instance);
+      auto & weight = dynamic_cast<Weight &>(entropy_term_instance);
 
       std::string line = "";
       while(line.find("[Weight]",0) == std::string::npos) {
@@ -110,9 +109,9 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      is >> weight->weight_;
+      is >> weight.weight_;
 
-      nested_values = entropy_term_instance->getReadFunction(weight->key)(file_type, is, entropy_term_instance);
+      nested_values = entropy_term_instance.getReadFunction(weight.key)(file_type, is, entropy_term_instance);
     }
 
     return nested_values;

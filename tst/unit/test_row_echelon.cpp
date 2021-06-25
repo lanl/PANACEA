@@ -52,7 +52,7 @@ TEST_CASE("Testing:row_echelon1","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get());
+  row_echelon.operate(*mat);
 
   mat->print();
   // Solution should be
@@ -125,7 +125,7 @@ TEST_CASE("Testing:row_echelon2","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get());
+  row_echelon.operate(*mat);
 
   mat->print();
   // Solution should be
@@ -198,7 +198,7 @@ TEST_CASE("Testing:row_echelon3","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get());
+  row_echelon.operate(*mat);
 
   mat->print();
   // Solution should be
@@ -278,7 +278,7 @@ TEST_CASE("Testing:row_echelon4","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get());
+  row_echelon.operate(*mat);
 
   mat->print();
   // Solution should be
@@ -362,7 +362,7 @@ TEST_CASE("Testing:row_echelon5","[unit,panacea]"){
   const double threshold = 1E-4;
   RowEchelon row_echelon(threshold);
 
-  row_echelon.operate(mat.get());
+  row_echelon.operate(*mat);
 
   mat->print();
   // Solution should be

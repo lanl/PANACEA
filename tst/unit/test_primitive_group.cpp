@@ -44,7 +44,7 @@ TEST_CASE("Testing:primitive group write & read using fileio","[integration,pana
 
   PrimitiveFactory prim_factory;
   auto prim_grp = prim_factory.createGroup(
-      &dwrapper_init,
+      dwrapper_init,
       kernel_settings,
       "test_prim_group");
 
@@ -88,9 +88,9 @@ TEST_CASE("Testing:primitive group write & read using fileio","[integration,pana
   REQUIRE(prim_grp2.reduced_inv_covariance->operator()(0,0) == Approx(prim_grp2.reduced_inv_covariance->operator()(0,0)));
 
   REQUIRE(prim_grp2.primitives.size() == 3);
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,0) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,0)));
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,1) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,1)));
-  REQUIRE(prim_grp.primitives.at(0)->compute(&dwrapper_init,2) == Approx(prim_grp2.primitives.at(0)->compute(&dwrapper_init,2)));
+  REQUIRE(prim_grp.primitives.at(0)->compute(dwrapper_init,0) == Approx(prim_grp2.primitives.at(0)->compute(dwrapper_init,0)));
+  REQUIRE(prim_grp.primitives.at(0)->compute(dwrapper_init,1) == Approx(prim_grp2.primitives.at(0)->compute(dwrapper_init,1)));
+  REQUIRE(prim_grp.primitives.at(0)->compute(dwrapper_init,2) == Approx(prim_grp2.primitives.at(0)->compute(dwrapper_init,2)));
 
 }
 
@@ -116,7 +116,7 @@ TEST_CASE("Testing:primitive group write & read","[unit,panacea]"){
 
   PrimitiveFactory prim_factory;
   auto prim_grp = prim_factory.createGroup(
-      &dwrapper_init,
+      dwrapper_init,
       kernel_settings,
       "test_prim_group");
 

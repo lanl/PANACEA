@@ -28,19 +28,17 @@ namespace panacea {
     return SelfEntropy::read;
   }
 
-  EntropyTerm::WriteFunction SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) {
+  EntropyTerm::WriteFunction SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
     return SelfEntropy::write;
   }
 
   double SelfEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & entropy_settings
       ) {
 
-    assert(descriptor_wrapper != nullptr);
-
     double self_entropy = 0.0;
-    for( int desc_pt = 0; desc_pt < descriptor_wrapper->getNumberPoints(); ++desc_pt ){
+    for( int desc_pt = 0; desc_pt < descriptor_wrapper.getNumberPoints(); ++desc_pt ){
       self_entropy += -1.0 * log(distribution_->compute(
             descriptor_wrapper,
             desc_pt,
@@ -51,12 +49,10 @@ namespace panacea {
   }
 
   double SelfEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const EntropySettings & entropy_settings
       ) {
-
-    assert(descriptor_wrapper != nullptr);
 
     return -1.0 * log(distribution_->compute(
           descriptor_wrapper,
@@ -66,14 +62,14 @@ namespace panacea {
   }
 
   double SelfEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const PANACEASettings & panacea_settings
       ) {
     return compute(descriptor_wrapper, EntropySettings(panacea_settings));
   }
 
   double SelfEntropy::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings
       ) {
@@ -81,15 +77,15 @@ namespace panacea {
   }
 
   std::vector<double> SelfEntropy::compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind, // Where the gradiant is being calculated at
           const EntropySettings & entropy_settings
           ) {
 
     std::cout << "Descriptor wrapper called from compute_grad in self entropy" << std::endl;
-      for( int i = 0; i < descriptor_wrapper->getNumberPoints(); ++i){
-        for( int j = 0; j< descriptor_wrapper->getNumberDimensions(); ++j) {
-          std::cout << descriptor_wrapper->operator()(i,j) << " ";
+      for( int i = 0; i < descriptor_wrapper.getNumberPoints(); ++i){
+        for( int j = 0; j< descriptor_wrapper.getNumberDimensions(); ++j) {
+          std::cout << descriptor_wrapper(i,j) << " ";
         }
         std::cout << "\n";
       }
@@ -97,18 +93,18 @@ namespace panacea {
 
 
       std::vector<double> inv_distribution;
-      inv_distribution.reserve(descriptor_wrapper->getNumberPoints());
-      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
+      inv_distribution.reserve(descriptor_wrapper.getNumberPoints());
+      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper.getNumberPoints(); ++desc_ind2 ){
         inv_distribution.push_back(-1.0/distribution_->compute(
               descriptor_wrapper,
               desc_ind2,
               entropy_settings.getDistributionSettings(Method::ComputeGradiant)));
       }
       // Compute the gradiant with respect to the Descriptors
-      std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
+      std::vector<double> grad(descriptor_wrapper.getNumberDimensions(),0.0);
 
       // Compute the gradiant with respect to each of the Kernels
-      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
+      for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper.getNumberPoints(); ++desc_ind2 ){
         std::vector<double> grad_temp = distribution_->compute_grad(
             descriptor_wrapper,
             desc_ind2, // desc_ind
@@ -133,7 +129,7 @@ namespace panacea {
   }
 
   std::vector<double> SelfEntropy::compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind, // Where the gradiant is being calculated at
           const PANACEASettings & panacea_settings
           ) {
@@ -142,7 +138,7 @@ namespace panacea {
 
   std::unique_ptr<EntropyTerm> SelfEntropy::create(
       const PassKey<EntropyFactory> & key,
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & settings) {
 
     DistributionFactory dist_factory;
@@ -171,24 +167,29 @@ namespace panacea {
     return distribution_->getDimensions();
   }
 
-  void SelfEntropy::update(const BaseDescriptorWrapper * descriptor_wrapper) {
+  void SelfEntropy::update(const BaseDescriptorWrapper & descriptor_wrapper) {
     distribution_->update(descriptor_wrapper);
   }
 
-  void SelfEntropy::initialize(const BaseDescriptorWrapper * descriptor_wrapper) {
+  void SelfEntropy::initialize(const BaseDescriptorWrapper & descriptor_wrapper) {
     distribution_->initialize(descriptor_wrapper);
   }
 
   std::vector<std::any> SelfEntropy::write(
       const settings::FileType file_type,
       std::ostream & os,
-      EntropyTerm * entropy_term_instance) {
+      const EntropyTerm & entropy_term_instance) {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      auto self_ent = dynamic_cast<SelfEntropy *>(entropy_term_instance);
-      nested_values.push_back(self_ent->distribution_.get());
+      if( entropy_term_instance.type() == settings::EntropyType::Self){
+        const auto & self_ent = dynamic_cast<const SelfEntropy &>(
+            entropy_term_instance);
+        nested_values.push_back(self_ent.distribution_.get());
+      } else {
+        PANACEA_FAIL("Unsupported entropy term encountered.");
+      }
     }
     return nested_values;
   }
@@ -196,13 +197,17 @@ namespace panacea {
    io::ReadInstantiateVector SelfEntropy::read(
       const settings::FileType file_type,
       std::istream & is,
-      EntropyTerm * entropy_term_instance) {
+      EntropyTerm & entropy_term_instance) {
 
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      auto self_ent = dynamic_cast<SelfEntropy *>(entropy_term_instance);
-      nested_values.emplace_back(self_ent->distribution_.get(), std::nullopt);
+      if( entropy_term_instance.type() == settings::EntropyType::Self){
+        auto & self_ent = dynamic_cast<SelfEntropy &>(entropy_term_instance);
+        nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
+      } else {
+        PANACEA_FAIL("Unsupported entropy term encountered.");
+      }
     }
     return nested_values;
    }

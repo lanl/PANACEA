@@ -20,28 +20,48 @@ namespace panacea {
       const settings::FileType file_type,
       std::ostream & os,
       std::any dwrapper_instance) {
-    
-    std::vector<std::any> nested_values;
+
+    const BaseDescriptorWrapper & dwrapper = [&]() -> const BaseDescriptorWrapper & {
+      if( std::type_index(dwrapper_instance.type()) == 
+          std::type_index(typeid(const BaseDescriptorWrapper &))){
+        return (std::any_cast<const BaseDescriptorWrapper &>(dwrapper_instance));
+
+      } else if( std::type_index(dwrapper_instance.type()) ==
+          std::type_index(typeid(const BaseDescriptorWrapper *))){
+        return *(std::any_cast<const BaseDescriptorWrapper *>(dwrapper_instance));
+
+      } else if( std::type_index(dwrapper_instance.type()) ==
+          std::type_index(typeid(BaseDescriptorWrapper &))){
+        return const_cast<const BaseDescriptorWrapper &>(
+            std::any_cast<BaseDescriptorWrapper &>(dwrapper_instance));
+
+      } else if( std::type_index(dwrapper_instance.type()) ==
+          std::type_index(typeid(BaseDescriptorWrapper *))){
+        return const_cast<const BaseDescriptorWrapper &>(*
+            (std::any_cast<BaseDescriptorWrapper *>(dwrapper_instance)));
+      } else {
+        std::string error_msg = "Unsupported BaseDescriptor type detected.\n";
+        PANACEA_FAIL(error_msg);
+      }
+      return (std::any_cast<const BaseDescriptorWrapper &>(dwrapper_instance));
+    }();
+
     if( file_type == settings::FileType::TXTDescriptors ) {
-      auto dwrapper = std::any_cast<BaseDescriptorWrapper *>(dwrapper_instance);
       os << "Descriptors\n";
-      os << dwrapper->arrangement() << "\n";
-      os << dwrapper->rows() << " " << dwrapper->cols() << "\n";
-      for( int row = 0; row < dwrapper->rows(); ++row ) {
-        for( int col = 0; col < dwrapper->cols(); ++col ) {
+      os << dwrapper.arrangement() << "\n";
+      os << dwrapper.rows() << " " << dwrapper.cols() << "\n";
+      for( int row = 0; row < dwrapper.rows(); ++row ) {
+        for( int col = 0; col < dwrapper.cols(); ++col ) {
           os << std::setfill(' ') 
             << std::setw(14) 
             << std::setprecision(8) 
             << std::right
-            << dwrapper->operator()(row,col) << " ";
+            << dwrapper(row,col) << " ";
         }
         os << "\n";
       }
-    } else {
-      std::string error_msg = "Descriptors cannot be written to the specified file type.";
-      PANACEA_FAIL(error_msg);
-    }
-    return nested_values;
+    } 
+    return std::vector<std::any>();
   }
 
   io::ReadInstantiateVector BaseDescriptorWrapper::read(
@@ -49,14 +69,27 @@ namespace panacea {
       std::istream & is,
       std::any dwrapper_instance) {
 
+    BaseDescriptorWrapper & dwrapper = [&]() -> BaseDescriptorWrapper & {
+      if( std::type_index(dwrapper_instance.type()) ==
+          std::type_index(typeid(BaseDescriptorWrapper &))){
+        return (std::any_cast<BaseDescriptorWrapper &>(dwrapper_instance));
+      } else if( std::type_index(dwrapper_instance.type()) ==
+          std::type_index(typeid(BaseDescriptorWrapper *))){
+        return *(std::any_cast<BaseDescriptorWrapper *>(dwrapper_instance));
+      } else {
+        std::string error_msg = "Unsupported BaseDescriptor type detected.\n";
+        PANACEA_FAIL(error_msg);
+      }
+      return (std::any_cast<BaseDescriptorWrapper &>(dwrapper_instance));
+    }();
+
     if( file_type == settings::FileType::TXTDescriptors ) {
-      auto dwrapper = std::any_cast<BaseDescriptorWrapper *>(dwrapper_instance);
 
       // Before doing any reading ensure that the underlying descriptor data type is
       // actually compatible, right now the Descriptor must be of type 
       // std::vector<std::vector<double>> as in the data must be owned by the descriptor
       // wrapper and not simply a pointer to it
-      if( dwrapper->getTypeIndex() != 
+      if( dwrapper.getTypeIndex() != 
           std::type_index(typeid(std::vector<std::vector<double>>))) {
         std::string error_msg = "Reading descriptor data in requires that the descriptor ";
         error_msg += "wrapper actually own the data so the underlying type must be of type";
@@ -76,9 +109,9 @@ namespace panacea {
       // Second line should indicate the arrangement
       std::getline(is, line);
       if( line.find("Points along rows dimensions along columns", 0) != std::string::npos) {
-        dwrapper->set(Arrangement::PointsAlongRowsDimensionsAlongCols);
+        dwrapper.set(Arrangement::PointsAlongRowsDimensionsAlongCols);
       } else if (line.find("Dimensions along rows points along columns", 0) != std::string::npos) {
-        dwrapper->set(Arrangement::DimensionsAlongRowsPointsAlongCols);
+        dwrapper.set(Arrangement::DimensionsAlongRowsPointsAlongCols);
       } else {
         std::cout << "Warning alignment line missing from descriptors txt file. The ";
         std::cout << "available options are:\n";
@@ -86,7 +119,7 @@ namespace panacea {
         std::cout << "Dimensions along rows points along columns\n";
         std::cout << "\nAssuming:\n";
         std::cout << "Points along rows dimensions along columns\n";
-        dwrapper->set(Arrangement::PointsAlongRowsDimensionsAlongCols);
+        dwrapper.set(Arrangement::PointsAlongRowsDimensionsAlongCols);
       }
 
       std::getline(is, line);
@@ -111,14 +144,14 @@ namespace panacea {
   
       try { 
 
-        dwrapper->resize(rows,cols);
+        dwrapper.resize(rows,cols);
         for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
           std::istringstream ss_data(line);
           for( int col = 0; col < cols; ++col) {
             double value;
             ss_data >> value;
-            dwrapper->operator()(row,col) = value;
+            dwrapper(row,col) = value;
           }
         } 
       } catch (...) {
@@ -128,14 +161,11 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
 
-
     } else {
       std::string error_msg = "Descriptors cannot be written to the specified file type.";
       PANACEA_FAIL(error_msg);
     }
-    io::ReadInstantiateVector nested_values;
-    return nested_values;
-
+    return io::ReadInstantiateVector();
   }
  
   BaseDescriptorWrapper::~BaseDescriptorWrapper() {};

@@ -28,7 +28,7 @@ namespace panacea {
       VectorEigen();
       virtual ~VectorEigen() final {};
       virtual const VectorType type() const final;
-      virtual VectorEigen& operator=(const Vector * vec) final;
+      virtual VectorEigen& operator=(const Vector & vec) final;
       virtual double& operator()(const int index) final;
       virtual double operator()(const int index) const final;
       virtual Direction direction() const final;

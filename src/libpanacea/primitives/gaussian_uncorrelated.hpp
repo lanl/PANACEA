@@ -54,7 +54,12 @@ namespace panacea {
                       std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) *
                       std::pow(constants::PI_SQRT*constants::SQRT_2,
                       static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
-                {};
+                {
+                
+                std::cout << __FILE__ <<":" << __LINE__ << std::endl; 
+                std::cout << "Assigning address " << attributes_.normalizer << std::endl;
+                std::cout << attributes_.normalizer->getNormalizationCoeffs().size() << std::endl;
+                };
 
       virtual const settings::KernelPrimitive type() const noexcept final;
       virtual const settings::KernelCorrelation correlation() const noexcept final;
@@ -64,7 +69,7 @@ namespace panacea {
       virtual void update(PrimitiveAttributes &&) final;
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int sample_ind,
           const settings::EquationSetting & prim_settings
           ) const final;
@@ -81,7 +86,7 @@ namespace panacea {
        * 6. GradSetting - whether the gradient is with respect to the descriptors or kernels or both
        **/
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptors,
+          const BaseDescriptorWrapper & descriptors,
           const int descriptor_ind,
           const settings::EquationSetting & prim_settings,
           const settings::GradSetting & grad_setting) const final;

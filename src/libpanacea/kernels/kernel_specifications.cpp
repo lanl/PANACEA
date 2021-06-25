@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <typeindex>
 
 namespace panacea {
 
@@ -20,29 +21,40 @@ namespace panacea {
       std::ostream & os,
       std::any kern_spec_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ||
-        file_type == settings::FileType::TXTKernelDistribution ) {
-      KernelSpecification * kern_spec;
-      try {
-        kern_spec = std::any_cast<KernelSpecification *>(kern_spec_instance);
-      } catch (...) {
+    const KernelSpecification & kern_spec = [&]() -> const KernelSpecification & {
+      if( std::type_index(kern_spec_instance.type()) == 
+          std::type_index(typeid(KernelSpecification *))){
+        return const_cast<const KernelSpecification &>(
+            *std::any_cast<KernelSpecification *>(kern_spec_instance));
+      }else if( std::type_index(kern_spec_instance.type()) ==
+          std::type_index(typeid(KernelSpecification &))){
+        return const_cast<const KernelSpecification &>(
+            std::any_cast<KernelSpecification &>(kern_spec_instance));
+      } else if( std::type_index(kern_spec_instance.type()) == 
+          std::type_index(typeid(const KernelSpecification *))){
+        return *std::any_cast<const KernelSpecification *>(kern_spec_instance);
+      }else if( std::type_index(kern_spec_instance.type()) ==
+          std::type_index(typeid(const KernelSpecification &))){
+        return std::any_cast<const KernelSpecification &>(kern_spec_instance);
+      } else {
         std::string error_msg = "Unable to cast to KernelSpecification * while";
         error_msg += " trying to write kernel specs to restart file.";
         PANACEA_FAIL(error_msg);
       }
+      return std::any_cast<const KernelSpecification &>(kern_spec_instance);
+    }();
+
+    if( file_type == settings::FileType::TXTRestart ||
+        file_type == settings::FileType::TXTKernelDistribution ) {
       os << "[Kernel Specifications]\n";
-      os << kern_spec->kern_correlation_ << "\n";
-      os << kern_spec->kern_count_ << "\n";
-      os << kern_spec->kern_prim_ << "\n";
-      os << kern_spec->kern_normalization_ << "\n";
-      os << kern_spec->kern_memory_ << "\n";
-      os << kern_spec->kern_center_ << "\n";
-      os << kern_spec->kern_algorithm_ << "\n";
+      os << kern_spec.kern_correlation_ << "\n";
+      os << kern_spec.kern_count_ << "\n";
+      os << kern_spec.kern_prim_ << "\n";
+      os << kern_spec.kern_normalization_ << "\n";
+      os << kern_spec.kern_memory_ << "\n";
+      os << kern_spec.kern_center_ << "\n";
+      os << kern_spec.kern_algorithm_ << "\n";
       os << "\n";
-    } else {
-      std::string error_msg = "Kernel specification cannot be written to ";
-      error_msg += "the specified file type.";
-      PANACEA_FAIL(error_msg);
     }
     return std::vector<std::any> {};
   }
@@ -52,16 +64,22 @@ namespace panacea {
       std::istream & is,
       std::any kern_spec_instance) {
 
-    if( file_type == settings::FileType::TXTRestart ||
-        file_type == settings::FileType::TXTKernelDistribution ) {
-      KernelSpecification * kern_spec;
-      try {
-        kern_spec = std::any_cast<KernelSpecification *>(kern_spec_instance);
-      } catch (...) {
+    KernelSpecification & kern_spec = [&]() -> KernelSpecification & {
+      if( std::type_index(kern_spec_instance.type()) == std::type_index(typeid(KernelSpecification *))){
+        return *std::any_cast<KernelSpecification *>(kern_spec_instance);
+      }else if( std::type_index(kern_spec_instance.type()) == std::type_index(typeid(KernelSpecification &))){
+        return (std::any_cast<KernelSpecification &>(kern_spec_instance));
+      } else {
         std::string error_msg = "Unable to cast to KernelSpecification * while";
-        error_msg += " trying to read kernel specs from restart file.";
+        error_msg += " trying to read kernel specs to restart file.";
         PANACEA_FAIL(error_msg);
       }
+      return (std::any_cast<KernelSpecification &>(kern_spec_instance));
+    }();
+
+    if( file_type == settings::FileType::TXTRestart ||
+        file_type == settings::FileType::TXTKernelDistribution ) {
+      
       std::string line = "";
       while(line.find("[Kernel Specifications]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -71,16 +89,15 @@ namespace panacea {
         }
         std::getline(is, line);
       }
-      is >> kern_spec->kern_correlation_;
-      is >> kern_spec->kern_count_;
-      is >> kern_spec->kern_prim_;
-      is >> kern_spec->kern_normalization_;
-      is >> kern_spec->kern_memory_;
-      is >> kern_spec->kern_center_;
-      is >> kern_spec->kern_algorithm_;
+      is >> kern_spec.kern_correlation_;
+      is >> kern_spec.kern_count_;
+      is >> kern_spec.kern_prim_;
+      is >> kern_spec.kern_normalization_;
+      is >> kern_spec.kern_memory_;
+      is >> kern_spec.kern_center_;
+      is >> kern_spec.kern_algorithm_;
     }
-    io::ReadInstantiateVector nested_values;
-    return nested_values;
+    return io::ReadInstantiateVector();
   }
 
   bool operator==(const KernelSpecification &spec1, const KernelSpecification &spec2) {

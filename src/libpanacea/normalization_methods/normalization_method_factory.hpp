@@ -22,7 +22,7 @@ namespace panacea {
 
   class NormalizationMethodFactory {
     public:
-      typedef std::vector<double> (*NormalizationMethod)(const BaseDescriptorWrapper * desc_wrapper, std::any);
+      typedef std::vector<double> (*NormalizationMethod)(const BaseDescriptorWrapper & desc_wrapper, std::any);
     private:
       static std::unordered_map<
         settings::KernelNormalization,

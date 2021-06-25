@@ -24,7 +24,7 @@ namespace panacea {
        * the current row in mat after it has been put in row echelon form.
        *
        **/
-      std::vector<int> operate(Matrix * mat);
+      std::vector<int> operate(Matrix & mat);
   };
 }
 

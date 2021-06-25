@@ -47,10 +47,10 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
 
   DistributionFactory dist_factory;
 
-  auto dist = dist_factory.create(&dwrapper_init, kernel_settings);
+  auto dist = dist_factory.create(dwrapper_init, kernel_settings);
 
-  REQUIRE(dist->compute(&dwrapper_init,0,kernel_settings) == Approx(dist->compute(&dwrapper_init,2,kernel_settings)));
-  REQUIRE(dist->compute(&dwrapper_init,1,kernel_settings) > dist->compute(&dwrapper_init,0,kernel_settings));
+  REQUIRE(dist->compute(dwrapper_init,0,kernel_settings) == Approx(dist->compute(dwrapper_init,2,kernel_settings)));
+  REQUIRE(dist->compute(dwrapper_init,1,kernel_settings) > dist->compute(dwrapper_init,0,kernel_settings));
 
   const DistributionSettings * dist_settings = &kernel_settings;
 
@@ -60,9 +60,9 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_sample(&data_sample, 3, 2);
 
   auto grad_setting = settings::GradSetting::WRTKernel;
-  auto grad0_wrt_kern = dist->compute_grad(&dwrapper_sample,0,0, *dist_settings, grad_setting);
-  auto grad1_wrt_kern = dist->compute_grad(&dwrapper_sample,0,1, *dist_settings, grad_setting);
-  auto grad2_wrt_kern = dist->compute_grad(&dwrapper_sample,0,2, *dist_settings, grad_setting);
+  auto grad0_wrt_kern = dist->compute_grad(dwrapper_sample,0,0, *dist_settings, grad_setting);
+  auto grad1_wrt_kern = dist->compute_grad(dwrapper_sample,0,1, *dist_settings, grad_setting);
+  auto grad2_wrt_kern = dist->compute_grad(dwrapper_sample,0,2, *dist_settings, grad_setting);
   std::cout << "grad0 WRT kernel Assuming we are sampling from a location removed from kernel " << grad0_wrt_kern.at(0) << std::endl;
   std::cout << "grad1 WRT kernel Assuming we are sampling from a location removed from kernel " << grad1_wrt_kern.at(0) << std::endl;
   std::cout << "grad2 WRT kernel Assuming we are sampling from a location removed from kernel " << grad2_wrt_kern.at(0) << std::endl;
@@ -74,16 +74,16 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
   std::cout << "Sum of gradiants WRT kernel Assuming we are sampling from a location removed from kernel " << grad0_wrt_kern.at(0) << std::endl;
 
   grad_setting = settings::GradSetting::WRTDescriptor;
-  auto grad0_wrt_desc = dist->compute_grad(&dwrapper_sample,0,0, *dist_settings, grad_setting);
+  auto grad0_wrt_desc = dist->compute_grad(dwrapper_sample,0,0, *dist_settings, grad_setting);
 
   std::cout << "grad0 WRT descriptor assuming we are sampling from a location removed from kernel " << grad0_wrt_desc.at(0) << std::endl;
   REQUIRE(grad0_wrt_desc.at(0) == Approx(-1.0 * grad0_wrt_kern.at(0)));
 
   grad_setting = settings::GradSetting::WRTBoth;
 
-  auto grad0 = dist->compute_grad(&dwrapper_init,0,0, *dist_settings, grad_setting);
-  auto grad1 = dist->compute_grad(&dwrapper_init,1,1, *dist_settings, grad_setting);
-  auto grad2 = dist->compute_grad(&dwrapper_init,2,2, *dist_settings, grad_setting);
+  auto grad0 = dist->compute_grad(dwrapper_init,0,0, *dist_settings, grad_setting);
+  auto grad1 = dist->compute_grad(dwrapper_init,1,1, *dist_settings, grad_setting);
+  auto grad2 = dist->compute_grad(dwrapper_init,2,2, *dist_settings, grad_setting);
 
   std::cout << "grad0 WRT both if probing at location of first descriptor/kernel " << grad0.at(0) << std::endl;
   std::cout << "grad1 WRT both if probing at location of second descriptor/kernel  " << grad1.at(0) << std::endl;
@@ -126,17 +126,17 @@ TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
   DistributionFactory dist_factory;
 
   std::cout << "Creating dist1" << std::endl;
-  auto dist1 = dist_factory.create(&dwrapper1, kernel_settings);
+  auto dist1 = dist_factory.create(dwrapper1, kernel_settings);
   std::cout << "Creating dist2" << std::endl;
-  auto dist2 = dist_factory.create(&dwrapper2, kernel_settings);
+  auto dist2 = dist_factory.create(dwrapper2, kernel_settings);
 
   std::cout << "Computing distribution 1" << std::endl;
-  std::cout << dist1->compute(&dwrapper1,0,kernel_settings) << std::endl;
+  std::cout << dist1->compute(dwrapper1,0,kernel_settings) << std::endl;
   std::cout << "Computing distribution 2" << std::endl;
-  std::cout << dist2->compute(&dwrapper2,0,kernel_settings) << std::endl;
+  std::cout << dist2->compute(dwrapper2,0,kernel_settings) << std::endl;
   // Check that the values are equivalent despite one being made up of three kernels and
   // the other composed of a single kernel
-  REQUIRE(dist1->compute(&dwrapper1,0,kernel_settings) == Approx(dist2->compute(&dwrapper2,0,kernel_settings)));
+  REQUIRE(dist1->compute(dwrapper1,0,kernel_settings) == Approx(dist2->compute(dwrapper2,0,kernel_settings)));
 }
 
 TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea]"){
@@ -169,11 +169,11 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
 
   DistributionFactory dist_factory;
 
-  auto dist1 = dist_factory.create(&dwrapper1, kernel_settings);
+  auto dist1 = dist_factory.create(dwrapper1, kernel_settings);
 
-  double value1 = dist1->compute(&dwrapper1,0, *distribution_settings);
+  double value1 = dist1->compute(dwrapper1,0, *distribution_settings);
   auto dims1 = dist1->getDimensions();
-  auto grad1 = dist1->compute_grad(&dwrapper1,0,0,*distribution_settings);
+  auto grad1 = dist1->compute_grad(dwrapper1,0,0,*distribution_settings);
 
   io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
@@ -187,9 +187,9 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
 
   restart_file->read(dist2.get(),"distribution_restart.txt");
 
-  double value2 = dist2->compute(&dwrapper1,0, *distribution_settings);
+  double value2 = dist2->compute(dwrapper1,0, *distribution_settings);
   auto dims2 = dist2->getDimensions();
-  auto grad2 = dist2->compute_grad(&dwrapper1,0,0,*distribution_settings);
+  auto grad2 = dist2->compute_grad(dwrapper1,0,0,*distribution_settings);
 
   REQUIRE(value1 == Approx(value2));
   REQUIRE(dims1.size() == dims2.size());

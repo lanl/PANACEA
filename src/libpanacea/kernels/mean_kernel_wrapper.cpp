@@ -21,14 +21,14 @@ namespace panacea {
     return MeanKernelWrapper::read;
   }
 
-  BaseKernelWrapper::WriteFunction MeanKernelWrapper::getWriteFunction_() {
+  BaseKernelWrapper::WriteFunction MeanKernelWrapper::getWriteFunction_() const {
     return MeanKernelWrapper::write;
   }
 
-  MeanKernelWrapper::MeanKernelWrapper(const BaseDescriptorWrapper * dwrapper) {
+  MeanKernelWrapper::MeanKernelWrapper(const BaseDescriptorWrapper & dwrapper) {
     Mean mean;
-    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper *,Direction::AlongColumns>(dwrapper);
-    number_pts_mean_ = dwrapper->getNumberPoints();
+    std::vector<double> center_ = mean.calculate<const BaseDescriptorWrapper &,Direction::AlongColumns>(dwrapper);
+    number_pts_mean_ = dwrapper.getNumberPoints();
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
   }
 
@@ -80,15 +80,14 @@ namespace panacea {
     data_wrapper_.set(arrangement);
   }
 
-  void MeanKernelWrapper::update(const BaseDescriptorWrapper * dwrapper) {
-    assert(dwrapper!=nullptr);
-    assert(dwrapper->getNumberDimensions() == data_wrapper_.getNumberDimensions());
+  void MeanKernelWrapper::update(const BaseDescriptorWrapper & dwrapper) {
+    assert(dwrapper.getNumberDimensions() == data_wrapper_.getNumberDimensions());
 
     Mean mean;
-    std::vector<double> new_center = mean.calculate<const BaseDescriptorWrapper *,
+    std::vector<double> new_center = mean.calculate<const BaseDescriptorWrapper &,
       Direction::AlongColumns>(dwrapper);
 
-    const double new_num_pts = static_cast<double>(dwrapper->getNumberPoints());
+    const double new_num_pts = static_cast<double>(dwrapper.getNumberPoints());
     const double inv_total_num_pts = 1.0/static_cast<double>(number_pts_mean_ + new_num_pts);
     for( int dim = 0; dim < data_wrapper_.getNumberDimensions(); ++dim){
       data_wrapper_(0,dim) =
@@ -96,7 +95,7 @@ namespace panacea {
         new_center.at(dim) * new_num_pts) *
         inv_total_num_pts;
     }
-    number_pts_mean_ += dwrapper->getNumberPoints();
+    number_pts_mean_ += dwrapper.getNumberPoints();
   }
 
   const std::any MeanKernelWrapper::getPointerToRawData() const noexcept {
@@ -119,9 +118,9 @@ namespace panacea {
     return settings::KernelCount::Single;
   }
 
-  std::istream & MeanKernelWrapper::read(BaseKernelWrapper * kwrapper_instance, std::istream & is) {
+  std::istream & MeanKernelWrapper::read(BaseKernelWrapper & kwrapper_instance, std::istream & is) {
 
-    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);
+    MeanKernelWrapper & kwrapper_mean = dynamic_cast<MeanKernelWrapper &>(kwrapper_instance);
 
     std::string line = "";
     while(line.find("[Total Number Points]",0) == std::string::npos) {
@@ -134,7 +133,7 @@ namespace panacea {
     }
 
     try {
-      is >> kwrapper_mean->number_pts_mean_;// = num_pts;
+      is >> kwrapper_mean.number_pts_mean_;// = num_pts;
     } catch (...) {
       std::string error_msg = "Unable to assign total number of points to mean";
       error_msg = " kernel type from file.\n";
@@ -144,10 +143,10 @@ namespace panacea {
     return is;
   }
 
-  std::ostream & MeanKernelWrapper::write(BaseKernelWrapper * kwrapper_instance, std::ostream & os) {
-    MeanKernelWrapper * kwrapper_mean = dynamic_cast<MeanKernelWrapper *>(kwrapper_instance);
+  std::ostream & MeanKernelWrapper::write(const BaseKernelWrapper & kwrapper_instance, std::ostream & os) {
+    const MeanKernelWrapper & kwrapper_mean = dynamic_cast<const MeanKernelWrapper &>(kwrapper_instance);
     os << "[Total Number Points]\n";
-    os << kwrapper_mean->number_pts_mean_ << "\n";
+    os << kwrapper_mean.number_pts_mean_ << "\n";
     return os;
   }
 }

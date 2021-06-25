@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(ENABLE_TESTING "Build and enable unit testing" ON)
+option(ENABLE_MEMORY_TESTING "Build and enable unit testing" ${ENABLE_TESTING})
 
 ########################################################
 # Includes                                             #

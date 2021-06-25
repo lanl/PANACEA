@@ -27,6 +27,14 @@ namespace panacea {
 
   /**
    * The specifications are fixed for each primitive group
+   *
+   * Note that each of the attributes used by a kernel must be a unique pointer,
+   * the reason being that when we call move on an entropy term it will
+   * invalidate any of the internal pointers, if they are not invaiant. Using
+   * unique pointers ensures that the data will be invariant.  
+   *
+   * It is not necessary to make the kernel specifications a unique pointer
+   * because there are no pointers to the kernel specifications
    **/
   class PrimitiveGroup {
     private:
@@ -37,7 +45,7 @@ namespace panacea {
 
       const KernelSpecification & getSpecification() { return specification; }
       std::string name = "";
-      Normalizer normalizer;
+      std::unique_ptr<Normalizer> normalizer = nullptr;
       std::unique_ptr<BaseKernelWrapper> kernel_wrapper = nullptr;
       std::unique_ptr<Covariance> covariance = nullptr;
       std::unique_ptr<ReducedCovariance> reduced_covariance = nullptr;
@@ -47,10 +55,10 @@ namespace panacea {
       PrimitiveAttributes createPrimitiveAttributes() noexcept;
 
       void update(
-          const BaseDescriptorWrapper * dwrapper);
+          const BaseDescriptorWrapper & dwrapper);
 
       void initialize(
-          const BaseDescriptorWrapper * dwrapper);
+          const BaseDescriptorWrapper & dwrapper);
 
       static std::vector<std::any> write(
           const settings::FileType file_type,
@@ -66,7 +74,7 @@ namespace panacea {
           const settings::FileType file_type,
           std::any prim_grp_instance);
 
-      static void postReadKernelSpecsAndNormalizerInitialization(std::any obj);
+      static void postReadKernelSpecsInitialization(std::any obj);
   };
 }
 

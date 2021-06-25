@@ -26,7 +26,7 @@ namespace panacea {
     public:
       virtual ~Matrix() {};
       virtual const MatrixType type() const = 0;
-      virtual Matrix& operator=(const Matrix * mat) = 0;
+      virtual Matrix& operator=(const Matrix & mat) = 0;
       virtual double& operator()(const int row, const int col) = 0;
       virtual double operator()(const int row, const int col) const = 0;
 
@@ -81,7 +81,7 @@ namespace panacea {
 
   // Create pseudo inverse of a matrix, will return matrix of the same type
   // as is passed in
-  std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat,
+  std::unique_ptr<Matrix> pseudoInverse(const Matrix & mat,
       const MatrixType type = MatrixType::Default );
 
 }

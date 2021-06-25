@@ -50,11 +50,11 @@ namespace panacea {
     return *this;
   }
 
-  MatrixEigen & MatrixEigen::operator=(const Matrix * mat) {
-    this->resize(mat->rows(), mat->cols());
-    for(int row = 0; row < mat->rows(); ++row){
-      for(int col = 0; col < mat->cols(); ++col){
-        this->operator()(row,col) = mat->operator()(row,col);
+  MatrixEigen & MatrixEigen::operator=(const Matrix & mat) {
+    this->resize(mat.rows(), mat.cols());
+    for(int row = 0; row < mat.rows(); ++row){
+      for(int col = 0; col < mat.cols(); ++col){
+        this->operator()(row,col) = mat(row,col);
       }
     }
     return *this;
@@ -106,15 +106,14 @@ namespace panacea {
     return matrix_->completeOrthogonalDecomposition().pseudoInverse();
   }
 
-  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat) {
-    assert(return_mat != nullptr);
-    assert(return_mat->rows() == mat->rows());
-    assert(return_mat->cols() == mat->cols());
+  void pseudoInverse(Matrix & return_mat, const MatrixEigen & mat) {
+    assert(return_mat.rows() == mat.rows());
+    assert(return_mat.cols() == mat.cols());
 
-    auto temp_mat = mat->pseudoInverse();
+    auto temp_mat = mat.pseudoInverse();
     for( int row = 0; row < temp_mat.rows(); ++row){
       for(int col = 0; col < temp_mat.cols(); ++col){
-        return_mat->operator()(row,col) = temp_mat(row,col);
+        return_mat(row,col) = temp_mat(row,col);
       }
     }
   }

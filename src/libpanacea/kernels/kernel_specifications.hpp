@@ -10,6 +10,7 @@
 
 // Standard includes
 #include <any>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>

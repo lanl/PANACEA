@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
+#include <typeindex>
 
 namespace panacea {
 
@@ -30,30 +31,42 @@ namespace panacea {
       std::ostream & os,
       std::any matrix_instance) {
 
-    std::vector<std::any> nested_values;
+    const Matrix & mat = [&]() -> const Matrix & {
+      if( std::type_index(matrix_instance.type()) == std::type_index(typeid(Matrix *)) ){
+        return const_cast<const Matrix &>(*std::any_cast<Matrix *>(matrix_instance));
+      } else if( std::type_index(matrix_instance.type()) == std::type_index(typeid(Matrix &)) ){
+        return const_cast<const Matrix &>(std::any_cast<Matrix &>(matrix_instance));
+      } else if( std::type_index(matrix_instance.type()) == std::type_index(typeid(const Matrix *)) ){
+        return *std::any_cast<const Matrix *>(matrix_instance);
+      } else if( std::type_index(matrix_instance.type()) == std::type_index(typeid(const Matrix &)) ){
+        return std::any_cast<const Matrix &>(matrix_instance);
+      } else {
+        std::string error_msg = "Unsupported Matrix type encountered.\n";
+        PANACEA_FAIL(error_msg);
+      }
+      return std::any_cast<const Matrix &>(matrix_instance);
+    }();
+
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
+
       os << "[Matrix Type]\n";
-      os << mat->type() << "\n\n";
+      os << mat.type() << "\n\n";
       os << "[Matrix]\n";
-      os << mat->rows() << " " << mat->cols() << "\n";
-      for( int row = 0; row < mat->rows(); ++row ) {
-        for( int col = 0; col < mat->cols(); ++col ) {
+      os << mat.rows() << " " << mat.cols() << "\n";
+      for( int row = 0; row < mat.rows(); ++row ) {
+        for( int col = 0; col < mat.cols(); ++col ) {
           os << std::setfill(' ')
             << std::setw(14)
             << std::setprecision(8)
             << std::right
-            << mat->operator()(row,col) << " ";
+            << mat(row,col) << " ";
         }
         os << "\n";
       }
       os << "\n";
-    } else {
-      std::string error_msg = "Matrix cannot be written to the specified file type.";
-      PANACEA_FAIL(error_msg);
-    }
-    return nested_values;
+    } 
+    return std::vector<std::any>();
   }
 
   io::ReadInstantiateVector Matrix::read(
@@ -61,9 +74,21 @@ namespace panacea {
       std::istream & is,
       std::any matrix_instance) {
 
+    Matrix & mat = [&]() -> Matrix & {
+      if( std::type_index(matrix_instance.type()) == std::type_index(typeid(Matrix *)) ){
+        return *std::any_cast<Matrix *>(matrix_instance);
+      } else if( std::type_index(matrix_instance.type()) == std::type_index(typeid(Matrix &)) ){
+        return std::any_cast<Matrix &>(matrix_instance);
+      } else {
+        std::string error_msg = "Unsupported Matrix type encountered.\n";
+        PANACEA_FAIL(error_msg);
+      }
+      return std::any_cast<Matrix &>(matrix_instance);
+    }();
+
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      Matrix * mat = std::any_cast<Matrix *>(matrix_instance);
+
       std::string line = "";
       while(line.find("[Matrix Type]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -76,22 +101,22 @@ namespace panacea {
 
       std::getline(is, line);
       if( line.find("Eigen",0) != std::string::npos){
-        if(mat->type() != MatrixType::Eigen && mat->type() != MatrixType::Default) {
+        if(mat.type() != MatrixType::Eigen && mat.type() != MatrixType::Default) {
           std::cout << "Note reading matrix data into a different type.";
           std::cout << " Restart file indicates an Eigen Matrix was used.";
-          std::cout << " Data is being loaded into a " << mat->type() << " matrix.\n";
+          std::cout << " Data is being loaded into a " << mat.type() << " matrix.\n";
         }
       }else if(line.find("Default",0) != std::string::npos ) {
-        if(mat->type() != MatrixType::Eigen && mat->type() != MatrixType::Default) {
+        if(mat.type() != MatrixType::Eigen && mat.type() != MatrixType::Default) {
           std::cout << "Note reading matrix data into a different type.";
           std::cout << " Restart file indicates an Default Matrix was used.";
-          std::cout << " Data is being loaded into a " << mat->type() << " matrix.\n";
+          std::cout << " Data is being loaded into a " << mat.type() << " matrix.\n";
         }
       } else {
         std::cout << "Warning matrix type value was not specified under the ";
         std::cout << "[Matrix Type] header, or it was unrecognized. ";
         std::cout << "Attempting to load data into a matrix of type ";
-        std::cout << mat->type() << "\n";
+        std::cout << mat.type() << "\n";
       }
 
       while(line.find("[Matrix]",0) == std::string::npos) {
@@ -122,7 +147,7 @@ namespace panacea {
           error_msg += "line is: " + line + "\n";
           PANACEA_FAIL(error_msg);
         }
-        mat->resize(rows,cols);
+        mat.resize(rows,cols);
       }
 
       try {
@@ -132,7 +157,7 @@ namespace panacea {
           for( int col = 0; col < cols; ++col) {
             double value;
             ss_data >> value;
-            mat->operator()(row,col) = value;
+            mat(row,col) = value;
           }
         }
       } catch (...) {
@@ -146,8 +171,7 @@ namespace panacea {
       std::string error_msg = "Matrix cannot be read from the specified file type.";
       PANACEA_FAIL(error_msg);
     }
-    io::ReadInstantiateVector nested_values;
-    return nested_values;
+    return io::ReadInstantiateVector();
   }
 
   std::unique_ptr<Matrix> createMatrix(
@@ -168,12 +192,13 @@ namespace panacea {
     return mat_eig;
   }
 
-  std::unique_ptr<Matrix> pseudoInverse(const Matrix * mat, const MatrixType type) {
-      if(MatrixType::Default != mat->type() && MatrixType::Eigen != mat->type()){
-        PANACEA_FAIL("Pseudo inverse is not supported for specified matrix type.");
+  std::unique_ptr<Matrix> pseudoInverse(const Matrix & mat, const MatrixType type) {
+      auto new_mat = createMatrix(mat.rows(), mat.cols(), type);
+      if( mat.type() == MatrixType::Eigen or mat.type() == MatrixType::Default) {
+        pseudoInverse(*new_mat, dynamic_cast<const MatrixEigen &>(mat));
+      } else {
+        PANACEA_FAIL("Unsupported matrix type for pseudo inverse.");
       }
-      auto new_mat = createMatrix(mat->rows(), mat->cols(), type);
-      pseudoInverse(new_mat.get(), static_cast<const MatrixEigen *>(mat));
       return new_mat;
     }
 }

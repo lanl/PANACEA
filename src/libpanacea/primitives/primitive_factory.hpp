@@ -84,7 +84,7 @@ namespace panacea {
        * in the primitive group will be populated.
        **/
       PrimitiveGroup createGroup(
-          const BaseDescriptorWrapper * dwrapper,
+          const BaseDescriptorWrapper & dwrapper,
           const KernelSpecification & specification,
           const std::string & name = "") const;
 
@@ -110,7 +110,7 @@ namespace panacea {
        **/
       void update(
           const PassKey<PrimitiveGroup> &,
-          const BaseDescriptorWrapper * dwrapper,
+          const BaseDescriptorWrapper & dwrapper,
           PrimitiveGroup & primitive_grp) const;
 
       /**
@@ -123,7 +123,7 @@ namespace panacea {
        **/
       void initialize(
           const PassKey<PrimitiveGroup> &,
-          const BaseDescriptorWrapper * dwrapper,
+          const BaseDescriptorWrapper & dwrapper,
           PrimitiveGroup & primitive_grp) const;
 
       enum class ResetOption {

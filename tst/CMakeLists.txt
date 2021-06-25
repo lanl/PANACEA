@@ -35,11 +35,24 @@ list( APPEND UNIT_TEST_SOURCES
     )
 
 include_directories(helper)
-add_executable(panacea_tests catch_main.cpp ${UNIT_TEST_SOURCES} ${PUBLIC_INTEGRATION_TEST_SOURCES})
-add_dependencies(panacea_tests helper panacea)
-target_link_libraries(panacea_tests PUBLIC panacea helper Catch2::Catch2)
+add_executable(panacea_unit_tests catch_main.cpp ${UNIT_TEST_SOURCES})
+add_dependencies(panacea_unit_tests helper panacea)
+target_link_libraries(panacea_unit_tests PUBLIC panacea helper Catch2::Catch2)
+ParseAndAddCatchTests(panacea_unit_tests)
 
-ParseAndAddCatchTests(panacea_tests)
+add_executable(panacea_public_tests catch_main.cpp ${PUBLIC_INTEGRATION_TEST_SOURCES})
+add_dependencies(panacea_public_tests helper panacea)
+target_link_libraries(panacea_public_tests PUBLIC panacea helper Catch2::Catch2)
+ParseAndAddCatchTests(panacea_public_tests)
 
 get_property(ALL_TESTS DIRECTORY . PROPERTY TESTS)
 
+if(ENABLE_MEMORY_TESTING)
+  find_program(VALGRIND NAMES valgrind)
+  message("Memory tests1 ${VALGRIND}")
+  if(VALGRIND)
+    message("Memory tests2")
+    add_test(NAME panacea_unit_memory_test COMMAND ${VALGRIND} --track-origins=yes ${PROJECT_BINARY_DIR}/tst/panacea_unit_tests)
+  endif()
+
+endif()

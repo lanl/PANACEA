@@ -45,14 +45,13 @@ namespace panacea {
   }
 
   double GaussLogCorrelated::compute(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings
       ) const {
 
-    assert(descriptor_wrapper != nullptr);
     assert(descriptor_ind > -1);
-    assert(descriptor_ind < descriptor_wrapper->getNumberPoints() );
+    assert(descriptor_ind < descriptor_wrapper.getNumberPoints() );
     assert(attributes_.kernel_wrapper != nullptr);
     assert(kernel_index_ > -1);
     assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -61,7 +60,7 @@ namespace panacea {
     assert(attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
     std::cout << "WARNING Multivariate Log normal distribution/Gaussian Log primitive has not yet been vetted." << std::endl;
 
-    auto & descs  = *(descriptor_wrapper);
+    auto & descs  = (descriptor_wrapper);
     auto & kerns = *(attributes_.kernel_wrapper);
     //const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
     auto & red_inv_cov = *(attributes_.reduced_inv_covariance);
@@ -98,14 +97,14 @@ namespace panacea {
   }
 
   std::vector<double> GaussLogCorrelated::compute_grad(
-      const BaseDescriptorWrapper * descriptors,
+      const BaseDescriptorWrapper & descriptors,
       const int descriptor_ind,
       const settings::EquationSetting & prim_settings,
       const settings::GradSetting & grad_setting) const {
 
     throw std::runtime_error("Analytical gradiant method for Multivariate Log normal distribution/GaussLog has not yet been implemented.");
 
-    auto & descs  = *(descriptors);
+    auto & descs  = (descriptors);
     const int ndim = descs.getNumberDimensions();
 
     std::vector<double> grad(ndim,0.0);

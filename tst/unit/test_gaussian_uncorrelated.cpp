@@ -50,7 +50,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   PrimitiveFactory prim_factory;
 
   auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
-      dwrapper.get(),
+      *dwrapper,
       specification);
 
   // There should be two primitives sense it is a one to one ratio and there
@@ -59,11 +59,11 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->getId() == 0);
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->getId() == 1);
   // Get the density located at the center of both primitives
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),0) == Approx(0.0795774715));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),1) == Approx(0.0795774715));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,0) == Approx(0.0795774715));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,1) == Approx(0.0795774715));
 
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(dwrapper.get(),1) == Approx(0.0107696397));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(dwrapper.get(),0) == Approx(0.0107696397));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,1) == Approx(0.0107696397));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,0) == Approx(0.0107696397));
 
   settings::EquationSetting eq_settings = settings::EquationSetting::None;
 
@@ -72,7 +72,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     const int kernel_ind = 0;
     WHEN("Taking graident with respect to kernel"){
       const settings::GradSetting setting = settings::GradSetting::WRTKernel;
-      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting );
+      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting );
       // Because the descriptor and kernel are on top of one another, they are both at the peak of a gaussian kernel
       // the gradient at this point should be 0
       REQUIRE(grad.at(0) == Approx(0.0));
@@ -80,7 +80,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     }
     WHEN("Taking graident with respect to descriptor"){
       const settings::GradSetting setting = settings::GradSetting::WRTDescriptor;
-      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting );
+      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting );
       // Because the descriptor and kernel are on top of one another, they are both at the peak of a gaussian kernel
       // the gradient at this point should be 0
       REQUIRE(grad.at(0) == Approx(0.0));
@@ -95,18 +95,17 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
     const int kernel_ind = 1;
     WHEN("Taking graident with respect to kernel"){
       const settings::GradSetting setting = settings::GradSetting::WRTKernel;
-      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting );
+      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting );
       REQUIRE(grad.at(0) == Approx(0.0));
       REQUIRE(grad.at(1) == Approx(0.0));
     }
     WHEN("Taking graident with respect to descriptor"){
       const settings::GradSetting setting = settings::GradSetting::WRTDescriptor;
-      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting );
+      const auto grad = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting );
       REQUIRE(grad.at(0) == Approx(0.0));
       REQUIRE(grad.at(1) == Approx(0.0));
     }
   }
-
 
 }
 
@@ -145,12 +144,12 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
     PrimitiveFactory prim_factory;
 
     auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
-        dwrapper.get(),
+        *dwrapper,
         specification);
 
     std::vector<double> grad_wrt_desc;
     const settings::GradSetting setting1 = settings::GradSetting::WRTDescriptor;
-    grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting1 );
+    grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting1 );
 
     // Compare with numerical result
     std::vector<std::vector<double>> raw_desc_data2{
@@ -159,7 +158,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
     auto dwrapper2 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,2, 2);
 
-    const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper2.get(),descriptor_ind);
+    const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper2,descriptor_ind);
 
     std::vector<std::vector<double>> raw_desc_data3{
       {numbers1.at(index)           , numbers2.at(index)},
@@ -168,14 +167,14 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
     auto dwrapper3 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data3,2, 2);
 
-    const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper3.get(),descriptor_ind);
+    const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper3,descriptor_ind);
 
     const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));
 
     REQUIRE( grad_val_numer == Approx(grad_wrt_desc.at(0)));
 
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
-    const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
+    const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting2 );
 
     REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop
@@ -218,13 +217,13 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     PrimitiveFactory prim_factory;
 
     auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
-        dwrapper.get(),
+        *dwrapper,
         specification);
 
     std::cout << "\n*********************Analytical begin***************" << std::endl;
     std::vector<double> grad_wrt_desc;
     const settings::GradSetting setting1 = settings::GradSetting::WRTDescriptor;
-    grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting1 );
+    grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting1 );
 
     std::cout << "*********************Analytical end***************\n" << std::endl;
     // Compare with numerical resul
@@ -235,7 +234,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,2, 2);
 
     std::cout << "\n*********************Numerical begin***************" << std::endl;
-    const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper2.get(),descriptor_ind);
+    const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper2,descriptor_ind);
 
     std::vector<std::vector<double>> raw_desc_data3{
       {numbers1.at(index)           , numbers2.at(index)},
@@ -244,17 +243,17 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     auto dwrapper3 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data3,2, 2);
 
-    const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(dwrapper3.get(),descriptor_ind);
+    const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper3,descriptor_ind);
 
     std::cout << "\n*********************Numerical end***************" << std::endl;
-    const std::vector<double> norm_coeffs =  gauss_uncorrelated_prim_grp.normalizer.getNormalizationCoeffs();
+    const std::vector<double> norm_coeffs =  gauss_uncorrelated_prim_grp.normalizer->getNormalizationCoeffs();
     const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));// * norm_coeffs.at(0);
 
     std::cout << "Grad val diff top " << (val2-val3) << std::endl;
     std::cout << "Grad val diff bottom " << (raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0)) << std::endl;
     REQUIRE( grad_val_numer == Approx(grad_wrt_desc.at(0)));
     const settings::GradSetting setting2 = settings::GradSetting::WRTKernel;
-    const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(dwrapper.get(), descriptor_ind, eq_settings, setting2 );
+    const auto grad_wrt_kern = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting2 );
 
     REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop

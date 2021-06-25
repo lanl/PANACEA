@@ -37,7 +37,7 @@ namespace panacea {
         DataPointTemplate<T> data_wrapper_;
 
         virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
-        virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
+        virtual BaseKernelWrapper::WriteFunction getWriteFunction_() const final;
 
       public:
 
@@ -70,7 +70,7 @@ namespace panacea {
           data_wrapper_(*data, rows, cols) {};
 
         KernelWrapper(const PassKey<test::Test> &,
-            const BaseDescriptorWrapper * desc_wrapper);
+            const BaseDescriptorWrapper & desc_wrapper);
 
         virtual const settings::KernelCenterCalculation center() const noexcept final;
         virtual const settings::KernelCount count() const noexcept final;
@@ -86,7 +86,7 @@ namespace panacea {
         virtual const Arrangement & arrangement() const noexcept final;
         virtual void set(const Arrangement arrangement) final;
 
-        virtual void update(const BaseDescriptorWrapper *) final;
+        virtual void update(const BaseDescriptorWrapper &) final;
         virtual const std::any getPointerToRawData() const noexcept final;
         virtual std::type_index getTypeIndex() const noexcept final;
         virtual void print() const final;
@@ -102,26 +102,26 @@ namespace panacea {
             const int rows,
             const int cols);
 
-        static std::istream & read(BaseKernelWrapper *, std::istream &);
-        static std::ostream & write(BaseKernelWrapper *, std::ostream &);
+        static std::istream & read(BaseKernelWrapper &, std::istream &);
+        static std::ostream & write(const BaseKernelWrapper &, std::ostream &);
     };
 
   template<class T>
     KernelWrapper<T>::KernelWrapper(
         const PassKey<test::Test> &,
-        const BaseDescriptorWrapper * dwrapper) {
+        const BaseDescriptorWrapper & dwrapper) {
 
       if constexpr(std::is_pointer<T>::value) {
         data_wrapper_ = DataPointTemplate<T>(
-            std::any_cast<T>(dwrapper->getPointerToRawData()),
-            dwrapper->rows(),
-            dwrapper->cols());
+            std::any_cast<T>(dwrapper.getPointerToRawData()),
+            dwrapper.rows(),
+            dwrapper.cols());
       } else {
         // Because dwrapper is const
         data_wrapper_ = DataPointTemplate<T>(
-            *(std::any_cast<const T *>(dwrapper->getPointerToRawData())),
-            dwrapper->rows(),
-            dwrapper->cols());
+            *(std::any_cast<const T *>(dwrapper.getPointerToRawData())),
+            dwrapper.rows(),
+            dwrapper.cols());
       }
     }
 
@@ -181,11 +181,11 @@ namespace panacea {
     }
 
   template<class T>
-    inline void KernelWrapper<T>::update(const BaseDescriptorWrapper * dwrapper) {
+    inline void KernelWrapper<T>::update(const BaseDescriptorWrapper & dwrapper) {
       data_wrapper_ = DataPointTemplate<T>(
-          std::any_cast<T>(dwrapper->getPointerToRawData()),
-          dwrapper->rows(),
-          dwrapper->cols());
+          std::any_cast<T>(dwrapper.getPointerToRawData()),
+          dwrapper.rows(),
+          dwrapper.cols());
     }
 
   template<class T>
@@ -207,7 +207,9 @@ namespace panacea {
 
       std::any data;
     std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
+      if( std::type_index(typeid(const BaseDescriptorWrapper *)) ==
+          std::type_index(data_in.type())){
+
         data = std::any_cast<const BaseDescriptorWrapper *>(data_in)->getPointerToRawData();
       } else {
         data = data_in;
@@ -277,12 +279,12 @@ namespace panacea {
     }
 
   template<class T>
-    inline std::istream & KernelWrapper<T>::read(BaseKernelWrapper *, std::istream & is) {
+    inline std::istream & KernelWrapper<T>::read(BaseKernelWrapper &, std::istream & is) {
       return is;
     }
 
   template<class T>
-    inline std::ostream & KernelWrapper<T>::write(BaseKernelWrapper *, std::ostream & os) {
+    inline std::ostream & KernelWrapper<T>::write(const BaseKernelWrapper &, std::ostream & os) {
       return os;
     }
 
@@ -298,7 +300,7 @@ namespace panacea {
     }
 
   template<class T>
-    inline BaseKernelWrapper::WriteFunction KernelWrapper<T>::getWriteFunction_() {
+    inline BaseKernelWrapper::WriteFunction KernelWrapper<T>::getWriteFunction_() const {
       return KernelWrapper<T>::write;
     }
 

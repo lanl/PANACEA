@@ -25,7 +25,7 @@ namespace panacea {
     public:
       using EntropyCreateMethod = std::unique_ptr<EntropyTerm>(*)(
           const PassKey<EntropyFactory> & key,
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & settings);
 
       using EntropyCreateShellMethod = std::unique_ptr<EntropyTerm>(*)(
@@ -61,7 +61,7 @@ namespace panacea {
         }
 
       std::unique_ptr<EntropyTerm> create(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & settings) const;
 
       std::unique_ptr<EntropyTerm> create(

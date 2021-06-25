@@ -22,7 +22,7 @@ namespace panacea {
       virtual ~MatrixEigen() final {};
       virtual const MatrixType type() const final;
       virtual MatrixEigen & operator=(const MatrixEigen & mat) final;
-      virtual MatrixEigen & operator=(const Matrix * mat) final;
+      virtual MatrixEigen & operator=(const Matrix & mat) final;
       virtual double& operator()(const int row, const int col) final;
       virtual double operator()(const int row, const int col) const final;
 
@@ -44,7 +44,7 @@ namespace panacea {
       Eigen::MatrixXd pseudoInverse() const;
   };
 
-  void pseudoInverse(Matrix * return_mat, const MatrixEigen * mat);
+  void pseudoInverse(Matrix & return_mat, const MatrixEigen & mat);
 
 }
 

@@ -6,6 +6,7 @@
 #include "covariance_functions.hpp"
 #include "error.hpp"
 #include "matrix/matrix.hpp"
+#include "type_map.hpp"
 #include "vector/vector.hpp"
 
 // Local public PANACEA includes
@@ -18,6 +19,7 @@
 #include <iostream>
 #include <optional>
 #include <vector>
+#include <typeindex>
 
 namespace panacea {
 
@@ -232,21 +234,75 @@ namespace panacea {
       std::ostream & os,
       std::any cov_instance) {
 
+    const CovarianceCorrelated & cov_mat = [&]() -> const CovarianceCorrelated & {
+      if( std::type_index(cov_instance.type()) == 
+          std::type_index(typeid(Covariance *))){
+
+        return const_cast<const CovarianceCorrelated &>(
+            dynamic_cast<CovarianceCorrelated &>(
+              *std::any_cast<Covariance *>(cov_instance)));
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance &))){
+        
+        return const_cast<const CovarianceCorrelated &>(
+            dynamic_cast<CovarianceCorrelated &>(
+              std::any_cast<Covariance &>(cov_instance)));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance *))){
+
+        return dynamic_cast<const CovarianceCorrelated &>(
+            *std::any_cast<const Covariance *>(cov_instance));
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance &))){
+
+        return dynamic_cast<const CovarianceCorrelated &>(
+            std::any_cast<const Covariance &>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceCorrelated *))){
+
+        return const_cast<const CovarianceCorrelated &>(
+            *std::any_cast<CovarianceCorrelated *>(cov_instance));
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceCorrelated &))){
+
+        return const_cast<const CovarianceCorrelated &>(
+            std::any_cast<CovarianceCorrelated &>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const CovarianceCorrelated *))){
+
+        return *std::any_cast<const CovarianceCorrelated *>(cov_instance);
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const CovarianceCorrelated &))){
+
+        return std::any_cast<const CovarianceCorrelated &>(cov_instance);
+
+      } else {
+        std::string error_msg = "Unsupported Covariance type encountered.";
+        PANACEA_FAIL(error_msg);
+      }
+      return std::any_cast<const CovarianceCorrelated &>(cov_instance);
+    }();
+
     std::vector<std::any> nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      auto cov_mat_generic = std::any_cast<Covariance *>(cov_instance);
-      auto cov_mat = dynamic_cast<CovarianceCorrelated *>(cov_mat_generic);
-      os << cov_mat->total_number_data_pts_ << "\n\n";
+
+      os << cov_mat.total_number_data_pts_ << "\n\n";
       os << "[Normalization State]\n";
-      os << cov_mat->normalized_ << "\n\n";
+      os << cov_mat.normalized_ << "\n\n";
       // Note order of writing out the covariance matrix must be the
       // same as order of reading in
-      nested_objs.push_back(cov_mat->matrix_.get());
-      nested_objs.push_back(cov_mat->mean_.get());
-    } else {
-      PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
+      nested_objs.push_back(cov_mat.matrix_.get());
+      nested_objs.push_back(cov_mat.mean_.get());
     }
+
     return nested_objs;
   }
 
@@ -255,24 +311,57 @@ namespace panacea {
       std::istream & is,
       std::any cov_instance) {
 
+    CovarianceCorrelated & cov_mat = [&]() -> CovarianceCorrelated & {
+      if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance *))){
+
+        return dynamic_cast<CovarianceCorrelated &>(
+              *std::any_cast<Covariance *>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(std::unique_ptr<Covariance> *))){
+
+        return dynamic_cast<CovarianceCorrelated &>(
+              *std::any_cast<std::unique_ptr<Covariance> *>(cov_instance)->get());
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance &))){
+
+        return dynamic_cast<CovarianceCorrelated &>(
+              std::any_cast<Covariance &>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceCorrelated *))){
+
+        return *std::any_cast<CovarianceCorrelated *>(cov_instance);
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceCorrelated &))){
+
+        return std::any_cast<CovarianceCorrelated &>(cov_instance);
+
+      } else {
+        std::string error_msg = "Unsupported Covariance type encountered.";
+        if( type_map.count(std::type_index(cov_instance.type()))){
+          error_msg += "Type identified as: ";
+          error_msg += type_map.at(std::type_index(cov_instance.type()));
+          error_msg += "\n";
+        }
+        PANACEA_FAIL(error_msg);
+      }
+      return std::any_cast<CovarianceCorrelated &>(cov_instance);
+    }();
+
     io::ReadInstantiateVector nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      CovarianceCorrelated * cov_mat = nullptr;
-      if(std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))) {
-        auto cov_mat_generic = std::any_cast<Covariance *>(cov_instance);
-        cov_mat = dynamic_cast<CovarianceCorrelated *>(cov_mat_generic);
-      } else if(std::type_index(cov_instance.type()) == std::type_index(typeid(std::unique_ptr<Covariance> *))) {
-        auto cov_mat_generic = std::any_cast<std::unique_ptr<Covariance> *>(cov_instance);
-        cov_mat = (dynamic_cast<CovarianceCorrelated *>(cov_mat_generic->get()));
-      }
-      assert(cov_mat != nullptr);
+
       std::string line = "";
 
       std::getline(is, line);
       {
         std::istringstream ss(line);
-        ss >> cov_mat->total_number_data_pts_;
+        ss >> cov_mat.total_number_data_pts_;
       }
 
       while(line.find("[Normalization State]",0) == std::string::npos) {
@@ -286,29 +375,27 @@ namespace panacea {
 
       std::getline(is, line);
       if( line.find("Normalized",0) != std::string::npos){
-        cov_mat->normalized_ = NormalizationState::Normalized;
+        cov_mat.normalized_ = NormalizationState::Normalized;
       }else if(line.find("Unnormalized",0) != std::string::npos ) {
-        cov_mat->normalized_ = NormalizationState::Unnormalized;
+        cov_mat.normalized_ = NormalizationState::Unnormalized;
       } else {
         std::cout << "Warning normalization state value is missing from restart file.";
         std::cout << " Assuming covariance data is unnormalized.\n";
         std::cout << "line is: " << line << std::endl;
-        cov_mat->normalized_ = NormalizationState::Unnormalized;
+        cov_mat.normalized_ = NormalizationState::Unnormalized;
       }
 
       // Check to see if memory has been allocated to the internal vector and matrix
-      if( cov_mat->matrix_.get() == nullptr ) {
-        cov_mat->matrix_ = createMatrix(0,0);
+      if( cov_mat.matrix_.get() == nullptr ) {
+        cov_mat.matrix_ = createMatrix(0,0);
       }
-      if( cov_mat->mean_.get() == nullptr ) {
-        cov_mat->mean_ = createVector(0);
+      if( cov_mat.mean_.get() == nullptr ) {
+        cov_mat.mean_ = createVector(0);
       }
-      std::cout << "Correlated Covariance read in matrix added" << std::endl;
-      nested_objs.emplace_back(cov_mat->matrix_.get(), std::nullopt);
-      nested_objs.emplace_back(cov_mat->mean_.get(),std::nullopt);
-    } else {
-      PANACEA_FAIL("Covariance matrix cannot be written to specified file type not supported.");
+      nested_objs.emplace_back(cov_mat.matrix_.get(), std::nullopt);
+      nested_objs.emplace_back(cov_mat.mean_.get(),std::nullopt);
     }
+
     return nested_objs;
   }
 }

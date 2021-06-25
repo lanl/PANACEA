@@ -59,14 +59,14 @@ namespace panacea {
           const settings::KernelNormalization & norm_method, 
           const NormalizerOption opt = NormalizerOption::Strict);
 
-      Normalizer(const BaseDescriptorWrapper * descriptor_wrapper,
+      Normalizer(const BaseDescriptorWrapper & descriptor_wrapper,
           const settings::KernelNormalization & norm_method, 
           const NormalizerOption opt = NormalizerOption::Strict);
 
-      const std::vector<double> & getNormalizationCoeffs() const noexcept;
+      const std::vector<double> getNormalizationCoeffs() const;
 
       void update(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           std::any extra_args = settings::None::None);
 
       template<class T>

@@ -97,13 +97,13 @@ namespace panacea {
     // 4 0 0 0 0
     //
     std::vector<int> reorderSymmetricMatrix_(
-        Matrix * mat, const std::vector<int> & priority_rows) {
+        Matrix & mat, const std::vector<int> & priority_rows) {
 
       // Next we need to keep track of where the original rows are located in the
       // covariance matrix
       std::vector<int> ind_rows;
-      ind_rows.reserve(mat->rows());
-      for( int ind =0; ind< mat->rows(); ++ind){
+      ind_rows.reserve(mat.rows());
+      for( int ind =0; ind< mat.rows(); ++ind){
         ind_rows.push_back(ind);
       }
       std::vector<int> ind_cols = ind_rows;
@@ -119,13 +119,13 @@ namespace panacea {
         int chosen_row = priority_rows_tmp1.at(index);
 
         int index_of_chosen = 0;
-        for(;index_of_chosen<mat->rows();++index_of_chosen){
+        for(;index_of_chosen<mat.rows();++index_of_chosen){
           if(ind_rows.at(index_of_chosen) == chosen_row) { break; }
         }
 
         if( index_of_chosen != index ) {
-          for( int col = 0; col < mat->cols(); ++col){
-            std::swap(mat->operator()(index,col),mat->operator()(index_of_chosen,col));
+          for( int col = 0; col < mat.cols(); ++col){
+            std::swap(mat(index,col),mat(index_of_chosen,col));
           }
           std::swap(ind_rows.at(index), ind_rows.at(index_of_chosen));
         }
@@ -135,12 +135,12 @@ namespace panacea {
       for(int index=0; index < priority_rows_tmp2.size(); ++index ){
         int chosen_col = priority_rows_tmp2.at(index);
         int index_of_chosen = 0;
-        for(;index_of_chosen<mat->cols();++index_of_chosen){
+        for(;index_of_chosen<mat.cols();++index_of_chosen){
           if(ind_cols.at(index_of_chosen) == chosen_col) { break; }
         }
         if ( index_of_chosen != index ) {
-          for( int row = 0; row < mat->rows(); ++row){
-            std::swap(mat->operator()(row, index),mat->operator()(row,index_of_chosen));
+          for( int row = 0; row < mat.rows(); ++row){
+            std::swap(mat(row, index),mat(row,index_of_chosen));
           }
           std::swap(ind_cols.at(index), ind_cols.at(index_of_chosen));
         }
@@ -149,7 +149,7 @@ namespace panacea {
     }
 
     std::vector<int> detectIndependentRows_(
-        Matrix * tmp,
+        Matrix & tmp,
         const std::vector<int> & ind_rows,
         const double threshold
         ) {
@@ -157,9 +157,9 @@ namespace panacea {
       // Now we will determine which rows are actually independent
       // The order does not matter
       std::vector<int> independent_rows;
-      for(int i = 0; i<tmp->rows(); ++i){
-        for(int k=0; k<tmp->cols(); ++k){
-          if( std::abs(tmp->operator()(i,k)) > threshold){
+      for(int i = 0; i<tmp.rows(); ++i){
+        for(int k=0; k<tmp.cols(); ++k){
+          if( std::abs(tmp(i,k)) > threshold){
             independent_rows.push_back(ind_rows.at(i));
             break;
           }
@@ -173,7 +173,7 @@ namespace panacea {
      * what constitutes a 0.
      */
     std::vector<int> rowEchelonDimensionDependenceDetection_(
-        Matrix * tmp,
+        Matrix & tmp,
         const double threshold) {
 
       RowEchelon row_echelon(threshold);
@@ -211,7 +211,7 @@ namespace panacea {
       }
 
       // Next we are going to reorder the covariance matrix
-      std::vector<int> order = reorderSymmetricMatrix_(tmp.get(), priority_rows);
+      std::vector<int> order = reorderSymmetricMatrix_(*tmp.get(), priority_rows);
 
       // E.g.
       // order.at(0) is row of reordered tmp that points back to the original tmp matrix
@@ -222,7 +222,7 @@ namespace panacea {
       // swapped, because the diagonal may not be non zero at the dimension of interest
       // this does not constitute an error
       const std::vector<int> relative_independent_rows =
-        rowEchelonDimensionDependenceDetection_(tmp.get(), threshold);
+        rowEchelonDimensionDependenceDetection_(*tmp.get(), threshold);
 
       // relative_independent_rows has not accounted for the changes in rows that occurred
       // during the call to reorderSymmetricMatrix this corrects the row indices

@@ -15,27 +15,27 @@ namespace panacea {
     bool makeElementNonZero_(
         const int i,
         const int m,
-        Matrix * tmp,
+        Matrix & tmp,
         const double threshold,
         std::vector<int> & ind_rows
         ){
 
       // Check to see if current column is 0 and if we
       // need to swap with a row that is lower down in the matrix
-      if( std::abs(tmp->operator()(i,m)) < threshold ) {
+      if( std::abs(tmp(i,m)) < threshold ) {
         // This means current column is close to 0.0 we will start by going
         // ahead and rounding it to 0.0
-        tmp->operator()(i,m) = 0.0;
+        tmp(i,m) = 0.0;
 
         // Ensure there are as many columns as rows before proceeding
-        if(m < tmp->cols() ) {
-          for(int j = i+1; j<tmp->rows(); ++j){
+        if(m < tmp.cols() ) {
+          for(int j = i+1; j<tmp.rows(); ++j){
             // Find the first row j underneath row i that has a non 0
             // element in the same column (in column i).
-            if( std::abs(tmp->operator()(j,m)) > threshold) {
+            if( std::abs(tmp(j,m)) > threshold) {
               // Swap the rows
-              for( int k = m; k <tmp->cols(); ++k){
-                std::swap(tmp->operator()(i,k), tmp->operator()(j,k));
+              for( int k = m; k <tmp.cols(); ++k){
+                std::swap(tmp(i,k), tmp(j,k));
               }
               std::swap(ind_rows.at(i), ind_rows.at(j));
               return true;
@@ -51,22 +51,22 @@ namespace panacea {
     void scaleAllRowsUnderElement_(
         const int i,
         const int m,
-        Matrix * tmp,
+        Matrix & tmp,
         const double threshold
         ){
 
-      for(int j = i+1; j<tmp->rows(); ++j) {
+      for(int j = i+1; j<tmp.rows(); ++j) {
         double scale;
-        if( std::abs(tmp->operator()(i,m)) < threshold ) {
+        if( std::abs(tmp(i,m)) < threshold ) {
           scale = 0.0;
         } else {
-          scale = tmp->operator()(j,m) / tmp->operator()(i,m);
+          scale = tmp(j,m) / tmp(i,m);
         }
-        for( int k = m; k<tmp->cols(); ++k) {
-          tmp->operator()(j,k) = tmp->operator()(j,k) - scale * tmp->operator()(i,k);
-          if( std::abs(tmp->operator()(j,k)) < threshold ) {
+        for( int k = m; k<tmp.cols(); ++k) {
+          tmp(j,k) = tmp(j,k) - scale * tmp(i,k);
+          if( std::abs(tmp(j,k)) < threshold ) {
             // Just make it 0.0 if it is small
-            tmp->operator()(j,k) = 0.0;
+            tmp(j,k) = 0.0;
           }
         }
       } // rows j
@@ -74,17 +74,17 @@ namespace panacea {
 
   } // namespace
 
-  std::vector<int> RowEchelon::operate(Matrix * tmp) {
+  std::vector<int> RowEchelon::operate(Matrix & tmp) {
       // Used to keep track of the rows
-      std::vector<int> ind_rows(tmp->rows());
+      std::vector<int> ind_rows(tmp.rows());
       std::iota(ind_rows.begin(), ind_rows.end(), 0);
 
-      for(int i = 0; i< tmp->rows(); ++i){
+      for(int i = 0; i< tmp.rows(); ++i){
 
         // Start at the diagonal but if no suitable swap is possible move
         // to the next column
         int m = i;
-        for(; m < tmp->cols(); ++m){
+        for(; m < tmp.cols(); ++m){
           if(makeElementNonZero_(i, m, tmp, threshold_, ind_rows)) {
             scaleAllRowsUnderElement_(i, m, tmp, threshold_);
             break;

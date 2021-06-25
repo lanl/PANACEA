@@ -62,7 +62,7 @@ namespace panacea {
   }
 
   std::unique_ptr<EntropyTerm> EntropyFactory::create(
-      const BaseDescriptorWrapper * descriptor_wrapper,
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & settings) const {
 
     if(create_methods_.count(settings.type) == 0){

@@ -26,7 +26,7 @@ namespace panacea {
           const int cols) const;
 
       std::unique_ptr<EntropyTerm> create(
-          const BaseDescriptorWrapper *,
+          const BaseDescriptorWrapper &,
           const PANACEASettings & settings) const;
 
       std::unique_ptr<EntropyTerm> create(

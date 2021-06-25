@@ -29,7 +29,7 @@ namespace panacea {
         return entropy_term_->getReadFunction(key);
       }
 
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) override {
+      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override {
         return entropy_term_->getWriteFunction(key);
       }
 
@@ -38,14 +38,14 @@ namespace panacea {
       }
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & entropy_settings
           ) override {
         return entropy_term_->compute(descriptor_wrapper, entropy_settings);
       }
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings
           ) override {
@@ -53,14 +53,14 @@ namespace panacea {
       }
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const PANACEASettings & panacea_settings
           ) override {
         return entropy_term_->compute(descriptor_wrapper, panacea_settings);
       }
 
       virtual double compute(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings
           ) override {
@@ -68,14 +68,14 @@ namespace panacea {
       }
 
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) override {
         return entropy_term_->compute_grad(descriptor_wrapper, desc_ind, entropy_settings);
       }
 
       virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper * descriptor_wrapper,
+          const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings) override;
 
@@ -87,11 +87,11 @@ namespace panacea {
         return entropy_term_->getDimensions();
       }
 
-      virtual void update(const BaseDescriptorWrapper * descriptor_wrapper) override {
+      virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) override {
         return entropy_term_->update(descriptor_wrapper);
       }
 
-      virtual void initialize(const BaseDescriptorWrapper * descriptor_wrapper) override {
+      virtual void initialize(const BaseDescriptorWrapper & descriptor_wrapper) override {
         return entropy_term_->initialize(descriptor_wrapper);
       }
   };

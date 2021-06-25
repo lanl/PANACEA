@@ -38,7 +38,7 @@ namespace panacea {
       FileRestartTXT::post_read_initialization_;
 
     FileRestartTXT::FileRestartTXT() {
-      // Alaways registers as a pointer
+      // Alaways registers as a pointer and reference
       registerWriteMethod<Covariance>();
       registerWriteMethod<Matrix>();
       registerWriteMethod<Vector>();
@@ -65,12 +65,16 @@ namespace panacea {
         std::ostream & os) {
 
       for( auto & obj : objs ) {
-        if( write_methods_.count(obj.type()) == 0 ) {
+        if( write_methods_.count(std::type_index(obj.type())) == 0 ) {
           std::string error_msg = "Unable to write object to restart file, write ";
           error_msg += "method is missing.";
+          if( type_map.count(std::type_index(obj.type()))){
+            error_msg += "\nType identified as: ";
+            error_msg += type_map.at(std::type_index(obj.type())) + "\n";
+          }
           PANACEA_FAIL(error_msg);
         }
-        auto data = write_methods_[obj.type()](type(), os, obj);
+        auto data = write_methods_[std::type_index(obj.type())](type(), os, obj);
         write_(data, os);
 
       }
@@ -83,9 +87,13 @@ namespace panacea {
 
       for( auto & obj : objs ) {
 
-        if( read_methods_.count(obj.instance.type()) == 0 ) {
+        if( read_methods_.count(std::type_index(obj.instance.type())) == 0 ) {
           std::string error_msg = "Unable to read object from restart txt file, read ";
           error_msg += "method is missing.";
+          if( type_map.count(std::type_index(obj.instance.type()))){
+            error_msg += "\nType identified as: ";
+            error_msg += type_map.at(std::type_index(obj.instance.type())) + "\n";
+          }
           PANACEA_FAIL(error_msg);
         }
         auto data = read_methods_[obj.instance.type()](type(), is, obj.instance);
@@ -113,12 +121,16 @@ namespace panacea {
     void FileRestartTXT::write(std::any obj, std::ostream & os) {
 
       // Check if object type is registered
-      if( write_methods_.count(obj.type()) ) {
+      if( write_methods_.count(std::type_index(obj.type())) ) {
         auto data = write_methods_[obj.type()](type(),os,obj);
         write_(data, os);
       } else {
         std::string error_msg = "Unable to write object it does not contain ";
         error_msg += "a registered write method.";
+        if( type_map.count(std::type_index(obj.type()))){
+          error_msg += "\nType identified as: ";
+          error_msg += type_map.at(std::type_index(obj.type())) + "\n";
+        }
         PANACEA_FAIL(error_msg);
       }
     }
@@ -136,16 +148,20 @@ namespace panacea {
     void FileRestartTXT::read(std::any obj, std::istream & is) {
 
       // Check if object type is registered
-      if( read_methods_.count(obj.type()) ) {
-        auto data = read_methods_[obj.type()](type(),is,obj);
+      if( read_methods_.count(std::type_index(obj.type())) ) {
+        auto data = read_methods_[std::type_index(obj.type())](type(),is,obj);
         read_(obj, data, is);
       } else {
         std::string error_msg = "Unable to read object it does not contain ";
         error_msg += "a registered read method.";
+        if( type_map.count(std::type_index(obj.type()))){
+          error_msg += "\nType identified as: ";
+          error_msg += type_map.at(std::type_index(obj.type())) + "\n";
+        }
         PANACEA_FAIL(error_msg);
       }
 
-      if( post_read_initialization_.count(obj.type())){
+      if( post_read_initialization_.count(std::type_index(obj.type()))){
         post_read_initialization_[obj.type()](type(),obj);
       }
     }
