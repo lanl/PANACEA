@@ -15,16 +15,17 @@ namespace panacea {
     Ordered
   };
 
+  class Randomizer;
+
   class Dimensions {
 
-      DimensionState state_ = DimensionState::Ordered;
+      DimensionsState state_ = DimensionsState::Ordered;
       std::vector<int> descriptor_dimensions_;
     public:
       /**
        * Specificy the maximum number of dimensions that can be used.
        **/
-      explicit Dimensions(const int max_num_dimensions) :
-        descriptor_dimensions_(max_num_dimensions);
+      explicit Dimensions(const int max_num_dimensions);
 
       std::vector<int>::const_iterator begin() const noexcept;
       std::vector<int>::const_iterator end() const noexcept;
@@ -35,6 +36,8 @@ namespace panacea {
        * Randomizer
        **/
       void set(PassKey<Randomizer>, DimensionsState state);
+
+      const DimensionsState state() const noexcept { return state_; }
 
       std::size_t size() const noexcept { return descriptor_dimensions_.size(); }
 

@@ -245,7 +245,7 @@ namespace panacea {
 
     std::unique_ptr<Matrix> createRedCovarRawMatrix_(
       const Covariance & cov,
-      std::vector<int> independent_rows) {
+      const std::vector<int> & independent_rows) {
 
       const int len = independent_rows.size();
 
@@ -253,9 +253,9 @@ namespace panacea {
       // Also need to know which reduced rows map to which dimensions of the original
       // covariance matrix
       int reduced_row = 0;
-      for( int ind_row : independent_rows){
+      for( const int ind_row : independent_rows){
         int reduced_col = 0;
-        for( int ind_col : independent_rows){
+        for( const int ind_col : independent_rows){
           reduced_covar_raw_mat->operator()(reduced_row, reduced_col) = cov(ind_row,ind_col);
           reduced_covar_raw_mat->operator()(reduced_col, reduced_row) = cov(ind_col,ind_row);
           ++reduced_col;

@@ -36,17 +36,15 @@ namespace panacea {
 
   /*
    * The only thing that gets normalized and unnormalized is
-   * the covariance matrix. 
+   * the covariance matrix.
    *
    * It would be unnormalized before the covariance matrix could
-   * be updated and normalized afterwards. 
+   * be updated and normalized afterwards.
    **/
   class Normalizer {
       std::vector<double> normalization_coeffs_;
       NormalizationMethodFactory::NormalizationMethod norm_method_ = nullptr;
       NormalizerOption norm_option_ = NormalizerOption::Strict;
-
-
     public:
       Normalizer() = default;
       Normalizer(const std::vector<double> & normalization_coeffs,
@@ -56,11 +54,11 @@ namespace panacea {
        * Appropriate for loading values from a restart file
        **/
       Normalizer(
-          const settings::KernelNormalization & norm_method, 
+          const settings::KernelNormalization & norm_method,
           const NormalizerOption opt = NormalizerOption::Strict);
 
       Normalizer(const BaseDescriptorWrapper & descriptor_wrapper,
-          const settings::KernelNormalization & norm_method, 
+          const settings::KernelNormalization & norm_method,
           const NormalizerOption opt = NormalizerOption::Strict);
 
       const std::vector<double> getNormalizationCoeffs() const;
@@ -72,8 +70,8 @@ namespace panacea {
       template<class T>
       T get() const noexcept;
 
-      void normalize(Covariance & cov) const; 
-      void unnormalize(Covariance & cov) const; 
+      void normalize(Covariance & cov) const;
+      void unnormalize(Covariance & cov) const;
 
       static std::vector<std::any> write(
           const settings::FileType file_type,
@@ -93,7 +91,7 @@ namespace panacea {
     return norm_option_;
   }
 
-  std::ostream& operator<<(std::ostream& os, const NormalizerOption &); 
+  std::ostream& operator<<(std::ostream& os, const NormalizerOption &);
   std::istream& operator>>(std::istream& is, NormalizerOption & );
 }
 #endif // PANACEA_PRIVATE_NORMALIZER_H

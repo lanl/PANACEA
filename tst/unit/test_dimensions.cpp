@@ -13,7 +13,7 @@ TEST_CASE("Testing:dimensions","[unit,panacea]"){
   Dimensions dimensions(5);
 
   REQUIRE(dimensions.size() == 5);
-  REQUIRE(dimensions.state() == DimensionState::Ordered);
+  REQUIRE(dimensions.state() == DimensionsState::Ordered);
 
   int expected_val = 0;
   for( const auto & val : dimensions ) {

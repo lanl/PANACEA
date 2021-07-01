@@ -133,6 +133,18 @@ namespace panacea {
         return numerical_grad_;
       }
 
+      int getMaxNumberOfDimensions() const noexcept {
+        return max_number_dimensions_;
+      }
+
+      bool descriptorDimensionsRandomized() const noexcept {
+        return randomize_descriptor_dimensions_;
+      }
+
+      bool numberDescriptorDimensionsRandomized() const noexcept {
+        return randomize_number_descriptor_dimensions_;
+      }
+
       template<class T>
       std::optional<T> get() const noexcept {
         if constexpr( std::is_same<settings::EntropyType,T>::value ) {
@@ -168,6 +180,11 @@ namespace panacea {
       std::optional<double> weight_;
       std::optional<double> inc_ratio_;
       std::optional<bool> numerical_grad_;
+      // -1 - nocap on dimensions
+      int max_number_dimensions_ = -1;
+
+      bool randomize_descriptor_dimensions_ = false;
+      bool randomize_number_descriptor_dimensions_ = false;
     };
 
   class PANACEASettingsBuilder {
@@ -180,6 +197,22 @@ namespace panacea {
       PANACEASettingsBuilder & weightEntropTermBy(const double & weight);
       PANACEASettingsBuilder & setIncrementRatioTo(const double & inc_ratio);
       PANACEASettingsBuilder & setNumericalGradTo(const bool & on_or_off);
+
+      /**
+       * Cannot have 0 dimensions, default is -1 which means no maximum is set
+       **/
+      PANACEASettingsBuilder & setMaxNumberDescriptorDimensions(const int number_dimensions);
+
+      /**
+       * Determine if the dimensions chosen appear in a randomized order.
+       **/
+      PANACEASettingsBuilder & randomizeDescriptorDimensions(const bool);
+
+      /**
+       * Will randomize the number of dimensions used.
+       **/
+      PANACEASettingsBuilder & randomizeNumberDescriptorDimensions(const bool);
+
       PANACEASettingsBuilder & set(const settings::KernelPrimitive &);
       PANACEASettingsBuilder & set(const settings::KernelCount &);
       PANACEASettingsBuilder & set(const settings::KernelCorrelation &);
