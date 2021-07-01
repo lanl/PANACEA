@@ -51,7 +51,6 @@ namespace panacea {
           kernel_index < prim_grp.kernel_wrapper->getNumberPoints();
           ++kernel_index){
 
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         prim_grp.primitives.push_back(
             create_methods_[prim_grp.getSpecification().get<settings::KernelPrimitive>()]\
             [prim_grp.getSpecification().get<settings::KernelCorrelation>()]\
@@ -60,7 +59,6 @@ namespace panacea {
              kernel_index));
       }
     } else {
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       // Shrink to fit
       prim_grp.primitives.resize(prim_grp.kernel_wrapper->getNumberPoints());
     }
@@ -69,7 +67,6 @@ namespace panacea {
       int num_prim_to_update = initial_num_prim;
       if( diff < 0 ) num_prim_to_update = prim_grp.kernel_wrapper->getNumberPoints();
       // make sure all the primitive attributes are up to date upto the initial_num_priming index
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       for( int kernel_index = 0; kernel_index < num_prim_to_update; ++kernel_index){
         prim_grp.primitives.at(kernel_index)->update(prim_grp.createPrimitiveAttributes());
       }
@@ -201,7 +198,7 @@ namespace panacea {
     // Create a normalizer with kwrapper
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
     prim_grp.normalizer->normalize(*prim_grp.covariance);
-  
+
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
@@ -212,12 +209,7 @@ namespace panacea {
 
     check_input_specifications_(specification);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Calling count_methods_ with " << specification.get<settings::KernelCount>() << std::endl;
-    std::cout << "Normalizer size " << prim_grp.normalizer->getNormalizationCoeffs().size() << std::endl;
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    std::cout << "Normalizer size " << prim_grp.normalizer->getNormalizationCoeffs().size() << std::endl;
 
     return prim_grp;
   }
@@ -285,7 +277,6 @@ namespace panacea {
       PrimitiveGroup & prim_grp) const {
 
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     // Before calling initialize we need to ensure that the descriptor
     // wrapper and the kernel wrapper are of compatible types
     //
@@ -322,7 +313,6 @@ namespace panacea {
         specification.get<settings::KernelAlgorithm>());
 
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
-    std::cout << "Calling normalize from within prim_factory initialize" << std::endl;
     prim_grp.normalizer->normalize(*prim_grp.covariance);
 
     Reducer reducer;
@@ -336,7 +326,6 @@ namespace panacea {
     check_input_specifications_(specification);
 
     count_methods_[specification.get<settings::KernelCount>()](PassKey<PrimitiveFactory>(),prim_grp);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   void PrimitiveFactory::reset(
@@ -344,12 +333,10 @@ namespace panacea {
       PrimitiveGroup & prim_grp,
       const ResetOption reset_opt) const {
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     assert(prim_grp.covariance.get() != nullptr);
     assert(prim_grp.covariance->defined());
     assert(prim_grp.kernel_wrapper.get() != nullptr);
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     if( prim_grp.covariance->is(NormalizationState::Unnormalized) ){
       prim_grp.normalizer->normalize(*prim_grp.covariance);
     }

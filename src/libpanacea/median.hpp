@@ -15,7 +15,7 @@ namespace panacea {
 
   class Median {
 
-    template<class T> 
+    template<class T>
       std::vector<double> createSortedRow(
           const T & data2d,
           const int row){
@@ -24,13 +24,13 @@ namespace panacea {
         local_column.reserve(data2d.cols());
         // Create local copy
         for( int col = 0; col < data2d.cols(); ++col) {
-          local_column.push_back(data2d(row,col)); 
+          local_column.push_back(data2d(row,col));
         }
         std::sort(local_column.begin(), local_column.end());
         return local_column;
-      } 
+      }
 
-    template<class T> 
+    template<class T>
       std::vector<double> createSortedColumn(
           const T & data2d,
           const int col){
@@ -39,11 +39,11 @@ namespace panacea {
         local_row.reserve(data2d.rows());
         // Create local copy
         for( int row = 0; row < data2d.rows(); ++row) {
-          local_row.push_back(data2d(row,col)); 
+          local_row.push_back(data2d(row,col));
         }
         std::sort(local_row.begin(), local_row.end());
         return local_row;
-      } 
+      }
 
     public:
 
@@ -54,13 +54,13 @@ namespace panacea {
      * of the two centeral elements.
      *
      * Can calculate the median along the rows or along the columns
-     * 
-     *       col1   col2  
+     *
+     *       col1   col2
      * row1  0.0    7.0
      * row2  3.0    5.0
      * row3  2.0    3.0
      *
-     * Along rows will return 
+     * Along rows will return
      *
      * row1 3.5
      * row2 4.0
@@ -72,7 +72,7 @@ namespace panacea {
      *     2.0       5.0
      *
      **/
-    template<class T, const Direction dir = Direction::AlongRows> 
+    template<class T, const Direction dir = Direction::AlongRows>
       std::vector<double> calculate(const T & data2d) {
 
         std::vector<double> median;
@@ -80,7 +80,7 @@ namespace panacea {
           if constexpr(dir == Direction::AlongRows) {
             median.reserve(data2d->rows());
             if( data2d->cols() % 2 == 1) {
-              // is odd 
+              // is odd
               for( int row = 0; row < data2d->rows(); ++row){
                 const auto local_row = createSortedRow(*data2d, row);
                 median.push_back(local_row.at(data2d->cols() / 2));
@@ -89,8 +89,8 @@ namespace panacea {
               // is even
               for( int row = 0; row < data2d->rows(); ++row){
                 const auto local_row = createSortedRow(*data2d, row);
-                const double avg_of_two = 
-                  (local_row.at(data2d->cols() / 2) + 
+                const double avg_of_two =
+                  (local_row.at(data2d->cols() / 2) +
                    local_row.at((data2d->cols() / 2) - 1)) * 0.5;
                 median.push_back(avg_of_two);
               }
@@ -98,7 +98,7 @@ namespace panacea {
           } else {
             median.reserve(data2d->cols());
             if( data2d->rows() % 2 == 1) {
-              // is odd 
+              // is odd
               for( int col = 0; col < data2d->cols(); ++col){
                 const auto local_column = createSortedColumn(*data2d, col);
                 median.push_back(local_column.at(data2d->rows() / 2));
@@ -107,25 +107,23 @@ namespace panacea {
               // is even
               for( int col = 0; col < data2d->cols(); ++col){
                 const auto local_column = createSortedColumn(*data2d, col);
-                const double avg_of_two = 
-                  (local_column.at(data2d->rows() / 2) + 
+                const double avg_of_two =
+                  (local_column.at(data2d->rows() / 2) +
                    local_column.at((data2d->rows() / 2) - 1)) * 0.5;
                 median.push_back(avg_of_two);
               }
             }
           }
         } else if constexpr(std::is_same<typename std::remove_const<T>::type, std::vector<std::deque<double>>>::value) {
-      
-          std::cout << "DEQUE MEDIAN" << std::endl;
+
           if(data2d.size() == 0) return median;
 
           const int rows = data2d.size();
           const int cols = data2d.at(0).size();
           if constexpr(dir == Direction::AlongRows) {
-          std::cout << "Along rows" << std::endl;
             median.reserve(rows);
             if( cols % 2 == 1) {
-              // is odd 
+              // is odd
               for( int row = 0; row < rows; ++row){
                 const auto local_row = createSortedRow(data2d, row);
                 median.push_back(local_row.at(cols / 2));
@@ -134,34 +132,28 @@ namespace panacea {
               // is even
               for( int row = 0; row < rows; ++row){
                 const auto local_row = createSortedRow(data2d, row);
-                const double avg_of_two = 
-                  (local_row.at(cols / 2) + 
+                const double avg_of_two =
+                  (local_row.at(cols / 2) +
                    local_row.at((cols / 2) - 1)) * 0.5;
                 median.push_back(avg_of_two);
               }
             }
           } else {
-          std::cout << "Along columns" << std::endl;
             median.reserve(cols);
             if( rows % 2 == 1) {
-              // is odd 
-              std::cout << "Number of columns " << cols << std::endl;
-              std::cout << "Number of rows " << rows << std::endl;
+              // is odd
               for( int col = 0; col < cols; ++col){
                 const auto local_column = createSortedColumn(data2d, col);
-                std::cout << "Odd number value is " << local_column.at(rows / 2) << std::endl;
                 median.push_back(local_column.at(rows / 2));
               }
             } else {
               // is even
-              std::cout << "Number of columns " << cols << std::endl;
               for( int col = 0; col < cols; ++col){
                 const auto local_column = createSortedColumn(data2d, col);
-                const double avg_of_two = 
-                  (local_column.at(rows / 2) + 
+                const double avg_of_two =
+                  (local_column.at(rows / 2) +
                    local_column.at(rows / 2) - 1) * 0.5;
                 median.push_back(avg_of_two);
-                std::cout << "Adding element to median " << avg_of_two << std::endl;
               }
             }
           }
@@ -171,7 +163,7 @@ namespace panacea {
           if constexpr(dir == Direction::AlongRows) {
             median.reserve(data2d.rows());
             if( data2d.cols() % 2 == 1) {
-              // is odd 
+              // is odd
               for( int row = 0; row < data2d.rows(); ++row){
                 const auto local_row = createSortedRow(data2d, row);
                 median.push_back(local_row.at(data2d.cols() / 2));
@@ -180,8 +172,8 @@ namespace panacea {
               // is even
               for( int row = 0; row < data2d.rows(); ++row){
                 const auto local_row = createSortedRow(data2d, row);
-                const double avg_of_two = 
-                  (local_row.at(data2d.cols() / 2) + 
+                const double avg_of_two =
+                  (local_row.at(data2d.cols() / 2) +
                    local_row.at((data2d.cols() / 2) - 1)) * 0.5;
                 median.push_back(avg_of_two);
               }
@@ -189,7 +181,7 @@ namespace panacea {
           } else {
             median.reserve(data2d.cols());
             if( data2d.rows() % 2 == 1) {
-              // is odd 
+              // is odd
               for( int col = 0; col < data2d.cols(); ++col){
                 const auto local_column = createSortedColumn(data2d, col);
                 median.push_back(local_column.at(data2d.rows() / 2));
@@ -198,19 +190,19 @@ namespace panacea {
               // is even
               for( int col = 0; col < data2d.cols(); ++col){
                 const auto local_column = createSortedColumn(data2d, col);
-                const double avg_of_two = 
-                  (local_column.at(data2d.rows() / 2) + 
+                const double avg_of_two =
+                  (local_column.at(data2d.rows() / 2) +
                    local_column.at((data2d.rows() / 2) - 1)) * 0.5;
                 median.push_back(avg_of_two);
               }
             }
           }
         }
-        return median; 
+        return median;
       }
   };
 
-  template<> 
+  template<>
   inline std::vector<double> Median::createSortedRow
     <std::vector<std::deque<double>>>(
         const std::vector<std::deque<double>> & data2d,
@@ -220,13 +212,13 @@ namespace panacea {
       local_column.reserve(data2d.at(0).size());
       // Create local copy
       for( int col = 0; col < data2d.at(0).size(); ++col) {
-        local_column.push_back(data2d.at(row).at(col)); 
+        local_column.push_back(data2d.at(row).at(col));
       }
       std::sort(local_column.begin(), local_column.end());
       return local_column;
-    } 
+    }
 
-  template<> 
+  template<>
   inline std::vector<double> Median::createSortedColumn
     <std::vector<std::deque<double>>>(
         const std::vector<std::deque<double>> & data2d,
@@ -236,11 +228,11 @@ namespace panacea {
       local_row.reserve(data2d.size());
       // Create local copy
       for( int row = 0; row < data2d.size(); ++row) {
-        local_row.push_back(data2d.at(row).at(col)); 
+        local_row.push_back(data2d.at(row).at(col));
       }
       std::sort(local_row.begin(), local_row.end());
       return local_row;
-    } 
+    }
 }
 
 #endif // PANACEA_PRIVATE_MEAN_H

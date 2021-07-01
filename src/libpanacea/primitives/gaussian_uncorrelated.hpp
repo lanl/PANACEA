@@ -54,12 +54,7 @@ namespace panacea {
                       std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) *
                       std::pow(constants::PI_SQRT*constants::SQRT_2,
                       static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
-                {
-                
-                std::cout << __FILE__ <<":" << __LINE__ << std::endl; 
-                std::cout << "Assigning address " << attributes_.normalizer << std::endl;
-                std::cout << attributes_.normalizer->getNormalizationCoeffs().size() << std::endl;
-                };
+                {};
 
       virtual const settings::KernelPrimitive type() const noexcept final;
       virtual const settings::KernelCorrelation correlation() const noexcept final;

@@ -46,7 +46,7 @@ namespace panacea {
 
     assert(this->kernel_wrapper != nullptr);
     assert(this->covariance != nullptr);
-    assert(this->reduced_covariance != nullptr); 
+    assert(this->reduced_covariance != nullptr);
     assert(this->reduced_inv_covariance != nullptr);
 
     return PrimitiveAttributes {
@@ -112,10 +112,10 @@ namespace panacea {
         &prim_grp.specification,
         prim_grp.normalizer.get(),
         prim_grp.kernel_wrapper.get(),
-        prim_grp.covariance.get() 
+        prim_grp.covariance.get()
       };
     }
-    
+
     return  nested_values;
   }
 
@@ -124,8 +124,6 @@ namespace panacea {
       std::istream & is,
       std::any prim_grp_instance) {
 
-    std::cout << __FILE__ <<":"<<__LINE__ << std::endl;
-    std::cout << "Primitive group read" << std::endl;
 
     PrimitiveGroup & prim_grp = [&]() -> PrimitiveGroup & {
       if(std::type_index(prim_grp_instance.type()) ==
@@ -159,20 +157,16 @@ namespace panacea {
       }
       std::getline(is, line);
       prim_grp.name = line;
-      std::cout << __FILE__ <<":"<<__LINE__ << " add spec read " <<  std::endl;
 
       nested_values.emplace_back(&prim_grp.specification,
           postReadKernelSpecsInitialization);
-      std::cout << __FILE__ <<":"<<__LINE__ << " adding normalizer read " << std::endl;
       nested_values.emplace_back(
           &(prim_grp.normalizer),
           std::nullopt);
 
       // Data of objects created with unique pointers need to first be created but after
       // the specifications have been read in
-      std::cout << __FILE__ <<":"<<__LINE__ << " adding kernel_wrapper read " << std::endl;
       nested_values.emplace_back(&(prim_grp.kernel_wrapper),std::nullopt);
-      std::cout << __FILE__ <<":"<<__LINE__ << " adding covar read" << std::endl;
 
       // Note we must use pointers to the unique_pointers because the memory has not yet
       // been allocated

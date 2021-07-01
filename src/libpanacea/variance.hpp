@@ -18,13 +18,11 @@ namespace panacea {
       template<class T>
       std::vector<double> calculate(T data2d) {
 
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         // Sample variance requires larger than 1 number of points in each
         // dimension
         if constexpr(std::is_pointer<typename std::remove_const<T>::type>::value) {
           assert(data2d->rows() > 1);
           Mean mean;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           std::vector<double> mean_vec =
             mean.calculate<T,Direction::AlongColumns>(data2d);
 
@@ -40,13 +38,11 @@ namespace panacea {
           const double divisor = 1.0/static_cast<double>(data2d->rows()-1);
           for(int col = 0; col < data2d->cols(); ++col ) {
             variance_vec.at(col) *= divisor;
-            std::cout << "Variance value is " << variance_vec.at(col) << std::endl;
           }
           return variance_vec;
         } else {
           assert(data2d.rows() > 1);
           Mean mean;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           std::vector<double> mean_vec =
             mean.calculate<T,Direction::AlongColumns>(data2d);
 
@@ -62,7 +58,6 @@ namespace panacea {
           const double divisor = 1.0/static_cast<double>(data2d.rows()-1);
           for(int col = 0; col < data2d.cols(); ++col ) {
             variance_vec.at(col) *= divisor;
-            std::cout << "Variance value is " << variance_vec.at(col) << std::endl;
           }
           return variance_vec;
         }
