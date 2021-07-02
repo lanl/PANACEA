@@ -22,7 +22,7 @@ namespace panacea {
       std::any kern_spec_instance) {
 
     const KernelSpecification & kern_spec = [&]() -> const KernelSpecification & {
-      if( std::type_index(kern_spec_instance.type()) == 
+      if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(KernelSpecification *))){
         return const_cast<const KernelSpecification &>(
             *std::any_cast<KernelSpecification *>(kern_spec_instance));
@@ -30,7 +30,7 @@ namespace panacea {
           std::type_index(typeid(KernelSpecification &))){
         return const_cast<const KernelSpecification &>(
             std::any_cast<KernelSpecification &>(kern_spec_instance));
-      } else if( std::type_index(kern_spec_instance.type()) == 
+      } else if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(const KernelSpecification *))){
         return *std::any_cast<const KernelSpecification *>(kern_spec_instance);
       }else if( std::type_index(kern_spec_instance.type()) ==
@@ -54,6 +54,9 @@ namespace panacea {
       os << kern_spec.kern_memory_ << "\n";
       os << kern_spec.kern_center_ << "\n";
       os << kern_spec.kern_algorithm_ << "\n";
+      os << kern_spec.randomize_dims_ << "\n";
+      os << kern_spec.randomize_num_dims_ << "\n";
+      os << kern_spec.max_number_dimensions_ << "\n";
       os << "\n";
     }
     return std::vector<std::any> {};
@@ -79,7 +82,7 @@ namespace panacea {
 
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
-      
+
       std::string line = "";
       while(line.find("[Kernel Specifications]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -96,18 +99,24 @@ namespace panacea {
       is >> kern_spec.kern_memory_;
       is >> kern_spec.kern_center_;
       is >> kern_spec.kern_algorithm_;
+      is >> kern_spec.randomize_dims_;
+      is >> kern_spec.randomize_num_dims_;
+      is >> kern_spec.max_number_dimensions_;
     }
     return io::ReadInstantiateVector();
   }
 
   bool operator==(const KernelSpecification &spec1, const KernelSpecification &spec2) {
-    if(spec2.kern_correlation_   != spec1.kern_correlation_ ) return false;
-    if(spec2.kern_count_         != spec1.kern_count_ ) return false;
-    if(spec2.kern_prim_          != spec1.kern_prim_ ) return false;
-    if(spec2.kern_normalization_ != spec1.kern_normalization_ ) return false;
-    if(spec2.kern_memory_        != spec1.kern_memory_ ) return false;
-    if(spec2.kern_center_        != spec1.kern_center_ ) return false;
-    if(spec2.kern_algorithm_     != spec1.kern_algorithm_ ) return false;
+    if(spec2.kern_correlation_      != spec1.kern_correlation_ ) return false;
+    if(spec2.kern_count_            != spec1.kern_count_ ) return false;
+    if(spec2.kern_prim_             != spec1.kern_prim_ ) return false;
+    if(spec2.kern_normalization_    != spec1.kern_normalization_ ) return false;
+    if(spec2.kern_memory_           != spec1.kern_memory_ ) return false;
+    if(spec2.kern_center_           != spec1.kern_center_ ) return false;
+    if(spec2.kern_algorithm_        != spec1.kern_algorithm_ ) return false;
+    if(spec2.randomize_num_dims_    != spec1.randomize_num_dims_ ) return false;
+    if(spec2.randomize_dims_        != spec1.randomize_dims_ ) return false;
+    if(spec2.max_number_dimensions_ != spec1.max_number_dimensions_ ) return false;
     return true;
   }
 

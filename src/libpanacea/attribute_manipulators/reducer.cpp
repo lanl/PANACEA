@@ -3,6 +3,7 @@
 #include "reducer.hpp"
 
 #include "attribute_manipulators/row_echelon.hpp"
+#include "attributes/dimensions.hpp"
 #include "error.hpp"
 #include "matrix/matrix.hpp"
 
@@ -23,7 +24,7 @@ namespace panacea {
      */
     void runChecks_(
           const Covariance & cov,
-          const std::vector<int> & preferred_dimensions) {
+          const Dimensions & preferred_dimensions) {
 
       // The first two checks are unnecessary because by definition of how the
       // covariance matrix is created, it shoudl be square and symmetric
@@ -97,7 +98,7 @@ namespace panacea {
     // 4 0 0 0 0
     //
     std::vector<int> reorderSymmetricMatrix_(
-        Matrix & mat, const std::vector<int> & priority_rows) {
+        Matrix & mat, const Dimensions & priority_rows) {
 
       // Next we need to keep track of where the original rows are located in the
       // covariance matrix
@@ -114,7 +115,7 @@ namespace panacea {
 
       // ind_rows
       // 0, 1, 2, 3, 4, 5 ..
-      std::vector<int> priority_rows_tmp1 = priority_rows;
+      Dimensions priority_rows_tmp1 = priority_rows;
       for(int index=0; index < priority_rows_tmp1.size(); ++index ){
         int chosen_row = priority_rows_tmp1.at(index);
 
@@ -131,7 +132,7 @@ namespace panacea {
         }
       }
 
-      std::vector<int> priority_rows_tmp2 = priority_rows;
+      Dimensions priority_rows_tmp2 = priority_rows;
       for(int index=0; index < priority_rows_tmp2.size(); ++index ){
         int chosen_col = priority_rows_tmp2.at(index);
         int index_of_chosen = 0;
@@ -196,9 +197,9 @@ namespace panacea {
      * When we rearrange the covariance matrix rows we will also have to rearrange the
      * columns (because it is a covariance matrix.
      */
-    std::vector<int> findLinearlyIndependentDescDimensions_(
+    Dimensions findLinearlyIndependentDescDimensions_(
         const Covariance & cov,
-        const std::vector<int> & priority_rows,
+        const Dimensions & priority_rows,
         const double threshold){
 
       auto tmp = createMatrix(cov.rows(),cov.cols());
@@ -240,12 +241,12 @@ namespace panacea {
           independent_rows.push_back(prior);
         }
       }
-      return independent_rows;
+      return Dimensions(independent_rows);
     }
 
     std::unique_ptr<Matrix> createRedCovarRawMatrix_(
       const Covariance & cov,
-      const std::vector<int> & independent_rows) {
+      const Dimensions & independent_rows) {
 
       const int len = independent_rows.size();
 
@@ -268,25 +269,24 @@ namespace panacea {
 
   ReducedCovariance Reducer::reduce(
       const Covariance & cov,
-      std::vector<int> priority_rows) const {
+      Dimensions priority_rows) const {
 
     // If priority rows are empty create some assume the current order is fine
     if(priority_rows.size() == 0){
-      priority_rows.resize(cov.rows());
-      std::iota(priority_rows.begin(), priority_rows.end(), 0);
+      priority_rows = Dimensions(cov.rows());
     }
 
     runChecks_(cov, priority_rows);
 
     double threshold = starting_threshold_;
     do {
-      std::vector<int> independent_dims = findLinearlyIndependentDescDimensions_(
+      Dimensions independent_dims = findLinearlyIndependentDescDimensions_(
           cov,
           priority_rows,
           threshold);
 
       if( independent_dims.size() == 0) {
-        independent_dims.push_back(priority_rows.at(0));
+        independent_dims = Dimensions(std::vector<int>{priority_rows.at(0)});
       }
 
       auto raw_mat = createRedCovarRawMatrix_(cov, independent_dims);

@@ -160,8 +160,8 @@ namespace panacea {
   }
 
 
-  const std::vector<int> & CrossEntropy::getDimensions() const noexcept {
-    return distribution_->getDimensions();
+  const std::vector<int> CrossEntropy::getDimensions() const noexcept {
+    return distribution_->getDimensions().convert();
   }
 
   void CrossEntropy::update(const BaseDescriptorWrapper & descriptor_wrapper) {

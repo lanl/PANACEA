@@ -6,6 +6,7 @@
 // Local private PANACEA includes
 #include "data_settings.hpp"
 #include "matrix/matrix.hpp"
+#include "dimensions.hpp"
 
 // Local public PANACEA includes
 #include "panacea/passkey.hpp"
@@ -15,21 +16,20 @@
 #include <vector>
 
 namespace panacea {
-
   class Inverter;
   class Reducer;
 
   class ReducedCovariance {
     private:
       std::unique_ptr<Matrix> matrix_;
-      std::vector<int> chosen_dimension_indices_;
+      Dimensions chosen_dimension_indices_;
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
       ReducedCovariance(PassKey<Reducer>);
       ReducedCovariance(PassKey<Reducer> key,
           std::unique_ptr<Matrix> matrix,
-          const std::vector<int> & chosen_dimension_indices,
+          const Dimensions & chosen_dimension_indices,
           const NormalizationState & normalized) :
         matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices),
@@ -48,7 +48,7 @@ namespace panacea {
 
       double getDeterminant() const;
       int getNumberDimensions() const;
-      const std::vector<int> & getReducedDimensions() const noexcept;
+      const Dimensions & getReducedDimensions() const noexcept;
   };
 }
 

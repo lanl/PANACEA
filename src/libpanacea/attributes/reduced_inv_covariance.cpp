@@ -17,7 +17,7 @@ namespace panacea {
     return matrix_->rows();
   }
 
-  const std::vector<int> & ReducedInvCovariance::getChosenDimensionIndices() const {
+  const Dimensions & ReducedInvCovariance::getChosenDimensionIndices() const {
     return chosen_dimension_indices_;
   }
 
@@ -25,7 +25,7 @@ namespace panacea {
     std::cout << "Reduced Inverse Covariance Matrix\n";
     matrix_->print();
     std::cout << "Reduced Inverse Covariance Dimensions\n";
-    for( int dim : chosen_dimension_indices_) {
+    for( const int dim : chosen_dimension_indices_) {
       std::cout << dim << " ";
     }
     std::cout << std::endl;

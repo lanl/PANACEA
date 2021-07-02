@@ -82,6 +82,18 @@ namespace panacea {
     return *this;
   }
 
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(
+      const settings::RandomizeDimensions & rand_dims) {
+    ent_settings_.randomize_dimensions_ = rand_dims;
+    return *this;
+  }
+
+  PANACEASettingsBuilder & PANACEASettingsBuilder::set(
+      const settings::RandomizeNumberDimensions & rand_num_dims) {
+    ent_settings_.randomize_number_dimensions_ = rand_num_dims;
+    return *this;
+  }
+
   /******************************************************
    * Ostream enums
    ******************************************************/
@@ -237,6 +249,26 @@ namespace panacea {
       os << "OwnIfRestart";
     }else if(kern_mem == settings::KernelMemory::Share) {
       os << "Share";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(
+      std::ostream& os, const settings::RandomizeDimensions & random_dims) {
+    if( random_dims == settings::RandomizeDimensions::Yes){
+      os << "Yes";
+    }else if( random_dims == settings::RandomizeDimensions::No){
+      os << "No";
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(
+      std::ostream& os, const settings::RandomizeNumberDimensions & random_num_dims) {
+    if( random_num_dims == settings::RandomizeNumberDimensions::Yes){
+      os << "Yes";
+    }else if( random_num_dims == settings::RandomizeNumberDimensions::No){
+      os << "No";
     }
     return os;
   }
@@ -544,7 +576,40 @@ namespace panacea {
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }
+    return is;
+  }
 
+  std::istream& operator>>(std::istream& is,  settings::RandomizeDimensions & rand_dims) {
+    std::string line;
+    std::getline(is,line);
+    if( line.find("Yes", 0) != std::string::npos ) {
+      rand_dims = settings::RandomizeDimensions::Yes;
+    }else if( line.find("No", 0) != std::string::npos ) {
+      rand_dims = settings::RandomizeDimensions::No;
+    } else {
+      std::string error_msg = "Unrecognized randomize dimensions setting while reading istream.\n";
+      error_msg += "Accepted randomize dimensions settings are:\n";
+      error_msg += "Yes\nNo\n";
+      error_msg += "Line is: " + line + "\n";
+      PANACEA_FAIL(error_msg);
+    }
+    return is;
+  }
+
+  std::istream& operator>>(std::istream& is,  settings::RandomizeNumberDimensions & rand_dims) {
+    std::string line;
+    std::getline(is,line);
+    if( line.find("Yes", 0) != std::string::npos ) {
+      rand_dims = settings::RandomizeNumberDimensions::Yes;
+    }else if( line.find("No", 0) != std::string::npos ) {
+      rand_dims = settings::RandomizeNumberDimensions::No;
+    } else {
+      std::string error_msg = "Unrecognized randomize number dimensions setting while reading istream.\n";
+      error_msg += "Accepted randomize number dimensions settings are:\n";
+      error_msg += "Yes\nNo\n";
+      error_msg += "Line is: " + line + "\n";
+      PANACEA_FAIL(error_msg);
+    }
     return is;
   }
 

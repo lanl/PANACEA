@@ -6,9 +6,12 @@
 #include "primitive_factory.hpp"
 
 #include "attributes/covariance.hpp"
+#include "attributes/dimensions.hpp"
 #include "attributes/reduced_covariance.hpp"
 #include "attributes/reduced_inv_covariance.hpp"
+#include "attribute_manipulators/dimension_limiter.hpp"
 #include "attribute_manipulators/inverter.hpp"
+#include "attribute_manipulators/randomizer.hpp"
 #include "attribute_manipulators/reducer.hpp"
 #include "error.hpp"
 #include "gaussian_correlated.hpp"
@@ -199,9 +202,23 @@ namespace panacea {
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
     prim_grp.normalizer->normalize(*prim_grp.covariance);
 
+    Dimensions dimensions(dwrapper.getNumberDimensions());
+
+    Randomizer randomizer;
+    randomizer.randomize(
+        dimensions,
+        specification.template get<settings::RandomizeDimensions>(),
+        specification.template get<settings::RandomizeNumberDimensions>());
+
+    int max_num = specification.getMaxNumberDimensions();
+    if( dimensions.size() > max_num && max_num != -1 ) {
+      DimensionLimiter dim_limiter;
+      dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
+    }
+
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
-        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+        reducer.reduce(*prim_grp.covariance, dimensions));
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
@@ -242,24 +259,37 @@ namespace panacea {
 
   void PrimitiveFactory::update(
       const PassKey<PrimitiveGroup> &,
-      const BaseDescriptorWrapper & descriptor_wrapper,
+      const BaseDescriptorWrapper & dwrapper,
       PrimitiveGroup & prim_grp) const {
 
-    prim_grp.kernel_wrapper->update(descriptor_wrapper);
+    prim_grp.kernel_wrapper->update(dwrapper);
     // Unnormalize the covariance matrix before updating
     prim_grp.normalizer->unnormalize(*prim_grp.covariance);
-    prim_grp.covariance->update(descriptor_wrapper);
+    prim_grp.covariance->update(dwrapper);
     // Now we are free to update the normalization coefficients, note that the covariance
     // matrix must be uptodate before it can be passed into the normalizer, in the
     // case of the variance the diagonal is used to calculate the variance
-    prim_grp.normalizer->update(descriptor_wrapper, prim_grp.covariance.get());
+    prim_grp.normalizer->update(dwrapper, prim_grp.covariance.get());
     prim_grp.normalizer->normalize(*prim_grp.covariance);
 
+    Dimensions dimensions(dwrapper.getNumberDimensions());
+
+    Randomizer randomizer;
+    randomizer.randomize(
+        dimensions,
+        prim_grp.getSpecification().template get<settings::RandomizeDimensions>(),
+        prim_grp.getSpecification().template get<settings::RandomizeNumberDimensions>());
+
+    int max_num = prim_grp.getSpecification().getMaxNumberDimensions();
+    if( dimensions.size() > max_num && max_num != -1 ) {
+      DimensionLimiter dim_limiter;
+      dim_limiter.limit(dimensions,prim_grp.getSpecification().getMaxNumberDimensions());
+    }
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices
     // these both need to be recalculated
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
-        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+        reducer.reduce(*prim_grp.covariance, dimensions));
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
@@ -302,7 +332,11 @@ namespace panacea {
           specification.get<settings::KernelNormalization>(),
           settings::KernelMemory::Share, // This is the only thing that is changed
           specification.get<settings::KernelCenterCalculation>(),
-          specification.get<settings::KernelAlgorithm>());
+          specification.get<settings::KernelAlgorithm>(),
+          specification.get<settings::RandomizeDimensions>(),
+          specification.get<settings::RandomizeNumberDimensions>(),
+          specification.getMaxNumberDimensions()
+          );
       prim_grp.kernel_wrapper = kfactory.create(dwrapper, local_spec);
     } else {
       prim_grp.kernel_wrapper = kfactory.create(dwrapper, specification);
@@ -315,9 +349,23 @@ namespace panacea {
     prim_grp.normalizer = createNormalizer(dwrapper, specification);
     prim_grp.normalizer->normalize(*prim_grp.covariance);
 
+    Dimensions dimensions(dwrapper.getNumberDimensions());
+
+    Randomizer randomizer;
+    randomizer.randomize(
+        dimensions,
+        specification.get<settings::RandomizeDimensions>(),
+        specification.get<settings::RandomizeNumberDimensions>());
+
+    int max_num = specification.getMaxNumberDimensions();
+    if( dimensions.size() > max_num && max_num != -1 ) {
+      DimensionLimiter dim_limiter;
+      dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
+    }
+
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
-        reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+        reducer.reduce(*prim_grp.covariance, dimensions));
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
@@ -342,9 +390,25 @@ namespace panacea {
     }
 
     if(reset_opt == ResetOption::All || reset_opt == ResetOption::ReducedCovariance){
+      // The number of rows in the covariance matrix should be equivalent to the number
+      // of available dimensions.
+      Dimensions dimensions(prim_grp.covariance->rows());
+
+      Randomizer randomizer;
+      randomizer.randomize(
+          dimensions,
+          prim_grp.getSpecification().template get<settings::RandomizeDimensions>(),
+          prim_grp.getSpecification().template get<settings::RandomizeNumberDimensions>());
+
+      int max_num = prim_grp.getSpecification().getMaxNumberDimensions();
+      if( dimensions.size() > max_num && max_num != -1 ) {
+        DimensionLimiter dim_limiter;
+        dim_limiter.limit(dimensions, prim_grp.getSpecification().getMaxNumberDimensions());
+      }
+
       Reducer reducer;
       prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
-          reducer.reduce(*prim_grp.covariance, std::vector<int> {}));
+          reducer.reduce(*prim_grp.covariance, dimensions));
     }
 
     if(reset_opt == ResetOption::All || reset_opt == ResetOption::ReducedInvCovariance){

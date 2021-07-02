@@ -147,8 +147,8 @@ namespace panacea {
     PANACEA_FAIL(error_msg);
   }
 
-  const std::vector<int> & SelfEntropy::getDimensions() const noexcept {
-    return distribution_->getDimensions();
+  const std::vector<int> SelfEntropy::getDimensions() const noexcept {
+    return distribution_->getDimensions().convert();
   }
 
   void SelfEntropy::update(const BaseDescriptorWrapper & descriptor_wrapper) {

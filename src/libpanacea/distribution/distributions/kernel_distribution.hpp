@@ -30,6 +30,7 @@ namespace panacea {
   }
 
   class BaseDescriptorWrapper;
+  class Dimensions;
   class DistributionFactory;
   class DistributionSettings;
 
@@ -80,7 +81,7 @@ namespace panacea {
           const DistributionSettings & distribution_settings,
           std::any grad_setting) final;
 
-      virtual const std::vector<int> & getDimensions() const noexcept final;
+      virtual const Dimensions & getDimensions() const noexcept final;
 
       /**
        * Will update the underlying data groups and ensure the prefactor is up to date.

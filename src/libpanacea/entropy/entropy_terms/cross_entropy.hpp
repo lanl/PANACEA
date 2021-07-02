@@ -71,7 +71,7 @@ namespace panacea {
 
       virtual void set(const settings::EntropyOption option, std::any val) override;
 
-      virtual const std::vector<int> & getDimensions() const noexcept override;
+      virtual const std::vector<int> getDimensions() const noexcept override;
 
       virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) override;
 

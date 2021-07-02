@@ -195,7 +195,7 @@ namespace panacea {
 
   }
 
-  const std::vector<int> & KernelDistribution::getDimensions() const noexcept {
+  const Dimensions & KernelDistribution::getDimensions() const noexcept {
     assert(prim_grp_.reduced_covariance!=nullptr);
     return prim_grp_.reduced_covariance->getReducedDimensions();
   }

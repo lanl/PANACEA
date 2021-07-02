@@ -6,6 +6,7 @@
 // Local private PANACEA includes
 #include "data_settings.hpp"
 #include "matrix/matrix.hpp"
+#include "dimensions.hpp"
 
 // Public PANACEA includes
 #include "panacea/passkey.hpp"
@@ -21,14 +22,14 @@ namespace panacea {
   class ReducedInvCovariance {
     private:
       std::unique_ptr<Matrix> matrix_;
-      std::vector<int> chosen_dimension_indices_;
+      Dimensions chosen_dimension_indices_;
 
       NormalizationState normalized_ = NormalizationState::Unnormalized;
     public:
       ReducedInvCovariance() = delete;
       ReducedInvCovariance(PassKey<Inverter>,
           std::unique_ptr<Matrix> matrix,
-          const std::vector<int> & chosen_dimension_indices,
+          const Dimensions & chosen_dimension_indices,
           const NormalizationState & normalized) :
         matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices),
@@ -42,7 +43,7 @@ namespace panacea {
        * Gets the total number of dimensions in the reduced inverse covariance matrix
        **/
       int getNumberDimensions() const;
-      const std::vector<int> & getChosenDimensionIndices() const;
+      const Dimensions & getChosenDimensionIndices() const;
 
       bool is(const NormalizationState & state) const noexcept;
       const NormalizationState & getNormalizationState() const noexcept;

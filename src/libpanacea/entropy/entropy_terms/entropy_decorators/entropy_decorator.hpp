@@ -83,7 +83,7 @@ namespace panacea {
         return entropy_term_->set(option, val);
       }
 
-      virtual const std::vector<int> & getDimensions() const noexcept override {
+      virtual const std::vector<int> getDimensions() const noexcept override {
         return entropy_term_->getDimensions();
       }
 

@@ -16,6 +16,7 @@
 namespace panacea {
 
   class BaseDescriptorWrapper;
+  class Dimensions;
   class DistributionSettings;
   class Distribution;
 
@@ -54,7 +55,7 @@ namespace panacea {
       /**
        * Get the actual dimensions used in the distribution
        **/
-      virtual const std::vector<int> & getDimensions() const noexcept = 0;
+      virtual const Dimensions & getDimensions() const noexcept = 0;
 
       virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) = 0;
 

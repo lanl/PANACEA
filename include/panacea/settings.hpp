@@ -86,6 +86,15 @@ namespace panacea {
       Median,
     };
 
+    enum class RandomizeDimensions {
+      Yes,
+      No
+    };
+
+    enum class RandomizeNumberDimensions {
+      Yes,
+      No
+    };
   }
 
   std::ostream& operator<<(std::ostream& os, const settings::DistributionType &);
@@ -98,6 +107,8 @@ namespace panacea {
   std::ostream& operator<<(std::ostream& os, const settings::KernelCorrelation &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelNormalization &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelCenterCalculation &);
+  std::ostream& operator<<(std::ostream& os, const settings::RandomizeDimensions &);
+  std::ostream& operator<<(std::ostream& os, const settings::RandomizeNumberDimensions &);
 
   std::istream& operator>>(std::istream& is, settings::DistributionType &);
   std::istream& operator>>(std::istream& is, settings::FileType &);
@@ -109,6 +120,8 @@ namespace panacea {
   std::istream& operator>>(std::istream& is, settings::KernelCorrelation &);
   std::istream& operator>>(std::istream& is, settings::KernelNormalization &);
   std::istream& operator>>(std::istream& is, settings::KernelCenterCalculation &);
+  std::istream& operator>>(std::istream& is, settings::RandomizeDimensions &);
+  std::istream& operator>>(std::istream& is, settings::RandomizeNumberDimensions &);
 
   class PANACEASettingsBuilder;
 
@@ -137,14 +150,6 @@ namespace panacea {
         return max_number_dimensions_;
       }
 
-      bool descriptorDimensionsRandomized() const noexcept {
-        return randomize_descriptor_dimensions_;
-      }
-
-      bool numberDescriptorDimensionsRandomized() const noexcept {
-        return randomize_number_descriptor_dimensions_;
-      }
-
       template<class T>
       std::optional<T> get() const noexcept {
         if constexpr( std::is_same<settings::EntropyType,T>::value ) {
@@ -163,9 +168,12 @@ namespace panacea {
           return kern_center_;
         }else if constexpr(std::is_same<settings::DistributionType,T>::value) {
           return dist_type_;
+        }else if constexpr(std::is_same<settings::RandomizeDimensions,T>::value) {
+          return randomize_dimensions_;
+        }else if constexpr(std::is_same<settings::RandomizeNumberDimensions,T>::value) {
+          return randomize_number_dimensions_;
         }
       }
-
 
     private:
       PANACEASettings() = default;
@@ -183,8 +191,8 @@ namespace panacea {
       // -1 - nocap on dimensions
       int max_number_dimensions_ = -1;
 
-      bool randomize_descriptor_dimensions_ = false;
-      bool randomize_number_descriptor_dimensions_ = false;
+      std::optional<settings::RandomizeDimensions> randomize_dimensions_;
+      std::optional<settings::RandomizeNumberDimensions> randomize_number_dimensions_;
     };
 
   class PANACEASettingsBuilder {
@@ -203,21 +211,13 @@ namespace panacea {
        **/
       PANACEASettingsBuilder & setMaxNumberDescriptorDimensions(const int number_dimensions);
 
-      /**
-       * Determine if the dimensions chosen appear in a randomized order.
-       **/
-      PANACEASettingsBuilder & randomizeDescriptorDimensions(const bool);
-
-      /**
-       * Will randomize the number of dimensions used.
-       **/
-      PANACEASettingsBuilder & randomizeNumberDescriptorDimensions(const bool);
-
       PANACEASettingsBuilder & set(const settings::KernelPrimitive &);
       PANACEASettingsBuilder & set(const settings::KernelCount &);
       PANACEASettingsBuilder & set(const settings::KernelCorrelation &);
       PANACEASettingsBuilder & set(const settings::KernelCenterCalculation &);
       PANACEASettingsBuilder & set(const settings::KernelNormalization &);
+      PANACEASettingsBuilder & set(const settings::RandomizeDimensions &);
+      PANACEASettingsBuilder & set(const settings::RandomizeNumberDimensions &);
 
       operator PANACEASettings&&() {
            return std::move(ent_settings_); // notice the move

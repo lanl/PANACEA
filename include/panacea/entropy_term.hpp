@@ -101,7 +101,7 @@ namespace panacea {
       /**
        * Get the actual dimensions used by the entropy term
        **/
-      virtual const std::vector<int> & getDimensions() const noexcept = 0;
+      virtual const std::vector<int> getDimensions() const noexcept = 0;
 
       /**
        * Update the internal members.

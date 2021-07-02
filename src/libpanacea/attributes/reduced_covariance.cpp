@@ -4,6 +4,7 @@
  */
 
 // Private local PANACEA includes
+#include "dimensions.hpp"
 #include "reduced_covariance.hpp"
 
 // Standard includes
@@ -29,7 +30,7 @@ namespace panacea {
     return matrix_->rows();
   }
 
-  const std::vector<int> & ReducedCovariance::getReducedDimensions() const noexcept {
+  const Dimensions & ReducedCovariance::getReducedDimensions() const noexcept {
     return chosen_dimension_indices_;
   }
 
@@ -41,9 +42,9 @@ namespace panacea {
     std::cout << "Reduced Covariance Matrix\n";
     matrix_->print();
     std::cout << "Reduced Covariance Dimensions\n";
-    for( int dim : chosen_dimension_indices_) {
+    for( const int dim : chosen_dimension_indices_) {
       std::cout << dim << " ";
-    } 
+    }
     std::cout << std::endl;
   }
 

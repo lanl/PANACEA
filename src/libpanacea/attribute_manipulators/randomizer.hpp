@@ -2,6 +2,9 @@
 #define PANACEA_PRIVATE_RANDOMIZER_H
 #pragma once
 
+// Public PANACEA includes
+#include "panacea/settings.hpp"
+
 namespace panacea {
 
   class Dimensions;
@@ -13,7 +16,10 @@ namespace panacea {
       /**
        * Designed to randomize dimensions
        **/
-      void randomize(Dimensions & dimensions) const;
+      void randomize(
+          Dimensions & dimensions,
+          const settings::RandomizeDimensions,
+          const settings::RandomizeNumberDimensions) const;
   };
 }
 
