@@ -19,7 +19,11 @@ namespace panacea {
 
     assert(dim_limit >= 1);
     auto & dims = dimensions.get(PassKey<DimensionLimiter>());
-    dims.resize(dim_limit);
+    // Only shrink the dimensions do not expand the dimensions if the limit is
+    // larger than the total number of dimensions
+    if( dims.size() > dim_limit ) {
+      dims.resize(dim_limit);
+    }
   }
 }
 

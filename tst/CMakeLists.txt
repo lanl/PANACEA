@@ -11,6 +11,7 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_data_point_template.cpp
     unit/test_descriptor_wrappers.cpp
     unit/test_dimensions.cpp
+    unit/test_dimension_limiter.cpp
     unit/test_distributions.cpp
     unit/test_gaussian_correlated.cpp
     unit/test_gaussian_uncorrelated.cpp
