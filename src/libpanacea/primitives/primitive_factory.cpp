@@ -216,6 +216,8 @@ namespace panacea {
       dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
     }
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    dimensions.print();
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, dimensions));
@@ -285,6 +287,9 @@ namespace panacea {
       DimensionLimiter dim_limiter;
       dim_limiter.limit(dimensions,prim_grp.getSpecification().getMaxNumberDimensions());
     }
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    dimensions.print();
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices
     // these both need to be recalculated
     Reducer reducer;

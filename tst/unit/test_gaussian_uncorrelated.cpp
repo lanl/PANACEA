@@ -45,7 +45,11 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelNormalization::None,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   PrimitiveFactory prim_factory;
 
@@ -139,7 +143,11 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -212,7 +220,11 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         settings::KernelNormalization::Variance,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 

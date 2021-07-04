@@ -42,7 +42,10 @@ TEST_CASE("Testing:self entropy","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Strict
+        settings::KernelAlgorithm::Strict,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
   EntropySettings settings;
@@ -117,7 +120,10 @@ TEST_CASE("Testing:self entropy with Array Data2","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Strict
+        settings::KernelAlgorithm::Strict,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
   EntropySettings settings;

@@ -2,6 +2,11 @@
 // Private local PANACEA includes
 #include "dimension_limiter.hpp"
 
+#include "attributes/dimensions.hpp"
+
+// Public PANACEA includes
+#include "panacea/passkey.hpp"
+
 // Standard includes
 #include <cassert>
 #include <vector>

@@ -28,7 +28,7 @@ namespace panacea {
 
     if( randomize_num_dims == settings::RandomizeNumberDimensions::Yes ) {
       if ( dimension_indices.size() > 1 ) {
-        dimension_indices.resize(1 + std::rand()/((RAND_MAX + 1u)/(dimension_indices.size())));
+        dimension_indices.resize(1 + std::rand() % dimension_indices.size() );
       }
 
       if( dimensions.state() == DimensionsState::Randomized ) {

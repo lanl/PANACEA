@@ -8,6 +8,7 @@
 // Standard includes
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -47,7 +48,19 @@ namespace panacea {
     state_ = state;
   }
 
-  std::vector<int> & Dimensions::get(PassKey<Randomizer>) {
+  std::vector<int> & Dimensions::get(const PassKey<Randomizer> &) {
     return descriptor_dimensions_;
+  }
+
+  std::vector<int> & Dimensions::get(const PassKey<DimensionLimiter> &) {
+    return descriptor_dimensions_;
+  }
+
+  void Dimensions::print() const noexcept {
+    std::cout << "Dimensions" << std::endl;
+    for(const auto & dim : descriptor_dimensions_ ) {
+      std::cout << dim << " ";
+    }
+    std::cout << std::endl;
   }
 } // panacea

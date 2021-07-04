@@ -46,7 +46,11 @@ TEST_CASE("Testing:compute of gaussian correlated primitive","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -142,7 +146,11 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
       settings::KernelNormalization::None,
       settings::KernelMemory::Own,
       settings::KernelCenterCalculation::Mean,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   PrimitiveFactory prim_factory;
@@ -204,7 +212,11 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single median kernel
       settings::KernelNormalization::None,
       settings::KernelMemory::Own,
       settings::KernelCenterCalculation::Median,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   PrimitiveFactory prim_factory;
 
@@ -274,7 +286,11 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad","[unit,panacea
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -376,7 +392,11 @@ TEST_CASE("Testing:compute of gaussian correlated primitive grad with normalizat
       settings::KernelNormalization::Variance,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
 
   const int descriptor_ind = 1;

@@ -33,7 +33,11 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -62,7 +66,11 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -91,7 +99,11 @@ TEST_CASE("Testing:primitive_factory create primitive group","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -123,7 +135,11 @@ TEST_CASE("Testing:primitive_factory create primitive group shell","[unit,panace
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -146,7 +162,11 @@ TEST_CASE("Testing:primitive_factory create primitive group shell","[unit,panace
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -169,7 +189,11 @@ TEST_CASE("Testing:primitive_factory create primitive group shell","[unit,panace
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -204,7 +228,11 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -234,7 +262,11 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 
@@ -265,7 +297,11 @@ TEST_CASE("Testing:primitive_factory initialize","[unit,panacea]") {
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     PrimitiveFactory prim_factory;
 

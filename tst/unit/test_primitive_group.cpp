@@ -38,7 +38,10 @@ TEST_CASE("Testing:primitive group write & read using fileio","[integration,pana
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       );
 
 
@@ -110,7 +113,10 @@ TEST_CASE("Testing:primitive group write & read","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       );
 
 

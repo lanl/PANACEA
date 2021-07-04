@@ -613,7 +613,7 @@ TEST_CASE("Testing:panacea cross entropy single mean update","[integration,panac
 TEST_CASE("Testing:panacea cross entropy single median update","[integration,panacea]"){
 
   // Creating settings for generating a self entropy term where the
-  // underlying distribution is using an kernel estimator
+  // underlying distribution is using a kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
                                         .set(EntropyType::Cross)
@@ -623,7 +623,9 @@ TEST_CASE("Testing:panacea cross entropy single median update","[integration,pan
                                             .set(KernelCount::Single)
                                             .set(KernelCorrelation::Correlated)
                                             .set(KernelCenterCalculation::Median)
-                                            .set(KernelNormalization::Variance);
+                                            .set(KernelNormalization::Variance)
+                                            .set(RandomizeDimensions::No)
+                                            .set(RandomizeNumberDimensions::No);
 
   // pi - public interface
   PANACEA panacea_pi;
@@ -647,55 +649,42 @@ TEST_CASE("Testing:panacea cross entropy single median update","[integration,pan
   kern_init_data[0][2] =  0.0;
   kern_init_data[1][2] =  0.0;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   auto dwrapper_init = panacea_pi.wrap(&(kern_init_data), rows, cols);
   REQUIRE(dwrapper_init != nullptr);
   REQUIRE(dwrapper_init.get() != nullptr);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
   std::unique_ptr<EntropyTerm> cross_ent = panacea_pi.create(*dwrapper_init, panacea_settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   cross_ent->compute(*dwrapper_init, panacea_settings);
   // Because we are calculating the median the memory will not be shared
   // it is ok at this point to delete the initial data
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   delete[] kern_init_data[0];
   delete[] kern_init_data[1];
   delete[] kern_init_data;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   auto desc_data = new double*[1];
   desc_data[0] = new double[cols];
   desc_data[0][0] = 70.0; // The median of three points 70 and 10 and 10 = 10
   desc_data[0][1] = 0.0; // The median of three points 70 and 10 and 10 = 10
   desc_data[0][2] = 0.0; // The median of three points 70 and 10 and 10 = 10
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // Using only a single row
   auto dwrapper = panacea_pi.wrap(&(desc_data), 1, cols);
 
   REQUIRE(dwrapper != nullptr);
   REQUIRE(dwrapper.get() != nullptr);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // The mean is currently at 10 and this new point is at 70 the cross entropy should be large
   double cross_ent_val_single_pt_before_update = cross_ent->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   cross_ent->update(*dwrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   // After update the mean is at 10 and this new point is at 70 the
-  // cross entropy should remain the same
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  // cross entropy should decrease even though the median has changed, this is because the descriptors
+  // are now being normalized, even though the covariance matrix is the same as before the update
   double cross_ent_val_single_pt_after_update = cross_ent->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  REQUIRE(cross_ent_val_single_pt_after_update == Approx(cross_ent_val_single_pt_before_update));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  REQUIRE(cross_ent_val_single_pt_after_update < cross_ent_val_single_pt_before_update);
 
   delete[] desc_data[0];
   delete[] desc_data;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-
 }
 
 TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,panacea]"){
@@ -709,6 +698,8 @@ TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,p
                                             .set(KernelCorrelation::Correlated)
                                             .set(KernelCenterCalculation::Median)
                                             .set(KernelNormalization::Variance)
+                                            .set(RandomizeDimensions::No)
+                                            .set(RandomizeNumberDimensions::No)
                                             .weightEntropTermBy(1.0);
 
   PANACEASettings panacea_settings2 = PANACEASettings::make()
@@ -720,6 +711,8 @@ TEST_CASE("Testing:panacea cross entropy single median weighted","[integration,p
                                             .set(KernelCorrelation::Correlated)
                                             .set(KernelCenterCalculation::Median)
                                             .set(KernelNormalization::Variance)
+                                            .set(RandomizeDimensions::No)
+                                            .set(RandomizeNumberDimensions::No)
                                             .weightEntropTermBy(-1.0);
 
   // pi - public interface

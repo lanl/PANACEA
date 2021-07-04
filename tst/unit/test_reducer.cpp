@@ -3,6 +3,7 @@
 #include "attribute_manipulators/reducer.hpp"
 
 #include "attributes/covariance.hpp"
+#include "attributes/dimensions.hpp"
 #include "matrix/matrix.hpp"
 #include "vector/vector.hpp"
 
@@ -70,7 +71,7 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     Reducer reducer;
 
     std::vector<int> priority_rows { 0, 1, 2, 3};
-    ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
+    ReducedCovariance reduced_covar = reducer.reduce(covar, Dimensions(priority_rows));
 
     // The order of the dimensions should be consistent
     REQUIRE(reduced_covar.getNumberDimensions() == 3);
@@ -98,7 +99,7 @@ TEST_CASE("Testing:reducer1","[unit,panacea]"){
     Reducer reducer;
 
     std::vector<int> priority_rows { 2, 0, 1, 3};
-    ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
+    ReducedCovariance reduced_covar = reducer.reduce(covar, Dimensions(priority_rows));
 
     // The order of the dimensions should be consistent
     REQUIRE(reduced_covar.getNumberDimensions() == 3);

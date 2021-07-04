@@ -47,8 +47,10 @@ namespace panacea {
 
       std::size_t size() const noexcept { return descriptor_dimensions_.size(); }
 
-      std::vector<int> & get(PassKey<Randomizer>);
-      std::vector<int> & get(PassKey<DimensionLimiter>);
+      std::vector<int> & get(const PassKey<Randomizer> &);
+      std::vector<int> & get(const PassKey<DimensionLimiter> &);
+
+      void print() const noexcept;
 
       /**
        * Returns a copy of the dimensions as a vector of ints

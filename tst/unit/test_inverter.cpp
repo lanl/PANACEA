@@ -3,6 +3,7 @@
 #include "attribute_manipulators/inverter.hpp"
 
 #include "attributes/covariance.hpp"
+#include "attributes/dimensions.hpp"
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attributes/reduced_covariance.hpp"
 #include "attribute_manipulators/reducer.hpp"
@@ -73,7 +74,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
     Reducer reducer;
 
     std::vector<int> priority_rows { 0, 1, 2, 3};
-    ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
+    ReducedCovariance reduced_covar = reducer.reduce(covar, Dimensions(priority_rows));
 
     Inverter inverter;
     ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_covar);
@@ -161,7 +162,7 @@ TEST_CASE("Testing:inverter less trivial","[unit,panacea]"){
     Reducer reducer;
 
     std::vector<int> priority_rows { 0, 1, 2, 3};
-    ReducedCovariance reduced_covar = reducer.reduce(covar, priority_rows);
+    ReducedCovariance reduced_covar = reducer.reduce(covar, Dimensions(priority_rows));
 
     Inverter inverter;
     ReducedInvCovariance reduced_inv_cov = inverter.invert(reduced_covar);

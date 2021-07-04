@@ -45,7 +45,10 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Own,
         settings::KernelCenterCalculation::Mean,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
   EntropySettings settings;
@@ -110,14 +113,15 @@ TEST_CASE("Testing:cross entropy","[unit,panacea]"){
     auto analy_grad = entropy_term->compute_grad(dwrapper_sample_max,0, settings);
     std::cout << "Analytical cross entropy grad of sample point should to the side of the kernel center should be negative: " << analy_grad.at(0) << std::endl;
 
-    /*auto entropy_term_numer2 = std::make_unique<NumericalGrad>(std::move(entropy_term));
+    auto entropy_term_numer2 = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
-    auto numer_grad = entropy_term_numer2->compute_grad(&dwrapper_sample_max, 0, settings);
+    auto numer_grad = entropy_term_numer2->compute_grad(dwrapper_sample_max, 0, settings);
     std::cout << "Numerical cross entropy grad of sample point located to the side of the kernel center is: " << numer_grad.at(0) << std::endl;
 
     REQUIRE( numer_grad.at(0) == Approx(analy_grad.at(0)));
 
-    REQUIRE( numer_grad.at(0) < 0.0);*/
+    REQUIRE( numer_grad.at(0) < 0.0);
     // Now if we use the location of the sample point such that it is a little removed
   }
 }
+

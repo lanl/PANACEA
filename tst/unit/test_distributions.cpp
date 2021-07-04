@@ -42,7 +42,10 @@ TEST_CASE("Testing:distributions","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
   DistributionFactory dist_factory;
@@ -120,7 +123,10 @@ TEST_CASE("Testing:distributions pre_factor","[unit,panacea]"){
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
   DistributionFactory dist_factory;
@@ -161,7 +167,10 @@ TEST_CASE("Testing:distributions write & read with fileio","[integration,panacea
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
       ));
 
 

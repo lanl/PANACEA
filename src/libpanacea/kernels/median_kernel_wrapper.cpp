@@ -100,6 +100,12 @@ namespace panacea {
     trim(points_near_median_, number_pts_store_, remove_from_front_);
 
     number_pts_median_ = dwrapper.getNumberPoints();
+
+    std::cout << "Median" << std::endl;
+    for( auto & val : center_ ) {
+      std::cout << val << " " << std::endl;
+    }
+    std::cout << std::endl;
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
@@ -139,6 +145,12 @@ namespace panacea {
 
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
     number_pts_median_ += dwrapper.getNumberPoints();
+
+    std::cout << "Median after update" << std::endl;
+    for( auto & val : center_ ) {
+      std::cout << val << " " << std::endl;
+    }
+    std::cout << std::endl;
   }
 
   double& MedianKernelWrapper::at(const int row, const int col) {

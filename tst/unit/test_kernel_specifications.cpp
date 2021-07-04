@@ -24,7 +24,11 @@ TEST_CASE("Testing:kernel specifications write & read","[unit,panacea]"){
       settings::KernelNormalization::None,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   std::fstream fs;
   fs.open("test_kern_specs.restart", std::fstream::out);
@@ -57,7 +61,11 @@ TEST_CASE("Testing:kernel specifications write & read using fileio","[integratio
       settings::KernelNormalization::None,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   io::FileIOFactory file_io_factory;
   auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
@@ -84,7 +92,11 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
       settings::KernelNormalization::None,
       settings::KernelMemory::Share,
       settings::KernelCenterCalculation::None,
-      settings::KernelAlgorithm::Flexible);
+      settings::KernelAlgorithm::Flexible,
+      settings::RandomizeDimensions::No,
+      settings::RandomizeNumberDimensions::No,
+      -1
+      );
 
   WHEN("Testing agains same instance") {
     REQUIRE(!(kern_specs!= kern_specs) );
@@ -98,7 +110,11 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     REQUIRE(!(kern_specs2 != kern_specs) );
     REQUIRE(kern_specs2 == kern_specs);
@@ -111,7 +127,11 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
         settings::KernelNormalization::None,
         settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        -1
+        );
 
     REQUIRE(kern_specs2 != kern_specs);
     REQUIRE(!(kern_specs2 == kern_specs) );
