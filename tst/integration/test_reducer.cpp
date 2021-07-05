@@ -13,7 +13,7 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:reducer1","[unit,panacea]"){
+TEST_CASE("Testing:reducer1","[integration,panacea]"){
 
   auto mat = createMatrix(4,4);
 

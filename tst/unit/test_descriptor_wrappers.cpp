@@ -23,8 +23,8 @@ TEST_CASE("Testing:descriptor_wrapper_constructor1","[unit,panacea]"){
 
 TEST_CASE("Testing:descriptor_wrapper_constructor2","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data = test::generateVecData(); 
-  
+  std::vector<std::vector<double>> data = test::generateVecData();
+
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2, 3);
   auto data_type_index = type_index(typeid(vector<vector<double>> *));
   REQUIRE(data_type_index == dwrapper.getTypeIndex());
@@ -37,7 +37,7 @@ TEST_CASE("Testing:descriptor_wrapper_constructor2","[unit,panacea]"){
 
 TEST_CASE("Testing:descriptor_wrapper_access","[unit,panacea]"){
 
-  std::vector<std::vector<double>> data = test::generateVecData(); 
+  std::vector<std::vector<double>> data = test::generateVecData();
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
 
@@ -54,7 +54,7 @@ TEST_CASE("Testing:descriptor_wrapper_access","[unit,panacea]"){
 TEST_CASE("Testing:descriptor_arrangements","[unit,panacea]"){
 
 
-  std::vector<std::vector<double>> data = test::generateVecData(); 
+  std::vector<std::vector<double>> data = test::generateVecData();
 
   DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data,2,3);
 
@@ -126,7 +126,7 @@ TEST_CASE("Testing:descriptor_wrapper write and read","[unit,panacea]"){
 
   REQUIRE(dwrapper(0,2) == 3.0);
   REQUIRE(dwrapper(1,2) == 3.0);
-  
+
   std::fstream fs;
   fs.open("descriptors.txt", std::fstream::out );
 
@@ -159,7 +159,4 @@ TEST_CASE("Testing:descriptor_wrapper write and read","[unit,panacea]"){
 
   REQUIRE(dwrapper2(0,2) == 3.0);
   REQUIRE(dwrapper2(1,2) == 3.0);
- 
-
 }
-
