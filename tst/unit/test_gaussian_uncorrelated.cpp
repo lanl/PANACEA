@@ -6,6 +6,7 @@
 #include "attributes/reduced_inv_covariance.hpp"
 #include "attribute_manipulators/reducer.hpp"
 #include "attribute_manipulators/inverter.hpp"
+#include "constants.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
 #include "helper.hpp"
 #include "kernels/kernel_wrapper.hpp"
@@ -25,6 +26,7 @@ using namespace panacea;
 
 TEST_CASE("Testing:creation of gaussian uncorrelated primitive","[unit,panacea]"){
   GaussUncorrelated gauss(test::Test::key(), 0);
+  REQUIRE(gauss.getPreFactor() == Approx(0.0));
 }
 
 TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]"){
@@ -48,7 +50,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
       settings::KernelAlgorithm::Flexible,
       settings::RandomizeDimensions::No,
       settings::RandomizeNumberDimensions::No,
-      -1
+      constants::automate
       );
 
   PrimitiveFactory prim_factory;
@@ -146,7 +148,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad","[unit,panac
         settings::KernelAlgorithm::Flexible,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
         );
 
     PrimitiveFactory prim_factory;
@@ -210,9 +212,6 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     auto dwrapper = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
 
-    std::cout << "Descriptor Wrapper " << std::endl;
-    dwrapper->print();
-
     KernelSpecification specification(
         settings::KernelCorrelation::Uncorrelated,
         settings::KernelCount::OneToOne,
@@ -223,7 +222,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         settings::KernelAlgorithm::Flexible,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
         );
 
     PrimitiveFactory prim_factory;
@@ -232,12 +231,10 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
         *dwrapper,
         specification);
 
-    std::cout << "\n*********************Analytical begin***************" << std::endl;
     std::vector<double> grad_wrt_desc;
     const settings::GradSetting setting1 = settings::GradSetting::WRTDescriptor;
     grad_wrt_desc = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute_grad(*dwrapper, descriptor_ind, eq_settings, setting1 );
 
-    std::cout << "*********************Analytical end***************\n" << std::endl;
     // Compare with numerical resul
     std::vector<std::vector<double>> raw_desc_data2{
       {numbers1.at(index)           , numbers2.at(index)},
@@ -245,7 +242,6 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
     auto dwrapper2 = std::make_unique<
       DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,2, 2);
 
-    std::cout << "\n*********************Numerical begin***************" << std::endl;
     const double val2 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper2,descriptor_ind);
 
     std::vector<std::vector<double>> raw_desc_data3{
@@ -257,7 +253,6 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
 
     const double val3 = gauss_uncorrelated_prim_grp.primitives.at(kernel_ind)->compute(*dwrapper3,descriptor_ind);
 
-    std::cout << "\n*********************Numerical end***************" << std::endl;
     const std::vector<double> norm_coeffs =  gauss_uncorrelated_prim_grp.normalizer->getNormalizationCoeffs();
     const double grad_val_numer = (val2-val3)/(raw_desc_data2.at(1).at(0) - raw_desc_data3.at(1).at(0));// * norm_coeffs.at(0);
 
@@ -269,4 +264,198 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
 
     REQUIRE( (grad_wrt_desc.at(0)*-1.0) == Approx(grad_wrt_kern.at(0)));
   } // End of for loop
+}
+
+TEST_CASE("Testing:gaussian uncorrelated update","[integration,panacea]"){
+
+  GIVEN("raw data consisting of two dimensions and two points."){
+    std::vector<std::vector<double>> raw_desc_data{
+      {0.0, -1.0},
+      {2.0, 5.0}};
+
+    // Variance of first set of points
+    //
+    // Dim 1 Mean (0.0 + 2.0) / 2.0 = 1.0
+    // Dim 2 mean (-1.0 + 5.0) / 2.0 = 2.0
+    //
+    // Sample variance
+    // (1 + 1)/1 = 2.0
+    // (9.0 + 9.0)/1 = 18.0
+    //
+    // Determinant 2.0 * 18.0 = 36.0
+
+    auto dwrapper = std::make_unique<
+      DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,2, 2);
+
+    KernelSpecification specification(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::Single,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::Mean,
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        constants::automate
+        );
+
+    PrimitiveFactory prim_factory;
+
+    auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
+        *dwrapper,
+        specification);
+
+    // There should be only a single primitive because the count is "Single"
+    const int primitive_index = 0;
+    Primitive & primitive = *gauss_uncorrelated_prim_grp.primitives.at(primitive_index);
+
+    const double initial_pre_factor = primitive.getPreFactor();
+    // The pre factor should be positive
+    REQUIRE(initial_pre_factor > 0.0);
+
+    // If we add another kernel point without expanding the dimensions we should see a
+    // decrease in the pre factor simply because our covarince matrix will change,
+
+    THEN("add a third point."){
+      std::vector<std::vector<double>> raw_desc_data2{
+        {4.0, 2.0}};
+
+      // After adding the covariance matrix will be calculated using these points
+      //
+      //   0.0, -1.0
+      //   2.0,  5.0
+      //   4.0,  2.0
+
+      // Variance of first set of points
+      //
+      // Dim 1 Mean (0.0 + 2.0 + 4.0) / 3.0 = 2.0
+      // Dim 2 mean (-1.0 + 5.0 + 2.0) / 3.0 = 2.0
+      //
+      // Sample variance
+      // (4.0 + 0.0 + 4.0)/2 = 4.0
+      // (9.0 + 9.0 + 0.0)/2 = 9.0
+
+      // Determinant 4.0 * 9.0 = 36.0
+
+      auto dwrapper2 = std::make_unique<
+        DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,1, 2);
+
+      // now we are going to update the primitive with the new set of points however, because
+      // the number of dimensions did not change the variance fo the two dimensions
+      // balances out the determinant the pre factor should remain the same
+      gauss_uncorrelated_prim_grp.update(*dwrapper2);
+
+      const double pre_factor_after_adding_point = primitive.getPreFactor();
+      REQUIRE(initial_pre_factor == Approx(pre_factor_after_adding_point));
+    }
+  }
+
+  GIVEN("raw data consisting of one dimension and three points."){
+    std::vector<std::vector<double>> raw_desc_data{
+      {0.0},
+      {-3.0},
+      {3.0}};
+
+    auto dwrapper = std::make_unique<
+      DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,3, 1);
+
+    KernelSpecification specification(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::Single,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::Mean,
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        constants::automate
+        );
+
+    PrimitiveFactory prim_factory;
+
+    auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
+        *dwrapper,
+        specification);
+
+    // There should be only a single primitive because the count is "Single"
+    const int primitive_index = 0;
+    Primitive & primitive = *gauss_uncorrelated_prim_grp.primitives.at(primitive_index);
+
+    const double initial_pre_factor = primitive.getPreFactor();
+    // The pre factor should be positive
+    REQUIRE(initial_pre_factor > 0.0);
+
+    THEN("a second set of data with three points and two dimensions."){
+      std::vector<std::vector<double>> raw_desc_data2{
+      {0.0, 1.0},
+      {-3.0, 0.0},
+      {3.0, -1.0}};
+
+      auto dwrapper2 = std::make_unique<
+        DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data2,3, 2);
+
+      // Should throw dimensions of descriptor wrapper should be consistent
+      REQUIRE_THROWS(gauss_uncorrelated_prim_grp.update(*dwrapper2));
+    }
+  }
+
+  GIVEN("raw data consisting of two dimension and three points."){
+    std::vector<std::vector<double>> raw_desc_data{
+      {0.0, 1.0},
+      {-3.0, 0.0},
+      {3.0, -1.0}};
+
+    auto dwrapper = std::make_unique<
+      DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,3, 2);
+
+    PrimitiveFactory prim_factory;
+
+    KernelSpecification specification(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::Single,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::Mean,
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        1 // number of dimensions to use
+        );
+
+    auto gauss_uncorrelated_prim_grp = prim_factory.createGroup(
+        *dwrapper,
+        specification);
+
+    KernelSpecification specification2(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::Single,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::Mean,
+        settings::KernelAlgorithm::Flexible,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        2 // number of dimensions to use
+        );
+
+    auto gauss_uncorrelated_prim_grp2 = prim_factory.createGroup(
+        *dwrapper,
+        specification2);
+
+    // There should be only a single primitive because the count is "Single"
+    const int primitive_index = 0;
+    Primitive & primitive1 = *gauss_uncorrelated_prim_grp.primitives.at(primitive_index);
+    const double pre_factor1 = primitive1.getPreFactor();
+    Primitive & primitive2 = *gauss_uncorrelated_prim_grp2.primitives.at(primitive_index);
+    const double pre_factor2 = primitive2.getPreFactor();
+    // The pre factor 1 should be greater than prefactor 2 because it has fewer dimensions
+    // and the determinant of the covariance matrix will be the same
+    REQUIRE(pre_factor1 > 0.0);
+    REQUIRE(pre_factor2 > 0.0);
+    REQUIRE(pre_factor1 > pre_factor2);
+  }
 }

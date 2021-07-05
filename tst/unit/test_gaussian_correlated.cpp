@@ -25,6 +25,7 @@ using namespace panacea;
 
 TEST_CASE("Testing:creation of gaussian correlated primitive","[unit,panacea]"){
   GaussCorrelated gauss(test::Test::key(), 0);
+  REQUIRE(gauss.getPreFactor() == Approx(0.0));
 }
 
 TEST_CASE("Testing:compute of gaussian correlated primitive","[unit,panacea]"){
@@ -134,11 +135,9 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
     {2.0, 5.0},
     {7.0, 7.0}};
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   auto dwrapper = std::make_unique<
     DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data,3, 2);
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   KernelSpecification specification(
       settings::KernelCorrelation::Correlated,
       settings::KernelCount::Single,
@@ -152,15 +151,12 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
       -1
       );
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   PrimitiveFactory prim_factory;
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
   auto gauss_correlated_prim_grp = prim_factory.createGroup(
       *dwrapper,
       specification);
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
   REQUIRE(gauss_correlated_prim_grp.primitives.size() == 1);
   REQUIRE(gauss_correlated_prim_grp.primitives.at(0)->getId() == 0);
@@ -178,10 +174,8 @@ TEST_CASE("Testing:compute of gaussian correlated primitive single mean kernel",
     {2.9, 4.9},
     {3.1, 5.1}};
 
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
   auto dwrapper_sample = std::make_unique<
     DescriptorWrapper<std::vector<std::vector<double>>*>>(&raw_desc_data_sample,3, 2);
-  std::cout << __FILE__ <<":" << __LINE__ << std::endl;
 
   const int single_kernel_index = 0;
   const double sample_center = gauss_correlated_prim_grp.primitives.at(single_kernel_index)->compute(*dwrapper_sample,0);

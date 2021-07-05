@@ -13,13 +13,28 @@
 
 namespace panacea {
 
+  enum class VarianceType {
+    Sample,
+    Population
+  };
+
   class Variance {
+      VarianceType type_ = VarianceType::Sample;
     public:
+      explicit Variance(const VarianceType type) : type_(type) {};
+
+      inline VarianceType type() const noexcept { return type_; }
+
       template<class T>
       std::vector<double> calculate(T data2d) {
 
         // Sample variance requires larger than 1 number of points in each
         // dimension
+        const int sample_or_pop = [&]() {
+          if( type_ == VarianceType::Sample ) return 1;
+          return 0;
+        }();
+
         if constexpr(std::is_pointer<typename std::remove_const<T>::type>::value) {
           assert(data2d->rows() > 1);
           Mean mean;
@@ -35,7 +50,7 @@ namespace panacea {
             }
           }
 
-          const double divisor = 1.0/static_cast<double>(data2d->rows()-1);
+          const double divisor = 1.0/static_cast<double>(data2d->rows()-sample_or_pop);
           for(int col = 0; col < data2d->cols(); ++col ) {
             variance_vec.at(col) *= divisor;
           }
@@ -55,7 +70,7 @@ namespace panacea {
             }
           }
 
-          const double divisor = 1.0/static_cast<double>(data2d.rows()-1);
+          const double divisor = 1.0/static_cast<double>(data2d.rows()- sample_or_pop);
           for(int col = 0; col < data2d.cols(); ++col ) {
             variance_vec.at(col) *= divisor;
           }

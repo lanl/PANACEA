@@ -31,7 +31,7 @@ namespace panacea {
    * Note that each of the attributes used by a kernel must be a unique pointer,
    * the reason being that when we call move on an entropy term it will
    * invalidate any of the internal pointers, if they are not invaiant. Using
-   * unique pointers ensures that the data will be invariant.  
+   * unique pointers ensures that the data will be invariant.
    *
    * It is not necessary to make the kernel specifications a unique pointer
    * because there are no pointers to the kernel specifications

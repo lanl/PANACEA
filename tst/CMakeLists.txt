@@ -37,6 +37,7 @@ list( APPEND INTEGRATION_TEST_SOURCES
     integration/test_kernel_specifications.cpp
     integration/test_kernel_wrappers.cpp
     integration/test_normalizer.cpp
+    integration/test_primitive_factory.cpp
     integration/test_primitive_group.cpp
     integration/test_randomizer.cpp
     integration/test_reducer.cpp

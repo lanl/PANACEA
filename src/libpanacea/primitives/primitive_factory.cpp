@@ -263,6 +263,19 @@ namespace panacea {
       const BaseDescriptorWrapper & dwrapper,
       PrimitiveGroup & prim_grp) const {
 
+    // Ensure that the number of dimensions in the "non-reduced" covariance matrix are
+    // consistent with the descriptor wrapper.
+    if( prim_grp.covariance->rows() != dwrapper.getNumberDimensions()) {
+      std::string error_msg = "The number of dimensions in the descriptor wrapper ";
+      error_msg += "are inconsistent with the number of rows and columns in the ";
+      error_msg += "covaraince matrix. Make sure the same number of dimensions are";
+      error_msg += " are provided when supplying the descriptors to a call to update.";
+      error_msg += "\nNumber of rows and columns in covariance matrix: ";
+      error_msg += std::to_string(prim_grp.covariance->rows());
+      error_msg += "\nNumber of dimensions in descriptor wrapper: ";
+      error_msg += std::to_string(dwrapper.getNumberDimensions());
+      PANACEA_FAIL(error_msg);
+    }
     prim_grp.kernel_wrapper->update(dwrapper);
     // Unnormalize the covariance matrix before updating
     prim_grp.normalizer->unnormalize(*prim_grp.covariance);

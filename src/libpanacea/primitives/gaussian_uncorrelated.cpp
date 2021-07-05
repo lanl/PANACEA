@@ -26,6 +26,9 @@ namespace panacea {
     assert(attributes.kernel_wrapper != nullptr);
     attributes_ = std::move(attributes);
     double determinant = attributes_.reduced_covariance->getDeterminant();
+    std::cout << "Determinant is " << determinant << std::endl;
+    std::cout << "Reduced covar" << std::endl;
+    attributes_.reduced_covariance->print();
     if( determinant <= 0.0 ) {
       std::string error_msg = "Determinant is less than 0 value: " + std::to_string(determinant);
       PANACEA_FAIL(error_msg);
@@ -33,6 +36,7 @@ namespace panacea {
     pre_factor_ = 1.0/(std::pow(determinant,0.5) *
         std::pow(constants::PI_SQRT*constants::SQRT_2,
           static_cast<double>(attributes_.reduced_covariance->getNumberDimensions())));
+    std::cout << "Number of dimensions " << attributes_.reduced_covariance->getNumberDimensions() << std::endl;
   }
 
   const settings::KernelPrimitive GaussUncorrelated::type() const noexcept {

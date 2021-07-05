@@ -145,6 +145,18 @@ namespace panacea {
           }else if( setting == CalculationType::Analytical ) {
             return "CalculationType=Analytical";
           }
+        } else if constexpr( std::is_same<RandomizeDimensions,T>::value ) {
+          if( setting == RandomizeDimensions::Yes ) {
+            return "RandomizeDimensions=Yes";
+          }else if( setting == RandomizeDimensions::No ) {
+            return "RandomizeDimensions=No";
+          }
+        } else if constexpr( std::is_same<RandomizeNumberDimensions,T>::value ) {
+          if( setting == RandomizeNumberDimensions::Yes ) {
+            return "RandomizeNumberDimensions=Yes";
+          }else if( setting == RandomizeNumberDimensions::No ) {
+            return "RandomizeNumberDimensions=No";
+          }
         }
         return "";
       }

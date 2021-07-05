@@ -57,6 +57,12 @@ namespace panacea {
     return *this;
   }
 
+  PANACEASettingsBuilder & PANACEASettingsBuilder::setMaxNumberDescriptorDimensions(
+      const int number_dimensions) {
+    ent_settings_.max_number_dimensions_ = number_dimensions;
+    return *this;
+  }
+
   PANACEASettingsBuilder & PANACEASettingsBuilder::set(const settings::KernelPrimitive & primitive) {
     ent_settings_.primitive_ = primitive;
     return *this;

@@ -23,6 +23,8 @@ namespace panacea {
 
       virtual int getId() const noexcept = 0;
 
+      virtual double getPreFactor() const noexcept = 0;
+
       /*
        * Updating a primitive inolves updating the kernel pointer
        * reset the inverse covariance matrix

@@ -6,6 +6,7 @@
 #include "private_settings.hpp"
 
 #include "constants.hpp"
+#include "error.hpp"
 
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
@@ -79,7 +80,15 @@ namespace panacea {
         randomize_dims_(randomize_dims),
         randomize_num_dims_(randomize_num_dims),
         max_number_dimensions_(max_num_dims)
-      {};
+      {
+        if( max_num_dims < -1 or max_num_dims == 0 ) {
+          std::string error_msg = "Problematic kernel specifications the max number of ";
+          error_msg += "allowed dimensions must be a positive number or it must be -1 to ";
+          error_msg += "indicate that the dimensions will automatically be determined. ";
+          error_msg += "\nYou have provided a value of: " + std::to_string(max_num_dims);
+          PANACEA_FAIL(error_msg);
+        }
+      };
 
       friend bool operator==(const KernelSpecification &spec1, const KernelSpecification &spec2);
       friend bool operator!=(const KernelSpecification &spec1, const KernelSpecification &spec2);

@@ -2,6 +2,7 @@
 // Local private PANACEA includes
 #include "kernels/kernel_specifications.hpp"
 
+#include "constants.hpp"
 #include "io/file_io_factory.hpp"
 
 // Public PANACEA includes
@@ -27,7 +28,7 @@ TEST_CASE("Testing:kernel specifications write & read","[unit,panacea]"){
       settings::KernelAlgorithm::Flexible,
       settings::RandomizeDimensions::No,
       settings::RandomizeNumberDimensions::No,
-      -1
+      constants::automate
       );
 
   std::fstream fs;
@@ -48,6 +49,9 @@ TEST_CASE("Testing:kernel specifications write & read","[unit,panacea]"){
   REQUIRE(kern_specs2.get<settings::KernelMemory>()            == settings::KernelMemory::Share);
   REQUIRE(kern_specs2.get<settings::KernelCenterCalculation>() == settings::KernelCenterCalculation::None);
   REQUIRE(kern_specs2.get<settings::KernelAlgorithm>()         == settings::KernelAlgorithm::Flexible);
+  REQUIRE(kern_specs2.get<settings::RandomizeNumberDimensions>() == settings::RandomizeNumberDimensions::No);
+  REQUIRE(kern_specs2.get<settings::RandomizeDimensions>()     == settings::RandomizeDimensions::No);
+  REQUIRE(kern_specs2.getMaxNumberDimensions()                 == constants::automate);
 }
 
 TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit,panacea]"){
@@ -61,7 +65,7 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
       settings::KernelAlgorithm::Flexible,
       settings::RandomizeDimensions::No,
       settings::RandomizeNumberDimensions::No,
-      -1
+      constants::automate
       );
 
   WHEN("Testing agains same instance") {
@@ -79,7 +83,7 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
         settings::KernelAlgorithm::Flexible,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
         );
 
     REQUIRE(!(kern_specs2 != kern_specs) );
@@ -96,7 +100,7 @@ TEST_CASE("Testing:kernel specifications equivalence operators == and !=","[unit
         settings::KernelAlgorithm::Flexible,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
         );
 
     REQUIRE(kern_specs2 != kern_specs);

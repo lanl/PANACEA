@@ -54,12 +54,19 @@ namespace panacea {
                       std::pow(attributes_.reduced_covariance->getDeterminant(),0.5) *
                       std::pow(constants::PI_SQRT*constants::SQRT_2,
                       static_cast<double>(attributes_.reduced_covariance->getNumberDimensions()))))
-                {};
+                {
+
+                  std::cout << "determinant " <<  attributes_.reduced_covariance->getDeterminant() << std::endl;
+                  std::cout << "dims " << attributes_.reduced_covariance->getNumberDimensions() << std::endl;
+                };
 
       virtual const settings::KernelPrimitive type() const noexcept final;
       virtual const settings::KernelCorrelation correlation() const noexcept final;
 
       virtual int getId() const noexcept final { return kernel_index_; }
+
+      virtual double getPreFactor() const noexcept final { return pre_factor_; }
+
       // Do not make const reference
       virtual void update(PrimitiveAttributes &&) final;
 

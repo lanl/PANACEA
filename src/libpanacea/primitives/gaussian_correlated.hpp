@@ -60,6 +60,9 @@ namespace panacea {
       virtual const settings::KernelCorrelation correlation() const noexcept final;
 
       virtual int getId() const noexcept final { return kernel_index_; }
+
+      virtual double getPreFactor() const noexcept final { return pre_factor_; }
+
       // Do not make const reference
       virtual void update(PrimitiveAttributes &&) final;
 

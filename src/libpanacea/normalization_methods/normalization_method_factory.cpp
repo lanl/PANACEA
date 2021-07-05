@@ -106,7 +106,7 @@ namespace panacea {
           assert(printDataQualityMessage2());
           return std::vector<double>(desc_wrapper.getNumberDimensions(), 1.0);
         }
-        Variance variance;
+        Variance variance(VarianceType::Sample);
         auto vec_variance = variance.calculate<const BaseDescriptorWrapper &>(desc_wrapper);
         for( const auto & dim : stacked_dims ) {
           vec_variance.at(dim) = 1.0;
