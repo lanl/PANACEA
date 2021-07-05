@@ -26,7 +26,6 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_primitive_group.cpp
     unit/test_reducer.cpp
     unit/test_row_echelon.cpp
-    unit/test_self_entropy.cpp
     unit/test_settings.cpp
     unit/test_variance.cpp
     )
@@ -40,6 +39,7 @@ list( APPEND INTEGRATION_TEST_SOURCES
     integration/test_normalizer.cpp
     integration/test_primitive_group.cpp
     integration/test_randomizer.cpp
+    integration/test_self_entropy.cpp
     )
 
 list( APPEND PUBLIC_INTEGRATION_TEST_SOURCES
