@@ -13,6 +13,7 @@
 #include "attribute_manipulators/inverter.hpp"
 #include "attribute_manipulators/randomizer.hpp"
 #include "attribute_manipulators/reducer.hpp"
+#include "constants.hpp"
 #include "error.hpp"
 #include "gaussian_correlated.hpp"
 #include "gaussian_log_correlated.hpp"
@@ -211,7 +212,7 @@ namespace panacea {
         specification.template get<settings::RandomizeNumberDimensions>());
 
     int max_num = specification.getMaxNumberDimensions();
-    if( dimensions.size() > max_num && max_num != -1 ) {
+    if( dimensions.size() > max_num && max_num != constants::automate) {
       DimensionLimiter dim_limiter;
       dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
     }
@@ -281,7 +282,7 @@ namespace panacea {
         prim_grp.getSpecification().template get<settings::RandomizeNumberDimensions>());
 
     int max_num = prim_grp.getSpecification().getMaxNumberDimensions();
-    if( dimensions.size() > max_num && max_num != -1 ) {
+    if( dimensions.size() > max_num && max_num != constants::automate) {
       DimensionLimiter dim_limiter;
       dim_limiter.limit(dimensions,prim_grp.getSpecification().getMaxNumberDimensions());
     }
@@ -359,7 +360,7 @@ namespace panacea {
         specification.get<settings::RandomizeNumberDimensions>());
 
     int max_num = specification.getMaxNumberDimensions();
-    if( dimensions.size() > max_num && max_num != -1 ) {
+    if( dimensions.size() > max_num && max_num != constants::automate) {
       DimensionLimiter dim_limiter;
       dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
     }
@@ -402,7 +403,7 @@ namespace panacea {
           prim_grp.getSpecification().template get<settings::RandomizeNumberDimensions>());
 
       int max_num = prim_grp.getSpecification().getMaxNumberDimensions();
-      if( dimensions.size() > max_num && max_num != -1 ) {
+      if( dimensions.size() > max_num && max_num != constants::automate) {
         DimensionLimiter dim_limiter;
         dim_limiter.limit(dimensions, prim_grp.getSpecification().getMaxNumberDimensions());
       }

@@ -69,12 +69,12 @@ TEST_CASE("Testing:mean","[unit,panacea]"){
     Mean mean;
 
     WHEN("Calculating mean along rows.") {
-      REQUIRE_NOTHROW(auto mean_vec = mean.calculate(data2d));
+      auto mean_vec = mean.calculate(data2d);
       REQUIRE(mean_vec.size() == 0);
     }
 
     WHEN("Calculating mean along cols.") {
-      REQUIRE_NOTHROW(auto mean_vec = mean.calculate<Data,Direction::AlongColumns>(data2d));
+      auto mean_vec = mean.calculate<Data,Direction::AlongColumns>(data2d);
       REQUIRE(mean_vec.size() == 0);
     }
 

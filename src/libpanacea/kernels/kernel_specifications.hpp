@@ -5,6 +5,8 @@
 // Local private PANACEA includes
 #include "private_settings.hpp"
 
+#include "constants.hpp"
+
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
 
@@ -51,7 +53,7 @@ namespace panacea {
       settings::RandomizeDimensions randomize_dims_ = defaults::randomize_dims_default;
       settings::RandomizeNumberDimensions randomize_num_dims_ =
         defaults::randomize_num_dims_default;
-      int max_number_dimensions_ = -1;
+      int max_number_dimensions_ = constants::automate;
 
     public:
       KernelSpecification() = default;
@@ -66,7 +68,7 @@ namespace panacea {
           const settings::KernelAlgorithm kern_algorithm,
           const settings::RandomizeDimensions randomize_dims,
           const settings::RandomizeNumberDimensions randomize_num_dims,
-          const int max_num_dims = -1) :
+          const int max_num_dims = constants::automate) :
         kern_correlation_(kern_correlation),
         kern_count_(kern_count),
         kern_prim_(kern_prim),

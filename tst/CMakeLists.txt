@@ -7,7 +7,6 @@ set_target_properties(helper PROPERTIES LINKER_LANGUAGE CXX)
 
 list( APPEND UNIT_TEST_SOURCES
     unit/test_covariance.cpp
-    unit/test_cross_entropy.cpp
     unit/test_data_point_template.cpp
     unit/test_descriptor_wrappers.cpp
     unit/test_dimensions.cpp
@@ -29,8 +28,10 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_variance.cpp
     )
 
+# Tests requiring intereaction between two or more non "std" classes
 list( APPEND INTEGRATION_TEST_SOURCES
     integration/test_covariance.cpp
+    integration/test_cross_entropy.cpp
     integration/test_dimension_limiter.cpp
     integration/test_distributions.cpp
     integration/test_inverter.cpp
