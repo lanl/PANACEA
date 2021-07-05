@@ -16,7 +16,7 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
+TEST_CASE("Testing:inverter trivial","[integration,panacea]"){
 
   auto mat = createMatrix(4,4);
 
@@ -104,7 +104,7 @@ TEST_CASE("Testing:inverter trivial","[unit,panacea]"){
   }
 }
 
-TEST_CASE("Testing:inverter less trivial","[unit,panacea]"){
+TEST_CASE("Testing:inverter less trivial","[integration,panacea]"){
 
   auto mat = createMatrix(4,4);
 

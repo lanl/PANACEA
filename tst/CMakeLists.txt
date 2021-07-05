@@ -14,7 +14,6 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_distributions.cpp
     unit/test_gaussian_correlated.cpp
     unit/test_gaussian_uncorrelated.cpp
-    unit/test_inverter.cpp
     unit/test_kernel_wrappers.cpp
     unit/test_kernel_specifications.cpp
     unit/test_matrix.cpp
@@ -34,6 +33,7 @@ list( APPEND INTEGRATION_TEST_SOURCES
     integration/test_covariance.cpp
     integration/test_dimension_limiter.cpp
     integration/test_distributions.cpp
+    integration/test_inverter.cpp
     integration/test_kernel_specifications.cpp
     integration/test_kernel_wrappers.cpp
     integration/test_normalizer.cpp
