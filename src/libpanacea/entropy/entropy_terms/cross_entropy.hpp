@@ -7,6 +7,7 @@
 #include "panacea/entropy_term.hpp"
 
 // Private PANACEA includes
+#include "entropy/entropy_settings/entropy_settings.hpp"
 #include "private_settings.hpp"
 
 // Local public PANACEA includes
@@ -26,11 +27,16 @@ namespace panacea {
     private:
       std::unique_ptr<Distribution> distribution_;
 
+      // The entropy term must own its own settings
+      // do not make unique_ptr if possible
+      EntropySettings entropy_settings_;
     public:
       CrossEntropy(
           const PassKey<EntropyFactory> & key,
-          std::unique_ptr<Distribution> dist) :
-        distribution_(std::move(dist)) {};
+          std::unique_ptr<Distribution> dist,
+          const EntropySettings & entropy_settings) :
+        distribution_(std::move(dist)),
+        entropy_settings_(entropy_settings) {};
 
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
       virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override;
@@ -38,6 +44,13 @@ namespace panacea {
       virtual settings::EntropyType type() const noexcept final;
 
       virtual double compute(
+          const BaseDescriptorWrapper & descriptor_wrapper) override;
+
+      virtual double compute(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind) override;
+
+      virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & entropy_settings
           ) override;
@@ -58,6 +71,10 @@ namespace panacea {
           const int desc_ind,
           const PANACEASettings & entropy_settings
           ) override;
+
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind) override;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,

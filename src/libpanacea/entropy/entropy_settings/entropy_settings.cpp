@@ -12,6 +12,63 @@ using namespace panacea::settings;
 
 namespace panacea {
 
+  EntropySettings::EntropySettings(const EntropySettings & entropy_settings) {
+
+    settings::EntropyType type = entropy_settings.type;
+    settings::Memory memory_policy = entropy_settings.memory_policy;
+    std::optional<double> weight = entropy_settings.weight;
+    std::optional<bool> numerical_grad_switch = entropy_settings.numerical_grad_switch;
+    std::optional<double> numerical_grad_inc = entropy_settings.numerical_grad_inc;
+
+    settings::EquationSetting compute_equation_settings =
+      entropy_settings.compute_equation_settings;
+    settings::EquationSetting grad_equation_settings =
+      entropy_settings.grad_equation_settings;
+
+    // Here we will create a heap allocation if the types are not the same.
+    // If the types are the same then we can assume that the memory has already
+    // been allocated for the members and we can simply copy from instance to the
+    // other.
+    if( dist_settings == nullptr ) {
+      dist_settings = DistributionSettings::create(*entropy_settings.dist_settings);
+    } else if(dist_settings->type() != entropy_settings.dist_settings->type()) {
+      dist_settings = DistributionSettings::create(*entropy_settings.dist_settings);
+    } else {
+      // Here because they are the same type we will simply copy the content over
+      // without requiring a heap allocation.
+      *dist_settings = *entropy_settings.dist_settings;
+    }
+  }
+
+  EntropySettings & EntropySettings::operator=(const EntropySettings & entropy_settings) {
+
+    settings::EntropyType type = entropy_settings.type;
+    settings::Memory memory_policy = entropy_settings.memory_policy;
+    std::optional<double> weight = entropy_settings.weight;
+    std::optional<bool> numerical_grad_switch = entropy_settings.numerical_grad_switch;
+    std::optional<double> numerical_grad_inc = entropy_settings.numerical_grad_inc;
+
+    settings::EquationSetting compute_equation_settings =
+      entropy_settings.compute_equation_settings;
+    settings::EquationSetting grad_equation_settings =
+      entropy_settings.grad_equation_settings;
+
+    // Here we will create a heap allocation if the types are not the same.
+    // If the types are the same then we can assume that the memory has already
+    // been allocated for the members and we can simply copy from instance to the
+    // other.
+    if( dist_settings == nullptr ) {
+      dist_settings = DistributionSettings::create(*entropy_settings.dist_settings);
+    } else if(dist_settings->type() != entropy_settings.dist_settings->type()) {
+      dist_settings = DistributionSettings::create(*entropy_settings.dist_settings);
+    } else {
+      // Here because they are the same type we will simply copy the content over
+      // without requiring a heap allocation.
+      *dist_settings = *entropy_settings.dist_settings;
+    }
+    return *this;
+  }
+
   EntropySettings::EntropySettings(const PANACEASettings & in, const Memory memory_policy) {
     if(auto val = in.get<EntropyType>() ) {
       this->type = *val;

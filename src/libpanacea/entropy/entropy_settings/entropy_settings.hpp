@@ -23,9 +23,17 @@ namespace panacea {
 
     public:
     EntropySettings() = default;
+    explicit EntropySettings(const EntropySettings & entropy_settings);
+
+    /**
+     * Overwrite the copy assignment operator.
+     **/
+    EntropySettings & operator=(const EntropySettings & entropy_settings);
+
     EntropySettings(
         const PANACEASettings &,
         const settings::Memory = settings::Memory::SelfOwnIfRestartCrossOwn );
+
     settings::EntropyType type = settings::EntropyType::Self;
     settings::Memory memory_policy = settings::Memory::SelfOwnIfRestartCrossOwn;
     std::optional<double> weight;

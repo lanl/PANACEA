@@ -28,6 +28,13 @@ namespace panacea {
       virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override;
 
       virtual double compute(
+          const BaseDescriptorWrapper & descriptor_wrapper) override;
+
+      virtual double compute(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind) override;
+
+      virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
           const EntropySettings & entropy_settings
           ) override;
@@ -46,6 +53,10 @@ namespace panacea {
           const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings) override;
+
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind) override;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,

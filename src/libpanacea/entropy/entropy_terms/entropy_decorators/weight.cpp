@@ -13,6 +13,17 @@
 namespace panacea {
 
   double Weight::compute(
+      const BaseDescriptorWrapper & descriptor_wrapper) {
+    return EntropyDecorator::compute(descriptor_wrapper) * weight_;
+  }
+
+  double Weight::compute(
+      const BaseDescriptorWrapper & descriptor_wrapper,
+      const int desc_ind) {
+    return EntropyDecorator::compute(descriptor_wrapper, desc_ind) * weight_;
+  }
+
+  double Weight::compute(
       const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & entropy_settings) {
     return EntropyDecorator::compute(descriptor_wrapper, entropy_settings) * weight_;
@@ -25,17 +36,34 @@ namespace panacea {
     return EntropyDecorator::compute(descriptor_wrapper, desc_ind, entropy_settings) * weight_;
   }
 
+  /**
+   * Note we do not multiply by the weight here because we are passing that baton
+   * to another Decorator method where the weight is accounted for.
+   **/
   double Weight::compute(
       const BaseDescriptorWrapper & descriptor_wrapper,
       const PANACEASettings & panacea_settings) {
-    return EntropyDecorator::compute(descriptor_wrapper, panacea_settings) * weight_;
+    return Weight::compute(descriptor_wrapper, EntropySettings(panacea_settings));
   }
 
+  /**
+   * Note we do not multiply by the weight here because we are passing that baton
+   * to another Decorator method where the weight is accounted for.
+   **/
   double Weight::compute(
       const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings) {
-    return EntropyDecorator::compute(descriptor_wrapper, desc_ind, panacea_settings) * weight_;
+    return Weight::compute(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
+  }
+
+  std::vector<double> Weight::compute_grad(
+      const BaseDescriptorWrapper & descriptor_wrapper,
+      const int desc_ind) {
+
+    auto vec = EntropyDecorator::compute_grad(descriptor_wrapper, desc_ind);
+    std::transform(vec.begin(), vec.end(), vec.begin(), std::bind(std::multiplies<double>(), std::placeholders::_1, weight_) );
+    return vec;
   }
 
   std::vector<double> Weight::compute_grad(
@@ -52,7 +80,7 @@ namespace panacea {
       const BaseDescriptorWrapper & descriptor_wrapper,
       const int desc_ind,
       const PANACEASettings & panacea_settings) {
-    return compute_grad(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
+    return Weight::compute_grad(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
   }
 
   void Weight::set(const settings::EntropyOption option, std::any val) {

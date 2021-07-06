@@ -2,6 +2,7 @@
 // Local private includes
 #include "entropy/entropy_terms/self_entropy.hpp"
 
+#include "constants.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "distribution/distribution_settings/distribution_settings.hpp"
@@ -45,7 +46,7 @@ TEST_CASE("Testing:self entropy","[integration,panacea]"){
         settings::KernelAlgorithm::Strict,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
       ));
 
   EntropySettings settings;
@@ -125,7 +126,7 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
           settings::KernelAlgorithm::Strict,
           settings::RandomizeDimensions::No,
           settings::RandomizeNumberDimensions::No,
-          -1
+          constants::automate
         ));
 
     EntropySettings settings;
@@ -193,7 +194,7 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
           settings::KernelAlgorithm::Strict,
           settings::RandomizeDimensions::No,
           settings::RandomizeNumberDimensions::No,
-          -1
+          constants::automate
         ));
 
     EntropySettings settings;

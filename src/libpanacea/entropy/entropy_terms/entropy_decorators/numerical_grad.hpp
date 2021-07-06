@@ -21,14 +21,23 @@ namespace panacea {
     double inc_ratio_ = 0.0001;
     bool numerical_grad_ = true;
 
-    public: 
-      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) : 
+    public:
+      explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) :
         EntropyDecorator(std::move(entropy_term)) {};
+
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind) override;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const EntropySettings & entropy_settings) override;
+
+      virtual std::vector<double> compute_grad(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind,
+          const PANACEASettings & panacea_settings) override;
 
       virtual void set(const settings::EntropyOption option, std::any val) override;
   };

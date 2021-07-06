@@ -45,7 +45,9 @@ list( APPEND INTEGRATION_TEST_SOURCES
     )
 
 list( APPEND PUBLIC_INTEGRATION_TEST_SOURCES
-    public_integration/test_panacea.cpp
+    public_integration/test_cross_entropy.cpp
+    public_integration/test_descriptor_wrapper.cpp
+    public_integration/test_self_entropy.cpp
     )
 
 include_directories(helper)

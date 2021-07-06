@@ -32,8 +32,7 @@ namespace panacea {
   }
 
   double CrossEntropy::compute(
-      const BaseDescriptorWrapper & descriptor_wrapper,
-      const EntropySettings & entropy_settings
+      const BaseDescriptorWrapper & descriptor_wrapper
       ) {
 
     double cross_entropy = 0.0;
@@ -41,27 +40,47 @@ namespace panacea {
       cross_entropy += -1.0 * log(distribution_->compute(
             descriptor_wrapper,
             desc_pt,
-            entropy_settings.getDistributionSettings(Method::Compute)));
+            entropy_settings_.getDistributionSettings(Method::Compute)));
     }
     return cross_entropy;
   }
 
-  double CrossEntropy::compute(const BaseDescriptorWrapper & descriptor_wrapper,
-      const int desc_ind,
+  double CrossEntropy::compute(
+      const BaseDescriptorWrapper & descriptor_wrapper,
       const EntropySettings & entropy_settings
+      ) {
+
+    entropy_settings_ = entropy_settings;
+    return CrossEntropy::compute(descriptor_wrapper);
+  }
+
+  double CrossEntropy::compute(
+      const BaseDescriptorWrapper & descriptor_wrapper,
+      const int desc_ind
       ) {
 
     return -1.0 * log(distribution_->compute(
           descriptor_wrapper,
           desc_ind,
-          entropy_settings.getDistributionSettings(Method::Compute)));
+          entropy_settings_.getDistributionSettings(Method::Compute)));
+  }
+
+  double CrossEntropy::compute(
+      const BaseDescriptorWrapper & descriptor_wrapper,
+      const int desc_ind,
+      const EntropySettings & entropy_settings
+      ) {
+    entropy_settings_ = entropy_settings;
+    return CrossEntropy::compute(descriptor_wrapper, desc_ind);
   }
 
   double CrossEntropy::compute(
       const BaseDescriptorWrapper & descriptor_wrapper,
       const PANACEASettings & panacea_settings
       ) {
-    return compute( descriptor_wrapper, EntropySettings(panacea_settings));
+    return CrossEntropy::compute(
+        descriptor_wrapper,
+        EntropySettings(panacea_settings));
   }
 
   double CrossEntropy::compute(
@@ -69,15 +88,16 @@ namespace panacea {
       const int desc_ind,
       const PANACEASettings & panacea_settings
       ) {
-    return compute( descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
+    return CrossEntropy::compute(
+        descriptor_wrapper,
+        desc_ind,
+        EntropySettings(panacea_settings));
   }
 
   std::vector<double> CrossEntropy::compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,
-          const int desc_ind, // Where the gradiant is being calculated at
-          const EntropySettings & entropy_settings
+          const int desc_ind // Where the gradiant is being calculated at
           ) {
-
 
       std::vector<double> inv_distribution;
       inv_distribution.reserve(descriptor_wrapper.getNumberPoints());
@@ -90,7 +110,7 @@ namespace panacea {
         inv_distribution.push_back(-1.0/distribution_->compute(
               descriptor_wrapper,
               desc_ind2,
-              entropy_settings.getDistributionSettings(Method::ComputeGradiant)));
+              entropy_settings_.getDistributionSettings(Method::ComputeGradiant)));
 
       }
 
@@ -108,7 +128,7 @@ namespace panacea {
             descriptor_wrapper,
             desc_ind, // desc_ind
             desc_ind, // grad_ind
-            entropy_settings.getDistributionSettings(Method::ComputeGradiant),
+            entropy_settings_.getDistributionSettings(Method::ComputeGradiant),
             settings::GradSetting::WRTDescriptor);
 
         std::transform(grad.begin(), grad.end(), grad.begin(),
@@ -123,12 +143,28 @@ namespace panacea {
   }
 
 
+
+  std::vector<double> CrossEntropy::compute_grad(
+          const BaseDescriptorWrapper & descriptor_wrapper,
+          const int desc_ind, // Where the gradiant is being calculated at
+          const EntropySettings & entropy_settings
+          ) {
+    entropy_settings_ = entropy_settings;
+    return CrossEntropy::compute_grad(
+        descriptor_wrapper,
+        desc_ind);;
+  }
+
+
   std::vector<double> CrossEntropy::compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind, // Where the gradiant is being calculated at
           const PANACEASettings & panacea_settings
           ) {
-    return compute_grad(descriptor_wrapper, desc_ind, EntropySettings(panacea_settings));
+    return CrossEntropy::compute_grad(
+        descriptor_wrapper,
+        desc_ind,
+        EntropySettings(panacea_settings));
   }
 
   std::unique_ptr<EntropyTerm> CrossEntropy::create(
@@ -140,7 +176,7 @@ namespace panacea {
     DistributionFactory dist_factory;
 
     auto dist = dist_factory.create(descriptor_wrapper, settings.getDistributionSettings(Method::Create));
-    return std::make_unique<CrossEntropy>(key, std::move(dist));
+    return std::make_unique<CrossEntropy>(key, std::move(dist), settings);
   }
 
   std::unique_ptr<EntropyTerm> CrossEntropy::create(
@@ -151,7 +187,7 @@ namespace panacea {
     DistributionFactory dist_factory;
 
     auto dist = dist_factory.create(settings.getDistributionSettings(Method::Create));
-    return std::make_unique<CrossEntropy>(key, std::move(dist));
+    return std::make_unique<CrossEntropy>(key, std::move(dist), settings);
   }
 
   void CrossEntropy::set(const settings::EntropyOption option, std::any val) {

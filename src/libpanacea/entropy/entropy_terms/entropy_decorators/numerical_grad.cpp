@@ -3,12 +3,63 @@
 #include "numerical_grad.hpp"
 
 #include "descriptors/descriptor_wrapper.hpp"
+#include "entropy/entropy_settings/entropy_settings.hpp"
 
 // Standard includes
 #include <cassert>
 #include <vector>
 
 namespace panacea {
+
+
+  /**
+   * WARNING the following two methods look almost identical but they
+   * are not.
+   **/
+  std::vector<double> NumericalGrad::compute_grad(
+      const BaseDescriptorWrapper & const_descriptor_wrapper,
+      const int wrt_pt) {
+
+    if( numerical_grad_ ) {
+      /**
+       * Why are we doing this?
+       *
+       * The easiest and most performant way to numerically calculate the gradiant
+       * is to simply adjust values in the descriptor wrapper compute the entropy
+       * and then return it to it's original value, this avoids an unneccessary copy of the
+       * descriptor wrapper which could be quite complex and costly to create.
+       *
+       * Though we are making changes to the descriptor wrapper within this
+       * method, it is being returned to it's original state before returning.
+       **/
+      BaseDescriptorWrapper & descriptor_wrapper = const_cast<BaseDescriptorWrapper &>(const_descriptor_wrapper);
+
+      const int ndim = getDimensions().size();
+      std::vector<double> grad(ndim,0.0);
+
+      // Cycle through dimensions
+      for( const int & dim : getDimensions() ){
+        assert(dim < ndim);
+        const double orig_x_val = descriptor_wrapper(wrt_pt,dim);
+        const double diff = orig_x_val*inc_ratio_;
+        // Change in this dimention
+        const std::vector<double> new_x_vals = {orig_x_val-diff, orig_x_val+diff};
+
+        // Temporarily alter the input value
+        std::vector<double> new_y_vals(2,0.0);
+        descriptor_wrapper(wrt_pt, dim) = new_x_vals.at(0);
+        new_y_vals.at(0) += EntropyDecorator::compute(descriptor_wrapper);
+        descriptor_wrapper(wrt_pt, dim) = new_x_vals.at(1);
+        new_y_vals.at(1) += EntropyDecorator::compute(descriptor_wrapper);
+        grad.at(dim) = (new_y_vals.at(1) - new_y_vals.at(0))/(2.0*diff);
+        // Reset to the original value
+        descriptor_wrapper(wrt_pt,dim) = orig_x_val;
+      }
+      return grad;
+    } else {
+      return EntropyDecorator::compute_grad(const_descriptor_wrapper, wrt_pt);
+    }
+  }
 
   std::vector<double> NumericalGrad::compute_grad(
       const BaseDescriptorWrapper & const_descriptor_wrapper,
@@ -55,6 +106,17 @@ namespace panacea {
       return EntropyDecorator::compute_grad(const_descriptor_wrapper, wrt_pt, entropy_settings);
     }
   }
+
+  std::vector<double> NumericalGrad::compute_grad(
+      const BaseDescriptorWrapper & const_descriptor_wrapper,
+      const int wrt_pt,
+      const PANACEASettings & panacea_settings) {
+    return NumericalGrad::compute_grad(
+        const_descriptor_wrapper,
+        wrt_pt,
+        EntropySettings(panacea_settings));
+  }
+
 
   void NumericalGrad::set(const settings::EntropyOption option, std::any val) {
     if( option == settings::EntropyOption::IncrementRatio ) {
