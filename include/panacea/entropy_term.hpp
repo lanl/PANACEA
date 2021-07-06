@@ -29,6 +29,17 @@ namespace panacea {
           std::ostream &,
           const EntropyTerm &);
 
+      /**
+       * The state of the entropy term, it is possible to create an entropy
+       * term that has not yet been fully initialized, e.g. if you need a
+       * placeholder in memory where the data from a restart file needs to
+       * be injected.
+       **/
+      enum class State {
+        Shell,
+        Initialized
+      };
+
     protected:
       const PassKey<EntropyTerm> key;
 
@@ -38,6 +49,11 @@ namespace panacea {
        **/
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) = 0;
       virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const = 0;
+
+      /**
+       * Will return the state of the entropy term
+       **/
+      virtual State state() const noexcept = 0;
 
       /**
        * Entropy type:

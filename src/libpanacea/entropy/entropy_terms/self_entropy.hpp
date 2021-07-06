@@ -29,16 +29,22 @@ namespace panacea {
       // The entropy term must own its own settings
       // do not make unique_ptr if possible
       EntropySettings entropy_settings_;
+
+      EntropyTerm::State state_ = EntropyTerm::State::Shell;
     public:
       SelfEntropy(
           const PassKey<EntropyFactory> & key,
           std::unique_ptr<Distribution> dist,
-          const EntropySettings & entropy_settings) :
+          const EntropySettings & entropy_settings,
+          const EntropyTerm::State state = EntropyTerm::State::Shell) :
         distribution_(std::move(dist)),
-        entropy_settings_(entropy_settings) {};
+        entropy_settings_(entropy_settings),
+        state_(state) {};
 
       virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
       virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override;
+
+      virtual EntropyTerm::State state() const noexcept final { return state_; }
 
       virtual settings::EntropyType type() const noexcept final;
 

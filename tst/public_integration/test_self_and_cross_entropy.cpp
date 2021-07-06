@@ -58,14 +58,38 @@ TEST_CASE("Testing:panacea self and cross entropy restart fileio","[end-to-end,p
   auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
 
   std::vector<std::unique_ptr<EntropyTerm>> entropy_terms;
-
   entropy_terms.emplace_back(panacea_pi.create(*dwrapper, panacea_settings_self));
   entropy_terms.emplace_back(panacea_pi.create(*dwrapper, panacea_settings_cross));
 
-    double total_entropy = 0.0;
+  double before_total_entropy = 0.0;
   for( auto & ent_term : entropy_terms ) {
-    total_entropy += ent_term->compute(*dwrapper);
+    before_total_entropy += ent_term->compute(*dwrapper);
   }
 
+   auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
+   ofstream restart_out;
+   restart_out.open("self_and_cross_entropy_restart.txt");
+   for( auto & ent_term : entropy_terms ) {
+     restart_file->write(ent_term.get(), restart_out);
+   }
+   restart_out.close();
+
+   std::vector<std::unique_ptr<EntropyTerm>> entropy_terms_shell;
+   entropy_terms_shell.emplace_back(panacea_pi.create(panacea_settings_self));
+   entropy_terms_shell.emplace_back(panacea_pi.create(panacea_settings_cross));
+
+   ifstream restart_in;
+   restart_in.open("self_and_cross_entropy_restart.txt");
+   for( auto & ent_term : entropy_terms_shell ) {
+     restart_file->read(ent_term.get(), restart_in);
+   }
+   restart_in.close();
+
+   double after_total_entropy = 0.0;
+   for( auto & ent_term : entropy_terms_shell ) {
+     after_total_entropy += ent_term->compute(*dwrapper);
+   }
+
+   REQUIRE(before_total_entropy == Approx(after_total_entropy));
 }
 

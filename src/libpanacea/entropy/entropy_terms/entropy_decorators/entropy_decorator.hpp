@@ -33,6 +33,10 @@ namespace panacea {
         return entropy_term_->getWriteFunction(key);
       }
 
+      virtual EntropyTerm::State state() const noexcept override {
+        return entropy_term_->state();
+      }
+
       virtual settings::EntropyType type() const noexcept override {
         return entropy_term_->type();
       }

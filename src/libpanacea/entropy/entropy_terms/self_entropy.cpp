@@ -36,6 +36,12 @@ namespace panacea {
       const BaseDescriptorWrapper & descriptor_wrapper
       ) {
 
+    if( state_ != EntropyTerm::State::Initialized) {
+      std::string error_msg = "Trying to call compute on an entropy term before it has ";
+      error_msg += "been initialized, please either initialize the entropy term first";
+      error_msg += " or when creating the entropy term provide the descriptors.";
+      PANACEA_FAIL(error_msg);
+    }
     double self_entropy = 0.0;
     for( int desc_pt = 0; desc_pt < descriptor_wrapper.getNumberPoints(); ++desc_pt ){
       self_entropy += -1.0 * log(distribution_->compute(
@@ -51,6 +57,12 @@ namespace panacea {
       const int desc_ind
       ) {
 
+    if( state_ != EntropyTerm::State::Initialized) {
+      std::string error_msg = "Trying to call compute on an entropy term before it has ";
+      error_msg += "been initialized, please either initialize the entropy term first";
+      error_msg += " or when creating the entropy term provide the descriptors.";
+      PANACEA_FAIL(error_msg);
+    }
     return -1.0 * log(distribution_->compute(
           descriptor_wrapper,
           desc_ind,
@@ -97,6 +109,12 @@ namespace panacea {
           const int desc_ind // Where the gradiant is being calculated at
           ) {
 
+    if( state_ != EntropyTerm::State::Initialized) {
+      std::string error_msg = "Trying to call compute_grad on an entropy term before it has ";
+      error_msg += "been initialized, please either initialize the entropy term first";
+      error_msg += " or when creating the entropy term provide the descriptors.";
+      PANACEA_FAIL(error_msg);
+    }
       std::vector<double> inv_distribution;
       inv_distribution.reserve(descriptor_wrapper.getNumberPoints());
       for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper.getNumberPoints(); ++desc_ind2 ){
@@ -155,7 +173,7 @@ namespace panacea {
     DistributionFactory dist_factory;
 
     auto dist = dist_factory.create(descriptor_wrapper, settings.getDistributionSettings(Method::Create));
-    return std::make_unique<SelfEntropy>(key, std::move(dist), settings);
+    return std::make_unique<SelfEntropy>(key, std::move(dist), settings, EntropyTerm::State::Initialized);
   }
 
   std::unique_ptr<EntropyTerm> SelfEntropy::create(
@@ -165,7 +183,7 @@ namespace panacea {
     DistributionFactory dist_factory;
 
     auto dist = dist_factory.create(settings.getDistributionSettings(Method::Create));
-    return std::make_unique<SelfEntropy>(key, std::move(dist), settings);
+    return std::make_unique<SelfEntropy>(key, std::move(dist), settings, EntropyTerm::State::Shell);
   }
 
   void SelfEntropy::set(const settings::EntropyOption option, std::any val) {
@@ -178,11 +196,18 @@ namespace panacea {
   }
 
   void SelfEntropy::update(const BaseDescriptorWrapper & descriptor_wrapper) {
+    if( state_ != EntropyTerm::State::Initialized) {
+      std::string error_msg = "Trying to call update on an entropy term before it has ";
+      error_msg += "been initialized, please either initialize the entropy term first";
+      error_msg += " or when creating the entropy term provide the descriptors.";
+      PANACEA_FAIL(error_msg);
+    }
     distribution_->update(descriptor_wrapper);
   }
 
   void SelfEntropy::initialize(const BaseDescriptorWrapper & descriptor_wrapper) {
     distribution_->initialize(descriptor_wrapper);
+    state_ = EntropyTerm::State::Initialized;
   }
 
   std::vector<std::any> SelfEntropy::write(
@@ -196,6 +221,16 @@ namespace panacea {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
         const auto & self_ent = dynamic_cast<const SelfEntropy &>(
             entropy_term_instance);
+
+        if( file_type == settings::FileType::TXTRestart) {
+          if(self_ent.state() != EntropyTerm::State::Initialized){
+            std::string error_msg = "Only entropy terms that have been initialized can";
+            error_msg += " be written to a restart file. If you want to still output ";
+            error_msg += "partial content of the term consider using a different file ";
+            error_msg += "type other than restart.";
+          }
+        }
+
         nested_values.push_back(self_ent.distribution_.get());
       } else {
         PANACEA_FAIL("Unsupported entropy term encountered.");
@@ -215,6 +250,13 @@ namespace panacea {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
         auto & self_ent = dynamic_cast<SelfEntropy &>(entropy_term_instance);
         nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
+
+        // Set the file type to initialized if reading a restart file
+        // This means that only entropy terms that have been initialized should be
+        // written to restart files
+        if( file_type == settings::FileType::TXTRestart) {
+          self_ent.state_ = EntropyTerm::State::Initialized;
+        }
       } else {
         PANACEA_FAIL("Unsupported entropy term encountered.");
       }

@@ -59,6 +59,8 @@ TEST_CASE("Testing:self entropy","[integration,panacea]"){
       dwrapper_init,
       settings);
 
+  REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
+
   std::cout << "Entropy type " << entropy_term->type() << std::endl;
 
   WHEN("Testing Numerical Decorator") {
@@ -139,6 +141,8 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
         dwrapper_init,
         settings);
 
+    REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
+
     WHEN("Testing Numerical Decorator") {
       double val1 = entropy_term->compute(dwrapper_init, settings);
       std::cout << "Self entropy is " << val1 << " at initial positions." << std::endl;
@@ -156,6 +160,8 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
 
       entropy_term = std::make_unique<NumericalGrad>(std::move(entropy_term));
 
+      REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
+
       auto numer_grad = entropy_term->compute_grad(dwrapper_init, 0, settings);
       std::cout << "Numerical self entropy grad of first descriptor " << numer_grad.at(0) << std::endl;
       auto numer_grad2 = entropy_term->compute_grad(dwrapper_init, 1, settings);
@@ -171,6 +177,7 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
 
       // Just flip the sign
       entropy_term = std::make_unique<Weight>(std::move(entropy_term),-1.0);
+      REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
       double val2 = entropy_term->compute(dwrapper_init, settings);
       auto grad2 = entropy_term->compute_grad(dwrapper_init,0, settings);
 
@@ -249,5 +256,63 @@ TEST_CASE("Testing:self entropy with Array Data2","[integration,panacea]"){
       REQUIRE(grad1.at(0) != Approx(grad2.at(0)));
     }
   }
+}
 
+TEST_CASE("Testing:self entropy shell + initialize","[integration,panacea]"){
+
+  /**
+   * The purpose of this tests is to check the errors are thrown if a shell
+   * entropy term is used before being initialized. This test is also to
+   * check that once a shell term has been initialized it has the same output
+   * as an entropy term that was constructred and initialized during creation.
+   **/
+
+  // Create an entropy shell term
+  KernelDistributionSettings kernel_settings;
+  kernel_settings.dist_settings = std::move(KernelSpecification(
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::OneToOne,
+        settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::None,
+        settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::None,
+        settings::KernelAlgorithm::Strict,
+        settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No,
+        constants::automate
+      ));
+
+  EntropySettings settings;
+  settings.type = settings::EntropyType::Self;
+  settings.setDistributionSettings(std::move(std::make_unique<KernelDistributionSettings>(kernel_settings)));
+
+  EntropyFactory entropy_factory;
+
+  auto entropy_term_shell = entropy_factory.create(settings);
+
+  REQUIRE(entropy_term_shell->state() == EntropyTerm::State::Shell);
+
+  // 3 points 2 dimensions
+  std::vector<std::vector<double>> data{
+    {1.0, 4.0},
+    {2.0, 5.0},
+    {3.0, 6.0}};
+
+  DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper(&data, 3, 2);
+
+  REQUIRE_THROWS(entropy_term_shell->compute(dwrapper));
+  REQUIRE_THROWS(entropy_term_shell->compute(dwrapper,0));
+  REQUIRE_THROWS(entropy_term_shell->compute_grad(dwrapper, 0));
+  REQUIRE_THROWS(entropy_term_shell->update(dwrapper));
+
+  // Now we are going to initialize the shell
+  entropy_term_shell->initialize(dwrapper);
+  REQUIRE(entropy_term_shell->state() == EntropyTerm::State::Initialized);
+  const double shell_term_entropy_value = entropy_term_shell->compute(dwrapper);
+
+  auto entropy_term_initialized = entropy_factory.create(dwrapper, settings);
+  REQUIRE(entropy_term_initialized->state() == EntropyTerm::State::Initialized);
+  const double initialized_term_entropy_value = entropy_term_initialized->compute(dwrapper);
+
+  REQUIRE(shell_term_entropy_value == Approx(initialized_term_entropy_value));
 }
