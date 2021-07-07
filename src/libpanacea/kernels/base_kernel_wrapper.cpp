@@ -29,31 +29,36 @@ namespace panacea {
     const BaseKernelWrapper & kwrapper = [&]() -> const BaseKernelWrapper & {
       if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(BaseKernelWrapper *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const BaseKernelWrapper &>(
             *std::any_cast<BaseKernelWrapper *>(kwrapper_instance));
 
       } else if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(BaseKernelWrapper &))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const BaseKernelWrapper &>(
             std::any_cast<BaseKernelWrapper &>(kwrapper_instance));
 
       } else if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(const BaseKernelWrapper *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const BaseKernelWrapper *>(kwrapper_instance);
 
       } else if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(const BaseKernelWrapper &))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const BaseKernelWrapper &>(kwrapper_instance);
 
       } else {
         std::string error_msg = "Unsupported Base kernel wrapper type.";
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const BaseKernelWrapper &>(kwrapper_instance);
     }();
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
 
       os << "[Kernel]\n";
@@ -67,15 +72,15 @@ namespace panacea {
       os << kwrapper.rows() << " " << kwrapper.cols() << "\n";
       for( int row = 0; row < kwrapper.rows(); ++row ) {
         for( int col = 0; col < kwrapper.cols(); ++col ) {
-          os << std::setfill(' ') 
-            << std::setw(14) 
-            << std::setprecision(8) 
+          os << std::setfill(' ')
+            << std::setw(14)
+            << std::setprecision(8)
             << std::right
             << kwrapper.at(row,col) << " ";
         }
         os << "\n";
       }
-    } 
+    }
     return nested_values;
   }
 
@@ -85,16 +90,19 @@ namespace panacea {
       std::any kwrapper_instance) {
 
     BaseKernelWrapper & kwrapper = [&]() -> BaseKernelWrapper & {
-      if(std::type_index(kwrapper_instance.type()) == 
+      if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(BaseKernelWrapper *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<BaseKernelWrapper *>(kwrapper_instance);
 
       } else if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(BaseKernelWrapper &))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<BaseKernelWrapper &>(kwrapper_instance);
 
       } else if(std::type_index(kwrapper_instance.type()) ==
           std::type_index(typeid(std::unique_ptr<BaseKernelWrapper> *))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *((std::any_cast<std::unique_ptr<BaseKernelWrapper> *>(kwrapper_instance))->get());
       } else {
         std::string error_msg = "Unsupported Base kernel wrapper type.";
@@ -105,21 +113,22 @@ namespace panacea {
         }
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<BaseKernelWrapper &>(kwrapper_instance);
     }();
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
 
       // Before doing any reading ensure that the underlying descriptor data type is
-      // actually compatible, right now the Kernel must be of type 
-      // std::vector<std::vector<double>> or std::vector<double> as in the data must 
+      // actually compatible, right now the Kernel must be of type
+      // std::vector<std::vector<double>> or std::vector<double> as in the data must
       // be owned by the kernel wrapper and not simply a pointer to it
-      if( 
-          kwrapper.getTypeIndex() != 
-          std::type_index(typeid(std::vector<std::vector<double>>)) && 
-          kwrapper.getTypeIndex() != 
+      if(
+          kwrapper.getTypeIndex() !=
+          std::type_index(typeid(std::vector<std::vector<double>>)) &&
+          kwrapper.getTypeIndex() !=
           std::type_index(typeid(std::vector<double>))
         ) {
         std::string error_msg = "Reading kernel data in requires that the kernel ";
@@ -151,7 +160,7 @@ namespace panacea {
         std::string error_msg = "Inconsistency between restart file kernel center ";
         error_msg += "method and the kernel who's state is being loaded from the ";
         error_msg += "restart file.";
-        PANACEA_FAIL(error_msg); 
+        PANACEA_FAIL(error_msg);
       }
 
       settings::KernelCount kernel_count;
@@ -166,7 +175,7 @@ namespace panacea {
         std::string error_msg = "Inconsistency between restart file kernel count ";
         error_msg += "setting and the kernel who's state is being loaded from the ";
         error_msg += "restart file.";
-        PANACEA_FAIL(error_msg); 
+        PANACEA_FAIL(error_msg);
       }
       // Look for derived class specific data tag
       while(line.find("[Meta Data]",0) == std::string::npos) {
@@ -210,9 +219,9 @@ namespace panacea {
       }
 
       std::getline(is, line);
-      std::istringstream ss(line); 
+      std::istringstream ss(line);
       int rows;
-      try { 
+      try {
         ss >> rows;
       } catch (...) {
         std::string error_msg = "Unable to read in rows from [Kernel] section ";
@@ -230,7 +239,7 @@ namespace panacea {
         PANACEA_FAIL(error_msg);
       }
 
-      try { 
+      try {
         kwrapper.resize(rows,cols);
         for( int row = 0; row < rows; ++row) {
           std::getline(is, line);
@@ -240,14 +249,14 @@ namespace panacea {
             ss_data >> value;
             kwrapper.at(row,col) = value;
           }
-        } 
+        }
       } catch (...) {
         std::string error_msg = "Error encountered while attempting to read in kernel ";
         error_msg += "coefficients from Kernel data file.\n";
         error_msg += "line is: " + line + "\n";
         PANACEA_FAIL(error_msg);
       }
-    } 
+    }
 
     return nested_values;
   }

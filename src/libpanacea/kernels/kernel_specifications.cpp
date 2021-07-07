@@ -24,23 +24,28 @@ namespace panacea {
     const KernelSpecification & kern_spec = [&]() -> const KernelSpecification & {
       if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(KernelSpecification *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const KernelSpecification &>(
             *std::any_cast<KernelSpecification *>(kern_spec_instance));
       }else if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(KernelSpecification &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const KernelSpecification &>(
             std::any_cast<KernelSpecification &>(kern_spec_instance));
       } else if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(const KernelSpecification *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const KernelSpecification *>(kern_spec_instance);
       }else if( std::type_index(kern_spec_instance.type()) ==
           std::type_index(typeid(const KernelSpecification &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const KernelSpecification &>(kern_spec_instance);
       } else {
         std::string error_msg = "Unable to cast to KernelSpecification * while";
         error_msg += " trying to write kernel specs to restart file.";
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const KernelSpecification &>(kern_spec_instance);
     }();
 
@@ -69,8 +74,10 @@ namespace panacea {
 
     KernelSpecification & kern_spec = [&]() -> KernelSpecification & {
       if( std::type_index(kern_spec_instance.type()) == std::type_index(typeid(KernelSpecification *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<KernelSpecification *>(kern_spec_instance);
       }else if( std::type_index(kern_spec_instance.type()) == std::type_index(typeid(KernelSpecification &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return (std::any_cast<KernelSpecification &>(kern_spec_instance));
       } else {
         std::string error_msg = "Unable to cast to KernelSpecification * while";

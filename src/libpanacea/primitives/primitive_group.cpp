@@ -79,26 +79,31 @@ namespace panacea {
     const PrimitiveGroup & prim_grp = [&]() -> const PrimitiveGroup & {
       if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const PrimitiveGroup &>(
             *std::any_cast<PrimitiveGroup *>(prim_grp_instance));
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const PrimitiveGroup &>(
             std::any_cast<PrimitiveGroup &>(prim_grp_instance));
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(const PrimitiveGroup *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const PrimitiveGroup *>(prim_grp_instance);
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(const PrimitiveGroup &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const PrimitiveGroup &>(prim_grp_instance);
       } else {
         std::string error_msg = "Unable to cast to PrimitiveGroup * while";
         error_msg += " trying to write primitive group to restart file.";
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const PrimitiveGroup &>(prim_grp_instance);
     }();
 
@@ -128,10 +133,12 @@ namespace panacea {
     PrimitiveGroup & prim_grp = [&]() -> PrimitiveGroup & {
       if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup *))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
       } else {
@@ -139,6 +146,7 @@ namespace panacea {
         error_msg += " trying to write primitive group to restart file.";
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
     }();
 
@@ -182,10 +190,12 @@ namespace panacea {
     PrimitiveGroup & prim_grp = [&]() -> PrimitiveGroup & {
       if( std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup *))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
       } else {
         std::string error_msg = "Unable to cast to PrimitiveGroup * while";
@@ -195,6 +205,7 @@ namespace panacea {
         }
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
     }();
 
@@ -229,10 +240,12 @@ namespace panacea {
     PrimitiveGroup & prim_grp = [&]() -> PrimitiveGroup & {
       if( std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup &))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
       } else if(std::type_index(prim_grp_instance.type()) ==
           std::type_index(typeid(PrimitiveGroup *))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
 
       } else {
@@ -243,6 +256,7 @@ namespace panacea {
         }
         PANACEA_FAIL(error_msg);
       }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
     }();
 

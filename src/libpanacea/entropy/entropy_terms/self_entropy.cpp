@@ -219,8 +219,10 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         const auto & self_ent = dynamic_cast<const SelfEntropy &>(
             entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
         if( file_type == settings::FileType::TXTRestart) {
           if(self_ent.state() != EntropyTerm::State::Initialized){
@@ -248,7 +250,9 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         auto & self_ent = dynamic_cast<SelfEntropy &>(entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
 
         // Set the file type to initialized if reading a restart file

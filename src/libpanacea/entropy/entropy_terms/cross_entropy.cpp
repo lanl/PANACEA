@@ -249,8 +249,10 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Cross ){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         const CrossEntropy & cross_ent = dynamic_cast<const CrossEntropy &>(
             entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         nested_values.push_back(cross_ent.distribution_.get());
 
         if( file_type == settings::FileType::TXTRestart) {
@@ -277,8 +279,10 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Cross){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         CrossEntropy & cross_ent = dynamic_cast<CrossEntropy &>(
             entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         nested_values.emplace_back(cross_ent.distribution_.get(), std::nullopt);
 
         // Set the file type to initialized if reading a restart file

@@ -112,12 +112,14 @@ namespace panacea {
         const BaseDescriptorWrapper & dwrapper) {
 
       if constexpr(std::is_pointer<T>::value) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         data_wrapper_ = DataPointTemplate<T>(
             std::any_cast<T>(dwrapper.getPointerToRawData()),
             dwrapper.rows(),
             dwrapper.cols());
       } else {
         // Because dwrapper is const
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         data_wrapper_ = DataPointTemplate<T>(
             *(std::any_cast<const T *>(dwrapper.getPointerToRawData())),
             dwrapper.rows(),
@@ -182,6 +184,7 @@ namespace panacea {
 
   template<class T>
     inline void KernelWrapper<T>::update(const BaseDescriptorWrapper & dwrapper) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       data_wrapper_ = DataPointTemplate<T>(
           std::any_cast<T>(dwrapper.getPointerToRawData()),
           dwrapper.rows(),
@@ -209,6 +212,7 @@ namespace panacea {
       if( std::type_index(typeid(const BaseDescriptorWrapper *)) ==
           std::type_index(data_in.type())){
 
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         data = std::any_cast<const BaseDescriptorWrapper *>(data_in)->getPointerToRawData();
       } else {
         data = data_in;
@@ -218,8 +222,10 @@ namespace panacea {
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T *>(data), rows, cols);
         } else {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<T *>(data)), rows, cols);
 
         }
@@ -229,13 +235,16 @@ namespace panacea {
         if( not std::is_pointer<T>::value) {
           // Allows conversion from a pointer type to a non pointer type
           // That way the kernel will have ownership of the data
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, std::any_cast<const T *>(data), rows, cols);
         } else {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           return std::make_unique<KernelWrapper<T>>(key, *(std::any_cast<const T *>(data)), rows, cols);
         }
       }
 
       if(std::type_index(data.type()) == std::type_index(typeid(T))) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::make_unique<KernelWrapper<T>>(key, std::any_cast<T>(data), rows, cols);
       }
 
@@ -247,6 +256,7 @@ namespace panacea {
         // we do not know the interface for getting the data out
         if( std::type_index(typeid(const BaseDescriptorWrapper *)) == std::type_index(data_in.type())){
           auto kwrapper = std::make_unique<KernelWrapper<T>>(key, rows, cols);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
           auto base_desc_wrapper = std::any_cast<const BaseDescriptorWrapper *>(data_in);
           for( int row = 0; row < rows; ++row){
             for( int col = 0; col < cols; ++col) {

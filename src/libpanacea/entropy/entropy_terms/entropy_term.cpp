@@ -8,6 +8,7 @@
 // Standard includes
 #include <any>
 #include <cassert>
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <typeindex>
@@ -23,22 +24,26 @@ namespace panacea {
     const EntropyTerm & entropy_term = [&]() -> const EntropyTerm & {
       if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(EntropyTerm &))){
-        // We are adding const because we are writing data there is no reason 
+        // We are adding const because we are writing data there is no reason
         // that the entropy term needs to be non const
+        std::cout << "Casting from EntropyTerm & to const Entropy Term &" << std::endl;
         return const_cast<const EntropyTerm &>(
             std::any_cast<EntropyTerm &>(entropy_term_instance));
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(EntropyTerm *))){
+        std::cout << "Casting from EntropyTerm * to const Entropy Term &" << std::endl;
         return const_cast<const EntropyTerm &>(
             *std::any_cast<EntropyTerm *>(entropy_term_instance));
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(const EntropyTerm &))){
+        std::cout << "Casting from const EntropyTerm & to const Entropy Term &" << std::endl;
         return std::any_cast<const EntropyTerm &>(entropy_term_instance);
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(const EntropyTerm *))){
+        std::cout << "Casting from const EntropyTerm * to const Entropy Term &" << std::endl;
         return *std::any_cast<const EntropyTerm *>(entropy_term_instance);
 
       } else {
@@ -48,12 +53,12 @@ namespace panacea {
     }();
 
     std::vector<std::any> nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       os << "[Entropy]\n";
       os << entropy_term.type() << "\n";
       nested_values = entropy_term.getWriteFunction(entropy_term.key)(file_type, os, entropy_term);
-    } 
+    }
     return nested_values;
   }
 
@@ -76,7 +81,7 @@ namespace panacea {
     }();
 
     io::ReadInstantiateVector nested_values;
-    if( file_type == settings::FileType::TXTRestart || 
+    if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
 
       std::string line = "";
@@ -93,7 +98,7 @@ namespace panacea {
       is >> ent_type;
       assert(ent_type == entropy_term.type());
       nested_values = entropy_term.getReadFunction(entropy_term.key)(file_type, is, entropy_term);
-    } 
+    }
     return nested_values;
   }
 }

@@ -215,6 +215,7 @@ namespace panacea {
 
   std::istream & MedianKernelWrapper::read(BaseKernelWrapper & kwrapper_instance, std::istream & is) {
 
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       MedianKernelWrapper & kwrapper_median = dynamic_cast<MedianKernelWrapper &>(kwrapper_instance);
       std::string line = "";
       while(line.find("[Total Number Points]",0) == std::string::npos) {
@@ -311,6 +312,7 @@ namespace panacea {
   }
 
   std::ostream & MedianKernelWrapper::write(const BaseKernelWrapper & kwrapper_instance, std::ostream & os) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const MedianKernelWrapper & kwrapper_median = dynamic_cast<const MedianKernelWrapper &>(kwrapper_instance);
     os << "[Total Number Points]\n";
     os << kwrapper_median.number_pts_median_ << "\n";

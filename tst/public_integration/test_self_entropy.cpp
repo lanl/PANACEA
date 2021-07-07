@@ -24,14 +24,14 @@ TEST_CASE("Testing:panacea self entropy","[end-to-end,panacea]"){
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
-                                        .set(EntropyType::Self)
-                                        .set(PANACEAAlgorithm::Flexible)
-                                        .distributionType(kernel)
-                                            .set(KernelPrimitive::Gaussian)
-                                            .set(KernelCount::OneToOne)
-                                            .set(KernelCorrelation::Uncorrelated)
-                                            .set(KernelCenterCalculation::None)
-                                            .set(KernelNormalization::None);
+    .set(EntropyType::Self)
+    .set(PANACEAAlgorithm::Flexible)
+    .distributionType(kernel)
+    .set(KernelPrimitive::Gaussian)
+    .set(KernelCount::OneToOne)
+    .set(KernelCorrelation::Uncorrelated)
+    .set(KernelCenterCalculation::None)
+    .set(KernelNormalization::None);
 
   // pi - public interface
   PANACEA panacea_pi;
@@ -185,31 +185,33 @@ TEST_CASE("Testing:panacea self entropy shell + initialize","[end-to-end,panacea
 
 TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,panacea]"){
 
-  // Creating settings for generating a self entropy term where the
-  // underlying distribution is using an kernel estimator
-  // that is a guassian kernel.
-  PANACEASettings panacea_settings = PANACEASettings::make()
-                                        .set(EntropyType::Self)
-                                        .set(PANACEAAlgorithm::Flexible)
-                                        .distributionType(kernel)
-                                            .set(KernelPrimitive::Gaussian)
-                                            .set(KernelCount::OneToOne)
-                                            .set(KernelCorrelation::Uncorrelated)
-                                            .set(KernelCenterCalculation::None)
-                                            .set(KernelNormalization::None);
-
   // pi - public interface
   PANACEA panacea_pi;
 
-    // Data has the following form, where it is stacked
-    //
-    //         col1   col2   col3
-    // row1    1.0     2.0    3.0  Point 1
-    // row2    1.0     2.0    3.0  Point 2
-    test::ArrayData array_data;
-    const int rows = 2;
-    const int cols = 3;
-    auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+  // Data has the following form, where it is stacked
+  //
+  //         col1   col2   col3
+  // row1    1.0     2.0    3.0  Point 1
+  // row2    1.0     2.0    3.0  Point 2
+  test::ArrayData array_data;
+  const int rows = 2;
+  const int cols = 3;
+  auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+
+  GIVEN("A self entropy term"){
+    // Creating settings for generating a self entropy term where the
+    // underlying distribution is using a kernel estimator
+    // that is a guassian kernel.
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Self)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::OneToOne)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::None)
+      .set(KernelNormalization::None);
+
     std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(*dwrapper, panacea_settings);
     double self_ent_val_stacked = self_ent->compute(*dwrapper, panacea_settings);
 
@@ -243,6 +245,79 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
 
       REQUIRE(self_ent_val == Approx(self_ent_val2));
     }
+  }
+
+  GIVEN("A weighted self entropy term"){
+    // Creating settings for generating a self entropy term where the
+    // underlying distribution is using a kernel estimator
+    // that is a guassian kernel.
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Self)
+      .weightEntropTermBy(2.0)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::OneToOne)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::None)
+      .set(KernelNormalization::None);
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(*dwrapper, panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    double self_ent_val_stacked = self_ent->compute(*dwrapper, panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    double self_ent_val = self_ent->compute(*dwrapper, panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    WHEN("provided with file_name") {
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_file->write(self_ent.get(),"weighted_self_entropy_restart.txt");
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+      restart_file->read(self_ent2.get(),"weighted_self_entropy_restart.txt");
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      double self_ent_val2 = self_ent2->compute(*dwrapper, panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+      REQUIRE(self_ent_val == Approx(self_ent_val2));
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    }
+    WHEN("provided with file stream"){
+
+      ofstream restart_out;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_out.open("weighted_self_entropy_restart2.txt");
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_file->write(self_ent.get(),restart_out);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_out.close();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+      ifstream restart_in;
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_in.open("weighted_self_entropy_restart2.txt");
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_file->read(self_ent2.get(),restart_in);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      restart_in.close();
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      double self_ent_val2 = self_ent2->compute(*dwrapper, panacea_settings);
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+      REQUIRE(self_ent_val == Approx(self_ent_val2));
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    }
+  }
 }
 
 TEST_CASE("Testing:panacea self entropy update","[end-to-end,panacea]"){
@@ -251,14 +326,14 @@ TEST_CASE("Testing:panacea self entropy update","[end-to-end,panacea]"){
   // underlying distribution is using an kernel estimator
   // that is a guassian kernel.
   PANACEASettings panacea_settings = PANACEASettings::make()
-                                        .set(EntropyType::Self)
-                                        .set(PANACEAAlgorithm::Flexible)
-                                        .distributionType(kernel)
-                                            .set(KernelPrimitive::Gaussian)
-                                            .set(KernelCount::OneToOne)
-                                            .set(KernelCorrelation::Uncorrelated)
-                                            .set(KernelCenterCalculation::None)
-                                            .set(KernelNormalization::None);
+    .set(EntropyType::Self)
+    .set(PANACEAAlgorithm::Flexible)
+    .distributionType(kernel)
+    .set(KernelPrimitive::Gaussian)
+    .set(KernelCount::OneToOne)
+    .set(KernelCorrelation::Uncorrelated)
+    .set(KernelCenterCalculation::None)
+    .set(KernelNormalization::None);
 
   // pi - public interface
   PANACEA panacea_pi;

@@ -7,6 +7,7 @@
 // Standard includes
 #include <algorithm>
 #include <any>
+#include <iostream>
 #include <typeindex>
 #include <vector>
 
@@ -86,9 +87,13 @@ namespace panacea {
   void Weight::set(const settings::EntropyOption option, std::any val) {
     if( option == settings::EntropyOption::Weight ) {
       if( std::type_index(val.type()) == std::type_index(typeid(double))){
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         weight_ = std::any_cast<double>(val);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       } else {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         weight_ = std::any_cast<const double>(val);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       }
     } else {
       EntropyDecorator::set(option, val);
@@ -110,10 +115,19 @@ namespace panacea {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      const auto & weight = dynamic_cast<const Weight &>(entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::cout << "Casting from const EntropyTerm & to const Weight &" << std::endl;
+      // Use a pointer here because it won't throw and so we can check if it was valid
+      // or not
+      const Weight * weight_ptr = dynamic_cast<const Weight *>(&entropy_term_instance);
+      if( weight_ptr == nullptr) {
+        weight_ptr = dynamic_cast<const Weight *>(&entropy_term_instance);
+        std::cout << "Problem casting" << std::endl;
+      }
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       os << "[Weight]\n";
-      os << weight.weight_ << "\n";
-      nested_values = entropy_term_instance.getWriteFunction(weight.key)(file_type, os, entropy_term_instance);
+      os << weight_ptr->weight_ << "\n";
+      nested_values = weight_ptr->entropy_term_->getWriteFunction(weight_ptr->key)(file_type, os, *weight_ptr->entropy_term_);
     }
     return nested_values;
   }
@@ -125,7 +139,10 @@ namespace panacea {
 
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      std::cout << "Casting from EntropyTerm & to Weight &" << std::endl;
       auto & weight = dynamic_cast<Weight &>(entropy_term_instance);
+        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       std::string line = "";
       while(line.find("[Weight]",0) == std::string::npos) {
@@ -139,7 +156,7 @@ namespace panacea {
 
       is >> weight.weight_;
 
-      nested_values = entropy_term_instance.getReadFunction(weight.key)(file_type, is, entropy_term_instance);
+      nested_values = weight.entropy_term_->getReadFunction(weight.key)(file_type, is, *weight.entropy_term_);
     }
 
     return nested_values;
