@@ -70,7 +70,7 @@ namespace panacea {
       PANACEA_FAIL(error_msg);
     }
 
-    auto ent_term = create_methods_.at(settings.type)(
+    std::unique_ptr<EntropyTerm> ent_term = create_methods_.at(settings.type)(
         PassKey<EntropyFactory>(),
         descriptor_wrapper,
         settings);
@@ -87,7 +87,7 @@ namespace panacea {
       std::string error_msg = "Entropy type is not registered with the factory.";
       PANACEA_FAIL(error_msg);
     }
-    auto ent_term = create_shell_methods_.at(settings.type)(
+    std::unique_ptr<EntropyTerm> ent_term = create_shell_methods_.at(settings.type)(
         PassKey<EntropyFactory>(),
         settings);
 

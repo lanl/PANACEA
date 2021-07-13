@@ -23,12 +23,24 @@ namespace panacea {
     return settings::EntropyType::Cross;
   }
 
-  EntropyTerm::ReadFunction CrossEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
-    return CrossEntropy::read;
+  std::vector<EntropyTerm::ReadElement> CrossEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+    return std::vector<EntropyTerm::ReadElement> {EntropyTerm::ReadElement{CrossEntropy::read, *this}};
   }
 
-  EntropyTerm::WriteFunction CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
-    return CrossEntropy::write;
+  std::vector<EntropyTerm::WriteElement> CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
+    return std::vector<EntropyTerm::WriteElement> {EntropyTerm::WriteElement{CrossEntropy::write, *this}};
+  }
+
+  bool CrossEntropy::set(const settings::EntropyOption opt, std::any value){
+    return false;
+  }
+
+  std::any CrossEntropy::get(const settings::EntropyOption opt) const {
+    std::string error_msg = "Unsupported option " + std::string(toString(opt));
+    error_msg += " for this entropy term. Perhaps your entropy term was ";
+    error_msg += "not initialized the way you expected it to be.";
+    PANACEA_FAIL(error_msg);
+    return false;
   }
 
   double CrossEntropy::compute(
@@ -131,16 +143,6 @@ namespace panacea {
 
     }
 
-    // Compute the gradiant with respect to the Descriptors
-    //std::vector<double> grad(descriptor_wrapper->getNumberDimensions(),0.0);
-
-    // Compute the gradiant with respect to each of the Kernels
-    //for( int desc_ind2 = 0; desc_ind2 < descriptor_wrapper->getNumberPoints(); ++desc_ind2 ){
-
-    // We assume the gradient is only ever calculated with changes in the
-    // descriptors, the kernel center is not going to move in this case,
-    // this is different from the self entropy term.
-    //std::vector<double> grad_temp = distribution_->compute_grad(
     std::vector<double> grad = distribution_->compute_grad(
         descriptor_wrapper,
         desc_ind, // desc_ind
@@ -153,9 +155,6 @@ namespace panacea {
           std::placeholders::_1,
           inv_distribution.at(desc_ind)));
 
-    //std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(), std::plus<double>());
-
-    //}
     return grad;
   }
 
@@ -215,12 +214,6 @@ namespace panacea {
         EntropyTerm::State::Shell);
   }
 
-  void CrossEntropy::set(const settings::EntropyOption option, std::any val) {
-    std::string error_msg = "CrossEntropy does not contain any options that can be set";
-    PANACEA_FAIL(error_msg);
-  }
-
-
   const std::vector<int> CrossEntropy::getDimensions() const noexcept {
     return distribution_->getDimensions().convert();
   }
@@ -244,15 +237,14 @@ namespace panacea {
       const settings::FileType file_type,
       std::ostream & os,
       const EntropyTerm & entropy_term_instance) {
-
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Cross ){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        const CrossEntropy & cross_ent = dynamic_cast<const CrossEntropy &>(
-            entropy_term_instance);
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+
+        const CrossEntropy & cross_ent =
+          dynamic_cast<const CrossEntropy &>(entropy_term_instance);
         nested_values.push_back(cross_ent.distribution_.get());
 
         if( file_type == settings::FileType::TXTRestart) {
@@ -261,6 +253,7 @@ namespace panacea {
             error_msg += " be written to a restart file. If you want to still output ";
             error_msg += "partial content of the term consider using a different file ";
             error_msg += "type other than restart.";
+            PANACEA_FAIL(error_msg);
           }
         }
       } else {
@@ -279,10 +272,8 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Cross){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        CrossEntropy & cross_ent = dynamic_cast<CrossEntropy &>(
-            entropy_term_instance);
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+        CrossEntropy & cross_ent = dynamic_cast<CrossEntropy &>(entropy_term_instance);
         nested_values.emplace_back(cross_ent.distribution_.get(), std::nullopt);
 
         // Set the file type to initialized if reading a restart file
@@ -291,13 +282,10 @@ namespace panacea {
         if( file_type == settings::FileType::TXTRestart) {
           cross_ent.state_ = EntropyTerm::State::Initialized;
         }
-
       } else {
         PANACEA_FAIL("Unsupported entropy term encountered.");
       }
     }
     return nested_values;
    }
-
-
 }

@@ -157,6 +157,14 @@ namespace panacea {
           }else if( setting == RandomizeNumberDimensions::No ) {
             return "RandomizeNumberDimensions=No";
           }
+        } else if constexpr( std::is_same<EntropyOption,T>::value ) {
+          if( setting == EntropyOption::Weight ) {
+            return "EntropyOption=Weight";
+          }else if( setting == EntropyOption::IncrementRatio ) {
+            return "EntropyOption=IncrementRatio";
+          }else if( setting == EntropyOption::NumericalGrad ) {
+            return "EntropyOption=NumericalGrad";
+          }
         }
         return "";
       }

@@ -96,7 +96,7 @@ namespace panacea {
           }
           PANACEA_FAIL(error_msg);
         }
-        auto data = read_methods_[obj.instance.type()](type(), is, obj.instance);
+        auto data = read_methods_[std::type_index(obj.instance.type())](type(), is, obj.instance);
         read_(obj.instance, data, is);
 
 
@@ -111,7 +111,7 @@ namespace panacea {
         }
 
         // Second option
-        if( post_read_initialization_.count(obj.instance.type())){
+        if( post_read_initialization_.count(std::type_index(obj.instance.type()))){
           post_read_initialization_[obj.instance.type()](type(),obj.instance);
         }
       }
@@ -122,7 +122,7 @@ namespace panacea {
 
       // Check if object type is registered
       if( write_methods_.count(std::type_index(obj.type())) ) {
-        auto data = write_methods_[obj.type()](type(),os,obj);
+        auto data = write_methods_[std::type_index(obj.type())](type(),os,obj);
         write_(data, os);
       } else {
         std::string error_msg = "Unable to write object it does not contain ";
@@ -162,7 +162,7 @@ namespace panacea {
       }
 
       if( post_read_initialization_.count(std::type_index(obj.type()))){
-        post_read_initialization_[obj.type()](type(),obj);
+        post_read_initialization_[std::type_index(obj.type())](type(),obj);
       }
     }
 

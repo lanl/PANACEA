@@ -25,11 +25,11 @@ namespace panacea {
       explicit EntropyDecorator(std::unique_ptr<EntropyTerm> entropy_term) :
         entropy_term_(std::move(entropy_term)) {};
 
-      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override {
+      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override {
         return entropy_term_->getReadFunction(key);
       }
 
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override {
+      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override {
         return entropy_term_->getWriteFunction(key);
       }
 
@@ -100,8 +100,14 @@ namespace panacea {
           const int desc_ind,
           const PANACEASettings & panacea_settings) override;
 
-      virtual void set(const settings::EntropyOption option, std::any val) override {
+      virtual bool set(
+          const settings::EntropyOption option, std::any val) override {
         return entropy_term_->set(option, val);
+      }
+
+      virtual std::any get(
+          const settings::EntropyOption option) const override {
+        return entropy_term_->get(option);
       }
 
       virtual const std::vector<int> getDimensions() const noexcept override {

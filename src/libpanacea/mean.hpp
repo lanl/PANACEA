@@ -19,13 +19,13 @@ namespace panacea {
        * Calculates the mean of 2d set of data
        *
        * Can calculate the mean along the rows or along the columns
-       * 
-       *       col1   col2  
+       *
+       *       col1   col2
        * row1  0.0    3.0
        * row2  2.0    5.0
        * row3  3.0    7.0
        *
-       * Along rows will return 
+       * Along rows will return
        *
        * row1 1.5
        * row2 3.5
@@ -35,9 +35,9 @@ namespace panacea {
        *
        *     col1      col2
        *     5.0/3.0   5.0
-       * 
+       *
        **/
-      template<class T, const Direction dir = Direction::AlongRows> 
+      template<class T, const Direction dir = Direction::AlongRows>
         std::vector<double> calculate(const T & data2d) {
 
           std::vector<double> mean;
@@ -96,7 +96,7 @@ namespace panacea {
               }
             }
           }
-          return mean; 
+          return mean;
         }
   };
 }

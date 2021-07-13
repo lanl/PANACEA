@@ -112,7 +112,9 @@ namespace panacea {
           rows_(rows),
           cols_(cols),
           number_dimensions_(cols),
-          number_points_(rows) {};
+          number_points_(rows) {
+
+          };
 
         /*
          * Allows the user to change how the rows and columns

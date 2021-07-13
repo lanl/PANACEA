@@ -11,6 +11,7 @@
 #include "distribution/distribution_settings/distribution_settings.hpp"
 #include "entropy/entropy_settings/entropy_settings.hpp"
 #include "error.hpp"
+#include "settings.hpp"
 
 // Standard includes
 #include <algorithm>
@@ -24,12 +25,24 @@ namespace panacea {
     return settings::EntropyType::Self;
   }
 
-  EntropyTerm::ReadFunction SelfEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
-    return SelfEntropy::read;
+  std::vector<EntropyTerm::ReadElement> SelfEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+    return std::vector<EntropyTerm::ReadElement> { EntropyTerm::ReadElement{SelfEntropy::read, *this} };
   }
 
-  EntropyTerm::WriteFunction SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
-    return SelfEntropy::write;
+  std::vector<EntropyTerm::WriteElement> SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
+    return std::vector<EntropyTerm::WriteElement> {EntropyTerm::WriteElement{SelfEntropy::write, *this}};
+  }
+
+  bool SelfEntropy::set(const settings::EntropyOption opt, std::any value){
+    return false;
+  }
+
+  std::any SelfEntropy::get(const settings::EntropyOption opt) const {
+    std::string error_msg = "Unsupported option " + std::string(toString(opt));
+    error_msg += " for this entropy term. Perhaps your entropy term was ";
+    error_msg += "not initialized the way you expected it to be.";
+    PANACEA_FAIL(error_msg);
+    return false;
   }
 
   double SelfEntropy::compute(
@@ -186,11 +199,6 @@ namespace panacea {
     return std::make_unique<SelfEntropy>(key, std::move(dist), settings, EntropyTerm::State::Shell);
   }
 
-  void SelfEntropy::set(const settings::EntropyOption option, std::any val) {
-    std::string error_msg = "SelfEntropy does not contain any options that can be set";
-    PANACEA_FAIL(error_msg);
-  }
-
   const std::vector<int> SelfEntropy::getDimensions() const noexcept {
     return distribution_->getDimensions().convert();
   }
@@ -219,27 +227,34 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        const auto & self_ent = dynamic_cast<const SelfEntropy &>(
-            entropy_term_instance);
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
         if( file_type == settings::FileType::TXTRestart) {
-          if(self_ent.state() != EntropyTerm::State::Initialized){
+          if(entropy_term_instance.state() != EntropyTerm::State::Initialized){
             std::string error_msg = "Only entropy terms that have been initialized can";
             error_msg += " be written to a restart file. If you want to still output ";
             error_msg += "partial content of the term consider using a different file ";
             error_msg += "type other than restart.";
+            PANACEA_FAIL(error_msg);
           }
         }
 
+      try {
+        const SelfEntropy & self_ent =
+          dynamic_cast<const SelfEntropy &>(entropy_term_instance);
         nested_values.push_back(self_ent.distribution_.get());
+      } catch (...) {
+        std::string error_msg = "Bad cast when trying to cast from ";
+        error_msg += "const EntropyTerm & to const SelfEntropy &.";
+        PANACEA_FAIL(error_msg);
+      }
+
       } else {
         PANACEA_FAIL("Unsupported entropy term encountered.");
       }
     }
     return nested_values;
   }
+
 
    io::ReadInstantiateVector SelfEntropy::read(
       const settings::FileType file_type,
@@ -250,16 +265,21 @@ namespace panacea {
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
       if( entropy_term_instance.type() == settings::EntropyType::Self){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        auto & self_ent = dynamic_cast<SelfEntropy &>(entropy_term_instance);
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-        nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
+        try {
+          SelfEntropy & self_ent =
+            dynamic_cast<SelfEntropy &>(entropy_term_instance);
+          nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
 
-        // Set the file type to initialized if reading a restart file
-        // This means that only entropy terms that have been initialized should be
-        // written to restart files
-        if( file_type == settings::FileType::TXTRestart) {
-          self_ent.state_ = EntropyTerm::State::Initialized;
+          // Set the file type to initialized if reading a restart file
+          // This means that only entropy terms that have been initialized should be
+          // written to restart files
+          if( file_type == settings::FileType::TXTRestart) {
+            self_ent.state_ = EntropyTerm::State::Initialized;
+          }
+        } catch (...) {
+          std::string error_msg = "Bad cast when attempting to convert ";
+          error_msg += "EntropyTerm & to SelfEntropy &.";
+          PANACEA_FAIL(error_msg);
         }
       } else {
         PANACEA_FAIL("Unsupported entropy term encountered.");
@@ -267,7 +287,5 @@ namespace panacea {
     }
     return nested_values;
    }
-
-
 
 }

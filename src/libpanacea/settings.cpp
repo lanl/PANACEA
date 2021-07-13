@@ -42,7 +42,7 @@ namespace panacea {
     return *this;
   }
 
-  PANACEASettingsBuilder & PANACEASettingsBuilder::weightEntropTermBy(const double & weight) {
+  PANACEASettingsBuilder & PANACEASettingsBuilder::weightEntropyTermBy(const double & weight) {
     ent_settings_.weight_ = weight;
     return *this;
   }

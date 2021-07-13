@@ -29,6 +29,20 @@ namespace panacea {
           std::ostream &,
           const EntropyTerm &);
 
+      struct ReadElement {
+        ReadElement(ReadFunction read_in, EntropyTerm & term_in) :
+          read(read_in), term(term_in) {};
+        ReadFunction read;
+        EntropyTerm & term;
+      };
+
+      struct WriteElement {
+        WriteElement(WriteFunction write_in, const EntropyTerm & term_in) :
+          write(write_in), term(term_in) {};
+        WriteFunction write;
+        const EntropyTerm & term;
+      };
+
       /**
        * The state of the entropy term, it is possible to create an entropy
        * term that has not yet been fully initialized, e.g. if you need a
@@ -41,17 +55,25 @@ namespace panacea {
       };
 
     protected:
-      const PassKey<EntropyTerm> key;
+      inline static const PassKey<EntropyTerm> key;
 
     public:
+
       /**
-       * These are auxillary methods used internally and are not meant to be accessible
+       * These are auxillary methods are used internally and are not meant to be accessible
        **/
-      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) = 0;
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const = 0;
+      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(
+          const PassKey<EntropyTerm> &
+          ) = 0;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(
+          const PassKey<EntropyTerm> &
+          ) const = 0;
 
       /**
        * Will return the state of the entropy term
+       *
+       * It can be used to determine if it is appropraite to calculate the entropy
+       * or gradiant yet or if further initialization is needed.
        **/
       virtual State state() const noexcept = 0;
 
@@ -62,10 +84,17 @@ namespace panacea {
        **/
       virtual settings::EntropyType type() const noexcept = 0;
 
+      virtual bool set(const settings::EntropyOption opt, std::any value) = 0;
+
+      virtual std::any get(const settings::EntropyOption opt) const = 0;
+
       /**
        * Computes entropy if all points are used to sample the entropy
        *
-       * Uses internally stored settings
+       * Uses internally stored settings.
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(const BaseDescriptorWrapper & descriptor_wrapper) = 0;
 
@@ -73,6 +102,9 @@ namespace panacea {
        * Computes the entropy if a single point is used to sample the entropy
        *
        * Uses internally stored settings
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -82,6 +114,9 @@ namespace panacea {
        * Computes entropy if all points are used to sample the entropy
        *
        * Will overwrite settings with call to compute
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -92,6 +127,9 @@ namespace panacea {
        * Computes the entropy if a single point is used to sample the entropy
        *
        * Will overwrite settings with call to compute
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -103,6 +141,9 @@ namespace panacea {
        * Computes entropy if all points are used to sample the entropy
        *
        * Will overwrite settings with call to compute
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -111,6 +152,9 @@ namespace panacea {
 
       /**
        * Computes the entropy if a single point is used to sample the entropy
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -123,6 +167,9 @@ namespace panacea {
        * descriptor given by 'desc_ind'.
        *
        * The vector returned contains the gradiant in each dimension.
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -132,7 +179,12 @@ namespace panacea {
        * Computes the gradiant of the entropy term at the location of the
        * descriptor given by 'desc_ind'.
        *
-       * The vector returned contains the gradiant in each dimension.
+       * The vector returned contains the gradiant in each dimension. In cases
+       * where the dimensions being utilized have been reduced 0.0s will be
+       * assigned to dimensions that are not used.
+       *
+       * Throws error if the entropy term has not been fully initialized before
+       * calling compute.
        **/
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,
@@ -143,8 +195,6 @@ namespace panacea {
           const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & panacea_settings) = 0;
-
-      virtual void set(const settings::EntropyOption option, std::any val) = 0;
 
       /**
        * Get the actual dimensions used by the entropy term

@@ -6,6 +6,9 @@
 // Local private PANACEA includes
 #include "entropy_decorator.hpp"
 
+// Public PANACEA includes
+#include "passkey.hpp"
+
 // Standard includes
 #include <memory>
 #include <vector>
@@ -20,12 +23,14 @@ namespace panacea {
 
     private:
       double weight_ = 1.0;
+      inline static const PassKey<EntropyTerm> & static_key = key;
 
+      EntropyTerm & getEntropyTerm();
     public:
       Weight(std::unique_ptr<EntropyTerm> entropy_term, const double & weight) : EntropyDecorator(std::move(entropy_term)), weight_(weight) {};
 
-      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
 
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper) override;
@@ -68,7 +73,8 @@ namespace panacea {
           const int desc_ind,
           const PANACEASettings & panacea_settings) override;
 
-      virtual void set(const settings::EntropyOption option, std::any val) override;
+      virtual bool set(const settings::EntropyOption option, std::any val) override;
+      virtual std::any get(const settings::EntropyOption option) const override;
 
       static std::vector<std::any> write(
           const settings::FileType file_type,

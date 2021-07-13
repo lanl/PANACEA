@@ -47,7 +47,13 @@ namespace panacea {
         const int max_number_pts,
         bool & remove_more_from_front){
 
-      const int num_pts = pts_near_median.at(0).size();
+    const int num_pts = [&]() -> const int {
+      if( pts_near_median.size() == 0){
+        return 0;
+      }
+      return pts_near_median.at(0).size();
+    }();
+
       const int diff = std::abs(max_number_pts - num_pts);
       if( num_pts > max_number_pts ) {
         int remove_from_front = diff/2;
@@ -100,12 +106,6 @@ namespace panacea {
     trim(points_near_median_, number_pts_store_, remove_from_front_);
 
     number_pts_median_ = dwrapper.getNumberPoints();
-
-    std::cout << "Median" << std::endl;
-    for( auto & val : center_ ) {
-      std::cout << val << " " << std::endl;
-    }
-    std::cout << std::endl;
   }
 
   MedianKernelWrapper::MedianKernelWrapper(
@@ -146,11 +146,6 @@ namespace panacea {
     data_wrapper_ = DataPointTemplate<std::vector<double>>(center_, 1, center_.size());
     number_pts_median_ += dwrapper.getNumberPoints();
 
-    std::cout << "Median after update" << std::endl;
-    for( auto & val : center_ ) {
-      std::cout << val << " " << std::endl;
-    }
-    std::cout << std::endl;
   }
 
   double& MedianKernelWrapper::at(const int row, const int col) {
@@ -215,7 +210,6 @@ namespace panacea {
 
   std::istream & MedianKernelWrapper::read(BaseKernelWrapper & kwrapper_instance, std::istream & is) {
 
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       MedianKernelWrapper & kwrapper_median = dynamic_cast<MedianKernelWrapper &>(kwrapper_instance);
       std::string line = "";
       while(line.find("[Total Number Points]",0) == std::string::npos) {
@@ -312,7 +306,6 @@ namespace panacea {
   }
 
   std::ostream & MedianKernelWrapper::write(const BaseKernelWrapper & kwrapper_instance, std::ostream & os) {
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     const MedianKernelWrapper & kwrapper_median = dynamic_cast<const MedianKernelWrapper &>(kwrapper_instance);
     os << "[Total Number Points]\n";
     os << kwrapper_median.number_pts_median_ << "\n";

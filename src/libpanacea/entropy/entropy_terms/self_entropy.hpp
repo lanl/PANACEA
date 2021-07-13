@@ -31,6 +31,7 @@ namespace panacea {
       EntropySettings entropy_settings_;
 
       EntropyTerm::State state_ = EntropyTerm::State::Shell;
+
     public:
       SelfEntropy(
           const PassKey<EntropyFactory> & key,
@@ -41,8 +42,8 @@ namespace panacea {
         entropy_settings_(entropy_settings),
         state_(state) {};
 
-      virtual EntropyTerm::ReadFunction getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual EntropyTerm::WriteFunction getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
 
       virtual EntropyTerm::State state() const noexcept final { return state_; }
 
@@ -91,7 +92,9 @@ namespace panacea {
           const int desc_ind,
           const PANACEASettings & panacea_settings) override;
 
-      virtual void set(const settings::EntropyOption option, std::any val) override;
+      virtual bool set(const settings::EntropyOption option, std::any val) override;
+
+      virtual std::any get(const settings::EntropyOption option) const override;
 
       virtual const std::vector<int> getDimensions() const noexcept override;
 

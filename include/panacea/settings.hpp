@@ -202,7 +202,7 @@ namespace panacea {
       PANACEASettingsBuilder & set(const settings::EntropyType &);
       PANACEASettingsBuilder & set(const settings::PANACEAAlgorithm &);
 
-      PANACEASettingsBuilder & weightEntropTermBy(const double & weight);
+      PANACEASettingsBuilder & weightEntropyTermBy(const double & weight);
       PANACEASettingsBuilder & setIncrementRatioTo(const double & inc_ratio);
       PANACEASettingsBuilder & setNumericalGradTo(const bool & on_or_off);
 

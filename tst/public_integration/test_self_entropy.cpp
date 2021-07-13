@@ -198,7 +198,7 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
   const int cols = 3;
   auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
 
-  GIVEN("A self entropy term"){
+/*  GIVEN("A self entropy term"){
     // Creating settings for generating a self entropy term where the
     // underlying distribution is using a kernel estimator
     // that is a guassian kernel.
@@ -245,15 +245,17 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
 
       REQUIRE(self_ent_val == Approx(self_ent_val2));
     }
-  }
+  }*/
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   GIVEN("A weighted self entropy term"){
     // Creating settings for generating a self entropy term where the
     // underlying distribution is using a kernel estimator
     // that is a guassian kernel.
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PANACEASettings panacea_settings = PANACEASettings::make()
       .set(EntropyType::Self)
-      .weightEntropTermBy(2.0)
+      .weightEntropyTermBy(2.0)
       .set(PANACEAAlgorithm::Flexible)
       .distributionType(kernel)
       .set(KernelPrimitive::Gaussian)

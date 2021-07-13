@@ -7,6 +7,7 @@
 #include "base_kernel_wrapper.hpp"
 
 #include "data_point_template.hpp"
+#include "error.hpp"
 
 // Local public PANACEA includes
 #include "panacea/passkey.hpp"
@@ -154,7 +155,7 @@ namespace panacea {
     } else{
       std::string error_msg = "Unsupported data type encountered while ";
       error_msg += "attempting to create Kernel center median";
-      throw std::runtime_error(error_msg);
+      PANACEA_FAIL(error_msg);
     }
     return nullptr;
   }
