@@ -11,14 +11,14 @@
 
 namespace panacea {
 
-      std::vector<EntropyTerm::ReadElement> NumericalGrad::getReadFunction(const PassKey<EntropyTerm> & key) {
-        std::vector<EntropyTerm::ReadElement> read_functions = EntropyDecorator::getReadFunction(key);
+      std::vector<EntropyTerm::ReadElement> NumericalGrad::getReadElements(const PassKey<EntropyTerm> & key) {
+        std::vector<EntropyTerm::ReadElement> read_functions = EntropyDecorator::getReadElements(key);
         read_functions.emplace_back(read, *this);
         return read_functions;
       }
 
-      std::vector<EntropyTerm::WriteElement> NumericalGrad::getWriteFunction(const PassKey<EntropyTerm> &) const {
-        std::vector<EntropyTerm::WriteElement> write_functions = EntropyDecorator::getWriteFunction(key);
+      std::vector<EntropyTerm::WriteElement> NumericalGrad::getWriteElements(const PassKey<EntropyTerm> &) const {
+        std::vector<EntropyTerm::WriteElement> write_functions = EntropyDecorator::getWriteElements(key);
         write_functions.emplace_back(write, *this);
         return write_functions;
       }
@@ -174,15 +174,19 @@ namespace panacea {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      os << "[Increment Ratio]\n";
-      os << std::any_cast<double>(
-          entropy_term_instance.get(
-            settings::EntropyOption::IncrementRatio)) << "\n";
-      os << "[Numerical Grad]\n";
-      os << std::any_cast<bool>(
-          entropy_term_instance.get(
-            settings::EntropyOption::NumericalGrad)) << "\n";
 
+      try {
+
+        const NumericalGrad & ent_term = dynamic_cast<const NumericalGrad &>(entropy_term_instance);
+        os << "[Increment Ratio]\n";
+        os << ent_term.inc_ratio_ << "\n";
+        os << "[Numerical Grad]\n";
+        os << ent_term.numerical_grad_ << "\n";
+
+      } catch (...) {
+        std::string error_msg = "Problem casting to NumericalGradiant.\n";
+        PANACEA_FAIL(error_msg);
+      }
     }
 
     return nested_values;
@@ -197,6 +201,16 @@ namespace panacea {
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
 
+      NumericalGrad & ent_term = [&]() -> NumericalGrad & {
+        try {
+          return dynamic_cast<NumericalGrad &>(entropy_term_instance);
+        } catch (...) {
+          std::string error_msg = "Unable to cast to NumericalGrad & from EntropyTerm &.";
+          PANACEA_FAIL(error_msg);
+        }
+        return dynamic_cast<NumericalGrad &>(entropy_term_instance);
+      }();
+
       std::string line = "";
       while(line.find("[Increment Ratio]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -207,9 +221,7 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      double inc_ratio;
-      is >> inc_ratio;
-      entropy_term_instance.set(settings::EntropyOption::IncrementRatio, inc_ratio);
+      is >> ent_term.inc_ratio_;
       while(line.find("[Numerical Grad]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
           std::string error_msg = "While reading numerical grad decorator section of entropy term ";
@@ -219,9 +231,7 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      bool numerical_grad;
-      is >> numerical_grad;
-      entropy_term_instance.set(settings::EntropyOption::NumericalGrad, numerical_grad);
+      is >> ent_term.numerical_grad_;
 
     }
 

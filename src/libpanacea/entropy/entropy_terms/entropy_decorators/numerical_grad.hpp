@@ -29,8 +29,8 @@ namespace panacea {
       explicit NumericalGrad(std::unique_ptr<EntropyTerm> entropy_term) :
         EntropyDecorator(std::move(entropy_term)) {};
 
-      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadElements(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteElements(const PassKey<EntropyTerm> &) const override;
 
       virtual std::vector<double> compute_grad(
           const BaseDescriptorWrapper & descriptor_wrapper,

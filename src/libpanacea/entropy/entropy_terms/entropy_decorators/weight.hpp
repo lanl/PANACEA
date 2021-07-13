@@ -29,8 +29,8 @@ namespace panacea {
     public:
       Weight(std::unique_ptr<EntropyTerm> entropy_term, const double & weight) : EntropyDecorator(std::move(entropy_term)), weight_(weight) {};
 
-      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadElements(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteElements(const PassKey<EntropyTerm> &) const override;
 
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper) override;

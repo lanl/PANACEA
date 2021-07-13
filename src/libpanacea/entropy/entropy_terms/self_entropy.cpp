@@ -25,11 +25,11 @@ namespace panacea {
     return settings::EntropyType::Self;
   }
 
-  std::vector<EntropyTerm::ReadElement> SelfEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+  std::vector<EntropyTerm::ReadElement> SelfEntropy::getReadElements(const PassKey<EntropyTerm> &) {
     return std::vector<EntropyTerm::ReadElement> { EntropyTerm::ReadElement{SelfEntropy::read, *this} };
   }
 
-  std::vector<EntropyTerm::WriteElement> SelfEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
+  std::vector<EntropyTerm::WriteElement> SelfEntropy::getWriteElements(const PassKey<EntropyTerm> &) const {
     return std::vector<EntropyTerm::WriteElement> {EntropyTerm::WriteElement{SelfEntropy::write, *this}};
   }
 
@@ -44,6 +44,7 @@ namespace panacea {
     PANACEA_FAIL(error_msg);
     return false;
   }
+
 
   double SelfEntropy::compute(
       const BaseDescriptorWrapper & descriptor_wrapper

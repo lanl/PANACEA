@@ -72,9 +72,7 @@ namespace panacea {
       }
       os << "[Entropy]\n";
       os << entropy_term.type() << "\n";
-      //nested_values = entropy_term.getWriteFunction(entropy_term.key)(file_type, os, entropy_term);
-      //
-      auto write_elements = entropy_term.getWriteFunction(entropy_term.key);
+      auto write_elements = entropy_term.getWriteElements(entropy_term.key);
       for( auto & write_element : write_elements) {
         std::vector<std::any> new_values = write_element.write(file_type, os, write_element.term);
         nested_values.insert(
@@ -121,8 +119,7 @@ namespace panacea {
       settings::EntropyType ent_type;
       is >> ent_type;
       assert(ent_type == entropy_term.type());
-//      nested_values = entropy_term.getReadFunction(entropy_term.key)(file_type, is, entropy_term);
-      auto read_elements = entropy_term.getReadFunction(entropy_term.key);
+      auto read_elements = entropy_term.getReadElements(entropy_term.key);
       for( auto & read_element : read_elements) {
         io::ReadInstantiateVector new_values = read_element.read(file_type, is, read_element.term);
         nested_values.insert(

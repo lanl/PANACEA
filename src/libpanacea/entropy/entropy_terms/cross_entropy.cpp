@@ -23,11 +23,11 @@ namespace panacea {
     return settings::EntropyType::Cross;
   }
 
-  std::vector<EntropyTerm::ReadElement> CrossEntropy::getReadFunction(const PassKey<EntropyTerm> &) {
+  std::vector<EntropyTerm::ReadElement> CrossEntropy::getReadElements(const PassKey<EntropyTerm> &) {
     return std::vector<EntropyTerm::ReadElement> {EntropyTerm::ReadElement{CrossEntropy::read, *this}};
   }
 
-  std::vector<EntropyTerm::WriteElement> CrossEntropy::getWriteFunction(const PassKey<EntropyTerm> &) const {
+  std::vector<EntropyTerm::WriteElement> CrossEntropy::getWriteElements(const PassKey<EntropyTerm> &) const {
     return std::vector<EntropyTerm::WriteElement> {EntropyTerm::WriteElement{CrossEntropy::write, *this}};
   }
 

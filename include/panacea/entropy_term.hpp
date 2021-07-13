@@ -62,10 +62,10 @@ namespace panacea {
       /**
        * These are auxillary methods are used internally and are not meant to be accessible
        **/
-      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(
+      virtual std::vector<EntropyTerm::ReadElement> getReadElements(
           const PassKey<EntropyTerm> &
           ) = 0;
-      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(
+      virtual std::vector<EntropyTerm::WriteElement> getWriteElements(
           const PassKey<EntropyTerm> &
           ) const = 0;
 

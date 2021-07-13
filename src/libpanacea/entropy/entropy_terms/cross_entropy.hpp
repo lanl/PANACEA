@@ -43,14 +43,11 @@ namespace panacea {
         entropy_settings_(entropy_settings),
         state_(state) {};
 
-      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadElements(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteElements(const PassKey<EntropyTerm> &) const override;
 
       virtual EntropyTerm::State state() const noexcept final { return state_; }
       virtual settings::EntropyType type() const noexcept final;
-
-      virtual bool set(const settings::EntropyOption opt, std::any value) override;
-      virtual std::any get(const settings::EntropyOption option) const override;
 
       virtual double compute(
           const BaseDescriptorWrapper & descriptor_wrapper) override;
@@ -94,6 +91,10 @@ namespace panacea {
           const BaseDescriptorWrapper & descriptor_wrapper,
           const int desc_ind,
           const PANACEASettings & entropy_settings) override;
+
+      virtual bool set(const settings::EntropyOption option, std::any val) override;
+
+      virtual std::any get(const settings::EntropyOption option) const override;
 
       virtual const std::vector<int> getDimensions() const noexcept override;
 

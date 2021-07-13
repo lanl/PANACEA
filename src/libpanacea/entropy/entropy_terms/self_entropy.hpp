@@ -42,8 +42,8 @@ namespace panacea {
         entropy_settings_(entropy_settings),
         state_(state) {};
 
-      virtual std::vector<EntropyTerm::ReadElement> getReadFunction(const PassKey<EntropyTerm> &) override;
-      virtual std::vector<EntropyTerm::WriteElement> getWriteFunction(const PassKey<EntropyTerm> &) const override;
+      virtual std::vector<EntropyTerm::ReadElement> getReadElements(const PassKey<EntropyTerm> &) override;
+      virtual std::vector<EntropyTerm::WriteElement> getWriteElements(const PassKey<EntropyTerm> &) const override;
 
       virtual EntropyTerm::State state() const noexcept final { return state_; }
 

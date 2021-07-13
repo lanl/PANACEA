@@ -110,14 +110,14 @@ namespace panacea {
     return true;
   }
 
-  std::vector<EntropyTerm::ReadElement> Weight::getReadFunction(const PassKey<EntropyTerm> &) {
-    std::vector<EntropyTerm::ReadElement> read_functions = EntropyDecorator::getReadFunction(key);
+  std::vector<EntropyTerm::ReadElement> Weight::getReadElements(const PassKey<EntropyTerm> &) {
+    std::vector<EntropyTerm::ReadElement> read_functions = EntropyDecorator::getReadElements(key);
     read_functions.emplace_back(read, *this);
     return read_functions;
   }
 
-  std::vector<EntropyTerm::WriteElement> Weight::getWriteFunction(const PassKey<EntropyTerm> &) const {
-    std::vector<EntropyTerm::WriteElement> write_functions = EntropyDecorator::getWriteFunction(key);
+  std::vector<EntropyTerm::WriteElement> Weight::getWriteElements(const PassKey<EntropyTerm> &) const {
+    std::vector<EntropyTerm::WriteElement> write_functions = EntropyDecorator::getWriteElements(key);
     write_functions.emplace_back(write, *this);
     return write_functions;
   }
@@ -129,10 +129,20 @@ namespace panacea {
 
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
-      os << "[Weight]\n";
-      os << std::any_cast<double>(
-          entropy_term_instance.get(
-            settings::EntropyOption::Weight)) << "\n";
+      try {
+        const Weight & ent_term= dynamic_cast<const Weight &>(entropy_term_instance);
+
+        os << "[Weight]\n";
+        os << ent_term.weight_ << "\n";
+
+//      os << std::any_cast<double>(
+//          entropy_term_instance.get(
+//            settings::EntropyOption::Weight)) << "\n";
+      } catch (...) {
+        std::string error_msg = "Problem casting from const EntropyTerm & to ";
+        error_msg += "const Weight &.";
+        PANACEA_FAIL(error_msg);
+      }
     }
     return nested_values;
   }
@@ -145,6 +155,8 @@ namespace panacea {
     io::ReadInstantiateVector nested_values;
     if( file_type == settings::FileType::TXTRestart ) {
 
+      try {
+        Weight & ent_term= dynamic_cast<Weight &>(entropy_term_instance);
       std::string line = "";
       while(line.find("[Weight]",0) == std::string::npos) {
         if( is.peek() == EOF ) {
@@ -155,10 +167,15 @@ namespace panacea {
         std::getline(is, line);
       }
 
-      double weight;
-      is >> weight;
-      entropy_term_instance.set(settings::EntropyOption::Weight, weight);
+      //double weight;
+      is >> ent_term.weight_;
+      //entropy_term_instance.set(settings::EntropyOption::Weight, weight);
 
+      } catch (...) {
+        std::string error_msg = "Problem casting from const EntropyTerm & to ";
+        error_msg += "Weight &.";
+        PANACEA_FAIL(error_msg);
+      }
     }
 
     return nested_values;
