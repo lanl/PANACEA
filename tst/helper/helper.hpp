@@ -64,6 +64,18 @@ namespace test {
       double ** data;
   };
 
+  /**
+   * Data for a few atoms using SNAP descriptors
+   **/
+  class ArrayDataNonTrivial {
+    public:
+      ArrayDataNonTrivial();
+      ~ArrayDataNonTrivial();
+      double ** data;
+      int rows = 21;
+      int cols = 30;
+  };
+
 
   /*
    * Will populate primitive attributes class with

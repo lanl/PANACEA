@@ -31,6 +31,7 @@ list( APPEND UNIT_TEST_SOURCES
 list( APPEND INTEGRATION_TEST_SOURCES
     integration/test_covariance.cpp
     integration/test_cross_entropy.cpp
+    integration/test_descriptor_wrappers.cpp
     integration/test_dimension_limiter.cpp
     integration/test_distributions.cpp
     integration/test_inverter.cpp

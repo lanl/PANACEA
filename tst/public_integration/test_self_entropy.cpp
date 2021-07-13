@@ -78,6 +78,50 @@ TEST_CASE("Testing:panacea self entropy","[end-to-end,panacea]"){
   }
 }
 
+TEST_CASE("Testing:panacea non trivial self entropy with strict alg","[end-to-end,panacea]"){
+
+  // pi - public interface
+  PANACEA panacea_pi;
+  // Creating settings for generating a self entropy term where the
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+  WHEN("positively vs negatively weighted.") {
+
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Self)
+      .set(PANACEAAlgorithm::Strict)
+      .distributionType(kernel)
+      .weightEntropyTermBy(1.0)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::OneToOne)
+      .set(KernelCorrelation::Uncorrelated)
+      .set(KernelCenterCalculation::None)
+      .set(KernelNormalization::None);
+
+
+    // Using data generated for an atomic configuration of
+    // 21 atoms and 30 SNAP descriptors
+    test::ArrayDataNonTrivial array_data;
+    auto dwrapper = panacea_pi.wrap(
+        &(array_data.data),
+        array_data.rows,
+        array_data.cols);
+
+    std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(*dwrapper, panacea_settings);
+    double positive_entropy = self_ent->compute(*dwrapper, panacea_settings);
+
+    REQUIRE(positive_entropy > 0);
+
+    // Switch the weight
+    self_ent->set(settings::EntropyOption::Weight, -1.0);
+
+    double negative_entropy = self_ent->compute(*dwrapper, panacea_settings);
+
+    REQUIRE(negative_entropy < 0);
+    REQUIRE(std::abs(negative_entropy) == Approx(positive_entropy));
+  }
+}
+
 TEST_CASE("Testing:panacea self entropy shell + initialize","[end-to-end,panacea]"){
 
   // Creating settings for generating a self entropy term where the
@@ -114,11 +158,12 @@ TEST_CASE("Testing:panacea self entropy shell + initialize","[end-to-end,panacea
       // shares the data with the descriptor changing the location of the
       // descriptors should not change anything,
       //
-      // E.g. because there was initially a peak at position x = 1.0, y = 2.0 and by
-      // default the entropy of the peaks is calculated moving the peak to x = 2.0 and y = 2.0
-      // will not change anything because we will simply be calculating th entropy at the new
-      // peak location. If the entropy term did not share the data then these values would
-      // be different.
+      // E.g. because there was initially a peak at position x = 1.0, y = 2.0
+      // and by default the entropy of the peaks is calculated moving the peak
+      // to x = 2.0 and y = 2.0 will not change anything because we will simply
+      // be calculating th entropy at the new peak location. If the entropy
+      // term did not share the data then these values would be different.
+      //
       dwrapper->operator()(0,0) = 2.0;
 
       double self_ent_val2 = self_ent->compute(*dwrapper, panacea_settings);
@@ -174,9 +219,10 @@ TEST_CASE("Testing:panacea self entropy shell + initialize","[end-to-end,panacea
       auto dwrapper = panacea_pi.wrap(&(data), rows, cols);
 
       // It should not be possible to create a self entropy term that is not
-      // using OneToOne mapping, at least yet, calculating the gradiant for that
-      // if the descriptors are being changed would prove difficult. E.g. if you are
-      // using the median, what would calculate_grad look like?
+      // using OneToOne mapping, at least yet, calculating the gradiant for
+      // that if the descriptors are being changed would prove difficult. E.g.
+      // if you are using the median, what would calculate_grad look like?
+
       CHECK_THROWS(self_ent->initialize(*dwrapper));
     }
 
@@ -198,7 +244,7 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
   const int cols = 3;
   auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
 
-/*  GIVEN("A self entropy term"){
+  GIVEN("A self entropy term"){
     // Creating settings for generating a self entropy term where the
     // underlying distribution is using a kernel estimator
     // that is a guassian kernel.
@@ -245,14 +291,12 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
 
       REQUIRE(self_ent_val == Approx(self_ent_val2));
     }
-  }*/
+  }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   GIVEN("A weighted self entropy term"){
     // Creating settings for generating a self entropy term where the
     // underlying distribution is using a kernel estimator
     // that is a guassian kernel.
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PANACEASettings panacea_settings = PANACEASettings::make()
       .set(EntropyType::Self)
       .weightEntropyTermBy(2.0)
@@ -264,60 +308,37 @@ TEST_CASE("Testing:panacea self entropy read & write with fileio","[end-to-end,p
       .set(KernelCenterCalculation::None)
       .set(KernelNormalization::None);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::unique_ptr<EntropyTerm> self_ent = panacea_pi.create(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double self_ent_val_stacked = self_ent->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     double self_ent_val = self_ent->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     WHEN("provided with file_name") {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->write(self_ent.get(),"weighted_self_entropy_restart.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       restart_file->read(self_ent2.get(),"weighted_self_entropy_restart.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       double self_ent_val2 = self_ent2->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       REQUIRE(self_ent_val == Approx(self_ent_val2));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
     WHEN("provided with file stream"){
 
       ofstream restart_out;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_out.open("weighted_self_entropy_restart2.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->write(self_ent.get(),restart_out);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_out.close();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> self_ent2 = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       ifstream restart_in;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_in.open("weighted_self_entropy_restart2.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->read(self_ent2.get(),restart_in);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_in.close();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       double self_ent_val2 = self_ent2->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       REQUIRE(self_ent_val == Approx(self_ent_val2));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
   }
 }
