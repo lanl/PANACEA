@@ -39,6 +39,7 @@ namespace panacea {
 
   class BaseDescriptorWrapper;
   class Normalizer;
+  class Reducer;
 
   /*
    * Class for storing the covariance matrix
@@ -96,6 +97,9 @@ namespace panacea {
       virtual bool isZero(const double threshold = 1E-9) const noexcept = 0;
 
       virtual const NormalizationState & getNormalizationState() const noexcept = 0;
+
+      // Specific to Reducer class
+      virtual const Matrix & matrix(PassKey<Reducer>) const = 0;
 
       // Specific to Normalizer class
       virtual void set(PassKey<Normalizer>, NormalizationState state) = 0;

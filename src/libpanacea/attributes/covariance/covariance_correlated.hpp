@@ -82,6 +82,9 @@ namespace panacea {
 
       virtual const NormalizationState & getNormalizationState() const noexcept final;
 
+      // Specific to Reducer class
+      virtual const Matrix & matrix(PassKey<Reducer>) const final;
+
       // Specific to Normalizer class
       virtual void set(PassKey<Normalizer>, NormalizationState state) final;
       virtual double & operator()(PassKey<Normalizer>, const int row, const int col) final;

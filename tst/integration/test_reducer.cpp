@@ -4,6 +4,7 @@
 
 #include "attributes/covariance.hpp"
 #include "attributes/dimensions.hpp"
+#include "descriptors/descriptor_wrapper.hpp"
 #include "matrix/matrix.hpp"
 #include "vector/vector.hpp"
 
@@ -12,6 +13,50 @@
 
 using namespace std;
 using namespace panacea;
+
+TEST_CASE("Testing:reducer simple test","[integration,panacea]"){
+
+  GIVEN("A small data set with linearly independent data."){
+    std::vector<std::vector<double>> data{
+        {1.0, 4.0},
+        {2.0, 5.0},
+        {3.0, 6.0}};
+
+    DescriptorWrapper<std::vector<std::vector<double>>*> dwrapper_init(&data, 3, 2);
+
+    WHEN("Creating a correlated covariance matrix."){
+      auto cov_ptr = Covariance::create(
+          dwrapper_init,
+          settings::KernelCorrelation::Correlated,
+          settings::KernelAlgorithm::Flexible
+          );
+
+      Reducer reducer;
+
+      std::vector<int> priority_rows { 0, 1};
+      ReducedCovariance reduced_covar = reducer.reduce(*cov_ptr, Dimensions(priority_rows));
+
+      // Dimensions should be reduced because correlated and the second
+      // dimension is linearly dependent on the first.
+      REQUIRE(reduced_covar.getNumberDimensions() == 1);
+    }
+    WHEN("Creating an uncorrelated covariance matrix."){
+      auto cov_ptr = Covariance::create(
+          dwrapper_init,
+          settings::KernelCorrelation::Uncorrelated,
+          settings::KernelAlgorithm::Flexible
+          );
+
+      Reducer reducer;
+
+      std::vector<int> priority_rows { 0, 1};
+      ReducedCovariance reduced_covar = reducer.reduce(*cov_ptr, Dimensions(priority_rows));
+
+      // Dimensions should not be reduced because uncorrelated.
+      REQUIRE(reduced_covar.getNumberDimensions() == 2);
+    }
+  }
+}
 
 TEST_CASE("Testing:reducer1","[integration,panacea]"){
 

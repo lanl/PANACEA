@@ -34,6 +34,7 @@ namespace panacea {
       const int num_dims = desc_wrap.getNumberDimensions();
       const int num_pts = desc_wrap.getNumberPoints();
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       assert(covariance.rows() == num_dims);
       assert(covariance.cols() == num_dims);
       assert(current_mean.rows() == num_dims);
@@ -63,6 +64,7 @@ namespace panacea {
           covariance(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
           covariance(dim,dim2) *= (A_ij + B_ij);
           covariance(dim2,dim) = covariance(dim,dim2);
+          std::cout << covariance(dim2,dim) << " Aij " << A_ij << " B_in " << B_ij << std::endl;
         } // account for off diagonal elements
       }
     }
@@ -215,6 +217,8 @@ namespace panacea {
   const NormalizationState & CovarianceCorrelated::getNormalizationState() const noexcept {
     return normalized_;
   }
+
+  const Matrix & CovarianceCorrelated::matrix(PassKey<Reducer>) const { return *matrix_; }
 
   void CovarianceCorrelated::set(PassKey<Normalizer>, NormalizationState state) {
     normalized_ = state;

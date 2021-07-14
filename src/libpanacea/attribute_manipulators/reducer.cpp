@@ -198,7 +198,7 @@ namespace panacea {
      * columns (because it is a covariance matrix.
      */
     Dimensions findLinearlyIndependentDescDimensions_(
-        const Covariance & cov,
+        const Matrix & cov,
         const Dimensions & priority_rows,
         const double threshold){
 
@@ -225,6 +225,8 @@ namespace panacea {
       const std::vector<int> relative_independent_rows =
         rowEchelonDimensionDependenceDetection_(*tmp.get(), threshold);
 
+      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+      tmp->print();
       // relative_independent_rows has not accounted for the changes in rows that occurred
       // during the call to reorderSymmetricMatrix this corrects the row indices
       std::unordered_set<int> converted;
@@ -276,12 +278,15 @@ namespace panacea {
       priority_rows = Dimensions(cov.rows());
     }
 
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+    cov.print();
+
     runChecks_(cov, priority_rows);
 
     double threshold = starting_threshold_;
     do {
       Dimensions independent_dims = findLinearlyIndependentDescDimensions_(
-          cov,
+          cov.matrix(PassKey<Reducer>()),
           priority_rows,
           threshold);
 
