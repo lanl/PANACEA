@@ -19,8 +19,10 @@ similarity.
 
 # Dependencies
 
-* Eigen - matrix opertions
-* Catch2 - for unit and integration testing
+Third party dependencies auto downloaded and used by PANACEA when built
+
+* [Eigen - matrix opertions](https://eigen.tuxfamily.org/index.php?title=Main_Page)
+* [Catch2 - for unit and integration testing](https://github.com/catchorg/Catch2)
 
 # Compiling & Installing
 
