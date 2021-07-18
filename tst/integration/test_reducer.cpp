@@ -52,8 +52,8 @@ TEST_CASE("Testing:reducer simple test","[integration,panacea]"){
       std::vector<int> priority_rows { 0, 1};
       ReducedCovariance reduced_covar = reducer.reduce(*cov_ptr, Dimensions(priority_rows));
 
-      // Dimensions should not be reduced because uncorrelated.
-      REQUIRE(reduced_covar.getNumberDimensions() == 2);
+      // Dimensions should also be reduced
+      REQUIRE(reduced_covar.getNumberDimensions() == 1);
     }
   }
 }

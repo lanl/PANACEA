@@ -60,10 +60,8 @@ TEST_CASE("Testing:self entropy","[integration,panacea]"){
       settings);
 
   REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
-  // Why 2? Because we are dealing with an uncorrelated gaussian, if it was
-  // correlated we would be able to detect the lineary dependence and it sould
-  // reduce to 1 dimension?
-  REQUIRE(entropy_term->getDimensions().size() == 2);
+
+  REQUIRE(entropy_term->getDimensions().size() == 1);
 
   std::cout << "Entropy type " << entropy_term->type() << std::endl;
 

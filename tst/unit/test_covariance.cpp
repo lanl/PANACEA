@@ -76,8 +76,8 @@ TEST_CASE("Testing:covariance test trivial constructor","[unit,panacea]"){
       REQUIRE( cov(1,0) == Approx(0.0) );
       REQUIRE( cov(1,1) == Approx(1.0) );
 
-      // Determinant should now be 1.0
-      REQUIRE( cov.getDeterminant() == Approx(1.0) );
+      // Determinant should also be 0.0
+      REQUIRE( cov.getDeterminant() == Approx(0.0) );
     }
   }
 }

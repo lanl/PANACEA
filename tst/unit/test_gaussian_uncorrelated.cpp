@@ -65,11 +65,11 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive","[unit,panacea]")
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->getId() == 0);
   REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->getId() == 1);
   // Get the density located at the center of both primitives
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,0) == Approx(0.0795774715));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,1) == Approx(0.0795774715));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,0) == Approx(0.2820947918));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,1) == Approx(0.2820947918));
 
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,1) == Approx(0.0107696397));
-  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,0) == Approx(0.0107696397));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(0)->compute(*dwrapper,1) == Approx(0.1037768744));
+  REQUIRE(gauss_uncorrelated_prim_grp.primitives.at(1)->compute(*dwrapper,0) == Approx(0.1037768744));
 
   settings::EquationSetting eq_settings = settings::EquationSetting::None;
 
@@ -268,6 +268,8 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with normaliz
 
 TEST_CASE("Testing:gaussian uncorrelated update","[integration,panacea]"){
 
+/*
+ * This test is not valid if we are using the full covariance matrix to calculate the determinant
   GIVEN("raw data consisting of two dimensions and two points."){
     std::vector<std::vector<double>> raw_desc_data{
       {0.0, -1.0},
@@ -349,7 +351,7 @@ TEST_CASE("Testing:gaussian uncorrelated update","[integration,panacea]"){
       const double pre_factor_after_adding_point = primitive.getPreFactor();
       REQUIRE(initial_pre_factor == Approx(pre_factor_after_adding_point));
     }
-  }
+  }*/
 
   GIVEN("raw data consisting of one dimension and three points."){
     std::vector<std::vector<double>> raw_desc_data{
