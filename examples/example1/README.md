@@ -11,7 +11,19 @@ kernel off center from the clump of points.
 
 # Building the Example
 
-To building the example requires that panacea has been installed.
+To building the example requires that panacea has been installed. Once it has
+been installed it is fairly straight forward to link it in as an external
+library. Notice there are two commands needed in CMake to find and link panacea.
+These commands can be seen in examples/examlple1/CMakeLists.txt
+
+```CMake
+find_package(panacea REQUIRED)
+
+target_link_libraries(name_of_target panacea::panacea)
+```
+
+The find package command will located panacea and the target_link_libraries command
+will link to the library so the compiler knows where to find it.
 
 ```bash
 $ cd examples/examlple1
