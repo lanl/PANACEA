@@ -11,6 +11,7 @@ list( APPEND UNIT_TEST_SOURCES
     unit/test_descriptor_wrappers.cpp
     unit/test_dimensions.cpp
     unit/test_distributions.cpp
+    unit/test_entropy_settings.cpp
     unit/test_gaussian_correlated.cpp
     unit/test_gaussian_uncorrelated.cpp
     unit/test_kernel_wrappers.cpp

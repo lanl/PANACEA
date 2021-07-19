@@ -26,28 +26,20 @@ namespace panacea {
           std::type_index(typeid(EntropyTerm &))){
         // We are adding const because we are writing data there is no reason
         // that the entropy term needs to be non const
-        std::cout << "Casting from EntropyTerm & to const Entropy Term &" << std::endl;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const EntropyTerm &>(
             std::any_cast<EntropyTerm &>(entropy_term_instance));
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(EntropyTerm *))){
-        std::cout << "Casting from EntropyTerm * to const Entropy Term &" << std::endl;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const EntropyTerm &>(
             *std::any_cast<EntropyTerm *>(entropy_term_instance));
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(const EntropyTerm &))){
-        std::cout << "Casting from const EntropyTerm & to const Entropy Term &" << std::endl;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const EntropyTerm &>(entropy_term_instance);
 
       } else if(std::type_index(entropy_term_instance.type()) ==
           std::type_index(typeid(const EntropyTerm *))){
-        std::cout << "Casting from const EntropyTerm * to const Entropy Term &" << std::endl;
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const EntropyTerm *>(entropy_term_instance);
 
       } else {
@@ -56,7 +48,6 @@ namespace panacea {
       return std::any_cast<const EntropyTerm &>(entropy_term_instance);
     }();
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {

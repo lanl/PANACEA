@@ -242,6 +242,7 @@ namespace panacea {
       try {
         const SelfEntropy & self_ent =
           dynamic_cast<const SelfEntropy &>(entropy_term_instance);
+        nested_values.push_back(&self_ent.entropy_settings_);
         nested_values.push_back(self_ent.distribution_.get());
       } catch (...) {
         std::string error_msg = "Bad cast when trying to cast from ";
@@ -269,6 +270,7 @@ namespace panacea {
         try {
           SelfEntropy & self_ent =
             dynamic_cast<SelfEntropy &>(entropy_term_instance);
+          nested_values.emplace_back(&self_ent.entropy_settings_, std::nullopt);
           nested_values.emplace_back(self_ent.distribution_.get(), std::nullopt);
 
           // Set the file type to initialized if reading a restart file

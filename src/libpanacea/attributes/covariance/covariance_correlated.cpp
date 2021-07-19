@@ -199,6 +199,7 @@ namespace panacea {
   }
 
   double CovarianceCorrelated::getDeterminant() const {
+    assert(matrix_ != nullptr);
     return matrix_->getDeterminant();
   }
 

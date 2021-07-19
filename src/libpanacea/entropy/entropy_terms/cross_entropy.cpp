@@ -245,6 +245,7 @@ namespace panacea {
 
         const CrossEntropy & cross_ent =
           dynamic_cast<const CrossEntropy &>(entropy_term_instance);
+        nested_values.push_back(&cross_ent.entropy_settings_);
         nested_values.push_back(cross_ent.distribution_.get());
 
         if( file_type == settings::FileType::TXTRestart) {
@@ -274,6 +275,7 @@ namespace panacea {
       if( entropy_term_instance.type() == settings::EntropyType::Cross){
 
         CrossEntropy & cross_ent = dynamic_cast<CrossEntropy &>(entropy_term_instance);
+        nested_values.emplace_back(&cross_ent.entropy_settings_, std::nullopt);
         nested_values.emplace_back(cross_ent.distribution_.get(), std::nullopt);
 
         // Set the file type to initialized if reading a restart file

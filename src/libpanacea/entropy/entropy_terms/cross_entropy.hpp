@@ -25,11 +25,11 @@ namespace panacea {
 
   class CrossEntropy : public EntropyTerm {
     private:
-      std::unique_ptr<Distribution> distribution_;
-
       // The entropy term must own its own settings
       // do not make unique_ptr if possible
       EntropySettings entropy_settings_;
+
+      std::unique_ptr<Distribution> distribution_;
 
       EntropyTerm::State state_ = EntropyTerm::State::Shell;
 

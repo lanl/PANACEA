@@ -176,6 +176,7 @@ namespace panacea {
   std::ostream& operator<<(std::ostream& os, const settings::GradSetting  &);
   std::ostream& operator<<(std::ostream& os, const settings::KernelAlgorithm & );
   std::ostream& operator<<(std::ostream& os, const settings::KernelMemory &);
+  std::ostream& operator<<(std::ostream& os, const settings::Memory &);
 
   std::istream& operator>>(std::istream& is, settings::CalculationType & );
   std::istream& operator>>(std::istream& is, settings::EquationSetting & );
@@ -183,6 +184,7 @@ namespace panacea {
   std::istream& operator>>(std::istream& is, settings::GradSetting  &);
   std::istream& operator>>(std::istream& is, settings::KernelAlgorithm & );
   std::istream& operator>>(std::istream& is, settings::KernelMemory &);
+  std::istream& operator>>(std::istream& is, settings::Memory &);
 
 
 }
