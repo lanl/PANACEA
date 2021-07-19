@@ -2,6 +2,7 @@
 // Local private PANACEA includes
 #include "primitives/primitive_group.hpp"
 
+#include "constants.hpp"
 #include "descriptors/descriptor_wrapper.hpp"
 #include "io/file_io_factory.hpp"
 #include "kernels/kernel_specifications.hpp"
@@ -41,7 +42,7 @@ TEST_CASE("Testing:primitive group write & read","[unit,panacea]"){
         settings::KernelAlgorithm::Flexible,
         settings::RandomizeDimensions::No,
         settings::RandomizeNumberDimensions::No,
-        -1
+        constants::automate
       );
 
 

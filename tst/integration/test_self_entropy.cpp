@@ -61,6 +61,8 @@ TEST_CASE("Testing:self entropy","[integration,panacea]"){
 
   REQUIRE(entropy_term->state() == EntropyTerm::State::Initialized);
 
+  REQUIRE(entropy_term->getDimensions().size() == 1);
+
   std::cout << "Entropy type " << entropy_term->type() << std::endl;
 
   WHEN("Testing Numerical Decorator") {

@@ -259,6 +259,19 @@ namespace panacea {
     return os;
   }
 
+  std::ostream& operator<<(std::ostream& os, const settings::Memory & mem) {
+    if(mem == settings::Memory::SelfOwnIfRestartCrossOwn) {
+      os << "SelfOwnIfRestartCrossOwn";
+    }else if(mem == settings::Memory::Own) {
+      os << "Own";
+    }else if(mem == settings::Memory::OwnIfRestart) {
+      os << "OwnIfRestart";
+    }else if(mem == settings::Memory::Share) {
+      os << "Share";
+    }
+    return os;
+  }
+
   std::ostream& operator<<(
       std::ostream& os, const settings::RandomizeDimensions & random_dims) {
     if( random_dims == settings::RandomizeDimensions::Yes){
@@ -579,6 +592,27 @@ namespace panacea {
       std::string error_msg = "Unrecognized kernek memory option while reading istream.\n";
       error_msg += "Accepted kernel memory options are:\n";
       error_msg += "Default\nOwnIfRestart\nOwn\nShare\n";
+      error_msg += "Line is: " + line + "\n";
+      PANACEA_FAIL(error_msg);
+    }
+    return is;
+  }
+
+  std::istream& operator>>(std::istream& is,  settings::Memory & mem) {
+    std::string line;
+    std::getline(is,line);
+    if( line.find("SelfOwnIfRestartCrossOwn", 0) != std::string::npos ) {
+      mem = settings::Memory::SelfOwnIfRestartCrossOwn;
+    }else if( line.find("OwnIfRestart", 0) != std::string::npos ) {
+      mem = settings::Memory::OwnIfRestart;
+    }else if( line.find("Own", 0) != std::string::npos ) {
+      mem = settings::Memory::Own;
+    }else if( line.find("Share", 0) != std::string::npos ) {
+      mem = settings::Memory::Share;
+    }  else {
+      std::string error_msg = "Unrecognized memory option while reading istream.\n";
+      error_msg += "Accepted memory options are:\n";
+      error_msg += "SelfOwnIfRestartCrossOwn\nOwnIfRestart\nOwn\nShare\n";
       error_msg += "Line is: " + line + "\n";
       PANACEA_FAIL(error_msg);
     }

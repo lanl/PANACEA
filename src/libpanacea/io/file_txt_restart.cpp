@@ -5,6 +5,7 @@
 #include "attributes/covariance.hpp"
 #include "attribute_manipulators/normalizer.hpp"
 #include "distribution/distributions/distribution.hpp"
+#include "entropy/entropy_settings/entropy_settings.hpp"
 #include "error.hpp"
 #include "kernels/base_kernel_wrapper.hpp"
 #include "kernels/kernel_specifications.hpp"
@@ -47,6 +48,7 @@ namespace panacea {
       registerWriteMethod<Normalizer>();
       registerWriteMethod<PrimitiveGroup>();
       registerWriteMethod<Distribution>();
+      registerWriteMethod<EntropySettings>();
       registerWriteMethod<EntropyTerm>();
 
       registerReadMethod<Covariance>();
@@ -57,6 +59,7 @@ namespace panacea {
       registerReadMethod<Normalizer>();
       registerReadMethod<PrimitiveGroup>();
       registerReadMethod<Distribution>();
+      registerReadMethod<EntropySettings>();
       registerReadMethod<EntropyTerm>();
     }
 

@@ -40,6 +40,15 @@ namespace panacea {
         const BaseDescriptorWrapper & desc_wrap,
         const int current_num_desc_pts);
 
+
+    void updateCovariance(
+      Matrix & covariance,
+      const Vector & current_mean,
+      const Vector & new_mean,
+      const int current_num_pts,
+      const BaseDescriptorWrapper & desc_wrap);
+
+
     /**
      * Check that the covariance matrix is symmetric.
      *

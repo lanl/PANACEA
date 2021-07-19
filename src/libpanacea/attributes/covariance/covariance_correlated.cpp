@@ -23,50 +23,6 @@
 
 namespace panacea {
 
-  namespace correlated {
-    void updateCovariance(
-        Matrix & covariance,
-        const Vector & current_mean,
-        const Vector & new_mean,
-        const int current_num_pts,
-        const BaseDescriptorWrapper & desc_wrap) {
-
-      const int num_dims = desc_wrap.getNumberDimensions();
-      const int num_pts = desc_wrap.getNumberPoints();
-
-      assert(covariance.rows() == num_dims);
-      assert(covariance.cols() == num_dims);
-      assert(current_mean.rows() == num_dims);
-      assert(new_mean.rows() == num_dims);
-      const int total_num_pts = current_num_pts + num_pts;
-      for( int dim=0; dim<num_dims; ++dim){
-        { // account for diagonal
-          double sum = 0.0;
-          for( int pt = 0; pt<num_pts; ++pt) {
-            sum += desc_wrap(pt,dim) * desc_wrap(pt,dim);
-          }
-          double A_ij = covariance(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) +
-            static_cast<double>(current_num_pts) * current_mean(dim)*current_mean(dim) + sum;
-          double B_ij = static_cast<double>(total_num_pts) * new_mean(dim)*new_mean(dim);
-
-          covariance(dim,dim)  = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          covariance(dim,dim) *= (A_ij - B_ij);
-        } // end account for diagonal
-        for( int dim2=dim+1; dim2<num_dims; ++dim2) { // account for off diagonal elements
-          double sum = 0.0;
-          for( int pt = 0; pt<num_pts; ++pt) {
-            sum += desc_wrap(pt,dim) * desc_wrap(pt,dim2);
-          }
-          double A_ij = covariance(dim,dim2) * (static_cast<double>(current_num_pts) - 1.0) +
-            static_cast<double>(current_num_pts) * current_mean(dim)*current_mean(dim2) + sum;
-          double B_ij = static_cast<double>(total_num_pts) * -1.0* new_mean(dim) * new_mean(dim2);
-          covariance(dim,dim2) = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          covariance(dim,dim2) *= (A_ij + B_ij);
-          covariance(dim2,dim) = covariance(dim,dim2);
-        } // account for off diagonal elements
-      }
-    }
-  } // namespace correlated
 
   CovarianceCorrelated::CovarianceCorrelated(const CovarianceBuild memory) {
     if( memory == CovarianceBuild::Allocate) {
@@ -92,7 +48,7 @@ namespace panacea {
     matrix_->resize(num_dims, num_dims);
     matrix_->setZero();
 
-    correlated::updateCovariance(
+    covariance::updateCovariance(
         *matrix_.get(),
         *mean_.get(),
         *new_mean.get(),
@@ -162,7 +118,7 @@ namespace panacea {
         desc_wrap,
         total_number_data_pts_);
 
-    correlated::updateCovariance(
+    covariance::updateCovariance(
         *matrix_.get(),
         *mean_.get(),
         *new_mean.get(),
@@ -197,6 +153,7 @@ namespace panacea {
   }
 
   double CovarianceCorrelated::getDeterminant() const {
+    assert(matrix_ != nullptr);
     return matrix_->getDeterminant();
   }
 
@@ -215,6 +172,8 @@ namespace panacea {
   const NormalizationState & CovarianceCorrelated::getNormalizationState() const noexcept {
     return normalized_;
   }
+
+  const Matrix & CovarianceCorrelated::matrix(PassKey<Reducer>) const { return *matrix_; }
 
   void CovarianceCorrelated::set(PassKey<Normalizer>, NormalizationState state) {
     normalized_ = state;

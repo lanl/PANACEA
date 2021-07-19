@@ -73,7 +73,7 @@ namespace panacea {
         for( int col = 0; col < vec.cols(); ++col ) {
           os << std::setfill(' ')
             << std::setw(14)
-            << std::setprecision(8)
+            << std::setprecision(15)
             << std::right
             << vec(col);
           os << " ";

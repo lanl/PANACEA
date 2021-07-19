@@ -381,7 +381,6 @@ namespace panacea {
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, dimensions));
-
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));

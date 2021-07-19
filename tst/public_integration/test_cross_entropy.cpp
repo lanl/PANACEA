@@ -453,6 +453,75 @@ TEST_CASE("Testing:panacea cross entropy single median weighted","[end-to-end,pa
 }
 
 TEST_CASE(
+    "Testing:panacea non trivial cross entropy read & write with fileio with shell plus initialize",
+    "[end-to-end,panacea]"){
+
+  // pi - public interface
+  PANACEA panacea_pi;
+
+  // Data has the following form, where it is stacked
+  //
+  //         col1   col2   col3
+  // row1    1.0     2.0    3.0  Point 1
+  // row2    1.0     2.0    3.0  Point 2
+  test::ArrayDataNonTrivial array_data;
+  auto dwrapper = panacea_pi.wrap(
+      &(array_data.data),
+      array_data.rows,
+      array_data.cols);
+
+  GIVEN("A cross entropy term"){
+    // Creating settings for generating a cross entropy term where the
+    // underlying distribution is using a kernel estimator
+    // that is a guassian kernel.
+    PANACEASettings panacea_settings = PANACEASettings::make()
+      .set(EntropyType::Cross)
+      .set(PANACEAAlgorithm::Flexible)
+      .distributionType(kernel)
+      .set(KernelPrimitive::Gaussian)
+      .set(KernelCount::Single)
+      .set(KernelCorrelation::Correlated)
+      .set(KernelCenterCalculation::Median)
+      .set(KernelNormalization::Variance);
+
+    std::unique_ptr<EntropyTerm> cross_ent_shell = panacea_pi.create(panacea_settings);
+    cross_ent_shell->initialize(*dwrapper);
+
+    double cross_ent_val = cross_ent_shell->compute(*dwrapper, panacea_settings);
+    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
+
+    WHEN("provided with file_name") {
+      restart_file->write(cross_ent_shell.get(),"cross_entropy_restart_nontrivial.txt");
+
+      std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(panacea_settings);
+
+      restart_file->read(cross_ent2.get(),"cross_entropy_restart_nontrivial.txt");
+      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
+
+      restart_file->write(cross_ent_shell.get(),"cross_entropy_restart_nontrivial_check.txt");
+      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+    }
+    WHEN("provided with file stream"){
+
+      ofstream restart_out;
+      restart_out.open("cross_entropy_restart_nontrivial2.txt");
+      restart_file->write(cross_ent_shell.get(),restart_out);
+      restart_out.close();
+
+      std::unique_ptr<EntropyTerm> cross_ent_shell2 =
+        panacea_pi.create(panacea_settings);
+      ifstream restart_in;
+      restart_in.open("cross_entropy_restart_nontrivial2.txt");
+      restart_file->read(cross_ent_shell2.get(),restart_in);
+      restart_in.close();
+      double cross_ent_val2 = cross_ent_shell2->compute(*dwrapper, panacea_settings);
+
+      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+    }
+  }
+}
+
+TEST_CASE(
     "Testing:panacea cross entropy read & write with fileio with shell plus initialize",
     "[end-to-end,panacea]"){
 
@@ -473,7 +542,6 @@ TEST_CASE(
     // Creating settings for generating a cross entropy term where the
     // underlying distribution is using a kernel estimator
     // that is a guassian kernel.
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     PANACEASettings panacea_settings = PANACEASettings::make()
       .set(EntropyType::Cross)
       .set(PANACEAAlgorithm::Flexible)
@@ -484,50 +552,37 @@ TEST_CASE(
       .set(KernelCenterCalculation::Median)
       .set(KernelNormalization::Variance);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::unique_ptr<EntropyTerm> cross_ent_shell = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     cross_ent_shell->initialize(*dwrapper);
     double cross_ent_val_stacked = cross_ent_shell->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
 
     double cross_ent_val = cross_ent_shell->compute(*dwrapper, panacea_settings);
     auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     WHEN("provided with file_name") {
       restart_file->write(cross_ent_shell.get(),"cross_entropy_restart.txt");
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(panacea_settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->read(cross_ent2.get(),"cross_entropy_restart.txt");
       double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       REQUIRE(cross_ent_val == Approx(cross_ent_val2));
     }
     WHEN("provided with file stream"){
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       ofstream restart_out;
       restart_out.open("cross_entropy_restart2.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->write(cross_ent_shell.get(),restart_out);
       restart_out.close();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(panacea_settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       ifstream restart_in;
       restart_in.open("cross_entropy_restart2.txt");
       restart_file->read(cross_ent2.get(),restart_in);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_in.close();
       double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       REQUIRE(cross_ent_val == Approx(cross_ent_val2));
     }
@@ -548,62 +603,38 @@ TEST_CASE(
       .set(KernelCenterCalculation::Mean)
       .set(KernelNormalization::Variance);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     std::unique_ptr<EntropyTerm> cross_ent_shell = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     cross_ent_shell->initialize(*dwrapper);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double cross_ent_val_stacked = cross_ent_shell->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     double cross_ent_val = cross_ent_shell->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     WHEN("provided with file_name") {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->write(cross_ent_shell.get(),"weighted_cross_entropy_restart.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       restart_file->read(cross_ent2.get(),"weighted_cross_entropy_restart.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       REQUIRE(cross_ent_val == Approx(cross_ent_val2));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
     WHEN("provided with file stream"){
 
       ofstream restart_out;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_out.open("weighted_cross_entropy_restart2.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->write(cross_ent_shell.get(),restart_out);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_out.close();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       std::unique_ptr<EntropyTerm> cross_ent2 = panacea_pi.create(panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       ifstream restart_in;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_in.open("weighted_cross_entropy_restart2.txt");
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_file->read(cross_ent2.get(),restart_in);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       restart_in.close();
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
       REQUIRE(cross_ent_val == Approx(cross_ent_val2));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
   }
 }

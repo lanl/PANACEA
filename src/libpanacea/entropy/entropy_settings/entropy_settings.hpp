@@ -6,6 +6,9 @@
 #include "distribution/distribution_settings/distribution_settings.hpp"
 #include "private_settings.hpp"
 
+// Public PANACEA includes
+#include "panacea/file_io_types.hpp"
+
 // Standard includes
 #include <memory>
 
@@ -50,6 +53,20 @@ namespace panacea {
      **/
     void setDistributionSettings(std::unique_ptr<DistributionSettings> dist_settings);
     const DistributionSettings & getDistributionSettings(const Method) const;
+
+
+    static std::vector<std::any> write(
+        const settings::FileType file_type,
+        std::ostream &,
+        std::any entropy_settings_instance);
+
+    static io::ReadInstantiateVector read(
+        const settings::FileType file_type,
+        std::istream &,
+        std::any entropy_settings_instance);
+
+    friend bool operator==(const EntropySettings &settings1, const EntropySettings &settings2);
+    friend bool operator!=(const EntropySettings &settings1, const EntropySettings &settings2);
   };
 
 }

@@ -1,3 +1,4 @@
+
 // Local private PANACEA includes
 #include "covariance_uncorrelated.hpp"
 
@@ -21,40 +22,6 @@
 #include <typeindex>
 
 namespace panacea {
-  namespace uncorrelated {
-
-    void updateCovarianceUncorrelated(
-        Matrix & covariance,
-        const Vector & current_mean,
-        const Vector & new_mean,
-        const int current_num_pts,
-        const BaseDescriptorWrapper & desc_wrap) {
-
-      const int num_dims = desc_wrap.getNumberDimensions();
-      const int num_pts = desc_wrap.getNumberPoints();
-
-      assert(covariance.rows() == num_dims);
-      assert(covariance.cols() == num_dims);
-      assert(current_mean.rows() == num_dims);
-      assert(new_mean.rows() == num_dims);
-      const int total_num_pts = current_num_pts + num_pts;
-      for( int dim=0; dim<num_dims; ++dim){
-        { // account for diagonal
-          double sum = 0.0;
-          for( int pt = 0; pt<num_pts; ++pt) {
-            sum += desc_wrap(pt,dim) * desc_wrap(pt,dim);
-          }
-          double A_ij = covariance(dim,dim) * (static_cast<double>(current_num_pts) - 1.0) +
-            static_cast<double>(current_num_pts) * current_mean(dim)*current_mean(dim) + sum;
-          double B_ij = static_cast<double>(total_num_pts) * new_mean(dim)*new_mean(dim);
-
-          covariance(dim,dim)  = 1.0/(static_cast<double>(total_num_pts) - 1.0);
-          covariance(dim,dim) *= (A_ij - B_ij);
-        } // end account for diagonal
-      }
-    }
-
-  } // namespace uncorrelated
 
   CovarianceUncorrelated::CovarianceUncorrelated(const CovarianceBuild memory) {
     if( memory == CovarianceBuild::Allocate) {
@@ -80,7 +47,7 @@ namespace panacea {
     matrix_->resize(num_dims, num_dims);
     matrix_->setZero();
 
-    uncorrelated::updateCovarianceUncorrelated(
+    covariance::updateCovariance(
         *matrix_.get(),
         *mean_.get(),
         *new_mean.get(),
@@ -93,9 +60,9 @@ namespace panacea {
       if( opt == CovarianceOption::Flexible ) {
         matrix_->makeIdentity();
       } else {
-        std::string error_msg = "You are trying to create covariance matrix with";
-        error_msg += " a single point. Either get a better starting data set ";
-        error_msg += "or allow flexibility in the algorithm.";
+        std::string error_msg = "You are trying to create covariance matrix with ";
+        error_msg += "a single point Either get a better starting data set or allow";
+        error_msg += " flexibility in the algorithm.";
         PANACEA_FAIL(error_msg);
       }
     } else {
@@ -118,7 +85,7 @@ namespace panacea {
         mean_(std::move(mean)),
         total_number_data_pts_(total_num_pts) {
 
-    assert(matrix_->rows() == matrix_->cols() && "CovarianceUncorrelated matrix must be square");
+    assert(matrix_->rows() == matrix_->cols() && "Covariance matrix must be square");
     assert(mean_->rows() == matrix_->rows() && "Mean and covariance matrix must have the same dimensions.");
     assert(total_num_pts > 0 && "Total number of points must be greater than 0");
 
@@ -134,7 +101,7 @@ namespace panacea {
     }
   }
 
-  bool CovarianceUncorrelated::isZero(const double threshold) const noexcept {
+  bool CovarianceUncorrelated::isZero(const double threshold ) const noexcept {
     return matrix_->isZero(threshold);
   }
 
@@ -150,7 +117,7 @@ namespace panacea {
         desc_wrap,
         total_number_data_pts_);
 
-    uncorrelated::updateCovarianceUncorrelated(
+    covariance::updateCovariance(
         *matrix_.get(),
         *mean_.get(),
         *new_mean.get(),
@@ -162,8 +129,12 @@ namespace panacea {
 
   }
 
+  // This is how we make it correlated
   double CovarianceUncorrelated::operator()(const int row, const int col) const {
-    return matrix_->operator()(row,col);
+    if( row == col ) {
+      return matrix_->operator()(row,col);
+    }
+    return 0.0;
   }
 
   int CovarianceUncorrelated::rows() const {
@@ -204,19 +175,19 @@ namespace panacea {
     return normalized_;
   }
 
+  const Matrix & CovarianceUncorrelated::matrix(PassKey<Reducer>) const { return *matrix_; }
+
   void CovarianceUncorrelated::set(PassKey<Normalizer>, NormalizationState state) {
     normalized_ = state;
   }
 
-  double & CovarianceUncorrelated::operator()(PassKey<Normalizer>, const int row, const int col) {
+  double & CovarianceUncorrelated::operator()(
+      PassKey<Normalizer>, const int row, const int col) {
     return matrix_->operator()(row,col);
   }
 
   void CovarianceUncorrelated::print() const {
-    covariance::printCovariance(
-        *matrix_.get(),
-        *mean_.get(),
-        total_number_data_pts_);
+    covariance::printCovariance(*matrix_.get(), *mean_.get(), total_number_data_pts_);
   }
 
   std::vector<std::any> CovarianceUncorrelated::write(
@@ -225,29 +196,54 @@ namespace panacea {
       std::any cov_instance) {
 
     const CovarianceUncorrelated & cov_mat = [&]() -> const CovarianceUncorrelated & {
-      if( std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance *))){
+      if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance *))){
+
         return const_cast<const CovarianceUncorrelated &>(
             dynamic_cast<CovarianceUncorrelated &>(
               *std::any_cast<Covariance *>(cov_instance)));
-      }else if( std::type_index(cov_instance.type()) == std::type_index(typeid(Covariance &))){
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(Covariance &))){
+
         return const_cast<const CovarianceUncorrelated &>(
             dynamic_cast<CovarianceUncorrelated &>(
               std::any_cast<Covariance &>(cov_instance)));
-      } else if( std::type_index(cov_instance.type()) == std::type_index(typeid(const Covariance *))){
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance *))){
+
         return dynamic_cast<const CovarianceUncorrelated &>(
             *std::any_cast<const Covariance *>(cov_instance));
-      }else if( std::type_index(cov_instance.type()) == std::type_index(typeid(const Covariance &))){
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const Covariance &))){
+
         return dynamic_cast<const CovarianceUncorrelated &>(
             std::any_cast<const Covariance &>(cov_instance));
 
-      } else if( std::type_index(cov_instance.type()) == std::type_index(typeid(CovarianceUncorrelated *))){
-        return const_cast<const CovarianceUncorrelated &>(*std::any_cast<CovarianceUncorrelated *>(cov_instance));
-      }else if( std::type_index(cov_instance.type()) == std::type_index(typeid(CovarianceUncorrelated &))){
-        return const_cast<const CovarianceUncorrelated &>(std::any_cast<CovarianceUncorrelated &>(cov_instance));
-      } else if( std::type_index(cov_instance.type()) == std::type_index(typeid(const CovarianceUncorrelated *))){
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceUncorrelated *))){
+
+        return const_cast<const CovarianceUncorrelated &>(
+            *std::any_cast<CovarianceUncorrelated *>(cov_instance));
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(CovarianceUncorrelated &))){
+
+        return const_cast<const CovarianceUncorrelated &>(
+            std::any_cast<CovarianceUncorrelated &>(cov_instance));
+
+      } else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const CovarianceUncorrelated *))){
+
         return *std::any_cast<const CovarianceUncorrelated *>(cov_instance);
-      }else if( std::type_index(cov_instance.type()) == std::type_index(typeid(const CovarianceUncorrelated &))){
+
+      }else if( std::type_index(cov_instance.type()) ==
+          std::type_index(typeid(const CovarianceUncorrelated &))){
+
         return std::any_cast<const CovarianceUncorrelated &>(cov_instance);
+
       } else {
         std::string error_msg = "Unsupported Covariance type encountered.";
         PANACEA_FAIL(error_msg);
@@ -258,6 +254,7 @@ namespace panacea {
     std::vector<std::any> nested_objs;
     if( file_type == settings::FileType::TXTRestart ||
         file_type == settings::FileType::TXTKernelDistribution ) {
+
       os << cov_mat.total_number_data_pts_ << "\n\n";
       os << "[Normalization State]\n";
       os << cov_mat.normalized_ << "\n\n";
@@ -278,22 +275,32 @@ namespace panacea {
     CovarianceUncorrelated & cov_mat = [&]() -> CovarianceUncorrelated & {
       if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(Covariance *))){
+
         return dynamic_cast<CovarianceUncorrelated &>(
               *std::any_cast<Covariance *>(cov_instance));
+
       } else if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(std::unique_ptr<Covariance> *))){
+
         return dynamic_cast<CovarianceUncorrelated &>(
               *std::any_cast<std::unique_ptr<Covariance> *>(cov_instance)->get());
-      }else if( std::type_index(cov_instance.type()) ==
+
+      } else if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(Covariance &))){
+
         return dynamic_cast<CovarianceUncorrelated &>(
               std::any_cast<Covariance &>(cov_instance));
+
       } else if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(CovarianceUncorrelated *))){
+
         return *std::any_cast<CovarianceUncorrelated *>(cov_instance);
+
       }else if( std::type_index(cov_instance.type()) ==
           std::type_index(typeid(CovarianceUncorrelated &))){
+
         return std::any_cast<CovarianceUncorrelated &>(cov_instance);
+
       } else {
         std::string error_msg = "Unsupported Covariance type encountered.";
         if( type_map.count(std::type_index(cov_instance.type()))){
@@ -349,6 +356,7 @@ namespace panacea {
       nested_objs.emplace_back(cov_mat.matrix_.get(), std::nullopt);
       nested_objs.emplace_back(cov_mat.mean_.get(),std::nullopt);
     }
+
     return nested_objs;
   }
 }

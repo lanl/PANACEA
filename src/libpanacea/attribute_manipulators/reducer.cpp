@@ -198,7 +198,7 @@ namespace panacea {
      * columns (because it is a covariance matrix.
      */
     Dimensions findLinearlyIndependentDescDimensions_(
-        const Covariance & cov,
+        const Matrix & cov,
         const Dimensions & priority_rows,
         const double threshold){
 
@@ -279,9 +279,10 @@ namespace panacea {
     runChecks_(cov, priority_rows);
 
     double threshold = starting_threshold_;
+
     do {
       Dimensions independent_dims = findLinearlyIndependentDescDimensions_(
-          cov,
+          cov.matrix(PassKey<Reducer>()),
           priority_rows,
           threshold);
 

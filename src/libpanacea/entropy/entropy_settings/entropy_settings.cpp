@@ -7,6 +7,8 @@
 
 // Standard includes
 #include <cassert>
+#include <iostream>
+#include <typeindex>
 
 using namespace panacea::settings;
 
@@ -148,4 +150,152 @@ namespace panacea {
 
     return *dist_settings;
   }
-}
+
+  std::vector<std::any> EntropySettings::write(
+      const settings::FileType file_type,
+      std::ostream & os,
+      std::any ent_settings_instance) {
+
+    const EntropySettings & ent_settings = [&]() -> const EntropySettings & {
+      if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(EntropySettings &))){
+        // We are adding const because we are writing data there is no reason
+        // that the entropy term needs to be non const
+        return const_cast<const EntropySettings &>(
+            std::any_cast<EntropySettings &>(ent_settings_instance));
+
+      } else if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(EntropySettings *))){
+        return const_cast<const EntropySettings &>(
+            *std::any_cast<EntropySettings *>(ent_settings_instance));
+
+      } else if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(const EntropySettings &))){
+        return std::any_cast<const EntropySettings &>(ent_settings_instance);
+
+      } else if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(const EntropySettings *))){
+        return *std::any_cast<const EntropySettings *>(ent_settings_instance);
+
+      } else {
+        PANACEA_FAIL("Unsupported EntropySettings encountered.");
+      }
+      return std::any_cast<const EntropySettings &>(ent_settings_instance);
+    }();
+
+    std::vector<std::any> nested_values;
+    if( file_type == settings::FileType::TXTRestart) {
+
+      os << "[Entropy Settings]\n";
+      os << ent_settings.type << "\n";
+      os << ent_settings.memory_policy << "\n";
+      if(auto weight = ent_settings.weight) {
+        os << *weight << "\n";
+      } else {
+        os << "N/A\n";
+      }
+      if(auto grad_switch = ent_settings.numerical_grad_switch) {
+        os << *grad_switch << "\n";
+      }else{
+        os << "N/A\n";
+      }
+      if(auto grad_inc = ent_settings.numerical_grad_inc){
+        os << *grad_inc << "\n";
+      }else{
+        os << "N/A\n";
+      }
+      os << ent_settings.compute_equation_settings << "\n";
+      os << ent_settings.grad_equation_settings << "\n";
+    }
+    return nested_values;
+  }
+
+  io::ReadInstantiateVector EntropySettings::read(
+      const settings::FileType file_type,
+      std::istream & is,
+      std::any ent_settings_instance) {
+
+    EntropySettings & ent_settings = [&]() -> EntropySettings & {
+      if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(EntropySettings &))){
+        return std::any_cast<EntropySettings &>(ent_settings_instance);
+      } else if(std::type_index(ent_settings_instance.type()) ==
+          std::type_index(typeid(EntropySettings *))){
+        return *std::any_cast<EntropySettings *>(ent_settings_instance);
+      } else {
+        PANACEA_FAIL("Unsupported EntropySettings encountered.");
+      }
+      return std::any_cast<EntropySettings &>(ent_settings_instance);
+    }();
+
+    io::ReadInstantiateVector nested_values;
+    if( file_type == settings::FileType::TXTRestart) {
+      std::string line = "";
+      while(line.find("[Entropy Settings]",0) == std::string::npos) {
+        if( is.peek() == EOF ) {
+          std::string error_msg = "While reading entropy settings section of ";
+          error_msg += "restart file, file does not contain the [Entropy Settings] tag.";
+          PANACEA_FAIL(error_msg);
+        }
+        std::getline(is, line);
+      }
+
+      is >> ent_settings.type;
+      is >> ent_settings.memory_policy;
+
+      std::getline(is, line);
+      if(line.find("N/A",0) == std::string::npos){
+        ent_settings.weight = std::stod(line);
+      }
+      std::getline(is, line);
+      if(line.find("N/A",0) == std::string::npos){
+        ent_settings.numerical_grad_switch = std::stoi(line);
+      }
+      std::getline(is, line);
+      if(line.find("N/A",0) == std::string::npos){
+        ent_settings.numerical_grad_inc = std::stod(line);
+      }
+      is >> ent_settings.compute_equation_settings;
+      is >> ent_settings.grad_equation_settings;
+    }
+    return nested_values;
+  }
+
+  bool operator==(const EntropySettings &settings1, const EntropySettings &settings2) {
+    if(settings1.type                  != settings2.type) return false;
+    if(settings1.memory_policy         != settings2.memory_policy) return false;
+
+    // If the weight is not set than we should assume a value of 1.0, because with
+    // out the weight decorator it is 1.0
+    double weight1 = 1.0;
+    if(settings1.weight.has_value()){
+      weight1 = *settings1.weight;
+    }
+    double weight2 = 1.0;
+    if(settings2.weight.has_value()){
+      weight2 = *settings2.weight;
+    }
+    if(weight1 != weight2) return false;
+
+    bool switch1 = false;
+    if( settings1.numerical_grad_switch.has_value()){
+      switch1 = *settings1.numerical_grad_switch;
+    }
+    bool switch2 = false;
+    if( settings2.numerical_grad_switch.has_value()){
+      switch2 = *settings2.numerical_grad_switch;
+    }
+    if(switch1 != switch2) return false;
+
+    if( switch1 ) {
+      // If the numerical grad switch is off there is no need to check the increment value
+      if(settings1.numerical_grad_inc    != settings2.numerical_grad_inc) return false;
+    }
+    return true;
+  }
+
+  bool operator!=(const EntropySettings &settings1, const EntropySettings &settings2) {
+    return !(settings1==settings2);
+  }
+
+} // namespace panacea
