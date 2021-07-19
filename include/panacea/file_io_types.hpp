@@ -10,18 +10,19 @@
 
 namespace panacea {
 
-  namespace io {
+namespace io {
 
-    using ExtraInstantiationMethod = void(*)(std::any); 
+using ExtraInstantiationMethod = void (*)(std::any);
 
-    struct IOElement {
-      IOElement(std::any val1, std::optional<ExtraInstantiationMethod> val2) : instance(val1), method(val2) {};
-      std::any instance;
-      std::optional<ExtraInstantiationMethod> method;
-    };
+struct IOElement {
+  IOElement(std::any val1, std::optional<ExtraInstantiationMethod> val2)
+      : instance(val1), method(val2){};
+  std::any instance;
+  std::optional<ExtraInstantiationMethod> method;
+};
 
-    using ReadInstantiateVector = std::vector<IOElement>;
-  }
-}
+using ReadInstantiateVector = std::vector<IOElement>;
+} // namespace io
+} // namespace panacea
 
 #endif // PANACEA_FILEIO_TYPES_H

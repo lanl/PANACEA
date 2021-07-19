@@ -8,7 +8,7 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:dimensions","[unit,panacea]"){
+TEST_CASE("Testing:dimensions", "[unit,panacea]") {
 
   Dimensions dimensions(5);
 
@@ -16,9 +16,8 @@ TEST_CASE("Testing:dimensions","[unit,panacea]"){
   REQUIRE(dimensions.state() == DimensionsState::Ordered);
 
   int expected_val = 0;
-  for( const auto & val : dimensions ) {
+  for (const auto &val : dimensions) {
     REQUIRE(expected_val == val);
     ++expected_val;
   }
 }
-

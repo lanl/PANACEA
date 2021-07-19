@@ -1,7 +1,7 @@
 
 // Local private PANACEA includes
-#include "attributes/dimensions.hpp"
 #include "attribute_manipulators/randomizer.hpp"
+#include "attributes/dimensions.hpp"
 
 // Third party includes
 #include <catch2/catch.hpp>
@@ -12,23 +12,21 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:randomizer choice of dimensions","[integration,panacea]"){
+TEST_CASE("Testing:randomizer choice of dimensions", "[integration,panacea]") {
 
   Dimensions dimensions(5);
 
   Randomizer randomizer;
 
-  randomizer.randomize(
-      dimensions,
-      settings::RandomizeDimensions::Yes,
-      settings::RandomizeNumberDimensions::No);
+  randomizer.randomize(dimensions, settings::RandomizeDimensions::Yes,
+                       settings::RandomizeNumberDimensions::No);
 
   REQUIRE(dimensions.state() == DimensionsState::Randomized);
   REQUIRE(dimensions.size() == 5);
   bool out_of_order = false;
   int ordered_val = 0;
-  for( const auto & val : dimensions ) {
-    if( val != ordered_val ) {
+  for (const auto &val : dimensions) {
+    if (val != ordered_val) {
       out_of_order = true;
       break;
     }
@@ -37,7 +35,7 @@ TEST_CASE("Testing:randomizer choice of dimensions","[integration,panacea]"){
   REQUIRE(out_of_order);
 }
 
-TEST_CASE("Testing:randomizer number dimensions","[integration,panacea]"){
+TEST_CASE("Testing:randomizer number dimensions", "[integration,panacea]") {
   const int total_num_dims = 20;
   Dimensions dimensions(total_num_dims);
 
@@ -48,17 +46,15 @@ TEST_CASE("Testing:randomizer number dimensions","[integration,panacea]"){
 
   int sum_count = 0;
   const int samples = 30;
-  for( int sample = 0; sample < samples; ++sample) {
-    randomizer.randomize(
-        dimensions,
-        settings::RandomizeDimensions::No,
-        settings::RandomizeNumberDimensions::Yes);
+  for (int sample = 0; sample < samples; ++sample) {
+    randomizer.randomize(dimensions, settings::RandomizeDimensions::No,
+                         settings::RandomizeNumberDimensions::Yes);
 
     REQUIRE(dimensions.state() == DimensionsState::RandomizedCount);
 
     // Dimensions should be ordered
     int expected_dim = 0;
-    for(const auto & dim : dimensions) {
+    for (const auto &dim : dimensions) {
       REQUIRE(expected_dim == dim);
       ++expected_dim;
     }
@@ -66,11 +62,13 @@ TEST_CASE("Testing:randomizer number dimensions","[integration,panacea]"){
     sum_count += static_cast<double>(dimensions.size());
   }
 
-  const double avg_dims = static_cast<double>(sum_count)/static_cast<double>(samples);
+  const double avg_dims =
+      static_cast<double>(sum_count) / static_cast<double>(samples);
   REQUIRE(avg_dims < static_cast<double>(total_num_dims));
 }
 
-TEST_CASE("Testing:randomizer check range samples sizes from 1 to max","[integration,panacea]"){
+TEST_CASE("Testing:randomizer check range samples sizes from 1 to max",
+          "[integration,panacea]") {
   const int total_num_dims = 2;
   Dimensions dimensions(total_num_dims);
 
@@ -82,11 +80,9 @@ TEST_CASE("Testing:randomizer check range samples sizes from 1 to max","[integra
   // * both dimensions
   // * single dimension
   std::unordered_set<int> number_of_dimensions_used;
-  for( int sample = 0; sample < samples; ++sample) {
-    randomizer.randomize(
-        dimensions,
-        settings::RandomizeDimensions::No,
-        settings::RandomizeNumberDimensions::Yes);
+  for (int sample = 0; sample < samples; ++sample) {
+    randomizer.randomize(dimensions, settings::RandomizeDimensions::No,
+                         settings::RandomizeNumberDimensions::Yes);
 
     number_of_dimensions_used.insert(dimensions.size());
     REQUIRE(dimensions.size() > 0);

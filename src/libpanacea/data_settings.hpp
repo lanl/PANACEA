@@ -7,19 +7,13 @@
 
 namespace panacea {
 
-  enum class Direction {
-    AlongRows,
-    AlongColumns
-  };
+enum class Direction { AlongRows, AlongColumns };
 
-  // Is an attribute normalized or not
-  enum class NormalizationState {
-    Normalized,
-    Unnormalized
-  };
+// Is an attribute normalized or not
+enum class NormalizationState { Normalized, Unnormalized };
 
-  std::ostream& operator<<(std::ostream& os, const Direction & );
-  std::ostream& operator<<(std::ostream& os, const NormalizationState & );
+std::ostream &operator<<(std::ostream &os, const Direction &);
+std::ostream &operator<<(std::ostream &os, const NormalizationState &);
 
-}
+} // namespace panacea
 #endif // PANACEA_PRIVATE_DATA_SETTINGS_H

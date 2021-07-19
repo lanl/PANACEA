@@ -13,72 +13,71 @@
 
 namespace panacea {
 
-  enum class VarianceType {
-    Sample,
-    Population
-  };
+enum class VarianceType { Sample, Population };
 
-  class Variance {
-      VarianceType type_ = VarianceType::Sample;
-    public:
-      explicit Variance(const VarianceType type) : type_(type) {};
+class Variance {
+  VarianceType type_ = VarianceType::Sample;
 
-      inline VarianceType type() const noexcept { return type_; }
+public:
+  explicit Variance(const VarianceType type) : type_(type){};
 
-      template<class T>
-      std::vector<double> calculate(T data2d) {
+  inline VarianceType type() const noexcept { return type_; }
 
-        // Sample variance requires larger than 1 number of points in each
-        // dimension
-        const int sample_or_pop = [&]() {
-          if( type_ == VarianceType::Sample ) return 1;
-          return 0;
-        }();
+  template <class T> std::vector<double> calculate(T data2d) {
 
-        if constexpr(std::is_pointer<typename std::remove_const<T>::type>::value) {
-          assert(data2d->rows() > 1);
-          Mean mean;
-          std::vector<double> mean_vec =
-            mean.calculate<T,Direction::AlongColumns>(data2d);
+    // Sample variance requires larger than 1 number of points in each
+    // dimension
+    const int sample_or_pop = [&]() {
+      if (type_ == VarianceType::Sample)
+        return 1;
+      return 0;
+    }();
 
-          std::vector<double> variance_vec(mean_vec.size(), 0.0);
+    if constexpr (std::is_pointer<typename std::remove_const<T>::type>::value) {
+      assert(data2d->rows() > 1);
+      Mean mean;
+      std::vector<double> mean_vec =
+          mean.calculate<T, Direction::AlongColumns>(data2d);
 
-          for( int row = 0; row < data2d->rows(); ++row ) {
-            for( int col = 0; col < data2d->cols(); ++col ) {
-              const double diff = (data2d->operator()(row,col) - mean_vec.at(col));
-              variance_vec.at(col) += diff * diff;
-            }
-          }
+      std::vector<double> variance_vec(mean_vec.size(), 0.0);
 
-          const double divisor = 1.0/static_cast<double>(data2d->rows()-sample_or_pop);
-          for(int col = 0; col < data2d->cols(); ++col ) {
-            variance_vec.at(col) *= divisor;
-          }
-          return variance_vec;
-        } else {
-          assert(data2d.rows() > 1);
-          Mean mean;
-          std::vector<double> mean_vec =
-            mean.calculate<T,Direction::AlongColumns>(data2d);
-
-          std::vector<double> variance_vec(mean_vec.size(), 0.0);
-
-          for( int row = 0; row < data2d.rows(); ++row ) {
-            for( int col = 0; col < data2d.cols(); ++col ) {
-              const double diff = (data2d(row,col) - mean_vec.at(col));
-              variance_vec.at(col) += diff * diff;
-            }
-          }
-
-          const double divisor = 1.0/static_cast<double>(data2d.rows()- sample_or_pop);
-          for(int col = 0; col < data2d.cols(); ++col ) {
-            variance_vec.at(col) *= divisor;
-          }
-          return variance_vec;
+      for (int row = 0; row < data2d->rows(); ++row) {
+        for (int col = 0; col < data2d->cols(); ++col) {
+          const double diff = (data2d->operator()(row, col) - mean_vec.at(col));
+          variance_vec.at(col) += diff * diff;
         }
       }
-  };
-}
+
+      const double divisor =
+          1.0 / static_cast<double>(data2d->rows() - sample_or_pop);
+      for (int col = 0; col < data2d->cols(); ++col) {
+        variance_vec.at(col) *= divisor;
+      }
+      return variance_vec;
+    } else {
+      assert(data2d.rows() > 1);
+      Mean mean;
+      std::vector<double> mean_vec =
+          mean.calculate<T, Direction::AlongColumns>(data2d);
+
+      std::vector<double> variance_vec(mean_vec.size(), 0.0);
+
+      for (int row = 0; row < data2d.rows(); ++row) {
+        for (int col = 0; col < data2d.cols(); ++col) {
+          const double diff = (data2d(row, col) - mean_vec.at(col));
+          variance_vec.at(col) += diff * diff;
+        }
+      }
+
+      const double divisor =
+          1.0 / static_cast<double>(data2d.rows() - sample_or_pop);
+      for (int col = 0; col < data2d.cols(); ++col) {
+        variance_vec.at(col) *= divisor;
+      }
+      return variance_vec;
+    }
+  }
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_VARIANCE_H
-

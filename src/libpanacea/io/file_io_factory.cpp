@@ -9,18 +9,19 @@
 
 namespace panacea {
 
-  namespace io {
-    std::unique_ptr<FileIO> FileIOFactory::create(const settings::FileType & type) const {
-      if(type == settings::FileType::TXTRestart) {
-        return std::make_unique<FileRestartTXT>();
-      } else if ( type == settings::FileType::TXTDescriptors ) {
-        return std::make_unique<FileDescriptorTXT>();
-      } else if ( type == settings::FileType::TXTKernelDistribution ) {
-        return std::make_unique<FileKernelDistributionTXT>();
-      } else {
-        PANACEA_FAIL("File type not registered with factory.");
-      }
-      return nullptr;
-    }
+namespace io {
+std::unique_ptr<FileIO>
+FileIOFactory::create(const settings::FileType &type) const {
+  if (type == settings::FileType::TXTRestart) {
+    return std::make_unique<FileRestartTXT>();
+  } else if (type == settings::FileType::TXTDescriptors) {
+    return std::make_unique<FileDescriptorTXT>();
+  } else if (type == settings::FileType::TXTKernelDistribution) {
+    return std::make_unique<FileKernelDistributionTXT>();
+  } else {
+    PANACEA_FAIL("File type not registered with factory.");
   }
+  return nullptr;
 }
+} // namespace io
+} // namespace panacea

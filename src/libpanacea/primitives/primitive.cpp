@@ -3,5 +3,5 @@
 #include "primitive.hpp"
 
 namespace panacea {
-  Primitive::~Primitive() {};
+Primitive::~Primitive(){};
 }

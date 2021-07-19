@@ -23,127 +23,120 @@
 
 namespace panacea {
 
-  namespace settings {
-    enum class DistributionType;
-    enum class EquationSetting;
-    enum class GradSetting;
-  }
+namespace settings {
+enum class DistributionType;
+enum class EquationSetting;
+enum class GradSetting;
+} // namespace settings
 
-  class BaseDescriptorWrapper;
-  class Dimensions;
-  class DistributionFactory;
-  class DistributionSettings;
+class BaseDescriptorWrapper;
+class Dimensions;
+class DistributionFactory;
+class DistributionSettings;
 
-  class KernelDistribution : public Distribution {
+class KernelDistribution : public Distribution {
 
-    private:
-      PrimitiveGroup prim_grp_;
-      KernelDistributionGradiant kern_dist_grad;
-      // For KDE 1/N value, where N is the number Kernels/primitives
-      double pre_factor_;
+private:
+  PrimitiveGroup prim_grp_;
+  KernelDistributionGradiant kern_dist_grad;
+  // For KDE 1/N value, where N is the number Kernels/primitives
+  double pre_factor_;
 
-      virtual Distribution::ReadFunction getReadFunction_() final;
-      virtual Distribution::WriteFunction getWriteFunction_() const final;
+  virtual Distribution::ReadFunction getReadFunction_() final;
+  virtual Distribution::WriteFunction getWriteFunction_() const final;
 
-      double compute_(
-          const BaseDescriptorWrapper & descriptor_wrapper,
-          const int desc_ind,
-          const settings::EquationSetting & equation_settings
-          );
+  double compute_(const BaseDescriptorWrapper &descriptor_wrapper,
+                  const int desc_ind,
+                  const settings::EquationSetting &equation_settings);
 
-    public:
-      KernelDistribution(const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper & descriptor_wrapper,
-          const KernelSpecification & settings);
+public:
+  KernelDistribution(const PassKey<DistributionFactory> &,
+                     const BaseDescriptorWrapper &descriptor_wrapper,
+                     const KernelSpecification &settings);
 
-      /**
-       * Creates a shell of the distribution that is appropriate for loading in
-       * values from a restart file.
-       **/
-      KernelDistribution(const PassKey<DistributionFactory> &,
-          const KernelSpecification & settings);
+  /**
+   * Creates a shell of the distribution that is appropriate for loading in
+   * values from a restart file.
+   **/
+  KernelDistribution(const PassKey<DistributionFactory> &,
+                     const KernelSpecification &settings);
 
-      virtual settings::DistributionType type() const noexcept final;
+  virtual settings::DistributionType type() const noexcept final;
 
-      virtual double compute(
-          const BaseDescriptorWrapper & descriptor_wrapper,
-          const int desc_ind,
-          const DistributionSettings & distribution_settings
-          ) final;
+  virtual double
+  compute(const BaseDescriptorWrapper &descriptor_wrapper, const int desc_ind,
+          const DistributionSettings &distribution_settings) final;
 
-      /**
-       * Keep in mind the default grad_setting is inherited from distribution base class.
-       **/
-      virtual std::vector<double> compute_grad(
-          const BaseDescriptorWrapper & descriptor_wrapper,
-          const int desc_ind,
-          const int grad_ind,
-          const DistributionSettings & distribution_settings,
-          std::any grad_setting) final;
+  /**
+   * Keep in mind the default grad_setting is inherited from distribution base
+   *class.
+   **/
+  virtual std::vector<double>
+  compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
+               const int desc_ind, const int grad_ind,
+               const DistributionSettings &distribution_settings,
+               std::any grad_setting) final;
 
-      virtual const Dimensions & getDimensions() const noexcept final;
+  virtual const Dimensions &getDimensions() const noexcept final;
 
-      /**
-       * Will update the underlying data groups and ensure the prefactor is up to date.
-       **/
-      virtual void update(const BaseDescriptorWrapper & descriptor_wrapper) final;
+  /**
+   * Will update the underlying data groups and ensure the prefactor is up to
+   *date.
+   **/
+  virtual void update(const BaseDescriptorWrapper &descriptor_wrapper) final;
 
-      virtual void initialize(const BaseDescriptorWrapper & descriptor_wrapper) final;
+  virtual void
+  initialize(const BaseDescriptorWrapper &descriptor_wrapper) final;
 
-      static std::unique_ptr<Distribution> create(
-          const PassKey<DistributionFactory> &,
-          const BaseDescriptorWrapper & descriptor_wrapper,
-          const DistributionSettings & settings);
+  static std::unique_ptr<Distribution>
+  create(const PassKey<DistributionFactory> &,
+         const BaseDescriptorWrapper &descriptor_wrapper,
+         const DistributionSettings &settings);
 
-      static std::unique_ptr<Distribution> create(
-          const PassKey<DistributionFactory> &,
-          const DistributionSettings & settings);
+  static std::unique_ptr<Distribution>
+  create(const PassKey<DistributionFactory> &,
+         const DistributionSettings &settings);
 
-      static std::vector<std::any> write(
-          const settings::FileType file_type,
-          std::ostream &,
-          const Distribution &);
+  static std::vector<std::any> write(const settings::FileType file_type,
+                                     std::ostream &, const Distribution &);
 
-      static io::ReadInstantiateVector read(
-          const settings::FileType file_type,
-          std::istream &,
-          Distribution &);
+  static io::ReadInstantiateVector read(const settings::FileType file_type,
+                                        std::istream &, Distribution &);
+};
 
-  };
+inline std::unique_ptr<Distribution>
+KernelDistribution::create(const PassKey<DistributionFactory> &key,
+                           const BaseDescriptorWrapper &descriptor_wrapper,
+                           const DistributionSettings &settings) {
 
-  inline std::unique_ptr<Distribution> KernelDistribution::create(
-      const PassKey<DistributionFactory> & key,
-      const BaseDescriptorWrapper & descriptor_wrapper,
-      const DistributionSettings & settings) {
+  assert(settings.type() == settings::DistributionType::Kernel);
 
-    assert(settings.type() == settings::DistributionType::Kernel);
+  const KernelDistributionSettings &kern_dist_settings =
+      dynamic_cast<const KernelDistributionSettings &>(settings);
 
-    const KernelDistributionSettings & kern_dist_settings = dynamic_cast<const KernelDistributionSettings &>(settings);
-
-    // The any must be the KernelSpecifications object
-    return std::make_unique<KernelDistribution>(
-        key,
-        descriptor_wrapper,
-        kern_dist_settings.dist_settings);
-  }
-
-  inline std::unique_ptr<Distribution> KernelDistribution::create(
-      const PassKey<DistributionFactory> & key,
-      const DistributionSettings & settings) {
-
-    assert(settings.type() == settings::DistributionType::Kernel);
-
-    const KernelDistributionSettings & kern_dist_settings = dynamic_cast<const KernelDistributionSettings &>(settings);
-
-    // Switch default Memory to OwnIfRestart, not possible to create a shell distribution
-    // that does not own it's kernels if loading from a restart file. If the distribution
-    // is later initialized then we can use the shared approach instead
-    //kern_dist_settings->dist_settings.set(settings::KernelMemory::OwnIfRestart);
-    // The any must be the KernelSpecifications object
-    return std::make_unique<KernelDistribution>(
-        key,
-        kern_dist_settings.dist_settings);
-  }
+  // The any must be the KernelSpecifications object
+  return std::make_unique<KernelDistribution>(key, descriptor_wrapper,
+                                              kern_dist_settings.dist_settings);
 }
+
+inline std::unique_ptr<Distribution>
+KernelDistribution::create(const PassKey<DistributionFactory> &key,
+                           const DistributionSettings &settings) {
+
+  assert(settings.type() == settings::DistributionType::Kernel);
+
+  const KernelDistributionSettings &kern_dist_settings =
+      dynamic_cast<const KernelDistributionSettings &>(settings);
+
+  // Switch default Memory to OwnIfRestart, not possible to create a shell
+  // distribution that does not own it's kernels if loading from a restart file.
+  // If the distribution is later initialized then we can use the shared
+  // approach instead
+  // kern_dist_settings->dist_settings.set(settings::KernelMemory::OwnIfRestart);
+  // The any must be the KernelSpecifications object
+  return std::make_unique<KernelDistribution>(key,
+                                              kern_dist_settings.dist_settings);
+}
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_KERNELDISTRIBUTION_H

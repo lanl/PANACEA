@@ -1,5 +1,3 @@
-
-
 import panacea.read_descriptors
 import panacea.read_files
 
@@ -7,11 +5,12 @@ import numpy as np
 
 # Class provides a means of reading multiple descriptor files
 class DescriptorFileGroup:
-    def __init__(self,path_to_files, base,extension):
+    def __init__(self, path_to_files, base, extension):
         self.__file_grp_reader = panacea.read_files.ReadFiles(
-                path_to_files, base, extension, panacea.read_descriptors.DescriptorFile)
-        self.__min_vals = np.zeros((0,0))
-        self.__max_vals = np.zeros((0,0))
+            path_to_files, base, extension, panacea.read_descriptors.DescriptorFile
+        )
+        self.__min_vals = np.zeros((0, 0))
+        self.__max_vals = np.zeros((0, 0))
         self.__dims = 0
         self.__total_descriptors = 0
         self.__file_name_to_index = {}
@@ -27,9 +26,11 @@ class DescriptorFileGroup:
             if not first_file:
                 if dims != self.__dims:
 
-                    raise Exception("Different numbers of dimensions detected while "\
-                        "reading in a group of descriptor files. Inconsistency in the "\
-                        "dimensions is problematic.")
+                    raise Exception(
+                        "Different numbers of dimensions detected while "
+                        "reading in a group of descriptor files. Inconsistency in the "
+                        "dimensions is problematic."
+                    )
             else:
                 first_file = False
                 self.__dims = dims
@@ -38,8 +39,12 @@ class DescriptorFileGroup:
         self.__max_vals.resize(len(self.__file_grp_reader.files_read), self.__dims)
 
         for index, file_name in enumerate(self.__file_grp_reader.files_read):
-            self.__min_vals[index] = self.__file_grp_reader[file_name].descriptors.min(axis=0)
-            self.__max_vals[index] = self.__file_grp_reader[file_name].descriptors.max(axis=0)
+            self.__min_vals[index] = self.__file_grp_reader[file_name].descriptors.min(
+                axis=0
+            )
+            self.__max_vals[index] = self.__file_grp_reader[file_name].descriptors.max(
+                axis=0
+            )
 
     def __getitem__(self, file_name_or_index):
         return self.__file_grp_reader[file_name_or_index]
@@ -69,4 +74,3 @@ class DescriptorFileGroup:
                     all_descriptors[index, col] = local_descriptors[row, col]
                 index = index + 1
         return all_descriptors
-

@@ -11,7 +11,7 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:settings printing with << ","[unit,panacea]"){
+TEST_CASE("Testing:settings printing with << ", "[unit,panacea]") {
   std::cout << settings::DistributionType::Histogram << std::endl;
   std::cout << settings::DistributionType::Kernel << std::endl;
   std::cout << settings::FileType::TXTRestart << std::endl;
@@ -38,5 +38,3 @@ TEST_CASE("Testing:settings printing with << ","[unit,panacea]"){
   std::cout << settings::KernelCenterCalculation::Mean << std::endl;
   std::cout << settings::KernelCenterCalculation::Median << std::endl;
 }
-
-

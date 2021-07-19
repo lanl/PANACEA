@@ -7,20 +7,18 @@
 
 namespace panacea {
 
-  class Dimensions;
+class Dimensions;
 
-  class Randomizer {
-    public:
-      Randomizer() = default;
+class Randomizer {
+public:
+  Randomizer() = default;
 
-      /**
-       * Designed to randomize dimensions
-       **/
-      void randomize(
-          Dimensions & dimensions,
-          const settings::RandomizeDimensions,
-          const settings::RandomizeNumberDimensions) const;
-  };
-}
+  /**
+   * Designed to randomize dimensions
+   **/
+  void randomize(Dimensions &dimensions, const settings::RandomizeDimensions,
+                 const settings::RandomizeNumberDimensions) const;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_RANDOMIZER_H

@@ -5,8 +5,8 @@
 
 // Local private PANACEA includes
 #include "data_settings.hpp"
-#include "matrix/matrix.hpp"
 #include "dimensions.hpp"
+#include "matrix/matrix.hpp"
 
 // Public PANACEA includes
 #include "panacea/passkey.hpp"
@@ -17,37 +17,38 @@
 
 namespace panacea {
 
-  class Inverter;
+class Inverter;
 
-  class ReducedInvCovariance {
-    private:
-      std::unique_ptr<Matrix> matrix_;
-      Dimensions chosen_dimension_indices_;
+class ReducedInvCovariance {
+private:
+  std::unique_ptr<Matrix> matrix_;
+  Dimensions chosen_dimension_indices_;
 
-      NormalizationState normalized_ = NormalizationState::Unnormalized;
-    public:
-      ReducedInvCovariance() = delete;
-      ReducedInvCovariance(PassKey<Inverter>,
-          std::unique_ptr<Matrix> matrix,
-          const Dimensions & chosen_dimension_indices,
-          const NormalizationState & normalized) :
-        matrix_(std::move(matrix)),
+  NormalizationState normalized_ = NormalizationState::Unnormalized;
+
+public:
+  ReducedInvCovariance() = delete;
+  ReducedInvCovariance(PassKey<Inverter>, std::unique_ptr<Matrix> matrix,
+                       const Dimensions &chosen_dimension_indices,
+                       const NormalizationState &normalized)
+      : matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices),
-        normalized_(normalized) {};
+        normalized_(normalized){};
 
-      double operator()(const int row, const int col) const;
+  double operator()(const int row, const int col) const;
 
-      void print() const;
+  void print() const;
 
-      /**
-       * Gets the total number of dimensions in the reduced inverse covariance matrix
-       **/
-      int getNumberDimensions() const;
-      const Dimensions & getChosenDimensionIndices() const;
+  /**
+   * Gets the total number of dimensions in the reduced inverse covariance
+   *matrix
+   **/
+  int getNumberDimensions() const;
+  const Dimensions &getChosenDimensionIndices() const;
 
-      bool is(const NormalizationState & state) const noexcept;
-      const NormalizationState & getNormalizationState() const noexcept;
-  };
-}
+  bool is(const NormalizationState &state) const noexcept;
+  const NormalizationState &getNormalizationState() const noexcept;
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_REDUCEDINVCOVARIANCE_H

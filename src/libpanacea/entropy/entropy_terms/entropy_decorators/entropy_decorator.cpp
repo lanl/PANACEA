@@ -5,18 +5,12 @@
 
 namespace panacea {
 
-  std::vector<double> EntropyDecorator::compute_grad(
-      const BaseDescriptorWrapper & descriptor_wrapper,
-      const int desc_ind,
-      const PANACEASettings & panacea_settings) {
-    return entropy_term_->compute_grad(
-        descriptor_wrapper,
-        desc_ind,
-        EntropySettings(panacea_settings));
-  }
-
-
-
+std::vector<double>
+EntropyDecorator::compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
+                               const int desc_ind,
+                               const PANACEASettings &panacea_settings) {
+  return entropy_term_->compute_grad(descriptor_wrapper, desc_ind,
+                                     EntropySettings(panacea_settings));
 }
 
-
+} // namespace panacea

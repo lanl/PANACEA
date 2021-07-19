@@ -10,54 +10,54 @@
 
 namespace panacea {
 
-  enum class DimensionsState {
-    Randomized,      // The total number is fixed but the order is random
-    RandomizedCount, // Only the number of descriptors is random
-    FullyRandomized, // Count and order of descriptors is random
-    Ordered          // Descriptor dimensions appear in sequential order
-  };
+enum class DimensionsState {
+  Randomized,      // The total number is fixed but the order is random
+  RandomizedCount, // Only the number of descriptors is random
+  FullyRandomized, // Count and order of descriptors is random
+  Ordered          // Descriptor dimensions appear in sequential order
+};
 
-  class DimensionLimiter;
-  class Randomizer;
+class DimensionLimiter;
+class Randomizer;
 
-  class Dimensions {
+class Dimensions {
 
-      DimensionsState state_ = DimensionsState::Ordered;
-      std::vector<int> descriptor_dimensions_;
-    public:
-      /**
-       * Specificy the number of dimensions that can be used.
-       **/
-      explicit Dimensions(const int num_dimensions);
-      explicit Dimensions(const std::vector<int> & dimensions);
+  DimensionsState state_ = DimensionsState::Ordered;
+  std::vector<int> descriptor_dimensions_;
 
-      std::vector<int>::const_iterator begin() const noexcept;
-      std::vector<int>::const_iterator end() const noexcept;
+public:
+  /**
+   * Specificy the number of dimensions that can be used.
+   **/
+  explicit Dimensions(const int num_dimensions);
+  explicit Dimensions(const std::vector<int> &dimensions);
 
-      int at(int index) const { return descriptor_dimensions_.at(index); }
+  std::vector<int>::const_iterator begin() const noexcept;
+  std::vector<int>::const_iterator end() const noexcept;
 
-      /**
-       * Changes to the dimensions class are limited to
-       * the:
-       * Randomizer
-       **/
-      void set(PassKey<Randomizer>, DimensionsState state);
+  int at(int index) const { return descriptor_dimensions_.at(index); }
 
-      const DimensionsState state() const noexcept { return state_; }
+  /**
+   * Changes to the dimensions class are limited to
+   * the:
+   * Randomizer
+   **/
+  void set(PassKey<Randomizer>, DimensionsState state);
 
-      std::size_t size() const noexcept { return descriptor_dimensions_.size(); }
+  const DimensionsState state() const noexcept { return state_; }
 
-      std::vector<int> & get(const PassKey<Randomizer> &);
-      std::vector<int> & get(const PassKey<DimensionLimiter> &);
+  std::size_t size() const noexcept { return descriptor_dimensions_.size(); }
 
-      void print() const noexcept;
+  std::vector<int> &get(const PassKey<Randomizer> &);
+  std::vector<int> &get(const PassKey<DimensionLimiter> &);
 
-      /**
-       * Returns a copy of the dimensions as a vector of ints
-       **/
-      std::vector<int> convert() const noexcept { return descriptor_dimensions_; }
-  };
-} // panacea
+  void print() const noexcept;
 
+  /**
+   * Returns a copy of the dimensions as a vector of ints
+   **/
+  std::vector<int> convert() const noexcept { return descriptor_dimensions_; }
+};
+} // namespace panacea
 
 #endif // PANACEA_PRIVATE_DIMENSIONS_H

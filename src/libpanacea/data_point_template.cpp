@@ -3,12 +3,12 @@
 
 namespace panacea {
 
-  std::ostream& operator<<(std::ostream& os, const Arrangement& arrange) {
-    if( arrange == Arrangement::PointsAlongRowsDimensionsAlongCols ) {
-      os << "Points along rows dimensions along columns";
-    } else if( arrange == Arrangement::DimensionsAlongRowsPointsAlongCols) {
-      os << "Dimensions along rows points along columns";
-    }
-    return os;
+std::ostream &operator<<(std::ostream &os, const Arrangement &arrange) {
+  if (arrange == Arrangement::PointsAlongRowsDimensionsAlongCols) {
+    os << "Points along rows dimensions along columns";
+  } else if (arrange == Arrangement::DimensionsAlongRowsPointsAlongCols) {
+    os << "Dimensions along rows points along columns";
   }
+  return os;
 }
+} // namespace panacea

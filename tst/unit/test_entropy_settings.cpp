@@ -6,13 +6,13 @@
 #include <catch2/catch.hpp>
 
 // Standard includes
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:entropy settings != and ==","[unit,panacea]"){
+TEST_CASE("Testing:entropy settings != and ==", "[unit,panacea]") {
   EntropySettings settings1;
   EntropySettings settings2;
 
@@ -25,7 +25,7 @@ TEST_CASE("Testing:entropy settings != and ==","[unit,panacea]"){
   REQUIRE(settings1 == settings2);
 }
 
-TEST_CASE("Testing:entropy settings write read restart","[unit,panacea]"){
+TEST_CASE("Testing:entropy settings write read restart", "[unit,panacea]") {
 
   EntropySettings settings1;
   settings1.weight = 10.0;
