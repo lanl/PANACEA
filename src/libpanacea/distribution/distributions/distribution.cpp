@@ -24,30 +24,25 @@ namespace panacea {
     const Distribution & dist = [&]() -> const Distribution & {
       if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(Distribution *))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const Distribution &>(
             *std::any_cast<Distribution *>(dist_instance));
 
       } else if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(Distribution &))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const Distribution &>(
             std::any_cast<Distribution &>(dist_instance));
 
       } else if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(const Distribution *))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const Distribution *>(dist_instance);
 
       } else if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(const Distribution &))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const Distribution &>(dist_instance);
       } else {
         std::string error_msg = "Unsupported Distribution encountered.";
         PANACEA_FAIL(error_msg);
       }
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const Distribution &>(dist_instance);
     }();
 
@@ -68,17 +63,14 @@ namespace panacea {
     Distribution & dist = [&]() -> Distribution & {
       if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(Distribution *))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<Distribution *>(dist_instance);
       } else if( std::type_index(dist_instance.type()) ==
           std::type_index(typeid(Distribution &))){
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<Distribution &>(dist_instance);
       } else {
         std::string error_msg = "Unsupported Distribution type encountered.";
         PANACEA_FAIL(error_msg);
       }
-        std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<Distribution &>(dist_instance);
     }();
 
