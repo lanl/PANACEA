@@ -161,24 +161,20 @@ namespace panacea {
           std::type_index(typeid(EntropySettings &))){
         // We are adding const because we are writing data there is no reason
         // that the entropy term needs to be non const
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const EntropySettings &>(
             std::any_cast<EntropySettings &>(ent_settings_instance));
 
       } else if(std::type_index(ent_settings_instance.type()) ==
           std::type_index(typeid(EntropySettings *))){
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return const_cast<const EntropySettings &>(
             *std::any_cast<EntropySettings *>(ent_settings_instance));
 
       } else if(std::type_index(ent_settings_instance.type()) ==
           std::type_index(typeid(const EntropySettings &))){
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return std::any_cast<const EntropySettings &>(ent_settings_instance);
 
       } else if(std::type_index(ent_settings_instance.type()) ==
           std::type_index(typeid(const EntropySettings *))){
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
         return *std::any_cast<const EntropySettings *>(ent_settings_instance);
 
       } else {
@@ -190,34 +186,27 @@ namespace panacea {
     std::vector<std::any> nested_values;
     if( file_type == settings::FileType::TXTRestart) {
 
-      std::cout << "Writing to file" << std::endl;
       os << "[Entropy Settings]\n";
       os << ent_settings.type << "\n";
       os << ent_settings.memory_policy << "\n";
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if(auto weight = ent_settings.weight) {
         os << *weight << "\n";
       } else {
         os << "N/A\n";
       }
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if(auto grad_switch = ent_settings.numerical_grad_switch) {
         os << *grad_switch << "\n";
       }else{
         os << "N/A\n";
       }
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       if(auto grad_inc = ent_settings.numerical_grad_inc){
         os << *grad_inc << "\n";
       }else{
         os << "N/A\n";
       }
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       os << ent_settings.compute_equation_settings << "\n";
       os << ent_settings.grad_equation_settings << "\n";
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     }
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return nested_values;
   }
 

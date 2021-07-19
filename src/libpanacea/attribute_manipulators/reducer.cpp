@@ -225,8 +225,6 @@ namespace panacea {
       const std::vector<int> relative_independent_rows =
         rowEchelonDimensionDependenceDetection_(*tmp.get(), threshold);
 
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      //tmp->print();
       // relative_independent_rows has not accounted for the changes in rows that occurred
       // during the call to reorderSymmetricMatrix this corrects the row indices
       std::unordered_set<int> converted;
@@ -278,9 +276,6 @@ namespace panacea {
       priority_rows = Dimensions(cov.rows());
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    cov.print();
-
     runChecks_(cov, priority_rows);
 
     double threshold = starting_threshold_;
@@ -304,8 +299,6 @@ namespace panacea {
           cov.getNormalizationState());
 
       if( reduced_covar.getDeterminant() > 0.0 ) {
-        std::cout << "Determinant should be greater than 0.0 " << reduced_covar.getDeterminant() << std::endl;
-        std::cout << "threshold is " << threshold << std::endl;
         return reduced_covar;
       }
 

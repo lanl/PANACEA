@@ -218,17 +218,8 @@ namespace panacea {
     }
 
     Reducer reducer;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, dimensions));
-    std::cout << "Dims " << prim_grp.reduced_covariance->getNumberDimensions() << std::endl;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cout << "dimensions are " << dimensions.size() << std::endl;
-      std::cout << "Max num is " << max_num << std::endl;
-      for( auto & dim : dimensions) {
-        std::cout << dim << " ";
-      }
-      std::cout << std::endl;
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
@@ -312,11 +303,8 @@ namespace panacea {
     // Cannot update the reduced covariance matrix and reduced inv covariance matrices
     // these both need to be recalculated
     Reducer reducer;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, dimensions));
-    std::cout << "Dims " << prim_grp.reduced_covariance->getNumberDimensions() << std::endl;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
@@ -390,12 +378,9 @@ namespace panacea {
       dim_limiter.limit(dimensions, specification.getMaxNumberDimensions());
     }
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Reducer reducer;
     prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
         reducer.reduce(*prim_grp.covariance, dimensions));
-    std::cout << "Dims " << prim_grp.reduced_covariance->getNumberDimensions() << std::endl;
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     Inverter inverter;
     prim_grp.reduced_inv_covariance = std::make_unique<ReducedInvCovariance>(
         inverter.invert(*prim_grp.reduced_covariance));
@@ -436,17 +421,8 @@ namespace panacea {
       }
 
       Reducer reducer;
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       prim_grp.reduced_covariance = std::make_unique<ReducedCovariance>(
           reducer.reduce(*prim_grp.covariance, dimensions));
-      std::cout << "Dims " << prim_grp.reduced_covariance->getNumberDimensions() << std::endl;
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-      std::cout << "dimensions are " << dimensions.size() << std::endl;
-      std::cout << "Max num is " << max_num << std::endl;
-      for( auto & dim : dimensions) {
-        std::cout << dim << " ";
-      }
-      std::cout << std::endl;
     }
 
     if(reset_opt == ResetOption::All || reset_opt == ResetOption::ReducedInvCovariance){

@@ -169,10 +169,8 @@ namespace panacea {
       const CovarianceOption opt) {
 
     if( corr == settings::KernelCorrelation::Correlated ) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<CovarianceCorrelated>(desc_wrap, opt);
     } else if( corr == settings::KernelCorrelation::Uncorrelated) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::make_unique<CovarianceUncorrelated>(desc_wrap, opt);
     }
 
