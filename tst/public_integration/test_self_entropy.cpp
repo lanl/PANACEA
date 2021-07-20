@@ -89,24 +89,24 @@ TEST_CASE("Testing:panacea randomize dimensions non trivial self entropy",
   // that is a guassian kernel.
 
   PANACEASettings panacea_settings = PANACEASettings::make()
-    .set(EntropyType::Self)
-    .set(PANACEAAlgorithm::Flexible)
-    .distributionType(kernel)
-    .set(RandomizeDimensions::Yes)
-    .set(KernelPrimitive::Gaussian)
-    .set(KernelCount::OneToOne)
-    .set(KernelCorrelation::Uncorrelated)
-    .set(KernelCenterCalculation::None)
-    .set(KernelNormalization::None);
+                                         .set(EntropyType::Self)
+                                         .set(PANACEAAlgorithm::Flexible)
+                                         .distributionType(kernel)
+                                         .set(RandomizeDimensions::Yes)
+                                         .set(KernelPrimitive::Gaussian)
+                                         .set(KernelCount::OneToOne)
+                                         .set(KernelCorrelation::Uncorrelated)
+                                         .set(KernelCenterCalculation::None)
+                                         .set(KernelNormalization::None);
 
   // Using data generated for an atomic configuration of
   // 21 atoms and 30 SNAP descriptors
   test::ArrayDataNonTrivial array_data;
   auto dwrapper =
-    panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
+      panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
 
   std::unique_ptr<EntropyTerm> self_ent =
-    panacea_pi.create(*dwrapper, panacea_settings);
+      panacea_pi.create(*dwrapper, panacea_settings);
 
   auto dimensions = self_ent->getDimensions();
 
@@ -114,8 +114,8 @@ TEST_CASE("Testing:panacea randomize dimensions non trivial self entropy",
   // different
   bool in_order = true;
   int index = 0;
-  for( auto & dim : dimensions ) {
-    if( dim != index) {
+  for (auto &dim : dimensions) {
+    if (dim != index) {
       in_order = false;
       break;
     }
@@ -124,8 +124,6 @@ TEST_CASE("Testing:panacea randomize dimensions non trivial self entropy",
 
   REQUIRE(in_order == false);
 }
-
-
 
 TEST_CASE("Testing:panacea non trivial self entropy with strict alg",
           "[end-to-end,panacea]") {
