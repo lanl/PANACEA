@@ -79,6 +79,54 @@ TEST_CASE("Testing:panacea self entropy", "[end-to-end,panacea]") {
   }
 }
 
+TEST_CASE("Testing:panacea randomize dimensions non trivial self entropy",
+          "[end-to-end,panacea]") {
+
+  // pi - public interface
+  PANACEA panacea_pi;
+  // Creating settings for generating a self entropy term where the
+  // underlying distribution is using an kernel estimator
+  // that is a guassian kernel.
+
+  PANACEASettings panacea_settings = PANACEASettings::make()
+    .set(EntropyType::Self)
+    .set(PANACEAAlgorithm::Flexible)
+    .distributionType(kernel)
+    .set(RandomizeDimensions::Yes)
+    .set(KernelPrimitive::Gaussian)
+    .set(KernelCount::OneToOne)
+    .set(KernelCorrelation::Uncorrelated)
+    .set(KernelCenterCalculation::None)
+    .set(KernelNormalization::None);
+
+  // Using data generated for an atomic configuration of
+  // 21 atoms and 30 SNAP descriptors
+  test::ArrayDataNonTrivial array_data;
+  auto dwrapper =
+    panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
+
+  std::unique_ptr<EntropyTerm> self_ent =
+    panacea_pi.create(*dwrapper, panacea_settings);
+
+  auto dimensions = self_ent->getDimensions();
+
+  // There should be enough dimensions that the order is always
+  // different
+  bool in_order = true;
+  int index = 0;
+  for( auto & dim : dimensions ) {
+    if( dim != index) {
+      in_order = false;
+      break;
+    }
+    ++index;
+  }
+
+  REQUIRE(in_order == false);
+}
+
+
+
 TEST_CASE("Testing:panacea non trivial self entropy with strict alg",
           "[end-to-end,panacea]") {
 
