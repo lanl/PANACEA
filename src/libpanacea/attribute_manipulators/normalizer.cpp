@@ -4,6 +4,7 @@
 
 #include "error.hpp"
 #include "normalization_methods/normalization_method_factory.hpp"
+#include "type_map.hpp"
 
 // Public PANACEA includes
 #include "panacea/file_io_types.hpp"
@@ -13,6 +14,7 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <typeindex>
 #include <vector>
 
 namespace panacea {
@@ -56,7 +58,7 @@ Normalizer::Normalizer(const std::vector<double> &normalization_coeffs,
   trim(normalization_coeffs, norm_option_, normalization_coeffs_);
 }
 
-Normalizer::Normalizer(const BaseDescriptorWrapper *dwrapper,
+Normalizer::Normalizer(const BaseDescriptorWrapper &dwrapper,
                        const settings::KernelNormalization &norm_method,
                        const NormalizerOption opt)
     : norm_option_(opt) {
@@ -77,6 +79,11 @@ Normalizer::Normalizer(const settings::KernelNormalization &norm_method,
 }
 
 void Normalizer::normalize(Covariance &cov) const {
+
+  if (cov.getNormalizationState() == NormalizationState::Normalized) {
+    return;
+  }
+
   assert(cov.cols() == normalization_coeffs_.size());
 
   // Division is expensive so do it once and then use the inverse
@@ -99,6 +106,9 @@ void Normalizer::normalize(Covariance &cov) const {
 
 void Normalizer::unnormalize(Covariance &cov) const {
 
+  if (cov.getNormalizationState() == NormalizationState::Unnormalized) {
+    return;
+  }
   assert(cov.cols() == normalization_coeffs_.size());
   for (int row = 0; row < cov.rows(); ++row) {
     for (int col = 0; col < cov.cols(); ++col) {
@@ -109,11 +119,11 @@ void Normalizer::unnormalize(Covariance &cov) const {
   cov.set(PassKey<Normalizer>(), NormalizationState::Unnormalized);
 }
 
-const std::vector<double> &Normalizer::getNormalizationCoeffs() const noexcept {
+const std::vector<double> Normalizer::getNormalizationCoeffs() const {
   return normalization_coeffs_;
 }
 
-void Normalizer::update(const BaseDescriptorWrapper *dwrapper,
+void Normalizer::update(const BaseDescriptorWrapper &dwrapper,
                         std::any extra_args) {
 
   assert(norm_method_ != nullptr);
@@ -125,30 +135,103 @@ std::vector<std::any> Normalizer::write(const settings::FileType file_type,
                                         std::ostream &os,
                                         std::any norm_instance) {
 
-  std::vector<std::any> nested_values;
+  const Normalizer &normalizer = [&]() -> const Normalizer & {
+    if (std::type_index(norm_instance.type()) ==
+        std::type_index(typeid(Normalizer &))) {
+
+      return const_cast<const Normalizer &>(
+          std::any_cast<Normalizer &>(norm_instance));
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(std::unique_ptr<Normalizer> *))) {
+
+      return const_cast<const Normalizer &>(
+          *(std::any_cast<std::unique_ptr<Normalizer> *>(norm_instance))
+               ->get());
+
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(std::unique_ptr<const Normalizer> *))) {
+
+      return *(std::any_cast<std::unique_ptr<const Normalizer> *>(
+                   norm_instance))
+                  ->get();
+
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(Normalizer *))) {
+
+      return const_cast<const Normalizer &>(
+          *std::any_cast<Normalizer *>(norm_instance));
+
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(const Normalizer &))) {
+
+      return std::any_cast<const Normalizer &>(norm_instance);
+
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(const Normalizer *))) {
+
+      return *std::any_cast<const Normalizer *>(norm_instance);
+
+    } else {
+      std::string error_msg = "Unsupported Normalizer type encountered.";
+      if (type_map.count(std::type_index(norm_instance.type()))) {
+        error_msg += "\nType identified as: ";
+        error_msg += type_map.at(std::type_index(norm_instance.type()));
+        error_msg += "\n";
+      }
+      PANACEA_FAIL(error_msg);
+    }
+    return std::any_cast<const Normalizer &>(norm_instance);
+  }();
+
   if (file_type == settings::FileType::TXTRestart ||
       file_type == settings::FileType::TXTKernelDistribution) {
-    auto normalizer = std::any_cast<Normalizer *>(norm_instance);
 
     os << "[Normalization]\n";
-    os << normalizer->norm_option_ << "\n";
-    os << normalizer->normalization_coeffs_.size() << "\n";
+    os << normalizer.norm_option_ << "\n";
+    os << normalizer.normalization_coeffs_.size() << "\n";
     os << "[Normalization Coefficients]\n";
-    for (const auto &coef : normalizer->normalization_coeffs_) {
-      os << std::setfill(' ') << std::setw(14) << std::setprecision(8)
+    for (const auto &coef : normalizer.normalization_coeffs_) {
+      os << std::setfill(' ') << std::setw(14) << std::setprecision(15)
          << std::right << coef << "\n";
     }
   }
-  return nested_values;
+  return std::vector<std::any>();
 }
 
 io::ReadInstantiateVector Normalizer::read(const settings::FileType file_type,
                                            std::istream &is,
                                            std::any norm_instance) {
 
+  Normalizer &normalizer = [&]() -> Normalizer & {
+    if (std::type_index(norm_instance.type()) ==
+        std::type_index(typeid(Normalizer &))) {
+
+      return std::any_cast<Normalizer &>(norm_instance);
+
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(Normalizer *))) {
+
+      return *std::any_cast<Normalizer *>(norm_instance);
+    } else if (std::type_index(norm_instance.type()) ==
+               std::type_index(typeid(std::unique_ptr<Normalizer> *))) {
+
+      return *(
+          std::any_cast<std::unique_ptr<Normalizer> *>(norm_instance)->get());
+
+    } else {
+      std::string error_msg = "Unsupported Normalizer type encountered.";
+      if (type_map.count(std::type_index(norm_instance.type()))) {
+        error_msg += "\nType identified as: ";
+        error_msg += type_map.at(std::type_index(norm_instance.type()));
+        error_msg += "\n";
+      }
+      PANACEA_FAIL(error_msg);
+    }
+    return std::any_cast<Normalizer &>(norm_instance);
+  }();
+
   if (file_type == settings::FileType::TXTRestart ||
       file_type == settings::FileType::TXTKernelDistribution) {
-    auto normalizer = std::any_cast<Normalizer *>(norm_instance);
 
     std::string line;
     std::getline(is, line);
@@ -162,7 +245,7 @@ io::ReadInstantiateVector Normalizer::read(const settings::FileType file_type,
       }
       std::getline(is, line);
     }
-    is >> normalizer->norm_option_;
+    is >> normalizer.norm_option_;
 
     int rows;
     try {
@@ -186,11 +269,11 @@ io::ReadInstantiateVector Normalizer::read(const settings::FileType file_type,
     }
 
     try {
-      normalizer->normalization_coeffs_.resize(rows);
+      normalizer.normalization_coeffs_.resize(rows);
       for (int row = 0; row < rows; ++row) {
         double value;
         is >> value;
-        normalizer->normalization_coeffs_.at(row) = value;
+        normalizer.normalization_coeffs_.at(row) = value;
       }
     } catch (...) {
       std::string error_msg =
@@ -199,8 +282,7 @@ io::ReadInstantiateVector Normalizer::read(const settings::FileType file_type,
       PANACEA_FAIL(error_msg);
     }
   }
-  io::ReadInstantiateVector nested_values;
-  return nested_values;
+  return io::ReadInstantiateVector();
 }
 
 std::ostream &operator<<(std::ostream &os, const NormalizerOption &norm_opt) {

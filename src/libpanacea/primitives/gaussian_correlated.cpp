@@ -48,12 +48,13 @@ const settings::KernelCorrelation GaussCorrelated::correlation() const
   return settings::KernelCorrelation::Correlated;
 }
 
-double GaussCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
-                                const int descriptor_ind) const {
+double
+GaussCorrelated::compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const int descriptor_ind,
+                         const settings::EquationSetting &prim_settings) const {
 
-  assert(descriptor_wrapper != nullptr);
   assert(descriptor_ind > -1);
-  assert(descriptor_ind < descriptor_wrapper->getNumberPoints());
+  assert(descriptor_ind < descriptor_wrapper.getNumberPoints());
   assert(attributes_.kernel_wrapper != nullptr);
   assert(kernel_index_ > -1);
   assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -61,37 +62,31 @@ double GaussCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
   assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
   assert(
       attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+  assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  auto &descs = *(descriptor_wrapper);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  if (prim_settings == settings::EquationSetting::IgnoreExpAndPrefactor) {
+    return 1.0;
+  }
+
+  auto &descs = (descriptor_wrapper);
   auto &kerns = *(attributes_.kernel_wrapper);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-  const auto &norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  const std::vector<double> &norm_coeffs =
+      attributes_.normalizer->getNormalizationCoeffs();
   auto &red_inv_cov = *(attributes_.reduced_inv_covariance);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   const auto &chosen_dims = red_inv_cov.getChosenDimensionIndices();
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
   std::vector<double> diff;
   const int red_ndim =
       attributes_.reduced_inv_covariance->getNumberDimensions();
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   diff.reserve(red_ndim);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   int index = 0;
   for (const int dim : chosen_dims) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-    diff.push_back((descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim)) *
+    diff.push_back((descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim)) /
                    norm_coeffs.at(dim));
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   }
 
   std::vector<double> MxV;
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   MxV.reserve(red_ndim);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   for (int j = 0; j < red_ndim; ++j) {
     double val = 0.0;
     for (int k = 0; k < red_ndim; ++k) {
@@ -99,30 +94,26 @@ double GaussCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
     }
     MxV.push_back(val);
   }
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
   double VxMxV = 0.0;
   for (int i = 0; i < red_ndim; ++i) {
     VxMxV += diff.at(i) * MxV.at(i);
   }
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   double result = pre_factor_ * std::exp(-0.5 * VxMxV);
   if (result == 0.0) {
     return std::numeric_limits<double>::min();
   }
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   return result;
 }
 
 std::vector<double>
-GaussCorrelated::compute_grad(const BaseDescriptorWrapper *descriptors,
+GaussCorrelated::compute_grad(const BaseDescriptorWrapper &descriptors,
                               const int descriptor_ind,
                               const settings::EquationSetting &prim_settings,
                               const settings::GradSetting &grad_setting) const {
 
-  assert(descriptors != nullptr);
   assert(descriptor_ind > -1);
-  assert(descriptor_ind < descriptors->getNumberPoints());
+  assert(descriptor_ind < descriptors.getNumberPoints());
   assert(attributes_.kernel_wrapper != nullptr);
   assert(kernel_index_ > -1);
   assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -130,26 +121,23 @@ GaussCorrelated::compute_grad(const BaseDescriptorWrapper *descriptors,
   assert(attributes_.reduced_inv_covariance->getNumberDimensions() > 0);
   assert(
       attributes_.reduced_inv_covariance->is(NormalizationState::Normalized));
+  assert(attributes_.normalizer != nullptr && "Normalizer is a nullptr");
 
-  auto &descs = *(descriptors);
-  const auto &norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+  auto &descs = (descriptors);
+  const auto &norm_coeffs = attributes_.normalizer->getNormalizationCoeffs();
   auto &kerns = *(attributes_.kernel_wrapper);
   const int ndim = descs.getNumberDimensions();
   auto &red_inv_cov = *(attributes_.reduced_inv_covariance);
   const auto &chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
-  const double exp_term = [&] {
-    if (prim_settings == settings::EquationSetting::IgnoreExp) {
-      return 1.0;
-    } else {
-      return compute(descriptors, descriptor_ind);
-    }
-  }();
+  const double exp_term = compute(descriptors, descriptor_ind, prim_settings);
 
   std::vector diff(ndim, 0.0);
   for (const int dim : chosen_dims) {
     // ( a_i * (d_x_i - d_mu_i) )
-    diff.at(dim) = (descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim));
+    diff.at(dim) =
+        ((descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim))) /
+        norm_coeffs.at(dim);
   }
 
   std::vector<double> grad(ndim, 0.0);
@@ -158,8 +146,9 @@ GaussCorrelated::compute_grad(const BaseDescriptorWrapper *descriptors,
   for (const int dim : chosen_dims) {
     int index2 = 0;
     for (const int dim2 : chosen_dims) {
-      grad.at(dim) += exp_term * diff.at(dim2) * norm_coeffs.at(dim) *
-                      norm_coeffs.at(dim2) * red_inv_cov(index1, index2);
+      grad.at(dim) += exp_term * diff.at(dim2) * red_inv_cov(index1, index2) *
+                      1.0 / norm_coeffs.at(dim);
+
       ++index2;
     }
     ++index1;

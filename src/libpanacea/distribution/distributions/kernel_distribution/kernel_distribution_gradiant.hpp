@@ -18,7 +18,7 @@ class PrimitiveGroup;
 class KernelDistributionGradiant {
 public:
   using GradiantMethod = std::vector<double> (*)(
-      const BaseDescriptorWrapper *descriptor_wrapper,
+      const BaseDescriptorWrapper &descriptor_wrapper,
       const int &descriptor_index, const int &grad_index,
       const PrimitiveGroup &prim_grp,
       const KernelDistributionSettings &distribution_settings,

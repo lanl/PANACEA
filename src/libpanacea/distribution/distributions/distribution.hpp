@@ -16,29 +16,31 @@
 namespace panacea {
 
 class BaseDescriptorWrapper;
+class Dimensions;
 class DistributionSettings;
 class Distribution;
 
 class Distribution {
 public:
   typedef io::ReadInstantiateVector (*ReadFunction)(
-      const settings::FileType file_type, std::istream &, Distribution *);
+      const settings::FileType file_type, std::istream &, Distribution &);
 
   typedef std::vector<std::any> (*WriteFunction)(
-      const settings::FileType file_type, std::ostream &, Distribution *);
+      const settings::FileType file_type, std::ostream &, const Distribution &);
 
 private:
   virtual Distribution::ReadFunction getReadFunction_() = 0;
-  virtual Distribution::WriteFunction getWriteFunction_() = 0;
+  virtual Distribution::WriteFunction getWriteFunction_() const = 0;
 
 public:
   virtual settings::DistributionType type() const noexcept = 0;
 
-  virtual double compute(const BaseDescriptorWrapper *descriptor_wrapper,
-                         const int desc_ind) = 0;
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const int desc_ind,
+                         const DistributionSettings &distribution_settings) = 0;
 
   virtual std::vector<double>
-  compute_grad(const BaseDescriptorWrapper *descriptor_wrapper,
+  compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
                const int desc_ind,
                const int grad_ind, // The index associated with whatever we are
                                    // taking the gradiant with respect to
@@ -48,11 +50,11 @@ public:
   /**
    * Get the actual dimensions used in the distribution
    **/
-  virtual const std::vector<int> &getDimensions() const noexcept = 0;
+  virtual const Dimensions &getDimensions() const noexcept = 0;
 
-  virtual void update(const BaseDescriptorWrapper *descriptor_wrapper) = 0;
+  virtual void update(const BaseDescriptorWrapper &descriptor_wrapper) = 0;
 
-  virtual void initialize(const BaseDescriptorWrapper *descriptor_wrapper) = 0;
+  virtual void initialize(const BaseDescriptorWrapper &descriptor_wrapper) = 0;
 
   virtual ~Distribution() = 0;
 

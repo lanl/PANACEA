@@ -5,6 +5,7 @@
 
 // Local private PANACEA includes
 #include "data_settings.hpp"
+#include "dimensions.hpp"
 #include "matrix/matrix.hpp"
 
 // Public PANACEA includes
@@ -21,14 +22,14 @@ class Inverter;
 class ReducedInvCovariance {
 private:
   std::unique_ptr<Matrix> matrix_;
-  std::vector<int> chosen_dimension_indices_;
+  Dimensions chosen_dimension_indices_;
 
   NormalizationState normalized_ = NormalizationState::Unnormalized;
 
 public:
   ReducedInvCovariance() = delete;
   ReducedInvCovariance(PassKey<Inverter>, std::unique_ptr<Matrix> matrix,
-                       const std::vector<int> &chosen_dimension_indices,
+                       const Dimensions &chosen_dimension_indices,
                        const NormalizationState &normalized)
       : matrix_(std::move(matrix)),
         chosen_dimension_indices_(chosen_dimension_indices),
@@ -43,7 +44,7 @@ public:
    *matrix
    **/
   int getNumberDimensions() const;
-  const std::vector<int> &getChosenDimensionIndices() const;
+  const Dimensions &getChosenDimensionIndices() const;
 
   bool is(const NormalizationState &state) const noexcept;
   const NormalizationState &getNormalizationState() const noexcept;

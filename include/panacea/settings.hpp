@@ -63,6 +63,9 @@ enum class KernelCenterCalculation {
   Median,
 };
 
+enum class RandomizeDimensions { Yes, No };
+
+enum class RandomizeNumberDimensions { Yes, No };
 } // namespace settings
 
 std::ostream &operator<<(std::ostream &os, const settings::DistributionType &);
@@ -77,6 +80,10 @@ std::ostream &operator<<(std::ostream &os,
                          const settings::KernelNormalization &);
 std::ostream &operator<<(std::ostream &os,
                          const settings::KernelCenterCalculation &);
+std::ostream &operator<<(std::ostream &os,
+                         const settings::RandomizeDimensions &);
+std::ostream &operator<<(std::ostream &os,
+                         const settings::RandomizeNumberDimensions &);
 
 std::istream &operator>>(std::istream &is, settings::DistributionType &);
 std::istream &operator>>(std::istream &is, settings::FileType &);
@@ -88,6 +95,9 @@ std::istream &operator>>(std::istream &is, settings::KernelCount &);
 std::istream &operator>>(std::istream &is, settings::KernelCorrelation &);
 std::istream &operator>>(std::istream &is, settings::KernelNormalization &);
 std::istream &operator>>(std::istream &is, settings::KernelCenterCalculation &);
+std::istream &operator>>(std::istream &is, settings::RandomizeDimensions &);
+std::istream &operator>>(std::istream &is,
+                         settings::RandomizeNumberDimensions &);
 
 class PANACEASettingsBuilder;
 
@@ -105,6 +115,10 @@ public:
   std::optional<double> getIncrement() const noexcept { return inc_ratio_; }
 
   std::optional<bool> numericalGrad() const noexcept { return numerical_grad_; }
+
+  int getMaxNumberOfDimensions() const noexcept {
+    return max_number_dimensions_;
+  }
 
   template <class T> std::optional<T> get() const noexcept {
     if constexpr (std::is_same<settings::EntropyType, T>::value) {
@@ -125,6 +139,12 @@ public:
       return kern_center_;
     } else if constexpr (std::is_same<settings::DistributionType, T>::value) {
       return dist_type_;
+    } else if constexpr (std::is_same<settings::RandomizeDimensions,
+                                      T>::value) {
+      return randomize_dimensions_;
+    } else if constexpr (std::is_same<settings::RandomizeNumberDimensions,
+                                      T>::value) {
+      return randomize_number_dimensions_;
     }
   }
 
@@ -141,6 +161,12 @@ private:
   std::optional<double> weight_;
   std::optional<double> inc_ratio_;
   std::optional<bool> numerical_grad_;
+  // -1 - nocap on dimensions
+  int max_number_dimensions_ = -1;
+
+  std::optional<settings::RandomizeDimensions> randomize_dimensions_;
+  std::optional<settings::RandomizeNumberDimensions>
+      randomize_number_dimensions_;
 };
 
 class PANACEASettingsBuilder {
@@ -150,14 +176,23 @@ public:
   PANACEASettingsBuilder &set(const settings::EntropyType &);
   PANACEASettingsBuilder &set(const settings::PANACEAAlgorithm &);
 
-  PANACEASettingsBuilder &weightEntropTermBy(const double &weight);
+  PANACEASettingsBuilder &weightEntropyTermBy(const double &weight);
   PANACEASettingsBuilder &setIncrementRatioTo(const double &inc_ratio);
   PANACEASettingsBuilder &setNumericalGradTo(const bool &on_or_off);
+
+  /**
+   * Cannot have 0 dimensions, default is -1 which means no maximum is set
+   **/
+  PANACEASettingsBuilder &
+  setMaxNumberDescriptorDimensions(const int number_dimensions);
+
   PANACEASettingsBuilder &set(const settings::KernelPrimitive &);
   PANACEASettingsBuilder &set(const settings::KernelCount &);
   PANACEASettingsBuilder &set(const settings::KernelCorrelation &);
   PANACEASettingsBuilder &set(const settings::KernelCenterCalculation &);
   PANACEASettingsBuilder &set(const settings::KernelNormalization &);
+  PANACEASettingsBuilder &set(const settings::RandomizeDimensions &);
+  PANACEASettingsBuilder &set(const settings::RandomizeNumberDimensions &);
 
   operator PANACEASettings &&() {
     return std::move(ent_settings_); // notice the move

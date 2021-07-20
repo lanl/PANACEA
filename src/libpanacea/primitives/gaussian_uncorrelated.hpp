@@ -52,19 +52,26 @@ public:
         pre_factor_(
             1.0 /
             (std::pow(attributes_.reduced_covariance->getDeterminant(), 0.5) *
-             std::pow(constants::PI_SQRT * constants::SQRT_2,
-                      static_cast<double>(attributes_.reduced_covariance
-                                              ->getNumberDimensions())))){};
+             std::pow(
+                 constants::PI_SQRT * constants::SQRT_2,
+                 static_cast<double>(
+                     attributes_.reduced_covariance->getNumberDimensions())))){
+
+        };
 
   virtual const settings::KernelPrimitive type() const noexcept final;
   virtual const settings::KernelCorrelation correlation() const noexcept final;
 
   virtual int getId() const noexcept final { return kernel_index_; }
+
+  virtual double getPreFactor() const noexcept final { return pre_factor_; }
+
   // Do not make const reference
   virtual void update(PrimitiveAttributes &&) final;
 
-  virtual double compute(const BaseDescriptorWrapper *descriptor_wrapper,
-                         const int sample_ind) const final;
+  virtual double
+  compute(const BaseDescriptorWrapper &descriptor_wrapper, const int sample_ind,
+          const settings::EquationSetting &prim_settings) const final;
 
   /*
    * Compute the gradient of the primitive
@@ -81,7 +88,7 @@ public:
    *kernels or both
    **/
   virtual std::vector<double>
-  compute_grad(const BaseDescriptorWrapper *descriptors,
+  compute_grad(const BaseDescriptorWrapper &descriptors,
                const int descriptor_ind,
                const settings::EquationSetting &prim_settings,
                const settings::GradSetting &grad_setting) const final;

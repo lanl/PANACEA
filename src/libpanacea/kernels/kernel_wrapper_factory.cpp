@@ -63,7 +63,7 @@ KernelWrapperFactory::KernelWrapperFactory() {
 }
 
 std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
-    const BaseDescriptorWrapper *desc_wrapper,
+    const BaseDescriptorWrapper &desc_wrapper,
     const KernelSpecification &kern_specification) const {
 
   // Ensure valid method exists
@@ -80,7 +80,7 @@ std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
 
     if (create_methods_[kern_specification
                             .get<settings::KernelCenterCalculation>()]
-            .count(desc_wrapper->getTypeIndex()) == 0) {
+            .count(desc_wrapper.getTypeIndex()) == 0) {
       std::string error_msg =
           "Kernel creation method is missing for the specified internal type.";
       PANACEA_FAIL(error_msg);
@@ -96,18 +96,18 @@ std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
       // This check is only appropriate if memory is shared, the desc_wrapper
       // type and pointer will likley differ in the case of non shared memory
       // because it's likely you will not have a pointer as the underlying type
-      if (desc_wrapper->getTypeIndex() !=
-          std::type_index(desc_wrapper->getPointerToRawData().type())) {
+      if (desc_wrapper.getTypeIndex() !=
+          std::type_index(desc_wrapper.getPointerToRawData().type())) {
         std::string error_msg =
             "Descriptor data index and pointerToRawData are not consistent";
-        if (type_map.count(desc_wrapper->getTypeIndex())) {
+        if (type_map.count(desc_wrapper.getTypeIndex())) {
           error_msg += "\ndesc_wrapper type is: " +
-                       type_map.at(desc_wrapper->getTypeIndex());
+                       type_map.at(desc_wrapper.getTypeIndex());
           error_msg += "\n";
         }
         PANACEA_FAIL(error_msg);
       }
-      auto desc_data_type_index = desc_wrapper->getTypeIndex();
+      auto desc_data_type_index = desc_wrapper.getTypeIndex();
       auto kern_data_type_index = desc_data_type_index;
       if (desc_data_type_index !=
               std::type_index(typeid(std::vector<std::vector<double>> *)) &&
@@ -115,18 +115,16 @@ std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
         PANACEA_FAIL("Unsupported types detected, cannot create kernels.");
       }
 
-      std::cout << "Should be sharing data" << std::endl;
       return create_methods_[kern_specification
                                  .get<settings::KernelCenterCalculation>()]
                             [desc_data_type_index][kern_data_type_index](
-                                PassKey<KernelWrapperFactory>(), desc_wrapper,
-                                desc_wrapper->rows(), desc_wrapper->cols());
+                                PassKey<KernelWrapperFactory>(), &desc_wrapper,
+                                desc_wrapper.rows(), desc_wrapper.cols());
     } else { // If owned
 
-      std::cout << "Not sharing data" << std::endl;
       auto kern_data_type_index =
           std::type_index(typeid(std::vector<std::vector<double>>));
-      auto desc_data_type_index = desc_wrapper->getTypeIndex();
+      auto desc_data_type_index = desc_wrapper.getTypeIndex();
       if (desc_data_type_index !=
               std::type_index(typeid(std::vector<std::vector<double>> *)) &&
           desc_data_type_index !=
@@ -150,8 +148,8 @@ std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
       return create_methods_[kern_specification
                                  .get<settings::KernelCenterCalculation>()]
                             [desc_data_type_index][kern_data_type_index](
-                                PassKey<KernelWrapperFactory>(), desc_wrapper,
-                                desc_wrapper->rows(), desc_wrapper->cols());
+                                PassKey<KernelWrapperFactory>(), &desc_wrapper,
+                                desc_wrapper.rows(), desc_wrapper.cols());
     }
   } else if (kern_specification.is(settings::KernelCount::Single)) {
     if (kern_specification.is(settings::KernelMemory::Own)) {
@@ -170,8 +168,8 @@ std::unique_ptr<BaseKernelWrapper> KernelWrapperFactory::create(
                                  .get<settings::KernelCenterCalculation>()]
                             [std::type_index(typeid(std::vector<double>))]
                             [std::type_index(typeid(std::vector<double>))](
-                                PassKey<KernelWrapperFactory>(), desc_wrapper,
-                                1, desc_wrapper->getNumberDimensions());
+                                PassKey<KernelWrapperFactory>(), &desc_wrapper,
+                                1, desc_wrapper.getNumberDimensions());
     }
   }
   std::string error_msg = "The combination of kernel specifications is not";

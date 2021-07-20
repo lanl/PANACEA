@@ -6,6 +6,7 @@
 
 // Private local PANACEA includes
 #include "reduced_covariance.hpp"
+#include "dimensions.hpp"
 
 // Standard includes
 #include <iostream>
@@ -16,8 +17,8 @@ double ReducedCovariance::operator()(const int row, const int col) const {
   return matrix_->operator()(row, col);
 }
 
-const Matrix *ReducedCovariance::get(PassKey<Inverter>) const {
-  return matrix_.get();
+const Matrix &ReducedCovariance::get(PassKey<Inverter>) const {
+  return *matrix_.get();
 }
 
 double ReducedCovariance::getDeterminant() const {
@@ -30,8 +31,7 @@ int ReducedCovariance::getNumberDimensions() const {
   return matrix_->rows();
 }
 
-const std::vector<int> &ReducedCovariance::getReducedDimensions() const
-    noexcept {
+const Dimensions &ReducedCovariance::getReducedDimensions() const noexcept {
   return chosen_dimension_indices_;
 }
 
@@ -43,7 +43,7 @@ void ReducedCovariance::print() const {
   std::cout << "Reduced Covariance Matrix\n";
   matrix_->print();
   std::cout << "Reduced Covariance Dimensions\n";
-  for (int dim : chosen_dimension_indices_) {
+  for (const int dim : chosen_dimension_indices_) {
     std::cout << dim << " ";
   }
   std::cout << std::endl;

@@ -51,13 +51,12 @@ const settings::KernelCorrelation GaussLogCorrelated::correlation() const
   return settings::KernelCorrelation::Correlated;
 }
 
-double
-GaussLogCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
-                            const int descriptor_ind) const {
+double GaussLogCorrelated::compute(
+    const BaseDescriptorWrapper &descriptor_wrapper, const int descriptor_ind,
+    const settings::EquationSetting &prim_settings) const {
 
-  assert(descriptor_wrapper != nullptr);
   assert(descriptor_ind > -1);
-  assert(descriptor_ind < descriptor_wrapper->getNumberPoints());
+  assert(descriptor_ind < descriptor_wrapper.getNumberPoints());
   assert(attributes_.kernel_wrapper != nullptr);
   assert(kernel_index_ > -1);
   assert(kernel_index_ < attributes_.kernel_wrapper->rows());
@@ -69,9 +68,9 @@ GaussLogCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
                "primitive has not yet been vetted."
             << std::endl;
 
-  auto &descs = *(descriptor_wrapper);
+  auto &descs = (descriptor_wrapper);
   auto &kerns = *(attributes_.kernel_wrapper);
-  const auto &norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
+  // const auto & norm_coeffs = attributes_.normalizer.getNormalizationCoeffs();
   auto &red_inv_cov = *(attributes_.reduced_inv_covariance);
   const auto &chosen_dims = red_inv_cov.getChosenDimensionIndices();
 
@@ -81,9 +80,8 @@ GaussLogCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
   diff.reserve(red_ndim);
   int index = 0;
   for (const int dim : chosen_dims) {
-    diff.push_back(
-        std::log(descs(descriptor_ind, dim) * norm_coeffs.at(dim)) -
-        std::log(kerns.at(kernel_index_, dim) * norm_coeffs.at(dim)));
+    diff.push_back(std::log(descs(descriptor_ind, dim)) -
+                   std::log(kerns.at(kernel_index_, dim)));
   }
 
   std::vector<double> MxV;
@@ -108,7 +106,7 @@ GaussLogCorrelated::compute(const BaseDescriptorWrapper *descriptor_wrapper,
 }
 
 std::vector<double> GaussLogCorrelated::compute_grad(
-    const BaseDescriptorWrapper *descriptors, const int descriptor_ind,
+    const BaseDescriptorWrapper &descriptors, const int descriptor_ind,
     const settings::EquationSetting &prim_settings,
     const settings::GradSetting &grad_setting) const {
 
@@ -116,7 +114,7 @@ std::vector<double> GaussLogCorrelated::compute_grad(
       "Analytical gradiant method for Multivariate Log normal "
       "distribution/GaussLog has not yet been implemented.");
 
-  auto &descs = *(descriptors);
+  auto &descs = (descriptors);
   const int ndim = descs.getNumberDimensions();
 
   std::vector<double> grad(ndim, 0.0);

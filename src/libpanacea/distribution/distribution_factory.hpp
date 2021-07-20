@@ -24,12 +24,12 @@ class DistributionFactory {
 public:
   using DistributionCreateMethod = std::unique_ptr<Distribution> (*)(
       const PassKey<DistributionFactory> &,
-      const BaseDescriptorWrapper *descriptor_wrapper,
-      DistributionSettings *dist_settings);
+      const BaseDescriptorWrapper &descriptor_wrapper,
+      const DistributionSettings &dist_settings);
 
-  using DistributionCreateShellMethod =
-      std::unique_ptr<Distribution> (*)(const PassKey<DistributionFactory> &,
-                                        DistributionSettings *dist_settings);
+  using DistributionCreateShellMethod = std::unique_ptr<Distribution> (*)(
+      const PassKey<DistributionFactory> &,
+      const DistributionSettings &dist_settings);
 
 private:
   static std::unordered_map<settings::DistributionType,
@@ -60,14 +60,15 @@ public:
   }
 
   std::unique_ptr<Distribution>
-  create(const BaseDescriptorWrapper *descriptor_wrapper,
-         DistributionSettings *settings) const;
+  create(const BaseDescriptorWrapper &descriptor_wrapper,
+         const DistributionSettings &settings) const;
 
   /**
    * Will create a shell of a distribution as no descriptor wrapper was
    *provided.
    **/
-  std::unique_ptr<Distribution> create(DistributionSettings *settings) const;
+  std::unique_ptr<Distribution>
+  create(const DistributionSettings &settings) const;
 };
 
 } // namespace panacea

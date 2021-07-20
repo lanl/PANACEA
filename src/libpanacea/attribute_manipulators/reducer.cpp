@@ -3,6 +3,7 @@
 #include "reducer.hpp"
 
 #include "attribute_manipulators/row_echelon.hpp"
+#include "attributes/dimensions.hpp"
 #include "error.hpp"
 #include "matrix/matrix.hpp"
 
@@ -21,8 +22,7 @@ namespace {
 /*
  * Runs a number of checks to ensure the input is allowed
  */
-void runChecks_(const Covariance &cov,
-                const std::vector<int> &preferred_dimensions) {
+void runChecks_(const Covariance &cov, const Dimensions &preferred_dimensions) {
 
   // The first two checks are unnecessary because by definition of how the
   // covariance matrix is created, it shoudl be square and symmetric
@@ -97,14 +97,14 @@ void runChecks_(const Covariance &cov,
 // 4 0 0 0 0
 // 4 0 0 0 0
 //
-std::vector<int>
-reorderSymmetricMatrix_(Matrix *mat, const std::vector<int> &priority_rows) {
+std::vector<int> reorderSymmetricMatrix_(Matrix &mat,
+                                         const Dimensions &priority_rows) {
 
   // Next we need to keep track of where the original rows are located in the
   // covariance matrix
   std::vector<int> ind_rows;
-  ind_rows.reserve(mat->rows());
-  for (int ind = 0; ind < mat->rows(); ++ind) {
+  ind_rows.reserve(mat.rows());
+  for (int ind = 0; ind < mat.rows(); ++ind) {
     ind_rows.push_back(ind);
   }
   std::vector<int> ind_cols = ind_rows;
@@ -115,39 +115,37 @@ reorderSymmetricMatrix_(Matrix *mat, const std::vector<int> &priority_rows) {
 
   // ind_rows
   // 0, 1, 2, 3, 4, 5 ..
-  std::vector<int> priority_rows_tmp1 = priority_rows;
+  Dimensions priority_rows_tmp1 = priority_rows;
   for (int index = 0; index < priority_rows_tmp1.size(); ++index) {
     int chosen_row = priority_rows_tmp1.at(index);
 
     int index_of_chosen = 0;
-    for (; index_of_chosen < mat->rows(); ++index_of_chosen) {
+    for (; index_of_chosen < mat.rows(); ++index_of_chosen) {
       if (ind_rows.at(index_of_chosen) == chosen_row) {
         break;
       }
     }
 
     if (index_of_chosen != index) {
-      for (int col = 0; col < mat->cols(); ++col) {
-        std::swap(mat->operator()(index, col),
-                  mat->operator()(index_of_chosen, col));
+      for (int col = 0; col < mat.cols(); ++col) {
+        std::swap(mat(index, col), mat(index_of_chosen, col));
       }
       std::swap(ind_rows.at(index), ind_rows.at(index_of_chosen));
     }
   }
 
-  std::vector<int> priority_rows_tmp2 = priority_rows;
+  Dimensions priority_rows_tmp2 = priority_rows;
   for (int index = 0; index < priority_rows_tmp2.size(); ++index) {
     int chosen_col = priority_rows_tmp2.at(index);
     int index_of_chosen = 0;
-    for (; index_of_chosen < mat->cols(); ++index_of_chosen) {
+    for (; index_of_chosen < mat.cols(); ++index_of_chosen) {
       if (ind_cols.at(index_of_chosen) == chosen_col) {
         break;
       }
     }
     if (index_of_chosen != index) {
-      for (int row = 0; row < mat->rows(); ++row) {
-        std::swap(mat->operator()(row, index),
-                  mat->operator()(row, index_of_chosen));
+      for (int row = 0; row < mat.rows(); ++row) {
+        std::swap(mat(row, index), mat(row, index_of_chosen));
       }
       std::swap(ind_cols.at(index), ind_cols.at(index_of_chosen));
     }
@@ -155,16 +153,16 @@ reorderSymmetricMatrix_(Matrix *mat, const std::vector<int> &priority_rows) {
   return ind_rows;
 }
 
-std::vector<int> detectIndependentRows_(Matrix *tmp,
+std::vector<int> detectIndependentRows_(Matrix &tmp,
                                         const std::vector<int> &ind_rows,
                                         const double threshold) {
 
   // Now we will determine which rows are actually independent
   // The order does not matter
   std::vector<int> independent_rows;
-  for (int i = 0; i < tmp->rows(); ++i) {
-    for (int k = 0; k < tmp->cols(); ++k) {
-      if (std::abs(tmp->operator()(i, k)) > threshold) {
+  for (int i = 0; i < tmp.rows(); ++i) {
+    for (int k = 0; k < tmp.cols(); ++k) {
+      if (std::abs(tmp(i, k)) > threshold) {
         independent_rows.push_back(ind_rows.at(i));
         break;
       }
@@ -178,7 +176,7 @@ std::vector<int> detectIndependentRows_(Matrix *tmp,
  * what constitutes a 0.
  */
 std::vector<int>
-rowEchelonDimensionDependenceDetection_(Matrix *tmp, const double threshold) {
+rowEchelonDimensionDependenceDetection_(Matrix &tmp, const double threshold) {
 
   RowEchelon row_echelon(threshold);
   const std::vector<int> ind_rows = row_echelon.operate(tmp);
@@ -200,9 +198,9 @@ rowEchelonDimensionDependenceDetection_(Matrix *tmp, const double threshold) {
  * When we rearrange the covariance matrix rows we will also have to rearrange
  * the columns (because it is a covariance matrix.
  */
-std::vector<int>
-findLinearlyIndependentDescDimensions_(const Covariance &cov,
-                                       const std::vector<int> &priority_rows,
+Dimensions
+findLinearlyIndependentDescDimensions_(const Matrix &cov,
+                                       const Dimensions &priority_rows,
                                        const double threshold) {
 
   auto tmp = createMatrix(cov.rows(), cov.cols());
@@ -215,9 +213,8 @@ findLinearlyIndependentDescDimensions_(const Covariance &cov,
   }
 
   // Next we are going to reorder the covariance matrix
-  std::vector<int> order = reorderSymmetricMatrix_(tmp.get(), priority_rows);
+  std::vector<int> order = reorderSymmetricMatrix_(*tmp.get(), priority_rows);
 
-  tmp->print();
   // E.g.
   // order.at(0) is row of reordered tmp that points back to the original tmp
   // matrix before it was changed which in this case is equivalent to
@@ -227,7 +224,7 @@ findLinearlyIndependentDescDimensions_(const Covariance &cov,
   // swapped, because the diagonal may not be non zero at the dimension of
   // interest this does not constitute an error
   const std::vector<int> relative_independent_rows =
-      rowEchelonDimensionDependenceDetection_(tmp.get(), threshold);
+      rowEchelonDimensionDependenceDetection_(*tmp.get(), threshold);
 
   // relative_independent_rows has not accounted for the changes in rows that
   // occurred during the call to reorderSymmetricMatrix this corrects the row
@@ -247,12 +244,12 @@ findLinearlyIndependentDescDimensions_(const Covariance &cov,
       independent_rows.push_back(prior);
     }
   }
-  return independent_rows;
+  return Dimensions(independent_rows);
 }
 
 std::unique_ptr<Matrix>
 createRedCovarRawMatrix_(const Covariance &cov,
-                         std::vector<int> independent_rows) {
+                         const Dimensions &independent_rows) {
 
   const int len = independent_rows.size();
 
@@ -260,9 +257,9 @@ createRedCovarRawMatrix_(const Covariance &cov,
   // Also need to know which reduced rows map to which dimensions of the
   // original covariance matrix
   int reduced_row = 0;
-  for (int ind_row : independent_rows) {
+  for (const int ind_row : independent_rows) {
     int reduced_col = 0;
-    for (int ind_col : independent_rows) {
+    for (const int ind_col : independent_rows) {
       reduced_covar_raw_mat->operator()(reduced_row, reduced_col) =
           cov(ind_row, ind_col);
       reduced_covar_raw_mat->operator()(reduced_col, reduced_row) =
@@ -276,23 +273,23 @@ createRedCovarRawMatrix_(const Covariance &cov,
 } // namespace
 
 ReducedCovariance Reducer::reduce(const Covariance &cov,
-                                  std::vector<int> priority_rows) const {
+                                  Dimensions priority_rows) const {
 
   // If priority rows are empty create some assume the current order is fine
   if (priority_rows.size() == 0) {
-    priority_rows.resize(cov.rows());
-    std::iota(priority_rows.begin(), priority_rows.end(), 0);
+    priority_rows = Dimensions(cov.rows());
   }
 
   runChecks_(cov, priority_rows);
 
   double threshold = starting_threshold_;
+
   do {
-    std::vector<int> independent_dims =
-        findLinearlyIndependentDescDimensions_(cov, priority_rows, threshold);
+    Dimensions independent_dims = findLinearlyIndependentDescDimensions_(
+        cov.matrix(PassKey<Reducer>()), priority_rows, threshold);
 
     if (independent_dims.size() == 0) {
-      independent_dims.push_back(priority_rows.at(0));
+      independent_dims = Dimensions(std::vector<int>{priority_rows.at(0)});
     }
 
     auto raw_mat = createRedCovarRawMatrix_(cov, independent_dims);

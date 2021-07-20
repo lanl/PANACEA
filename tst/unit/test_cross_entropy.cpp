@@ -53,15 +53,12 @@ TEST_CASE("Testing:cross entropy", "[unit,panacea]") {
     // entropy term needs to be created here because it is moved when decorated
     auto entropy_term = entropy_factory.create(&dwrapper_init, &settings);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     REQUIRE(entropy_term != nullptr);
     REQUIRE(entropy_term.get() != nullptr);
     std::vector<std::vector<double>> data_sample_max{{3.0, 5.0}};
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     DescriptorWrapper<std::vector<std::vector<double>> *> dwrapper_sample_max(
         &data_sample_max, 1, 2);
 
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     double val1 = entropy_term->compute(&dwrapper_sample_max);
     std::cout << "Cross entropy is " << val1
               << " at what should be the center of the cross entropy term."

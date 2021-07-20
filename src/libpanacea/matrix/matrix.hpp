@@ -23,11 +23,17 @@ class Matrix {
 public:
   virtual ~Matrix(){};
   virtual const MatrixType type() const = 0;
-  virtual Matrix &operator=(const Matrix *mat) = 0;
+  virtual Matrix &operator=(const Matrix &mat) = 0;
   virtual double &operator()(const int row, const int col) = 0;
   virtual double operator()(const int row, const int col) const = 0;
 
   virtual double getDeterminant() const = 0;
+
+  /**
+   * Check if all elements in a matrix are 0, a threshold value can be
+   * specefied to help define what constitutes 0.
+   **/
+  virtual bool isZero(const double threshold) const noexcept = 0;
 
   /**
    * Resize the matrix to the specified rows and columns
@@ -67,7 +73,7 @@ createMatrix(const int rows, const int cols,
 // Create pseudo inverse of a matrix, will return matrix of the same type
 // as is passed in
 std::unique_ptr<Matrix>
-pseudoInverse(const Matrix *mat, const MatrixType type = MatrixType::Default);
+pseudoInverse(const Matrix &mat, const MatrixType type = MatrixType::Default);
 
 } // namespace panacea
 

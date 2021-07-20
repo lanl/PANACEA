@@ -34,20 +34,20 @@ private:
   int number_pts_mean_; // Number of points used to calculate the mean
 
   virtual BaseKernelWrapper::ReadFunction getReadFunction_() final;
-  virtual BaseKernelWrapper::WriteFunction getWriteFunction_() final;
+  virtual BaseKernelWrapper::WriteFunction getWriteFunction_() const final;
 
-  explicit MeanKernelWrapper(const BaseDescriptorWrapper *desc_wrapper);
+  explicit MeanKernelWrapper(const BaseDescriptorWrapper &desc_wrapper);
   explicit MeanKernelWrapper(const std::vector<double> &);
 
 public:
   explicit MeanKernelWrapper(const PassKey<test::Test> &){};
 
   MeanKernelWrapper(const PassKey<KernelWrapperFactory> &,
-                    const BaseDescriptorWrapper *desc_wrapper)
+                    const BaseDescriptorWrapper &desc_wrapper)
       : MeanKernelWrapper(desc_wrapper){};
 
   MeanKernelWrapper(const PassKey<test::Test> &,
-                    const BaseDescriptorWrapper *desc_wrapper)
+                    const BaseDescriptorWrapper &desc_wrapper)
       : MeanKernelWrapper(desc_wrapper){};
 
   /**
@@ -72,7 +72,7 @@ public:
   virtual int getNumberPoints() const final;
   virtual const Arrangement &arrangement() const noexcept final;
   virtual void set(const Arrangement arrangement) final;
-  virtual void update(const BaseDescriptorWrapper *) final;
+  virtual void update(const BaseDescriptorWrapper &) final;
   virtual const std::any getPointerToRawData() const noexcept final;
   virtual std::type_index getTypeIndex() const noexcept final;
   virtual void print() const final;
@@ -82,8 +82,8 @@ public:
   create(const PassKey<KernelWrapperFactory> &, std::any data, const int rows,
          const int cols);
 
-  static std::istream &read(BaseKernelWrapper *, std::istream &);
-  static std::ostream &write(BaseKernelWrapper *, std::ostream &);
+  static std::istream &read(BaseKernelWrapper &, std::istream &);
+  static std::ostream &write(const BaseKernelWrapper &, std::ostream &);
 };
 
 inline std::unique_ptr<BaseKernelWrapper>
@@ -92,16 +92,25 @@ MeanKernelWrapper::create(const PassKey<KernelWrapperFactory> &key,
 
   if (std::type_index(data.type()) ==
       std::type_index(typeid(const BaseDescriptorWrapper *))) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::make_unique<MeanKernelWrapper>(
-        key, std::any_cast<const BaseDescriptorWrapper *>(data));
+        key, *std::any_cast<const BaseDescriptorWrapper *>(data));
 
   } else if (std::type_index(data.type()) ==
              std::type_index(typeid(BaseDescriptorWrapper *))) {
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::make_unique<MeanKernelWrapper>(
-        key, const_cast<const BaseDescriptorWrapper *>(
-                 std::any_cast<BaseDescriptorWrapper *>(data)));
+        key, const_cast<const BaseDescriptorWrapper &>(
+                 *std::any_cast<BaseDescriptorWrapper *>(data)));
+
+  } else if (std::type_index(data.type()) ==
+             std::type_index(typeid(BaseDescriptorWrapper &))) {
+    return std::make_unique<MeanKernelWrapper>(
+        key, const_cast<const BaseDescriptorWrapper &>(
+                 std::any_cast<BaseDescriptorWrapper &>(data)));
+
+  } else if (std::type_index(data.type()) ==
+             std::type_index(typeid(const BaseDescriptorWrapper &))) {
+    return std::make_unique<MeanKernelWrapper>(
+        key, std::any_cast<const BaseDescriptorWrapper &>(data));
 
   } else if (std::type_index(data.type()) ==
              std::type_index(typeid(std::vector<double>))) {

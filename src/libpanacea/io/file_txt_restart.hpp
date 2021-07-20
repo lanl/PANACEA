@@ -64,15 +64,28 @@ public:
   }
 
   /**
-   * Will always register methods to the pointer type index
+   * Will always register methods to the pointer and reference type index
+   * for write method will also register const pointer and const reference
    **/
   template <class T> static bool registerWriteMethod() {
-    if (write_methods_.count(std::type_index(typeid(T *)))) {
-      return false;
-    } else {
+    bool at_least_one_new_registration = false;
+    if (write_methods_.count(std::type_index(typeid(const T *))) == 0) {
+      at_least_one_new_registration = true;
+      write_methods_[std::type_index(typeid(const T *))] = T::write;
+    }
+    if (write_methods_.count(std::type_index(typeid(const T &))) == 0) {
+      at_least_one_new_registration = true;
+      write_methods_[std::type_index(typeid(const T &))] = T::write;
+    }
+    if (write_methods_.count(std::type_index(typeid(T *))) == 0) {
+      at_least_one_new_registration = true;
       write_methods_[std::type_index(typeid(T *))] = T::write;
     }
-    return true;
+    if (write_methods_.count(std::type_index(typeid(T &))) == 0) {
+      at_least_one_new_registration = true;
+      write_methods_[std::type_index(typeid(T &))] = T::write;
+    }
+    return at_least_one_new_registration;
   }
 
   /**
@@ -82,29 +95,37 @@ public:
    * one is detected with the correct function signature.
    **/
   template <class T> static bool registerReadMethod() {
-    if (read_methods_.count(std::type_index(typeid(T *)))) {
-      return false;
-    } else {
+    bool at_least_one_new_registration = false;
+    if (read_methods_.count(std::type_index(typeid(T *))) == 0) {
+      at_least_one_new_registration = true;
       read_methods_[std::type_index(typeid(T *))] = T::read;
     }
-    if (read_methods_.count(std::type_index(typeid(std::unique_ptr<T> *)))) {
-      return false;
-    } else {
+    if (read_methods_.count(std::type_index(typeid(T &))) == 0) {
+      at_least_one_new_registration = true;
+      read_methods_[std::type_index(typeid(T &))] = T::read;
+    }
+    if (read_methods_.count(std::type_index(typeid(std::unique_ptr<T> *))) ==
+        0) {
+      at_least_one_new_registration = true;
       read_methods_[std::type_index(typeid(std::unique_ptr<T> *))] = T::read;
     }
 
     if constexpr (has_post_read_initialization_method<
                       T, void(const settings::FileType, std::any)>::value) {
 
-      if (post_read_initialization_.count(std::type_index(typeid(T *)))) {
-        return false;
-      } else {
+      if (post_read_initialization_.count(std::type_index(typeid(T *))) == 0) {
+        at_least_one_new_registration = true;
         post_read_initialization_[std::type_index(typeid(T *))] =
+            T::postReadInitialization;
+      }
+      if (post_read_initialization_.count(std::type_index(typeid(T &))) == 0) {
+        at_least_one_new_registration = true;
+        post_read_initialization_[std::type_index(typeid(T &))] =
             T::postReadInitialization;
       }
     }
 
-    return true;
+    return at_least_one_new_registration;
   }
 
   virtual void read(std::any obj, std::istream &is) final;

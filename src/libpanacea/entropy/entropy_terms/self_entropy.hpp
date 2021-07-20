@@ -8,6 +8,7 @@
 
 // Local private PANACEA includes
 #include "distribution/distributions/distribution.hpp"
+#include "entropy/entropy_settings/entropy_settings.hpp"
 #include "private_settings.hpp"
 
 // Local public PANACEA includes
@@ -23,58 +24,89 @@ class EntropyFactory;
 
 class SelfEntropy : public EntropyTerm {
 private:
+  // The entropy term must own its own settings
+  // do not make unique_ptr if possible
+  EntropySettings entropy_settings_;
+
   std::unique_ptr<Distribution> distribution_;
+
+  EntropyTerm::State state_ = EntropyTerm::State::Shell;
 
 public:
   SelfEntropy(const PassKey<EntropyFactory> &key,
-              std::unique_ptr<Distribution> dist)
-      : distribution_(std::move(dist)){};
+              std::unique_ptr<Distribution> dist,
+              const EntropySettings &entropy_settings,
+              const EntropyTerm::State state = EntropyTerm::State::Shell)
+      : distribution_(std::move(dist)), entropy_settings_(entropy_settings),
+        state_(state){};
 
-  virtual EntropyTerm::ReadFunction
-  getReadFunction(const PassKey<EntropyTerm> &) override;
-  virtual EntropyTerm::WriteFunction
-  getWriteFunction(const PassKey<EntropyTerm> &) override;
+  virtual std::vector<EntropyTerm::ReadElement>
+  getReadElements(const PassKey<EntropyTerm> &) override;
+  virtual std::vector<EntropyTerm::WriteElement>
+  getWriteElements(const PassKey<EntropyTerm> &) const override;
+
+  virtual EntropyTerm::State state() const noexcept final { return state_; }
 
   virtual settings::EntropyType type() const noexcept final;
 
   virtual double
-  compute(const BaseDescriptorWrapper *descriptor_wrapper) override;
+  compute(const BaseDescriptorWrapper &descriptor_wrapper) override;
 
-  virtual double compute(const BaseDescriptorWrapper *descriptor_wrapper,
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
                          const int desc_ind) override;
 
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const EntropySettings &entropy_settings) override;
+
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const int desc_ind,
+                         const EntropySettings &entropy_settings) override;
+
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const PANACEASettings &panacea_settings) override;
+
+  virtual double compute(const BaseDescriptorWrapper &descriptor_wrapper,
+                         const int desc_ind,
+                         const PANACEASettings &panacea_settings) override;
+
   virtual std::vector<double>
-  compute_grad(const BaseDescriptorWrapper *descriptor_wrapper,
+  compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
+               const int desc_ind) override;
+
+  virtual std::vector<double>
+  compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
                const int desc_ind,
                const EntropySettings &entropy_settings) override;
 
   virtual std::vector<double>
-  compute_grad(const BaseDescriptorWrapper *descriptor_wrapper,
+  compute_grad(const BaseDescriptorWrapper &descriptor_wrapper,
                const int desc_ind,
                const PANACEASettings &panacea_settings) override;
 
-  virtual void set(const settings::EntropyOption option, std::any val) override;
+  virtual bool set(const settings::EntropyOption option, std::any val) override;
 
-  virtual const std::vector<int> &getDimensions() const noexcept override;
+  virtual std::any get(const settings::EntropyOption option) const override;
 
-  virtual void update(const BaseDescriptorWrapper *descriptor_wrapper) override;
+  virtual const std::vector<int> getDimensions() const noexcept override;
+
+  virtual void update(const BaseDescriptorWrapper &descriptor_wrapper) override;
 
   virtual void
-  initialize(const BaseDescriptorWrapper *descriptor_wrapper) override;
+  initialize(const BaseDescriptorWrapper &descriptor_wrapper) override;
 
   static std::unique_ptr<EntropyTerm>
   create(const PassKey<EntropyFactory> &key,
-         const BaseDescriptorWrapper *descriptor_wrapper,
-         EntropySettings *settings);
+         const BaseDescriptorWrapper &descriptor_wrapper,
+         const EntropySettings &settings);
 
   static std::unique_ptr<EntropyTerm> create(const PassKey<EntropyFactory> &key,
-                                             EntropySettings *settings);
+                                             const EntropySettings &settings);
 
   static std::vector<std::any> write(const settings::FileType file_type,
-                                     std::ostream &, EntropyTerm *);
+                                     std::ostream &, const EntropyTerm &);
 
   static io::ReadInstantiateVector read(const settings::FileType file_type,
-                                        std::istream &, EntropyTerm *);
+                                        std::istream &, EntropyTerm &);
 };
 
 } // namespace panacea

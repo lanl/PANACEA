@@ -25,11 +25,11 @@ class EntropyFactory {
 public:
   using EntropyCreateMethod = std::unique_ptr<EntropyTerm> (*)(
       const PassKey<EntropyFactory> &key,
-      const BaseDescriptorWrapper *descriptor_wrapper,
-      EntropySettings *settings);
+      const BaseDescriptorWrapper &descriptor_wrapper,
+      const EntropySettings &settings);
 
   using EntropyCreateShellMethod = std::unique_ptr<EntropyTerm> (*)(
-      const PassKey<EntropyFactory> &key, EntropySettings *settings);
+      const PassKey<EntropyFactory> &key, const EntropySettings &settings);
 
 private:
   static std::unordered_map<settings::EntropyType, EntropyCreateMethod>
@@ -58,10 +58,10 @@ public:
   }
 
   std::unique_ptr<EntropyTerm>
-  create(const BaseDescriptorWrapper *descriptor_wrapper,
-         EntropySettings *settings) const;
+  create(const BaseDescriptorWrapper &descriptor_wrapper,
+         const EntropySettings &settings) const;
 
-  std::unique_ptr<EntropyTerm> create(EntropySettings *settings) const;
+  std::unique_ptr<EntropyTerm> create(const EntropySettings &settings) const;
 };
 } // namespace panacea
 

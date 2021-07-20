@@ -19,7 +19,7 @@ class ReducedInvCovariance;
  */
 class PrimitiveAttributes {
 public:
-  Normalizer normalizer;
+  Normalizer *normalizer = nullptr; // Cannot be a copy
   BaseKernelWrapper *kernel_wrapper = nullptr;
   Covariance *covariance = nullptr;
   ReducedCovariance *reduced_covariance = nullptr;

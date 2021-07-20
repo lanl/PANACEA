@@ -9,6 +9,7 @@
 #include <any>
 #include <iomanip>
 #include <iostream>
+#include <typeindex>
 #include <vector>
 
 namespace panacea {
@@ -23,7 +24,7 @@ std::ostream &operator<<(std::ostream &os, const VectorType &vec_type) {
 }
 
 std::unique_ptr<Vector> createVector(const int rows, const VectorType type) {
-  auto vec_eig = std::unique_ptr<VectorEigen>(new VectorEigen);
+  auto vec_eig = std::make_unique<VectorEigen>();
   vec_eig->resize(rows);
   return vec_eig;
 }
@@ -32,45 +33,75 @@ std::vector<std::any> Vector::write(const settings::FileType file_type,
                                     std::ostream &os,
                                     std::any vector_instance) {
 
-  std::vector<std::any> nested_values;
+  const Vector &vec = [&]() -> const Vector & {
+    if (std::type_index(vector_instance.type()) ==
+        std::type_index(typeid(Vector *))) {
+      return const_cast<const Vector &>(
+          *std::any_cast<Vector *>(vector_instance));
+    } else if (std::type_index(vector_instance.type()) ==
+               std::type_index(typeid(Vector &))) {
+      return const_cast<const Vector &>(
+          std::any_cast<Vector &>(vector_instance));
+    } else if (std::type_index(vector_instance.type()) ==
+               std::type_index(typeid(const Vector *))) {
+      return *std::any_cast<const Vector *>(vector_instance);
+    } else if (std::type_index(vector_instance.type()) ==
+               std::type_index(typeid(const Vector &))) {
+      return std::any_cast<const Vector &>(vector_instance);
+    } else {
+      std::string error_msg = "Unsupported vector type encountered.";
+      PANACEA_FAIL(error_msg);
+    }
+    return std::any_cast<const Vector &>(vector_instance);
+  }();
+
   if (file_type == settings::FileType::TXTRestart ||
       file_type == settings::FileType::TXTKernelDistribution) {
-    Vector *vec = std::any_cast<Vector *>(vector_instance);
+
     os << "[Vector Type]\n";
-    os << vec->type() << "\n";
-    os << vec->direction() << "\n\n";
+    os << vec.type() << "\n";
+    os << vec.direction() << "\n\n";
     os << "[Vector]\n";
-    os << vec->rows() << " " << vec->cols() << "\n";
-    if (vec->direction() == Direction::AlongRows) {
-      for (int row = 0; row < vec->rows(); ++row) {
+    os << vec.rows() << " " << vec.cols() << "\n";
+    if (vec.direction() == Direction::AlongRows) {
+      for (int row = 0; row < vec.rows(); ++row) {
         os << std::setfill(' ') << std::setw(14) << std::setprecision(8)
-           << std::right << vec->operator()(row);
+           << std::right << vec(row);
         os << "\n";
       }
     } else {
-      for (int col = 0; col < vec->cols(); ++col) {
-        os << std::setfill(' ') << std::setw(14) << std::setprecision(8)
-           << std::right << vec->operator()(col);
+      for (int col = 0; col < vec.cols(); ++col) {
+        os << std::setfill(' ') << std::setw(14) << std::setprecision(15)
+           << std::right << vec(col);
         os << " ";
       }
     }
-
     os << "\n";
-  } else {
-    std::string error_msg =
-        "Vector cannot be written to the specified file type.";
-    PANACEA_FAIL(error_msg);
   }
-  return nested_values;
+  return std::vector<std::any>();
 }
 
 io::ReadInstantiateVector Vector::read(const settings::FileType file_type,
                                        std::istream &is,
                                        std::any vector_instance) {
 
+  Vector &vec = [&]() -> Vector & {
+    if (std::type_index(vector_instance.type()) ==
+        std::type_index(typeid(Vector *))) {
+      return *std::any_cast<Vector *>(vector_instance);
+    } else if (std::type_index(vector_instance.type()) ==
+               std::type_index(typeid(Vector &))) {
+      return std::any_cast<Vector &>(vector_instance);
+    } else {
+      std::string error_msg = "Unsupported vector type encountered.";
+      PANACEA_FAIL(error_msg);
+    }
+    return std::any_cast<Vector &>(vector_instance);
+  }();
+
   if (file_type == settings::FileType::TXTRestart ||
       file_type == settings::FileType::TXTKernelDistribution) {
-    Vector *vec = std::any_cast<Vector *>(vector_instance);
+
     std::string line = "";
     while (line.find("[Vector Type]", 0) == std::string::npos) {
       if (is.peek() == EOF) {
@@ -84,39 +115,39 @@ io::ReadInstantiateVector Vector::read(const settings::FileType file_type,
 
     std::getline(is, line);
     if (line.find("Eigen", 0) != std::string::npos) {
-      if (vec->type() != VectorType::Eigen &&
-          vec->type() != VectorType::Default) {
+      if (vec.type() != VectorType::Eigen &&
+          vec.type() != VectorType::Default) {
         std::cout << "Note reading vector data into a different type.";
         std::cout << " Restart file indicates an Eigen Vector was used.";
-        std::cout << " Data is being loaded into a " << vec->type()
+        std::cout << " Data is being loaded into a " << vec.type()
                   << " vector.\n";
       }
     } else if (line.find("Default", 0) != std::string::npos) {
-      if (vec->type() != VectorType::Eigen &&
-          vec->type() != VectorType::Default) {
+      if (vec.type() != VectorType::Eigen &&
+          vec.type() != VectorType::Default) {
         std::cout << "Note reading vector data into a different type.";
         std::cout << " Restart file indicates an Default Vector was used.";
-        std::cout << " Data is being loaded into a " << vec->type()
+        std::cout << " Data is being loaded into a " << vec.type()
                   << " vector.\n";
       }
     } else {
       std::cout << "Warning vector type value was not specified under the ";
       std::cout << "[Vector Type] header, or it was unrecognized. ";
       std::cout << "Attempting to load data into a vector of type ";
-      std::cout << vec->type() << "\n";
+      std::cout << vec.type() << "\n";
     }
 
     std::getline(is, line);
     if (line.find("Along Rows", 0) != std::string::npos) {
-      vec->direction(Direction::AlongRows);
+      vec.direction(Direction::AlongRows);
     } else if (line.find("Along Columns", 0) != std::string::npos) {
-      vec->direction(Direction::AlongColumns);
+      vec.direction(Direction::AlongColumns);
     } else {
       std::cout
           << "Warning vector direction value was not specified under the ";
       std::cout << "[Vector Type] header, or it was unrecognized. ";
       std::cout << "Assuming Row vector.\n";
-      vec->direction(Direction::AlongRows);
+      vec.direction(Direction::AlongRows);
     }
 
     while (line.find("[Vector]", 0) == std::string::npos) {
@@ -149,10 +180,10 @@ io::ReadInstantiateVector Vector::read(const settings::FileType file_type,
         error_msg += "line is: " + line + "\n";
         PANACEA_FAIL(error_msg);
       }
-      if (vec->direction() == Direction::AlongRows) {
-        vec->resize(rows);
+      if (vec.direction() == Direction::AlongRows) {
+        vec.resize(rows);
       } else {
-        vec->resize(cols);
+        vec.resize(cols);
       }
     }
 
@@ -163,10 +194,10 @@ io::ReadInstantiateVector Vector::read(const settings::FileType file_type,
         for (int col = 0; col < cols; ++col) {
           double value;
           ss_data >> value;
-          if (vec->direction() == Direction::AlongRows) {
-            vec->operator()(row) = value;
+          if (vec.direction() == Direction::AlongRows) {
+            vec(row) = value;
           } else {
-            vec->operator()(col) = value;
+            vec(col) = value;
           }
         }
       }

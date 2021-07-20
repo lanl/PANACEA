@@ -31,6 +31,7 @@ enum class CovarianceBuild { Allocate, NoAllocate };
 
 class BaseDescriptorWrapper;
 class Normalizer;
+class Reducer;
 
 /*
  * Class for storing the covariance matrix
@@ -49,74 +50,84 @@ class Normalizer;
  * allow the covariance matrix to assign 0's on problematic diagonal elements.
  */
 class Covariance {
-private:
-  /// The covariance matrix
-  std::unique_ptr<Matrix> matrix_ = nullptr;
-
-  /// Mean of the values used to create the covariance matrix
-  std::unique_ptr<Vector> mean_ = nullptr;
-
-  /// Total number of data points used in the creation of the covariance matrix
-  /// and in updating it
-  int total_number_data_pts_ = 0;
-
-  NormalizationState normalized_ = NormalizationState::Unnormalized;
 
 public:
-  Covariance() = default;
+  virtual ~Covariance();
 
-  explicit Covariance(const CovarianceBuild);
-
-  Covariance(const BaseDescriptorWrapper *desc_wrap,
-             const CovarianceOption opt = CovarianceOption::Strict);
-
-  Covariance(std::unique_ptr<Matrix> matrix, std::unique_ptr<Vector> mean,
-             int total_num_pts,
-             const CovarianceOption opt = CovarianceOption::Strict);
+  virtual settings::KernelCorrelation correlation() const noexcept = 0;
 
   /// Designed to update the covariance matrix
-  void update(const BaseDescriptorWrapper *desc_wrap);
+  virtual void update(const BaseDescriptorWrapper &desc_wrap) = 0;
 
   /// Don't want to allow for the matrix to be arbitrarily changed but do want
   /// to provide access to the actual covariance matrix elements
-  double operator()(const int row, const int col) const;
+  virtual double operator()(const int row, const int col) const = 0;
 
-  int rows() const;
-  int cols() const;
+  virtual int rows() const = 0;
+  virtual int cols() const = 0;
 
   /**
    * Check to ensure that the covariance instance is fully defined, e.g.
    * there are no nullptr's in the internal members.
    **/
-  bool defined() const noexcept;
+  virtual bool defined() const noexcept = 0;
 
-  double getDeterminant() const;
+  virtual double getDeterminant() const = 0;
 
-  double getMean(const int index) const;
+  virtual double getMean(const int index) const = 0;
 
-  int getCummulativeDescPoints() const;
+  /**
+   * The total number of points used to build the covariance matrix.
+   **/
+  virtual int getCummulativeDescPoints() const = 0;
 
-  bool is(const NormalizationState &state) const noexcept;
+  virtual bool is(const NormalizationState &state) const noexcept = 0;
 
   /**
    * Check if the covariance matrix is full of 0's, this can occur if all
    * data passed in is stacked on top of its self.
    **/
-  bool isZero(const double threshold = 1E-9) const noexcept;
+  virtual bool isZero(const double threshold = 1E-9) const noexcept = 0;
 
-  const NormalizationState &getNormalizationState() const noexcept;
+  virtual const NormalizationState &getNormalizationState() const noexcept = 0;
+
+  // Specific to Reducer class
+  virtual const Matrix &matrix(PassKey<Reducer>) const = 0;
 
   // Specific to Normalizer class
-  void set(PassKey<Normalizer>, NormalizationState state);
-  double &operator()(PassKey<Normalizer>, const int row, const int col);
+  virtual void set(PassKey<Normalizer>, NormalizationState state) = 0;
+  virtual double &operator()(PassKey<Normalizer>, const int row,
+                             const int col) = 0;
 
-  void print() const;
+  virtual void print() const = 0;
 
   static io::ReadInstantiateVector read(const settings::FileType file_type,
                                         std::istream &, std::any cov_instance);
 
   static std::vector<std::any> write(const settings::FileType file_type,
                                      std::ostream &, std::any cov_instance);
+
+  /*
+   * Factory method
+   **/
+  static std::unique_ptr<Covariance>
+  create(const BaseDescriptorWrapper &desc_wrap,
+         const settings::KernelCorrelation corr,
+         const CovarianceOption opt = CovarianceOption::Strict);
+
+  static std::unique_ptr<Covariance>
+  create(const BaseDescriptorWrapper &desc_wrap,
+         const settings::KernelCorrelation corr,
+         const settings::KernelAlgorithm opt);
+
+  static std::unique_ptr<Covariance>
+  create(const settings::KernelCorrelation corr);
+
+  static std::unique_ptr<Covariance>
+  create(const settings::KernelCorrelation, std::unique_ptr<Matrix> matrix,
+         std::unique_ptr<Vector> mean, int total_num_pts,
+         const CovarianceOption opt = CovarianceOption::Strict);
 };
+
 } // namespace panacea
 #endif // PANACEA_PRIVATE_COVARIANCE_H

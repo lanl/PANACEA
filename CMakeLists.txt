@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(ENABLE_TESTING "Build and enable unit testing" ON)
+option(ENABLE_MEMORY_TESTING "Build and enable unit testing" ${ENABLE_TESTING})
 
 ########################################################
 # Includes                                             #
@@ -54,9 +55,10 @@ endif()
 # Grab source files                                                    #
 ########################################################################
 
-file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp 
+file(GLOB SOURCES ${panacea_SOURCE_DIR}/src/libpanacea/*.cpp
   ${panacea_SOURCE_DIR}/src/libpanacea/*
   ${panacea_SOURCE_DIR}/src/libpanacea/attributes/*
+  ${panacea_SOURCE_DIR}/src/libpanacea/attributes/covariance/*
   ${panacea_SOURCE_DIR}/src/libpanacea/attribute_manipulators/*
   ${panacea_SOURCE_DIR}/src/libpanacea/descriptors/*
   ${panacea_SOURCE_DIR}/src/libpanacea/distribution/*
@@ -90,7 +92,7 @@ target_link_libraries(panacea Eigen3::Eigen)
 add_subdirectory(include/panacea)
 
 ###############################
-# Setup installation 
+# Setup installation
 ###############################
 include(cmake/PanaceaInstall.cmake)
 

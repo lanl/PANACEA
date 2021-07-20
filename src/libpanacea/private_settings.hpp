@@ -28,7 +28,7 @@ enum class Memory { SelfOwnIfRestartCrossOwn, Own, Share, OwnIfRestart };
 // be
 enum class CalculationType { Numerical, Analytical };
 
-enum class EquationSetting { None, IgnoreExp };
+enum class EquationSetting { None, IgnoreExp, IgnoreExpAndPrefactor };
 
 enum class None { None };
 
@@ -119,6 +119,26 @@ template <class T> constexpr const char *toString(T setting) {
     } else if (setting == CalculationType::Analytical) {
       return "CalculationType=Analytical";
     }
+  } else if constexpr (std::is_same<RandomizeDimensions, T>::value) {
+    if (setting == RandomizeDimensions::Yes) {
+      return "RandomizeDimensions=Yes";
+    } else if (setting == RandomizeDimensions::No) {
+      return "RandomizeDimensions=No";
+    }
+  } else if constexpr (std::is_same<RandomizeNumberDimensions, T>::value) {
+    if (setting == RandomizeNumberDimensions::Yes) {
+      return "RandomizeNumberDimensions=Yes";
+    } else if (setting == RandomizeNumberDimensions::No) {
+      return "RandomizeNumberDimensions=No";
+    }
+  } else if constexpr (std::is_same<EntropyOption, T>::value) {
+    if (setting == EntropyOption::Weight) {
+      return "EntropyOption=Weight";
+    } else if (setting == EntropyOption::IncrementRatio) {
+      return "EntropyOption=IncrementRatio";
+    } else if (setting == EntropyOption::NumericalGrad) {
+      return "EntropyOption=NumericalGrad";
+    }
   }
   return "";
 }
@@ -130,6 +150,7 @@ std::ostream &operator<<(std::ostream &os, const settings::None &);
 std::ostream &operator<<(std::ostream &os, const settings::GradSetting &);
 std::ostream &operator<<(std::ostream &os, const settings::KernelAlgorithm &);
 std::ostream &operator<<(std::ostream &os, const settings::KernelMemory &);
+std::ostream &operator<<(std::ostream &os, const settings::Memory &);
 
 std::istream &operator>>(std::istream &is, settings::CalculationType &);
 std::istream &operator>>(std::istream &is, settings::EquationSetting &);
@@ -137,6 +158,7 @@ std::istream &operator>>(std::istream &is, settings::None &);
 std::istream &operator>>(std::istream &is, settings::GradSetting &);
 std::istream &operator>>(std::istream &is, settings::KernelAlgorithm &);
 std::istream &operator>>(std::istream &is, settings::KernelMemory &);
+std::istream &operator>>(std::istream &is, settings::Memory &);
 
 } // namespace panacea
 #endif // PANACEA_PRIVATE_SETTINGS_H

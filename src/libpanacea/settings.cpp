@@ -44,7 +44,7 @@ PANACEASettingsBuilder &PANACEASettingsBuilder::set(
 }
 
 PANACEASettingsBuilder &
-PANACEASettingsBuilder::weightEntropTermBy(const double &weight) {
+PANACEASettingsBuilder::weightEntropyTermBy(const double &weight) {
   ent_settings_.weight_ = weight;
   return *this;
 }
@@ -58,6 +58,13 @@ PANACEASettingsBuilder::setIncrementRatioTo(const double &inc_ratio) {
 PANACEASettingsBuilder &
 PANACEASettingsBuilder::setNumericalGradTo(const bool &on_or_off) {
   ent_settings_.numerical_grad_ = on_or_off;
+  return *this;
+}
+
+PANACEASettingsBuilder &
+PANACEASettingsBuilder::setMaxNumberDescriptorDimensions(
+    const int number_dimensions) {
+  ent_settings_.max_number_dimensions_ = number_dimensions;
   return *this;
 }
 
@@ -88,6 +95,18 @@ PANACEASettingsBuilder &PANACEASettingsBuilder::set(
 PANACEASettingsBuilder &
 PANACEASettingsBuilder::set(const settings::KernelNormalization &kern_norm) {
   ent_settings_.kern_norm_ = kern_norm;
+  return *this;
+}
+
+PANACEASettingsBuilder &
+PANACEASettingsBuilder::set(const settings::RandomizeDimensions &rand_dims) {
+  ent_settings_.randomize_dimensions_ = rand_dims;
+  return *this;
+}
+
+PANACEASettingsBuilder &PANACEASettingsBuilder::set(
+    const settings::RandomizeNumberDimensions &rand_num_dims) {
+  ent_settings_.randomize_number_dimensions_ = rand_num_dims;
   return *this;
 }
 
@@ -260,6 +279,40 @@ std::ostream &operator<<(std::ostream &os,
     os << "OwnIfRestart";
   } else if (kern_mem == settings::KernelMemory::Share) {
     os << "Share";
+  }
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const settings::Memory &mem) {
+  if (mem == settings::Memory::SelfOwnIfRestartCrossOwn) {
+    os << "SelfOwnIfRestartCrossOwn";
+  } else if (mem == settings::Memory::Own) {
+    os << "Own";
+  } else if (mem == settings::Memory::OwnIfRestart) {
+    os << "OwnIfRestart";
+  } else if (mem == settings::Memory::Share) {
+    os << "Share";
+  }
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os,
+                         const settings::RandomizeDimensions &random_dims) {
+  if (random_dims == settings::RandomizeDimensions::Yes) {
+    os << "Yes";
+  } else if (random_dims == settings::RandomizeDimensions::No) {
+    os << "No";
+  }
+  return os;
+}
+
+std::ostream &
+operator<<(std::ostream &os,
+           const settings::RandomizeNumberDimensions &random_num_dims) {
+  if (random_num_dims == settings::RandomizeNumberDimensions::Yes) {
+    os << "Yes";
+  } else if (random_num_dims == settings::RandomizeNumberDimensions::No) {
+    os << "No";
   }
   return os;
 }
@@ -586,7 +639,66 @@ std::istream &operator>>(std::istream &is, settings::KernelMemory &kern_mem) {
     error_msg += "Line is: " + line + "\n";
     PANACEA_FAIL(error_msg);
   }
+  return is;
+}
 
+std::istream &operator>>(std::istream &is, settings::Memory &mem) {
+  std::string line;
+  std::getline(is, line);
+  if (line.find("SelfOwnIfRestartCrossOwn", 0) != std::string::npos) {
+    mem = settings::Memory::SelfOwnIfRestartCrossOwn;
+  } else if (line.find("OwnIfRestart", 0) != std::string::npos) {
+    mem = settings::Memory::OwnIfRestart;
+  } else if (line.find("Own", 0) != std::string::npos) {
+    mem = settings::Memory::Own;
+  } else if (line.find("Share", 0) != std::string::npos) {
+    mem = settings::Memory::Share;
+  } else {
+    std::string error_msg =
+        "Unrecognized memory option while reading istream.\n";
+    error_msg += "Accepted memory options are:\n";
+    error_msg += "SelfOwnIfRestartCrossOwn\nOwnIfRestart\nOwn\nShare\n";
+    error_msg += "Line is: " + line + "\n";
+    PANACEA_FAIL(error_msg);
+  }
+  return is;
+}
+
+std::istream &operator>>(std::istream &is,
+                         settings::RandomizeDimensions &rand_dims) {
+  std::string line;
+  std::getline(is, line);
+  if (line.find("Yes", 0) != std::string::npos) {
+    rand_dims = settings::RandomizeDimensions::Yes;
+  } else if (line.find("No", 0) != std::string::npos) {
+    rand_dims = settings::RandomizeDimensions::No;
+  } else {
+    std::string error_msg =
+        "Unrecognized randomize dimensions setting while reading istream.\n";
+    error_msg += "Accepted randomize dimensions settings are:\n";
+    error_msg += "Yes\nNo\n";
+    error_msg += "Line is: " + line + "\n";
+    PANACEA_FAIL(error_msg);
+  }
+  return is;
+}
+
+std::istream &operator>>(std::istream &is,
+                         settings::RandomizeNumberDimensions &rand_dims) {
+  std::string line;
+  std::getline(is, line);
+  if (line.find("Yes", 0) != std::string::npos) {
+    rand_dims = settings::RandomizeNumberDimensions::Yes;
+  } else if (line.find("No", 0) != std::string::npos) {
+    rand_dims = settings::RandomizeNumberDimensions::No;
+  } else {
+    std::string error_msg = "Unrecognized randomize number dimensions setting "
+                            "while reading istream.\n";
+    error_msg += "Accepted randomize number dimensions settings are:\n";
+    error_msg += "Yes\nNo\n";
+    error_msg += "Line is: " + line + "\n";
+    PANACEA_FAIL(error_msg);
+  }
   return is;
 }
 

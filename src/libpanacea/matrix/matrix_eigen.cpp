@@ -21,6 +21,18 @@ double MatrixEigen::getDeterminant() const {
   return matrix_->determinant();
 }
 
+bool MatrixEigen::isZero(const double threshold) const noexcept {
+  assert(threshold > 0.0);
+  // Because it is symmetric only need to check one half
+  for (int i = 0; i < matrix_->rows(); ++i) {
+    for (int j = i; j < matrix_->cols(); ++j) {
+      if (std::abs(matrix_->operator()(i, j)) > threshold)
+        return false;
+    }
+  }
+  return true;
+}
+
 void MatrixEigen::resize(const int rows, const int cols) {
   assert(rows >= 0);
   assert(cols >= 0);
@@ -37,11 +49,11 @@ MatrixEigen &MatrixEigen::operator=(const MatrixEigen &mat) {
   return *this;
 }
 
-MatrixEigen &MatrixEigen::operator=(const Matrix *mat) {
-  this->resize(mat->rows(), mat->cols());
-  for (int row = 0; row < mat->rows(); ++row) {
-    for (int col = 0; col < mat->cols(); ++col) {
-      this->operator()(row, col) = mat->operator()(row, col);
+MatrixEigen &MatrixEigen::operator=(const Matrix &mat) {
+  this->resize(mat.rows(), mat.cols());
+  for (int row = 0; row < mat.rows(); ++row) {
+    for (int col = 0; col < mat.cols(); ++col) {
+      this->operator()(row, col) = mat(row, col);
     }
   }
   return *this;
@@ -85,15 +97,14 @@ Eigen::MatrixXd MatrixEigen::pseudoInverse() const {
   return matrix_->completeOrthogonalDecomposition().pseudoInverse();
 }
 
-void pseudoInverse(Matrix *return_mat, const MatrixEigen *mat) {
-  assert(return_mat != nullptr);
-  assert(return_mat->rows() == mat->rows());
-  assert(return_mat->cols() == mat->cols());
+void pseudoInverse(Matrix &return_mat, const MatrixEigen &mat) {
+  assert(return_mat.rows() == mat.rows());
+  assert(return_mat.cols() == mat.cols());
 
-  auto temp_mat = mat->pseudoInverse();
+  auto temp_mat = mat.pseudoInverse();
   for (int row = 0; row < temp_mat.rows(); ++row) {
     for (int col = 0; col < temp_mat.cols(); ++col) {
-      return_mat->operator()(row, col) = temp_mat(row, col);
+      return_mat(row, col) = temp_mat(row, col);
     }
   }
 }

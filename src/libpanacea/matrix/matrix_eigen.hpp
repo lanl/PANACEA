@@ -23,11 +23,13 @@ public:
   virtual ~MatrixEigen() final{};
   virtual const MatrixType type() const final;
   virtual MatrixEigen &operator=(const MatrixEigen &mat) final;
-  virtual MatrixEigen &operator=(const Matrix *mat) final;
+  virtual MatrixEigen &operator=(const Matrix &mat) final;
   virtual double &operator()(const int row, const int col) final;
   virtual double operator()(const int row, const int col) const final;
 
   virtual double getDeterminant() const final;
+
+  virtual bool isZero(const double threshold) const noexcept final;
 
   virtual void resize(const int rows, const int cols) final;
 
@@ -43,7 +45,7 @@ public:
   Eigen::MatrixXd pseudoInverse() const;
 };
 
-void pseudoInverse(Matrix *return_mat, const MatrixEigen *mat);
+void pseudoInverse(Matrix &return_mat, const MatrixEigen &mat);
 
 } // namespace panacea
 

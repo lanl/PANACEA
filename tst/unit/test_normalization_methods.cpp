@@ -23,7 +23,7 @@ TEST_CASE("Testing:normalization_method_factory", "[unit,panacea]") {
       norm_method_factory.create(settings::KernelNormalization::Variance);
 
   auto extra_args = settings::None::None;
-  std::vector<double> norm_coefficients = norm_method(&dwrapper, extra_args);
+  std::vector<double> norm_coefficients = norm_method(dwrapper, extra_args);
 
   // Only be two dimensions
   REQUIRE(norm_coefficients.size() == 2);

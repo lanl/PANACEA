@@ -4,6 +4,7 @@
 
 // Local private PANACEA includes
 #include "attributes/covariance.hpp"
+#include "attributes/dimensions.hpp"
 #include "attributes/reduced_covariance.hpp"
 
 // Standard includes
@@ -40,7 +41,7 @@ public:
    * @return
    */
   ReducedCovariance reduce(const Covariance &cov,
-                           std::vector<int> preferred_dimensions) const;
+                           Dimensions preferred_dimensions) const;
 };
 } // namespace panacea
 

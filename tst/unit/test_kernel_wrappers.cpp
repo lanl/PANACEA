@@ -29,7 +29,7 @@ TEST_CASE("Testing:kernel_wrapper creation", "[unit,panacea]") {
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data, 3, 1);
 
   WHEN("Testing mean kernel wrapper") {
-    MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
+    MeanKernelWrapper mean_kwrapper(test::Test::key(), dwrapper);
     REQUIRE(mean_kwrapper.rows() == 1);
     REQUIRE(mean_kwrapper.cols() == 1);
     REQUIRE(mean_kwrapper.getNumberDimensions() == 1);
@@ -40,7 +40,7 @@ TEST_CASE("Testing:kernel_wrapper creation", "[unit,panacea]") {
   }
 
   WHEN("Testing median kernel wrapper") {
-    MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
+    MedianKernelWrapper median_kwrapper(test::Test::key(), dwrapper);
     REQUIRE(median_kwrapper.getNumberDimensions() == 1);
     REQUIRE(median_kwrapper.getNumberPoints() == 3);
     REQUIRE(median_kwrapper.rows() == 1);
@@ -52,7 +52,7 @@ TEST_CASE("Testing:kernel_wrapper creation", "[unit,panacea]") {
   WHEN("Testing template kernel wrapper with vector<vector<double>> *") {
     auto type_ind_data = std::type_index(typeid(vector<vector<double>> *));
     KernelWrapper<vector<vector<double>> *> kwrapper(test::Test::key(),
-                                                     &dwrapper);
+                                                     dwrapper);
     REQUIRE(kwrapper.getNumberDimensions() == 1);
     REQUIRE(kwrapper.getNumberPoints() == 3);
     REQUIRE(kwrapper.rows() == 3);
@@ -69,7 +69,7 @@ TEST_CASE("Testing:kernel_wrapper creation", "[unit,panacea]") {
     DescriptorWrapper<vector<vector<double>>> dwrapper2(data, 3, 1);
     auto type_ind_data = std::type_index(typeid(vector<vector<double>>));
     KernelWrapper<vector<vector<double>>> kwrapper(test::Test::key(),
-                                                   &dwrapper2);
+                                                   dwrapper2);
 
     REQUIRE(kwrapper.getNumberDimensions() == 1);
     REQUIRE(kwrapper.getNumberPoints() == 3);
@@ -114,7 +114,7 @@ TEST_CASE("Testing:mean kernel_wrapper write & read", "[unit,panacea]") {
   std::vector<std::vector<double>> data = {{1.0, 4.0}, {2.0, 9.0}, {6.0, 2.0}};
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data, 3, 2);
 
-  MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
+  MeanKernelWrapper mean_kwrapper(test::Test::key(), dwrapper);
   BaseKernelWrapper *kwrapper_ptr = &mean_kwrapper;
 
   std::fstream fs;
@@ -138,40 +138,12 @@ TEST_CASE("Testing:mean kernel_wrapper write & read", "[unit,panacea]") {
   REQUIRE(mean_kwrapper2.getTypeIndex() == type_ind_data);
 }
 
-TEST_CASE("Testing:mean kernel_wrapper write & read using fileio",
-          "[integration,panacea]") {
-
-  std::vector<std::vector<double>> data = {{1.0, 4.0}, {2.0, 9.0}, {6.0, 2.0}};
-  DescriptorWrapper<vector<vector<double>> *> dwrapper(&data, 3, 2);
-
-  MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
-  BaseKernelWrapper *kwrapper_ptr = &mean_kwrapper;
-
-  io::FileIOFactory file_io_factory;
-  auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
-
-  restart_file->write(kwrapper_ptr, "test_kernel_mean_full.restart");
-
-  MeanKernelWrapper mean_kwrapper2(test::Test::key());
-  kwrapper_ptr = &mean_kwrapper2;
-  restart_file->read(kwrapper_ptr, "test_kernel_mean_full.restart");
-
-  REQUIRE(mean_kwrapper2.rows() == 1);
-  REQUIRE(mean_kwrapper2.cols() == 2);
-  REQUIRE(mean_kwrapper2.getNumberDimensions() == 2);
-  REQUIRE(mean_kwrapper2.getNumberPoints() == 3);
-  REQUIRE(mean_kwrapper2.at(0, 0) == Approx(3.0));
-  REQUIRE(mean_kwrapper2.at(0, 1) == Approx(5.0));
-  auto type_ind_data = std::type_index(typeid(vector<double>));
-  REQUIRE(mean_kwrapper2.getTypeIndex() == type_ind_data);
-}
-
 TEST_CASE("Testing:median kernel_wrapper write & read", "[unit,panacea]") {
 
   std::vector<std::vector<double>> data = {{1.0, 4.0}, {2.0, 9.0}, {6.0, 2.0}};
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data, 3, 2);
 
-  MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
+  MedianKernelWrapper median_kwrapper(test::Test::key(), dwrapper);
   BaseKernelWrapper *kwrapper_ptr = &median_kwrapper;
 
   std::fstream fs;
@@ -202,8 +174,7 @@ TEST_CASE("Testing:template kernel_wrapper write & read", "[unit,panacea]") {
   DescriptorWrapper<vector<vector<double>> *> dwrapper(&data, 3, 2);
 
   auto type_ind_data = std::type_index(typeid(vector<vector<double>>));
-  KernelWrapper<vector<vector<double>> *> kwrapper(test::Test::key(),
-                                                   &dwrapper);
+  KernelWrapper<vector<vector<double>> *> kwrapper(test::Test::key(), dwrapper);
   BaseKernelWrapper *kwrapper_ptr = &kwrapper;
 
   std::fstream fs;
@@ -245,9 +216,10 @@ TEST_CASE("Testing:kernel_wrapper creation with factory", "[unit,panacea]") {
         settings::KernelCount::OneToOne, settings::KernelPrimitive::Gaussian,
         settings::KernelNormalization::None, settings::KernelMemory::Share,
         settings::KernelCenterCalculation::None,
-        settings::KernelAlgorithm::Flexible);
+        settings::KernelAlgorithm::Flexible, settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No, -1);
 
-    auto kwrapper = kern_factory.create(&dwrapper, specs);
+    auto kwrapper = kern_factory.create(dwrapper, specs);
   }
 }
 
@@ -262,8 +234,8 @@ TEST_CASE("Testing:kernel_wrappers with update", "[unit,panacea]") {
   DescriptorWrapper<vector<vector<double>> *> dwrapper2(&data2, 5, 1);
 
   WHEN("Testing mean kernel wrapper") {
-    MeanKernelWrapper mean_kwrapper(test::Test::key(), &dwrapper);
-    mean_kwrapper.update(&dwrapper2);
+    MeanKernelWrapper mean_kwrapper(test::Test::key(), dwrapper);
+    mean_kwrapper.update(dwrapper2);
     REQUIRE(mean_kwrapper.getNumberDimensions() == 1);
     REQUIRE(mean_kwrapper.getNumberPoints() == 8);
     //
@@ -277,8 +249,8 @@ TEST_CASE("Testing:kernel_wrappers with update", "[unit,panacea]") {
   }
 
   WHEN("Testing median kernel wrapper") {
-    MedianKernelWrapper median_kwrapper(test::Test::key(), &dwrapper);
-    median_kwrapper.update(&dwrapper2);
+    MedianKernelWrapper median_kwrapper(test::Test::key(), dwrapper);
+    median_kwrapper.update(dwrapper2);
     REQUIRE(median_kwrapper.getNumberDimensions() == 1);
     REQUIRE(median_kwrapper.getNumberPoints() == 8);
     //
@@ -295,7 +267,7 @@ TEST_CASE("Testing:kernel_wrappers with update", "[unit,panacea]") {
         std::any_cast<vector<vector<double>> *>(dwrapper.getPointerToRawData()),
         3, 1);
 
-    kwrapper.update(&dwrapper2);
+    kwrapper.update(dwrapper2);
     REQUIRE(kwrapper.getNumberDimensions() == 1);
     // Unlike mean and median the new points will
     // simply overwrite the existing

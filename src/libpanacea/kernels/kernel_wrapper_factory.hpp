@@ -44,7 +44,7 @@ public:
    * in the descriptor wrapper.
    **/
   std::unique_ptr<BaseKernelWrapper>
-  create(const BaseDescriptorWrapper *desc_wrapper,
+  create(const BaseDescriptorWrapper &desc_wrapper,
          const KernelSpecification &kern_specification) const;
 
   /**

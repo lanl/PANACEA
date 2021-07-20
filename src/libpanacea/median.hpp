@@ -113,14 +113,12 @@ public:
     } else if constexpr (std::is_same<typename std::remove_const<T>::type,
                                       std::vector<std::deque<double>>>::value) {
 
-      std::cout << "DEQUE MEDIAN" << std::endl;
       if (data2d.size() == 0)
         return median;
 
       const int rows = data2d.size();
       const int cols = data2d.at(0).size();
       if constexpr (dir == Direction::AlongRows) {
-        std::cout << "Along rows" << std::endl;
         median.reserve(rows);
         if (cols % 2 == 1) {
           // is odd
@@ -138,28 +136,21 @@ public:
           }
         }
       } else {
-        std::cout << "Along columns" << std::endl;
         median.reserve(cols);
         if (rows % 2 == 1) {
           // is odd
-          std::cout << "Number of columns " << cols << std::endl;
-          std::cout << "Number of rows " << rows << std::endl;
           for (int col = 0; col < cols; ++col) {
             const auto local_column = createSortedColumn(data2d, col);
-            std::cout << "Odd number value is " << local_column.at(rows / 2)
-                      << std::endl;
             median.push_back(local_column.at(rows / 2));
           }
         } else {
           // is even
-          std::cout << "Number of columns " << cols << std::endl;
           for (int col = 0; col < cols; ++col) {
             const auto local_column = createSortedColumn(data2d, col);
             const double avg_of_two =
                 (local_column.at(rows / 2) + local_column.at(rows / 2) - 1) *
                 0.5;
             median.push_back(avg_of_two);
-            std::cout << "Adding element to median " << avg_of_two << std::endl;
           }
         }
       }

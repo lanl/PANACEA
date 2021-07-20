@@ -54,21 +54,20 @@ PANACEA::wrap(std::any data, const int rows, const int cols) const {
 }
 
 std::unique_ptr<EntropyTerm>
-PANACEA::create(const BaseDescriptorWrapper *dwrapper,
+PANACEA::create(const BaseDescriptorWrapper &dwrapper,
                 const PANACEASettings &settings) const {
 
   EntropySettings entropy_settings(settings);
   EntropyFactory entropy_factory;
-  return entropy_factory.create(dwrapper, &entropy_settings);
+  return entropy_factory.create(dwrapper, entropy_settings);
 }
 
 std::unique_ptr<EntropyTerm>
 PANACEA::create(const PANACEASettings &settings) const {
 
   EntropySettings entropy_settings(settings);
-
   EntropyFactory entropy_factory;
-  return entropy_factory.create(&entropy_settings);
+  return entropy_factory.create(entropy_settings);
 }
 
 std::unique_ptr<io::FileIO>

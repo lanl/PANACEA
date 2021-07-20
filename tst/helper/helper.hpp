@@ -50,6 +50,33 @@ public:
 };
 
 /*
+ * Creates data containing three rows of
+ * arrays with the values:
+ *
+ * [0][0] = 1.0 [0][1] = 4.0
+ * [1][0] = 2.0 [1][1] = 5.0
+ * [2][0] = 3.0 [2][1] = 6.0
+ */
+class ArrayData2 {
+public:
+  ArrayData2();
+  ~ArrayData2();
+  double **data;
+};
+
+/**
+ * Data for a few atoms using SNAP descriptors
+ **/
+class ArrayDataNonTrivial {
+public:
+  ArrayDataNonTrivial();
+  ~ArrayDataNonTrivial();
+  double **data;
+  int rows = 21;
+  int cols = 30;
+};
+
+/*
  * Will populate primitive attributes class with
  * appropriate members:
  *
