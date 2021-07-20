@@ -9,6 +9,7 @@
 #include "distribution/distribution_settings/distribution_settings.hpp"
 #include "distribution/distributions/distribution.hpp"
 #include "distribution/distributions/kernel_distribution.hpp"
+#include "entropy_term_common.hpp"
 #include "entropy/entropy_settings/entropy_settings.hpp"
 #include "error.hpp"
 
@@ -133,10 +134,11 @@ std::vector<double> CrossEntropy::compute_grad(
      * Here is the problem I'm calling compute from within the gradiant method
      * but have no way of indicating that.
      */
-    inv_distribution.push_back(
-        -1.0 / distribution_->compute(descriptor_wrapper, desc_ind2,
+    double density = distribution_->compute(descriptor_wrapper, desc_ind2,
                                       entropy_settings_.getDistributionSettings(
-                                          Method::ComputeGradiant)));
+                                          Method::ComputeGradiant));
+    inv_distribution.push_back(
+        -1.0 / density);
   }
 
   std::vector<double> grad = distribution_->compute_grad(
@@ -149,6 +151,11 @@ std::vector<double> CrossEntropy::compute_grad(
   std::transform(grad.begin(), grad.end(), grad.begin(),
                  std::bind(std::multiplies<double>(), std::placeholders::_1,
                            inv_distribution.at(desc_ind)));
+
+    // Replace nan values with 0.0
+    std::replace_if(grad.begin(), grad.end(), std::isnan<double>, 0.0);
+    std::replace_if(grad.begin(), grad.end(), is_pos_inf, std::numeric_limits<double>::max());
+    std::replace_if(grad.begin(), grad.end(), is_neg_inf, std::numeric_limits<double>::min());
 
   return grad;
 }

@@ -17,6 +17,7 @@
 // Standard includes
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 namespace panacea {
@@ -115,9 +116,11 @@ std::vector<double> GaussUncorrelated::compute_grad(
     const double diff = (descriptors(descriptor_ind, dim) -
                          attributes_.kernel_wrapper->at(kernel_index_, dim)) /
                         (norm_coeffs.at(dim) * norm_coeffs.at(dim));
+
     grad.at(dim) =
         diff * attributes_.reduced_inv_covariance->operator()(index, index) *
         exp_term;
+
     ++index;
   }
 
@@ -127,7 +130,6 @@ std::vector<double> GaussUncorrelated::compute_grad(
       grad.at(dim) *= -1.0;
     }
   }
-
   return grad;
 }
 
