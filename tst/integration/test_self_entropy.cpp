@@ -102,8 +102,10 @@ TEST_CASE("Testing:self entropy", "[integration,panacea]") {
     REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
     REQUIRE(val1 != Approx(val2));
 
+    // Check that values are the same
     REQUIRE(std::abs(grad1.at(0)) == Approx(std::abs(grad2.at(0))));
-    REQUIRE(grad1.at(0) != Approx(grad2.at(0)));
+    // Check that opposite in direction
+    REQUIRE(grad1.at(0) == Approx(grad2.at(0) * -1.0));
   }
 }
 
