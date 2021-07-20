@@ -99,6 +99,9 @@ EntropySettings::EntropySettings(const PANACEASettings &in,
     if (dist_type == DistributionType::Kernel) {
       auto kern_dist_settings = std::make_unique<KernelDistributionSettings>();
 
+      kern_dist_settings->dist_settings.setMaxNumberDimensions(
+          in.getMaxNumberOfDimensions());
+
       if (auto val = in.get<KernelCorrelation>()) {
         kern_dist_settings->dist_settings.set(*val);
       }
