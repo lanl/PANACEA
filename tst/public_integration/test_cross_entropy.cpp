@@ -500,11 +500,10 @@ TEST_CASE("Testing:panacea non trivial cross entropy max number dimensions ",
 
     std::cout << "Total dimensions used " << dimensions.size() << std::endl;
 
-    REQUIRE(dimensions.size() <=5 );
+    REQUIRE(dimensions.size() <= 5);
     REQUIRE(dimensions.size() > 0);
   }
 }
-
 
 TEST_CASE("Testing:panacea non trivial cross entropy read & write with fileio "
           "with shell plus initialize",

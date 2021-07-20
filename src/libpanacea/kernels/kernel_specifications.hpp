@@ -139,7 +139,9 @@ public:
   }
 
   int getMaxNumberDimensions() const noexcept { return max_number_dimensions_; }
-  void setMaxNumberDimensions(const int dims) noexcept { max_number_dimensions_ = dims; }
+  void setMaxNumberDimensions(const int dims) noexcept {
+    max_number_dimensions_ = dims;
+  }
 
   inline bool is(const settings::KernelCorrelation correlation) const noexcept {
     if (correlation == kern_correlation_)
