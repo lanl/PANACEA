@@ -89,6 +89,8 @@ public:
 
   virtual const std::vector<int> getDimensions() const noexcept override;
 
+  virtual const int getMaximumNumberOfDimensions() const noexcept override;
+
   virtual void update(const BaseDescriptorWrapper &descriptor_wrapper) override;
 
   virtual void

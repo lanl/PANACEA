@@ -52,6 +52,8 @@ public:
    **/
   virtual const Dimensions &getDimensions() const noexcept = 0;
 
+  virtual const int getMaximumNumberOfDimensions() const noexcept = 0;
+
   virtual void update(const BaseDescriptorWrapper &descriptor_wrapper) = 0;
 
   virtual void initialize(const BaseDescriptorWrapper &descriptor_wrapper) = 0;

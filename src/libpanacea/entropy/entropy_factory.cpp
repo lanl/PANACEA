@@ -30,7 +30,7 @@ std::unique_ptr<EntropyTerm> decorate(std::unique_ptr<EntropyTerm> ent_term,
     ent_term = std::make_unique<Weight>(std::move(ent_term),
                                         settings.weight.value_or(1.0));
   }
-  if (settings.numerical_grad_switch) {
+  if (settings.numerical_grad_switch.value_or(false)) {
     ent_term = std::make_unique<NumericalGrad>(std::move(ent_term));
   }
   return ent_term;

@@ -41,8 +41,8 @@ std::vector<double> NumericalGrad::compute_grad(
      * The easiest and most performant way to numerically calculate the gradiant
      * is to simply adjust values in the descriptor wrapper compute the entropy
      * and then return it to it's original value, this avoids an unneccessary
-     *copy of the descriptor wrapper which could be quite complex and costly to
-     *create.
+     * copy of the descriptor wrapper which could be quite complex and costly to
+     * create.
      *
      * Though we are making changes to the descriptor wrapper within this
      * method, it is being returned to it's original state before returning.
@@ -50,7 +50,7 @@ std::vector<double> NumericalGrad::compute_grad(
     BaseDescriptorWrapper &descriptor_wrapper =
         const_cast<BaseDescriptorWrapper &>(const_descriptor_wrapper);
 
-    const int ndim = getDimensions().size();
+    const int ndim = getMaximumNumberOfDimensions();
     std::vector<double> grad(ndim, 0.0);
 
     // Cycle through dimensions
@@ -98,7 +98,7 @@ std::vector<double> NumericalGrad::compute_grad(
     BaseDescriptorWrapper &descriptor_wrapper =
         const_cast<BaseDescriptorWrapper &>(const_descriptor_wrapper);
 
-    const int ndim = getDimensions().size();
+    const int ndim = getMaximumNumberOfDimensions();
     std::vector<double> grad(ndim, 0.0);
 
     // Cycle through dimensions

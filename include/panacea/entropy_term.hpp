@@ -177,9 +177,18 @@ public:
                const int desc_ind, const PANACEASettings &panacea_settings) = 0;
 
   /**
-   * Get the actual dimensions used by the entropy term
+   * Get the actual dimensions used by the entropy term, there is a filtering
+   * process used to actally pick which dimensions are used. For instance
+   * if linear dependence is detected between dimensions then some of the
+   * dimensions will be removed.
    **/
   virtual const std::vector<int> getDimensions() const noexcept = 0;
+
+  /**
+   * Get the maximum number of dimension, this will be based on the dimensions
+   * provided by the descriptor wrapper.
+   **/
+  virtual const int getMaximumNumberOfDimensions() const noexcept = 0;
 
   /**
    * Update the internal members.

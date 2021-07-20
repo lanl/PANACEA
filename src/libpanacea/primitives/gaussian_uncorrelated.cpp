@@ -26,7 +26,6 @@ void GaussUncorrelated::update(PrimitiveAttributes &&attributes) {
   assert(attributes.kernel_wrapper != nullptr);
   attributes_ = std::move(attributes);
   double determinant = attributes_.reduced_covariance->getDeterminant();
-  attributes_.reduced_covariance->print();
   if (determinant <= 0.0) {
     std::string error_msg =
         "Determinant is less than 0 value: " + std::to_string(determinant);
