@@ -203,4 +203,3 @@ TEST_CASE("Testing:covariance read & write", "[unit,panacea]") {
   REQUIRE(cov2.getCummulativeDescPoints() == 6);
   REQUIRE(cov2.getNormalizationState() == NormalizationState::Unnormalized);
 }
-

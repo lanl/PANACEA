@@ -55,9 +55,9 @@ public:
              std::pow(
                  constants::PI_SQRT * constants::SQRT_2,
                  static_cast<double>(
-                     attributes_.reduced_covariance->getNumberDimensions())))) {
+                     attributes_.reduced_covariance->getNumberDimensions())))){
 
-  };
+        };
 
   virtual const settings::KernelPrimitive type() const noexcept final;
   virtual const settings::KernelCorrelation correlation() const noexcept final;

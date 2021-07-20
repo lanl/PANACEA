@@ -109,6 +109,5 @@ public:
                                         std::istream &, EntropyTerm &);
 };
 
-
 } // namespace panacea
 #endif // PANACEA_PRIVATE_CROSSENTROPY_H
