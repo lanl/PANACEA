@@ -205,6 +205,10 @@ const std::vector<int> SelfEntropy::getDimensions() const noexcept {
   return distribution_->getDimensions().convert();
 }
 
+const int SelfEntropy::getMaximumNumberOfDimensions() const noexcept {
+  return distribution_->getMaximumNumberOfDimensions();
+}
+
 void SelfEntropy::update(const BaseDescriptorWrapper &descriptor_wrapper) {
   if (state_ != EntropyTerm::State::Initialized) {
     std::string error_msg =

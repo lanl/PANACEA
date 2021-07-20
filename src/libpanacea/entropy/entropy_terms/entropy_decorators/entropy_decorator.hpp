@@ -109,6 +109,10 @@ public:
     return entropy_term_->getDimensions();
   }
 
+  virtual const int getMaximumNumberOfDimensions() const noexcept override {
+    return entropy_term_->getMaximumNumberOfDimensions();
+  }
+
   virtual void
   update(const BaseDescriptorWrapper &descriptor_wrapper) override {
     return entropy_term_->update(descriptor_wrapper);

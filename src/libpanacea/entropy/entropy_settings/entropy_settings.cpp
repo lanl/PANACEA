@@ -117,6 +117,12 @@ EntropySettings::EntropySettings(const PANACEASettings &in,
       if (auto val = in.get<KernelCenterCalculation>()) {
         kern_dist_settings->dist_settings.set(*val);
       }
+      if (auto val = in.get<RandomizeDimensions>()) {
+        kern_dist_settings->dist_settings.set(*val);
+      }
+      if (auto val = in.get<RandomizeNumberDimensions>()) {
+        kern_dist_settings->dist_settings.set(*val);
+      }
       if (auto val = in.get<PANACEAAlgorithm>()) {
         if (*val == PANACEAAlgorithm::Flexible) {
           kern_dist_settings->dist_settings.set(KernelAlgorithm::Flexible);

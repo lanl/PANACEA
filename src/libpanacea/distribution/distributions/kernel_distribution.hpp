@@ -79,6 +79,8 @@ public:
 
   virtual const Dimensions &getDimensions() const noexcept final;
 
+  virtual const int getMaximumNumberOfDimensions() const noexcept final;
+
   /**
    * Will update the underlying data groups and ensure the prefactor is up to
    *date.

@@ -201,6 +201,10 @@ const std::vector<int> CrossEntropy::getDimensions() const noexcept {
   return distribution_->getDimensions().convert();
 }
 
+const int CrossEntropy::getMaximumNumberOfDimensions() const noexcept {
+  return distribution_->getMaximumNumberOfDimensions();
+}
+
 void CrossEntropy::update(const BaseDescriptorWrapper &descriptor_wrapper) {
   if (state_ != EntropyTerm::State::Initialized) {
     std::string error_msg = "Trying to update an entropy term before it has ";

@@ -171,6 +171,11 @@ const Dimensions &KernelDistribution::getDimensions() const noexcept {
   return prim_grp_.reduced_covariance->getReducedDimensions();
 }
 
+const int KernelDistribution::getMaximumNumberOfDimensions() const noexcept {
+  assert(prim_grp_.covariance != nullptr);
+  // Rows and columns should be equivalent
+  return prim_grp_.covariance->rows();
+}
 void KernelDistribution::update(
     const BaseDescriptorWrapper &descriptor_wrapper) {
   prim_grp_.update(descriptor_wrapper);
