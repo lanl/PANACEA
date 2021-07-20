@@ -14,3 +14,4 @@ using namespace panacea;
 TEST_CASE("Testing:primitive_factory trivial constructor", "[unit,panacea]") {
   PrimitiveFactory prim_factory;
 }
+

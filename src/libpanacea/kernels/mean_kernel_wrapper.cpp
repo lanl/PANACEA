@@ -87,7 +87,6 @@ void MeanKernelWrapper::update(const BaseDescriptorWrapper &dwrapper) {
       mean.calculate<const BaseDescriptorWrapper &, Direction::AlongColumns>(
           dwrapper);
 
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   const double new_num_pts = static_cast<double>(dwrapper.getNumberPoints());
   const double inv_total_num_pts =
       1.0 / static_cast<double>(number_pts_mean_ + new_num_pts);
@@ -122,7 +121,6 @@ const settings::KernelCount MeanKernelWrapper::count() const noexcept {
 std::istream &MeanKernelWrapper::read(BaseKernelWrapper &kwrapper_instance,
                                       std::istream &is) {
 
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   MeanKernelWrapper &kwrapper_mean =
       dynamic_cast<MeanKernelWrapper &>(kwrapper_instance);
 
@@ -151,7 +149,6 @@ std::istream &MeanKernelWrapper::read(BaseKernelWrapper &kwrapper_instance,
 std::ostream &
 MeanKernelWrapper::write(const BaseKernelWrapper &kwrapper_instance,
                          std::ostream &os) {
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   const MeanKernelWrapper &kwrapper_mean =
       dynamic_cast<const MeanKernelWrapper &>(kwrapper_instance);
   os << "[Total Number Points]\n";

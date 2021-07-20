@@ -57,11 +57,6 @@ public:
                  static_cast<double>(
                      attributes_.reduced_covariance->getNumberDimensions())))) {
 
-    std::cout << "determinant "
-              << attributes_.reduced_covariance->getDeterminant() << std::endl;
-    std::cout << "dims "
-              << attributes_.reduced_covariance->getNumberDimensions()
-              << std::endl;
   };
 
   virtual const settings::KernelPrimitive type() const noexcept final;

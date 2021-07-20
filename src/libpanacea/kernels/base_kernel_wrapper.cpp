@@ -28,31 +28,26 @@ BaseKernelWrapper::write(const settings::FileType file_type, std::ostream &os,
   const BaseKernelWrapper &kwrapper = [&]() -> const BaseKernelWrapper & {
     if (std::type_index(kwrapper_instance.type()) ==
         std::type_index(typeid(BaseKernelWrapper *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return const_cast<const BaseKernelWrapper &>(
           *std::any_cast<BaseKernelWrapper *>(kwrapper_instance));
 
     } else if (std::type_index(kwrapper_instance.type()) ==
                std::type_index(typeid(BaseKernelWrapper &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return const_cast<const BaseKernelWrapper &>(
           std::any_cast<BaseKernelWrapper &>(kwrapper_instance));
 
     } else if (std::type_index(kwrapper_instance.type()) ==
                std::type_index(typeid(const BaseKernelWrapper *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<const BaseKernelWrapper *>(kwrapper_instance);
 
     } else if (std::type_index(kwrapper_instance.type()) ==
                std::type_index(typeid(const BaseKernelWrapper &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const BaseKernelWrapper &>(kwrapper_instance);
 
     } else {
       std::string error_msg = "Unsupported Base kernel wrapper type.";
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<const BaseKernelWrapper &>(kwrapper_instance);
   }();
 
@@ -87,17 +82,14 @@ BaseKernelWrapper::read(const settings::FileType file_type, std::istream &is,
   BaseKernelWrapper &kwrapper = [&]() -> BaseKernelWrapper & {
     if (std::type_index(kwrapper_instance.type()) ==
         std::type_index(typeid(BaseKernelWrapper *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<BaseKernelWrapper *>(kwrapper_instance);
 
     } else if (std::type_index(kwrapper_instance.type()) ==
                std::type_index(typeid(BaseKernelWrapper &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<BaseKernelWrapper &>(kwrapper_instance);
 
     } else if (std::type_index(kwrapper_instance.type()) ==
                std::type_index(typeid(std::unique_ptr<BaseKernelWrapper> *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *((std::any_cast<std::unique_ptr<BaseKernelWrapper> *>(
                     kwrapper_instance))
                    ->get());
@@ -110,7 +102,6 @@ BaseKernelWrapper::read(const settings::FileType file_type, std::istream &is,
       }
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<BaseKernelWrapper &>(kwrapper_instance);
   }();
 

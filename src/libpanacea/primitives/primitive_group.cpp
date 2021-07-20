@@ -76,31 +76,26 @@ std::vector<std::any> PrimitiveGroup::write(const settings::FileType file_type,
   const PrimitiveGroup &prim_grp = [&]() -> const PrimitiveGroup & {
     if (std::type_index(prim_grp_instance.type()) ==
         std::type_index(typeid(PrimitiveGroup *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return const_cast<const PrimitiveGroup &>(
           *std::any_cast<PrimitiveGroup *>(prim_grp_instance));
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(PrimitiveGroup &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return const_cast<const PrimitiveGroup &>(
           std::any_cast<PrimitiveGroup &>(prim_grp_instance));
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(const PrimitiveGroup *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<const PrimitiveGroup *>(prim_grp_instance);
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(const PrimitiveGroup &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<const PrimitiveGroup &>(prim_grp_instance);
     } else {
       std::string error_msg = "Unable to cast to PrimitiveGroup * while";
       error_msg += " trying to write primitive group to restart file.";
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<const PrimitiveGroup &>(prim_grp_instance);
   }();
 
@@ -114,7 +109,6 @@ std::vector<std::any> PrimitiveGroup::write(const settings::FileType file_type,
         &prim_grp.specification, prim_grp.normalizer.get(),
         prim_grp.kernel_wrapper.get(), prim_grp.covariance.get()};
   }
-
   return nested_values;
 }
 
@@ -125,12 +119,10 @@ PrimitiveGroup::read(const settings::FileType file_type, std::istream &is,
   PrimitiveGroup &prim_grp = [&]() -> PrimitiveGroup & {
     if (std::type_index(prim_grp_instance.type()) ==
         std::type_index(typeid(PrimitiveGroup *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(PrimitiveGroup &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
     } else {
@@ -138,7 +130,6 @@ PrimitiveGroup::read(const settings::FileType file_type, std::istream &is,
       error_msg += " trying to write primitive group to restart file.";
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
   }();
 
@@ -181,12 +172,10 @@ void PrimitiveGroup::postReadKernelSpecsInitialization(
   PrimitiveGroup &prim_grp = [&]() -> PrimitiveGroup & {
     if (std::type_index(prim_grp_instance.type()) ==
         std::type_index(typeid(PrimitiveGroup &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(PrimitiveGroup *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
     } else {
       std::string error_msg = "Unable to cast to PrimitiveGroup * while";
@@ -197,7 +186,6 @@ void PrimitiveGroup::postReadKernelSpecsInitialization(
       }
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
   }();
 
@@ -232,12 +220,10 @@ void PrimitiveGroup::postReadInitialization(const settings::FileType file_type,
   PrimitiveGroup &prim_grp = [&]() -> PrimitiveGroup & {
     if (std::type_index(prim_grp_instance.type()) ==
         std::type_index(typeid(PrimitiveGroup &))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
 
     } else if (std::type_index(prim_grp_instance.type()) ==
                std::type_index(typeid(PrimitiveGroup *))) {
-      std::cout << __FILE__ << ":" << __LINE__ << std::endl;
       return *std::any_cast<PrimitiveGroup *>(prim_grp_instance);
 
     } else {
@@ -249,7 +235,6 @@ void PrimitiveGroup::postReadInitialization(const settings::FileType file_type,
       }
       PANACEA_FAIL(error_msg);
     }
-    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     return std::any_cast<PrimitiveGroup &>(prim_grp_instance);
   }();
 

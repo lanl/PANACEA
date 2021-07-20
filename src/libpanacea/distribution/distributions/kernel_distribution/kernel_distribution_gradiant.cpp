@@ -110,7 +110,6 @@ std::vector<double> gradiant_one_to_one_wrt_kern_only(
   std::transform(
       grad.begin(), grad.end(), grad.begin(),
       std::bind(std::multiplies<double>(), std::placeholders::_1, pre_factor));
-
   return grad;
 }
 

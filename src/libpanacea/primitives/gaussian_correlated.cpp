@@ -83,31 +83,23 @@ GaussCorrelated::compute(const BaseDescriptorWrapper &descriptor_wrapper,
   for (const int dim : chosen_dims) {
     diff.push_back((descs(descriptor_ind, dim) - kerns.at(kernel_index_, dim)) /
                    norm_coeffs.at(dim));
-    std::cout << "dim " << dim << " diff " << diff.back() << " norm_coeff "
-              << norm_coeffs.at(dim) << std::endl;
   }
 
-  std::cout << "Red Inv Cov" << std::endl;
   std::vector<double> MxV;
   MxV.reserve(red_ndim);
   for (int j = 0; j < red_ndim; ++j) {
     double val = 0.0;
     for (int k = 0; k < red_ndim; ++k) {
-      std::cout << red_inv_cov(j, k) << " ";
       val += red_inv_cov(j, k) * diff.at(k);
     }
     MxV.push_back(val);
-    std::cout << std::endl;
   }
 
   double VxMxV = 0.0;
   for (int i = 0; i < red_ndim; ++i) {
     VxMxV += diff.at(i) * MxV.at(i);
   }
-  std::cout << "VxMxV " << VxMxV << std::endl;
   double result = pre_factor_ * std::exp(-0.5 * VxMxV);
-  std::cout << "result " << result << " pre_factor_ " << pre_factor_
-            << std::endl;
   if (result == 0.0) {
     return std::numeric_limits<double>::min();
   }

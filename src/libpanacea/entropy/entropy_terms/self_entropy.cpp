@@ -155,7 +155,6 @@ std::vector<double> SelfEntropy::compute_grad(
     std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(),
                    std::plus<double>());
   }
-
   return grad;
 }
 

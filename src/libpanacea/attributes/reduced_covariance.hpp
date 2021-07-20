@@ -16,6 +16,7 @@
 #include <vector>
 
 namespace panacea {
+
 class Inverter;
 class Reducer;
 
