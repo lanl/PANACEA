@@ -151,7 +151,7 @@ GaussCorrelated::compute_grad(const BaseDescriptorWrapper &descriptors,
     }
 
     // It is appropriate to have a gradiant of 0.0 e.g. at the peak of a kernel
-    grad.at(dim)*=exp_term* 1.0 / norm_coeffs.at(dim);
+    grad.at(dim) *= exp_term * 1.0 / norm_coeffs.at(dim);
     ++index1;
   }
 

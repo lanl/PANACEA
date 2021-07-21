@@ -468,8 +468,9 @@ TEST_CASE("Testing:panacea cross entropy single median weighted",
   delete[] desc_data;
 }
 
-TEST_CASE("Testing:panacea non trivial cross entropy randomize number dimensions ",
-          "[end-to-end,panacea]") {
+TEST_CASE(
+    "Testing:panacea non trivial cross entropy randomize number dimensions ",
+    "[end-to-end,panacea]") {
 
   // pi - public interface
   PANACEA panacea_pi;
@@ -503,7 +504,6 @@ TEST_CASE("Testing:panacea non trivial cross entropy randomize number dimensions
     auto dimensions = cross_ent_shell->getDimensions();
 
     std::cout << "Total dimensions used " << dimensions.size() << std::endl;
-
   }
   GIVEN("A cross entropy term that is fully initialized on construction") {
     // Creating settings for generating a cross entropy term where the
