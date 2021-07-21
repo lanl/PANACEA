@@ -22,45 +22,46 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:panacea non trivial distribution read & write with fileio "
-          "with shell plus initialize",
+TEST_CASE("Testing:panacea non trivial distribution",
           "[integration,panacea]") {
+  
+  SECTION("read & write with fileio with shell plus initialize"){
+    test::ArrayDataNonTrivial array_data;
 
-  test::ArrayDataNonTrivial array_data;
+    DescriptorWrapper<double ***> dwrapper(&(array_data.data), array_data.rows,
+        array_data.cols);
 
-  DescriptorWrapper<double ***> dwrapper(&(array_data.data), array_data.rows,
-                                         array_data.cols);
+    KernelDistributionSettings kernel_settings;
 
-  KernelDistributionSettings kernel_settings;
+    kernel_settings.dist_settings = std::move(KernelSpecification(
+          settings::KernelCorrelation::Uncorrelated, settings::KernelCount::Single,
+          settings::KernelPrimitive::Gaussian,
+          settings::KernelNormalization::Variance, settings::KernelMemory::Own,
+          settings::KernelCenterCalculation::Mean,
+          settings::KernelAlgorithm::Flexible, settings::RandomizeDimensions::No,
+          settings::RandomizeNumberDimensions::No, constants::automate));
 
-  kernel_settings.dist_settings = std::move(KernelSpecification(
-      settings::KernelCorrelation::Uncorrelated, settings::KernelCount::Single,
-      settings::KernelPrimitive::Gaussian,
-      settings::KernelNormalization::Variance, settings::KernelMemory::Own,
-      settings::KernelCenterCalculation::Mean,
-      settings::KernelAlgorithm::Flexible, settings::RandomizeDimensions::No,
-      settings::RandomizeNumberDimensions::No, constants::automate));
+    DistributionSettings *distribution_settings = &kernel_settings;
 
-  DistributionSettings *distribution_settings = &kernel_settings;
+    DistributionFactory dist_factory;
 
-  DistributionFactory dist_factory;
+    auto dist1 = dist_factory.create(kernel_settings);
 
-  auto dist1 = dist_factory.create(kernel_settings);
+    dist1->initialize(dwrapper);
 
-  dist1->initialize(dwrapper);
+    double dist_val1 = dist1->compute(dwrapper, 0, *distribution_settings);
 
-  double dist_val1 = dist1->compute(dwrapper, 0, *distribution_settings);
+    io::FileIOFactory file_io_factory;
+    auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
 
-  io::FileIOFactory file_io_factory;
-  auto restart_file = file_io_factory.create(settings::FileType::TXTRestart);
+    restart_file->write(dist1.get(), "distribution_nontrivial.restart");
 
-  restart_file->write(dist1.get(), "distribution_nontrivial.restart");
+    auto dist2 = dist_factory.create(kernel_settings);
+    restart_file->read(dist2.get(), "distribution_nontrivial.restart");
+    double dist_val2 = dist2->compute(dwrapper, 0, *distribution_settings);
 
-  auto dist2 = dist_factory.create(kernel_settings);
-  restart_file->read(dist2.get(), "distribution_nontrivial.restart");
-  double dist_val2 = dist2->compute(dwrapper, 0, *distribution_settings);
-
-  REQUIRE(dist_val1 == Approx(dist_val2));
+    REQUIRE(dist_val1 == Approx(dist_val2));
+  }
 }
 
 TEST_CASE("Testing:distributions write & read with fileio",

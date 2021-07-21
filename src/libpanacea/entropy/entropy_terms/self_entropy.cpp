@@ -157,7 +157,8 @@ std::vector<double> SelfEntropy::compute_grad(
                    std::plus<double>());
   }
 
-  std::replace_if(grad.begin(), grad.end(), std::isnan<double>, 0.0);
+  auto f = [](double const val) { return std::isnan(val); };
+  std::replace_if(grad.begin(), grad.end(), f, 0.0);
   std::replace_if(grad.begin(), grad.end(), is_pos_inf,
                   std::numeric_limits<double>::max());
   std::replace_if(grad.begin(), grad.end(), is_neg_inf,
