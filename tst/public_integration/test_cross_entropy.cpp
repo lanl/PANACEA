@@ -468,6 +468,72 @@ TEST_CASE("Testing:panacea cross entropy single median weighted",
   delete[] desc_data;
 }
 
+TEST_CASE("Testing:panacea non trivial cross entropy randomize number dimensions ",
+          "[end-to-end,panacea]") {
+
+  // pi - public interface
+  PANACEA panacea_pi;
+
+  test::ArrayDataNonTrivial array_data;
+  auto dwrapper =
+      panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
+
+  GIVEN("A cross entropy shell that is initialized") {
+    // Creating settings for generating a cross entropy term where the
+    // underlying distribution is using a kernel estimator
+    // that is a guassian kernel.
+    PANACEASettings panacea_settings = PANACEASettings::make()
+                                           .set(EntropyType::Cross)
+                                           .set(PANACEAAlgorithm::Flexible)
+                                           .distributionType(kernel)
+                                           .set(KernelPrimitive::Gaussian)
+                                           .set(RandomizeNumberDimensions::Yes)
+                                           .set(KernelCount::Single)
+                                           .set(KernelCorrelation::Correlated)
+                                           .set(KernelCenterCalculation::Median)
+                                           .set(KernelNormalization::Variance);
+
+    std::unique_ptr<EntropyTerm> cross_ent_shell =
+        panacea_pi.create(panacea_settings);
+
+    CHECK_NOTHROW(cross_ent_shell->initialize(*dwrapper));
+
+    CHECK_NOTHROW(cross_ent_shell->compute(*dwrapper));
+
+    auto dimensions = cross_ent_shell->getDimensions();
+
+    std::cout << "Total dimensions used " << dimensions.size() << std::endl;
+
+  }
+  GIVEN("A cross entropy term that is fully initialized on construction") {
+    // Creating settings for generating a cross entropy term where the
+    // underlying distribution is using a kernel estimator
+    // that is a guassian kernel.
+    PANACEASettings panacea_settings = PANACEASettings::make()
+                                           .set(EntropyType::Cross)
+                                           .set(PANACEAAlgorithm::Flexible)
+                                           .distributionType(kernel)
+                                           .set(KernelPrimitive::Gaussian)
+                                           .set(RandomizeNumberDimensions::Yes)
+                                           .set(KernelCount::Single)
+                                           .set(KernelCorrelation::Correlated)
+                                           .set(KernelCenterCalculation::Median)
+                                           .set(KernelNormalization::Variance);
+
+    std::unique_ptr<EntropyTerm> cross_ent =
+        panacea_pi.create(*dwrapper, panacea_settings);
+
+    CHECK_NOTHROW(cross_ent->compute(*dwrapper));
+
+    auto dimensions = cross_ent->getDimensions();
+
+    std::cout << "Total dimensions used " << dimensions.size() << std::endl;
+
+    REQUIRE(dimensions.size() > 0);
+    REQUIRE(dimensions.size() <= dwrapper->getNumberDimensions());
+  }
+}
+
 TEST_CASE("Testing:panacea non trivial cross entropy max number dimensions ",
           "[end-to-end,panacea]") {
 
