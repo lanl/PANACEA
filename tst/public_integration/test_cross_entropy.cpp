@@ -580,11 +580,6 @@ TEST_CASE("Testing:panacea non trivial cross entropy read & write",
     // pi - public interface
     PANACEA panacea_pi;
 
-    // Data has the following form, where it is stacked
-    //
-    //         col1   col2   col3
-    // row1    1.0     2.0    3.0  Point 1
-    // row2    1.0     2.0    3.0  Point 2
     test::ArrayDataNonTrivial array_data;
     auto dwrapper =
         panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
