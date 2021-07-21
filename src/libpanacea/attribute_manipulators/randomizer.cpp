@@ -9,6 +9,7 @@
 
 // Standard includes
 #include <algorithm>
+#include <iostream>
 #include <random>
 
 namespace panacea {

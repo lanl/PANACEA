@@ -146,11 +146,12 @@ GaussCorrelated::compute_grad(const BaseDescriptorWrapper &descriptors,
   for (const int dim : chosen_dims) {
     int index2 = 0;
     for (const int dim2 : chosen_dims) {
-      grad.at(dim) += exp_term * diff.at(dim2) * red_inv_cov(index1, index2) *
-                      1.0 / norm_coeffs.at(dim);
-
+      grad.at(dim) += diff.at(dim2) * red_inv_cov(index1, index2);
       ++index2;
     }
+
+    // It is appropriate to have a gradiant of 0.0 e.g. at the peak of a kernel
+    grad.at(dim) *= exp_term * 1.0 / norm_coeffs.at(dim);
     ++index1;
   }
 
@@ -159,7 +160,6 @@ GaussCorrelated::compute_grad(const BaseDescriptorWrapper &descriptors,
       grad.at(dim) *= -1.0;
     }
   }
-
   return grad;
 }
 

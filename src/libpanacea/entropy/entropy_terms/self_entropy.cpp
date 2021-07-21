@@ -10,6 +10,7 @@
 #include "distribution/distributions/distribution.hpp"
 #include "distribution/distributions/kernel_distribution.hpp"
 #include "entropy/entropy_settings/entropy_settings.hpp"
+#include "entropy_term_common.hpp"
 #include "error.hpp"
 #include "settings.hpp"
 
@@ -155,6 +156,13 @@ std::vector<double> SelfEntropy::compute_grad(
     std::transform(grad.begin(), grad.end(), grad_temp.begin(), grad.begin(),
                    std::plus<double>());
   }
+
+  std::replace_if(grad.begin(), grad.end(), std::isnan<double>, 0.0);
+  std::replace_if(grad.begin(), grad.end(), is_pos_inf,
+                  std::numeric_limits<double>::max());
+  std::replace_if(grad.begin(), grad.end(), is_neg_inf,
+                  std::numeric_limits<double>::min());
+
   return grad;
 }
 
