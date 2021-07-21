@@ -22,24 +22,23 @@
 using namespace std;
 using namespace panacea;
 
-TEST_CASE("Testing:panacea non trivial distribution",
-          "[integration,panacea]") {
-  
-  SECTION("read & write with fileio with shell plus initialize"){
+TEST_CASE("Testing:panacea non trivial distribution", "[integration,panacea]") {
+
+  SECTION("read & write with fileio with shell plus initialize") {
     test::ArrayDataNonTrivial array_data;
 
     DescriptorWrapper<double ***> dwrapper(&(array_data.data), array_data.rows,
-        array_data.cols);
+                                           array_data.cols);
 
     KernelDistributionSettings kernel_settings;
 
     kernel_settings.dist_settings = std::move(KernelSpecification(
-          settings::KernelCorrelation::Uncorrelated, settings::KernelCount::Single,
-          settings::KernelPrimitive::Gaussian,
-          settings::KernelNormalization::Variance, settings::KernelMemory::Own,
-          settings::KernelCenterCalculation::Mean,
-          settings::KernelAlgorithm::Flexible, settings::RandomizeDimensions::No,
-          settings::RandomizeNumberDimensions::No, constants::automate));
+        settings::KernelCorrelation::Uncorrelated,
+        settings::KernelCount::Single, settings::KernelPrimitive::Gaussian,
+        settings::KernelNormalization::Variance, settings::KernelMemory::Own,
+        settings::KernelCenterCalculation::Mean,
+        settings::KernelAlgorithm::Flexible, settings::RandomizeDimensions::No,
+        settings::RandomizeNumberDimensions::No, constants::automate));
 
     DistributionSettings *distribution_settings = &kernel_settings;
 

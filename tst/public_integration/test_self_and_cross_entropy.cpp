@@ -21,35 +21,35 @@ using namespace panacea::settings;
 TEST_CASE("Testing:panacea weighted self and cross entropy",
           "[end-to-end,panacea]") {
 
-  SECTION(" with numerical grad restart fileio"){
+  SECTION(" with numerical grad restart fileio") {
     // Creating settings for generating a self entropy term where the
     // underlying distribution is using an kernel estimator
     // that is a guassian kernel.
     PANACEASettings panacea_settings_self =
-      PANACEASettings::make()
-      .set(EntropyType::Self)
-      .set(PANACEAAlgorithm::Flexible)
-      .distributionType(kernel)
-      .setNumericalGradTo(true)
-      .weightEntropyTermBy(1.0)
-      .set(KernelPrimitive::Gaussian)
-      .set(KernelCount::OneToOne)
-      .set(KernelCorrelation::Uncorrelated)
-      .set(KernelCenterCalculation::None)
-      .set(KernelNormalization::None);
+        PANACEASettings::make()
+            .set(EntropyType::Self)
+            .set(PANACEAAlgorithm::Flexible)
+            .distributionType(kernel)
+            .setNumericalGradTo(true)
+            .weightEntropyTermBy(1.0)
+            .set(KernelPrimitive::Gaussian)
+            .set(KernelCount::OneToOne)
+            .set(KernelCorrelation::Uncorrelated)
+            .set(KernelCenterCalculation::None)
+            .set(KernelNormalization::None);
 
     PANACEASettings panacea_settings_cross =
-      PANACEASettings::make()
-      .set(EntropyType::Cross)
-      .set(PANACEAAlgorithm::Flexible)
-      .distributionType(kernel)
-      .setNumericalGradTo(true)
-      .weightEntropyTermBy(2.0)
-      .set(KernelPrimitive::Gaussian)
-      .set(KernelCount::Single)
-      .set(KernelCorrelation::Correlated)
-      .set(KernelCenterCalculation::Mean)
-      .set(KernelNormalization::None);
+        PANACEASettings::make()
+            .set(EntropyType::Cross)
+            .set(PANACEAAlgorithm::Flexible)
+            .distributionType(kernel)
+            .setNumericalGradTo(true)
+            .weightEntropyTermBy(2.0)
+            .set(KernelPrimitive::Gaussian)
+            .set(KernelCount::Single)
+            .set(KernelCorrelation::Correlated)
+            .set(KernelCenterCalculation::Mean)
+            .set(KernelNormalization::None);
 
     // pi - public interface
     PANACEA panacea_pi;
@@ -71,9 +71,9 @@ TEST_CASE("Testing:panacea weighted self and cross entropy",
         panacea_pi.create(*dwrapper, panacea_settings_cross));
 
     std::vector<double> self_grad_before =
-      entropy_terms.at(0)->compute_grad(*dwrapper, 0);
+        entropy_terms.at(0)->compute_grad(*dwrapper, 0);
     std::vector<double> cross_grad_before =
-      entropy_terms.at(1)->compute_grad(*dwrapper, 0);
+        entropy_terms.at(1)->compute_grad(*dwrapper, 0);
     double before_total_entropy = 0.0;
     for (auto &ent_term : entropy_terms) {
       before_total_entropy += ent_term->compute(*dwrapper);
@@ -104,9 +104,9 @@ TEST_CASE("Testing:panacea weighted self and cross entropy",
     }
 
     std::vector<double> self_grad_after =
-      entropy_terms.at(0)->compute_grad(*dwrapper, 0);
+        entropy_terms.at(0)->compute_grad(*dwrapper, 0);
     std::vector<double> cross_grad_after =
-      entropy_terms.at(1)->compute_grad(*dwrapper, 0);
+        entropy_terms.at(1)->compute_grad(*dwrapper, 0);
     REQUIRE(before_total_entropy == Approx(after_total_entropy));
   }
 }
