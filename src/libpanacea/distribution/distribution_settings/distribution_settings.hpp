@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <any>
+#include <memory>
 
 namespace panacea {
 

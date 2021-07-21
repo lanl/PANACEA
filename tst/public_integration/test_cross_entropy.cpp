@@ -468,69 +468,71 @@ TEST_CASE("Testing:panacea cross entropy single median weighted",
   delete[] desc_data;
 }
 
-TEST_CASE(
-    "Testing:panacea non trivial cross entropy randomize number dimensions ",
-    "[end-to-end,panacea]") {
+TEST_CASE("Testing:panacea non trivial cross entropy", "[end-to-end,panacea]") {
 
-  // pi - public interface
-  PANACEA panacea_pi;
+  SECTION("randomize number of dimensions") {
+    // pi - public interface
+    PANACEA panacea_pi;
 
-  test::ArrayDataNonTrivial array_data;
-  auto dwrapper =
-      panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
+    test::ArrayDataNonTrivial array_data;
+    auto dwrapper =
+        panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
 
-  GIVEN("A cross entropy shell that is initialized") {
-    // Creating settings for generating a cross entropy term where the
-    // underlying distribution is using a kernel estimator
-    // that is a guassian kernel.
-    PANACEASettings panacea_settings = PANACEASettings::make()
-                                           .set(EntropyType::Cross)
-                                           .set(PANACEAAlgorithm::Flexible)
-                                           .distributionType(kernel)
-                                           .set(KernelPrimitive::Gaussian)
-                                           .set(RandomizeNumberDimensions::Yes)
-                                           .set(KernelCount::Single)
-                                           .set(KernelCorrelation::Correlated)
-                                           .set(KernelCenterCalculation::Median)
-                                           .set(KernelNormalization::Variance);
+    GIVEN("A cross entropy shell that is initialized") {
+      // Creating settings for generating a cross entropy term where the
+      // underlying distribution is using a kernel estimator
+      // that is a guassian kernel.
+      PANACEASettings panacea_settings =
+          PANACEASettings::make()
+              .set(EntropyType::Cross)
+              .set(PANACEAAlgorithm::Flexible)
+              .distributionType(kernel)
+              .set(KernelPrimitive::Gaussian)
+              .set(RandomizeNumberDimensions::Yes)
+              .set(KernelCount::Single)
+              .set(KernelCorrelation::Correlated)
+              .set(KernelCenterCalculation::Median)
+              .set(KernelNormalization::Variance);
 
-    std::unique_ptr<EntropyTerm> cross_ent_shell =
-        panacea_pi.create(panacea_settings);
+      std::unique_ptr<EntropyTerm> cross_ent_shell =
+          panacea_pi.create(panacea_settings);
 
-    CHECK_NOTHROW(cross_ent_shell->initialize(*dwrapper));
+      CHECK_NOTHROW(cross_ent_shell->initialize(*dwrapper));
 
-    CHECK_NOTHROW(cross_ent_shell->compute(*dwrapper));
+      CHECK_NOTHROW(cross_ent_shell->compute(*dwrapper));
 
-    auto dimensions = cross_ent_shell->getDimensions();
+      auto dimensions = cross_ent_shell->getDimensions();
 
-    std::cout << "Total dimensions used " << dimensions.size() << std::endl;
-  }
-  GIVEN("A cross entropy term that is fully initialized on construction") {
-    // Creating settings for generating a cross entropy term where the
-    // underlying distribution is using a kernel estimator
-    // that is a guassian kernel.
-    PANACEASettings panacea_settings = PANACEASettings::make()
-                                           .set(EntropyType::Cross)
-                                           .set(PANACEAAlgorithm::Flexible)
-                                           .distributionType(kernel)
-                                           .set(KernelPrimitive::Gaussian)
-                                           .set(RandomizeNumberDimensions::Yes)
-                                           .set(KernelCount::Single)
-                                           .set(KernelCorrelation::Correlated)
-                                           .set(KernelCenterCalculation::Median)
-                                           .set(KernelNormalization::Variance);
+      std::cout << "Total dimensions used " << dimensions.size() << std::endl;
+    }
+    GIVEN("A cross entropy term that is fully initialized on construction") {
+      // Creating settings for generating a cross entropy term where the
+      // underlying distribution is using a kernel estimator
+      // that is a guassian kernel.
+      PANACEASettings panacea_settings =
+          PANACEASettings::make()
+              .set(EntropyType::Cross)
+              .set(PANACEAAlgorithm::Flexible)
+              .distributionType(kernel)
+              .set(KernelPrimitive::Gaussian)
+              .set(RandomizeNumberDimensions::Yes)
+              .set(KernelCount::Single)
+              .set(KernelCorrelation::Correlated)
+              .set(KernelCenterCalculation::Median)
+              .set(KernelNormalization::Variance);
 
-    std::unique_ptr<EntropyTerm> cross_ent =
-        panacea_pi.create(*dwrapper, panacea_settings);
+      std::unique_ptr<EntropyTerm> cross_ent =
+          panacea_pi.create(*dwrapper, panacea_settings);
 
-    CHECK_NOTHROW(cross_ent->compute(*dwrapper));
+      CHECK_NOTHROW(cross_ent->compute(*dwrapper));
 
-    auto dimensions = cross_ent->getDimensions();
+      auto dimensions = cross_ent->getDimensions();
 
-    std::cout << "Total dimensions used " << dimensions.size() << std::endl;
+      std::cout << "Total dimensions used " << dimensions.size() << std::endl;
 
-    REQUIRE(dimensions.size() > 0);
-    REQUIRE(dimensions.size() <= dwrapper->getNumberDimensions());
+      REQUIRE(dimensions.size() > 0);
+      REQUIRE(dimensions.size() <= dwrapper->getNumberDimensions());
+    }
   }
 }
 
@@ -571,205 +573,210 @@ TEST_CASE("Testing:panacea non trivial cross entropy max number dimensions ",
   }
 }
 
-TEST_CASE("Testing:panacea non trivial cross entropy read & write with fileio "
-          "with shell plus initialize",
+TEST_CASE("Testing:panacea non trivial cross entropy read & write",
           "[end-to-end,panacea]") {
 
-  // pi - public interface
-  PANACEA panacea_pi;
+  SECTION(" with fileio with shell plus initialize") {
+    // pi - public interface
+    PANACEA panacea_pi;
 
-  // Data has the following form, where it is stacked
-  //
-  //         col1   col2   col3
-  // row1    1.0     2.0    3.0  Point 1
-  // row2    1.0     2.0    3.0  Point 2
-  test::ArrayDataNonTrivial array_data;
-  auto dwrapper =
-      panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
+    test::ArrayDataNonTrivial array_data;
+    auto dwrapper =
+        panacea_pi.wrap(&(array_data.data), array_data.rows, array_data.cols);
 
-  GIVEN("A cross entropy term") {
-    // Creating settings for generating a cross entropy term where the
-    // underlying distribution is using a kernel estimator
-    // that is a guassian kernel.
-    PANACEASettings panacea_settings = PANACEASettings::make()
-                                           .set(EntropyType::Cross)
-                                           .set(PANACEAAlgorithm::Flexible)
-                                           .distributionType(kernel)
-                                           .set(KernelPrimitive::Gaussian)
-                                           .set(KernelCount::Single)
-                                           .set(KernelCorrelation::Correlated)
-                                           .set(KernelCenterCalculation::Median)
-                                           .set(KernelNormalization::Variance);
+    GIVEN("A cross entropy term") {
+      // Creating settings for generating a cross entropy term where the
+      // underlying distribution is using a kernel estimator
+      // that is a guassian kernel.
+      PANACEASettings panacea_settings =
+          PANACEASettings::make()
+              .set(EntropyType::Cross)
+              .set(PANACEAAlgorithm::Flexible)
+              .distributionType(kernel)
+              .set(KernelPrimitive::Gaussian)
+              .set(KernelCount::Single)
+              .set(KernelCorrelation::Correlated)
+              .set(KernelCenterCalculation::Median)
+              .set(KernelNormalization::Variance);
 
-    std::unique_ptr<EntropyTerm> cross_ent_shell =
-        panacea_pi.create(panacea_settings);
-    cross_ent_shell->initialize(*dwrapper);
-
-    double cross_ent_val =
-        cross_ent_shell->compute(*dwrapper, panacea_settings);
-    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
-
-    WHEN("provided with file_name") {
-      restart_file->write(cross_ent_shell.get(),
-                          "cross_entropy_restart_nontrivial.txt");
-
-      std::unique_ptr<EntropyTerm> cross_ent2 =
+      std::unique_ptr<EntropyTerm> cross_ent_shell =
           panacea_pi.create(panacea_settings);
+      cross_ent_shell->initialize(*dwrapper);
 
-      restart_file->read(cross_ent2.get(),
-                         "cross_entropy_restart_nontrivial.txt");
-      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
+      double cross_ent_val =
+          cross_ent_shell->compute(*dwrapper, panacea_settings);
+      auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
 
-      restart_file->write(cross_ent_shell.get(),
-                          "cross_entropy_restart_nontrivial_check.txt");
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
-    }
-    WHEN("provided with file stream") {
+      WHEN("provided with file_name") {
+        restart_file->write(cross_ent_shell.get(),
+                            "cross_entropy_restart_nontrivial.txt");
 
-      ofstream restart_out;
-      restart_out.open("cross_entropy_restart_nontrivial2.txt");
-      restart_file->write(cross_ent_shell.get(), restart_out);
-      restart_out.close();
+        std::unique_ptr<EntropyTerm> cross_ent2 =
+            panacea_pi.create(panacea_settings);
 
-      std::unique_ptr<EntropyTerm> cross_ent_shell2 =
-          panacea_pi.create(panacea_settings);
-      ifstream restart_in;
-      restart_in.open("cross_entropy_restart_nontrivial2.txt");
-      restart_file->read(cross_ent_shell2.get(), restart_in);
-      restart_in.close();
-      double cross_ent_val2 =
-          cross_ent_shell2->compute(*dwrapper, panacea_settings);
+        restart_file->read(cross_ent2.get(),
+                           "cross_entropy_restart_nontrivial.txt");
+        double cross_ent_val2 =
+            cross_ent2->compute(*dwrapper, panacea_settings);
 
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+        restart_file->write(cross_ent_shell.get(),
+                            "cross_entropy_restart_nontrivial_check.txt");
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
+      WHEN("provided with file stream") {
+
+        ofstream restart_out;
+        restart_out.open("cross_entropy_restart_nontrivial2.txt");
+        restart_file->write(cross_ent_shell.get(), restart_out);
+        restart_out.close();
+
+        std::unique_ptr<EntropyTerm> cross_ent_shell2 =
+            panacea_pi.create(panacea_settings);
+        ifstream restart_in;
+        restart_in.open("cross_entropy_restart_nontrivial2.txt");
+        restart_file->read(cross_ent_shell2.get(), restart_in);
+        restart_in.close();
+        double cross_ent_val2 =
+            cross_ent_shell2->compute(*dwrapper, panacea_settings);
+
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
     }
   }
 }
 
-TEST_CASE("Testing:panacea cross entropy read & write with fileio with shell "
-          "plus initialize",
+TEST_CASE("Testing:panacea cross entropy read & write with fileio",
           "[end-to-end,panacea]") {
 
-  // pi - public interface
-  PANACEA panacea_pi;
+  SECTION(" with shell plus initialize") {
+    // pi - public interface
+    PANACEA panacea_pi;
 
-  // Data has the following form, where it is stacked
-  //
-  //         col1   col2   col3
-  // row1    1.0     2.0    3.0  Point 1
-  // row2    1.0     2.0    3.0  Point 2
-  test::ArrayData array_data;
-  const int rows = 2;
-  const int cols = 3;
-  auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
+    // Data has the following form, where it is stacked
+    //
+    //         col1   col2   col3
+    // row1    1.0     2.0    3.0  Point 1
+    // row2    1.0     2.0    3.0  Point 2
+    test::ArrayData array_data;
+    const int rows = 2;
+    const int cols = 3;
+    auto dwrapper = panacea_pi.wrap(&(array_data.data), rows, cols);
 
-  GIVEN("A cross entropy term") {
-    // Creating settings for generating a cross entropy term where the
-    // underlying distribution is using a kernel estimator
-    // that is a guassian kernel.
-    PANACEASettings panacea_settings = PANACEASettings::make()
-                                           .set(EntropyType::Cross)
-                                           .set(PANACEAAlgorithm::Flexible)
-                                           .distributionType(kernel)
-                                           .set(KernelPrimitive::Gaussian)
-                                           .set(KernelCount::Single)
-                                           .set(KernelCorrelation::Correlated)
-                                           .set(KernelCenterCalculation::Median)
-                                           .set(KernelNormalization::Variance);
+    GIVEN("A cross entropy term") {
+      // Creating settings for generating a cross entropy term where the
+      // underlying distribution is using a kernel estimator
+      // that is a guassian kernel.
+      PANACEASettings panacea_settings =
+          PANACEASettings::make()
+              .set(EntropyType::Cross)
+              .set(PANACEAAlgorithm::Flexible)
+              .distributionType(kernel)
+              .set(KernelPrimitive::Gaussian)
+              .set(KernelCount::Single)
+              .set(KernelCorrelation::Correlated)
+              .set(KernelCenterCalculation::Median)
+              .set(KernelNormalization::Variance);
 
-    std::unique_ptr<EntropyTerm> cross_ent_shell =
-        panacea_pi.create(panacea_settings);
-    cross_ent_shell->initialize(*dwrapper);
-    double cross_ent_val_stacked =
-        cross_ent_shell->compute(*dwrapper, panacea_settings);
-
-    double cross_ent_val =
-        cross_ent_shell->compute(*dwrapper, panacea_settings);
-    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
-
-    WHEN("provided with file_name") {
-      restart_file->write(cross_ent_shell.get(), "cross_entropy_restart.txt");
-
-      std::unique_ptr<EntropyTerm> cross_ent2 =
+      std::unique_ptr<EntropyTerm> cross_ent_shell =
           panacea_pi.create(panacea_settings);
+      cross_ent_shell->initialize(*dwrapper);
+      double cross_ent_val_stacked =
+          cross_ent_shell->compute(*dwrapper, panacea_settings);
 
-      restart_file->read(cross_ent2.get(), "cross_entropy_restart.txt");
-      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
+      double cross_ent_val =
+          cross_ent_shell->compute(*dwrapper, panacea_settings);
+      auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
 
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      WHEN("provided with file_name") {
+        restart_file->write(cross_ent_shell.get(), "cross_entropy_restart.txt");
+
+        std::unique_ptr<EntropyTerm> cross_ent2 =
+            panacea_pi.create(panacea_settings);
+
+        restart_file->read(cross_ent2.get(), "cross_entropy_restart.txt");
+        double cross_ent_val2 =
+            cross_ent2->compute(*dwrapper, panacea_settings);
+
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
+      WHEN("provided with file stream") {
+
+        ofstream restart_out;
+        restart_out.open("cross_entropy_restart2.txt");
+        restart_file->write(cross_ent_shell.get(), restart_out);
+        restart_out.close();
+        std::unique_ptr<EntropyTerm> cross_ent2 =
+            panacea_pi.create(panacea_settings);
+
+        ifstream restart_in;
+        restart_in.open("cross_entropy_restart2.txt");
+        restart_file->read(cross_ent2.get(), restart_in);
+        restart_in.close();
+        double cross_ent_val2 =
+            cross_ent2->compute(*dwrapper, panacea_settings);
+
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
     }
-    WHEN("provided with file stream") {
 
-      ofstream restart_out;
-      restart_out.open("cross_entropy_restart2.txt");
-      restart_file->write(cross_ent_shell.get(), restart_out);
-      restart_out.close();
-      std::unique_ptr<EntropyTerm> cross_ent2 =
+    GIVEN("A weighted cross entropy term") {
+      // Creating settings for generating a cross entropy term where the
+      // underlying distribution is using a kernel estimator
+      // that is a guassian kernel.
+      PANACEASettings panacea_settings =
+          PANACEASettings::make()
+              .set(EntropyType::Cross)
+              .weightEntropyTermBy(2.0)
+              .set(PANACEAAlgorithm::Flexible)
+              .distributionType(kernel)
+              .set(KernelPrimitive::Gaussian)
+              .set(KernelCount::Single)
+              .set(KernelCorrelation::Correlated)
+              .set(KernelCenterCalculation::Mean)
+              .set(KernelNormalization::Variance);
+
+      std::unique_ptr<EntropyTerm> cross_ent_shell =
           panacea_pi.create(panacea_settings);
+      cross_ent_shell->initialize(*dwrapper);
+      double cross_ent_val_stacked =
+          cross_ent_shell->compute(*dwrapper, panacea_settings);
 
-      ifstream restart_in;
-      restart_in.open("cross_entropy_restart2.txt");
-      restart_file->read(cross_ent2.get(), restart_in);
-      restart_in.close();
-      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
+      double cross_ent_val =
+          cross_ent_shell->compute(*dwrapper, panacea_settings);
+      auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
 
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
-    }
-  }
+      WHEN("provided with file_name") {
+        restart_file->write(cross_ent_shell.get(),
+                            "weighted_cross_entropy_restart.txt");
 
-  GIVEN("A weighted cross entropy term") {
-    // Creating settings for generating a cross entropy term where the
-    // underlying distribution is using a kernel estimator
-    // that is a guassian kernel.
-    PANACEASettings panacea_settings = PANACEASettings::make()
-                                           .set(EntropyType::Cross)
-                                           .weightEntropyTermBy(2.0)
-                                           .set(PANACEAAlgorithm::Flexible)
-                                           .distributionType(kernel)
-                                           .set(KernelPrimitive::Gaussian)
-                                           .set(KernelCount::Single)
-                                           .set(KernelCorrelation::Correlated)
-                                           .set(KernelCenterCalculation::Mean)
-                                           .set(KernelNormalization::Variance);
+        std::unique_ptr<EntropyTerm> cross_ent2 =
+            panacea_pi.create(panacea_settings);
 
-    std::unique_ptr<EntropyTerm> cross_ent_shell =
-        panacea_pi.create(panacea_settings);
-    cross_ent_shell->initialize(*dwrapper);
-    double cross_ent_val_stacked =
-        cross_ent_shell->compute(*dwrapper, panacea_settings);
+        restart_file->read(cross_ent2.get(),
+                           "weighted_cross_entropy_restart.txt");
+        double cross_ent_val2 =
+            cross_ent2->compute(*dwrapper, panacea_settings);
 
-    double cross_ent_val =
-        cross_ent_shell->compute(*dwrapper, panacea_settings);
-    auto restart_file = panacea_pi.create(settings::FileType::TXTRestart);
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
+      WHEN("provided with file stream") {
 
-    WHEN("provided with file_name") {
-      restart_file->write(cross_ent_shell.get(),
-                          "weighted_cross_entropy_restart.txt");
+        ofstream restart_out;
+        restart_out.open("weighted_cross_entropy_restart2.txt");
+        restart_file->write(cross_ent_shell.get(), restart_out);
+        restart_out.close();
+        std::unique_ptr<EntropyTerm> cross_ent2 =
+            panacea_pi.create(panacea_settings);
 
-      std::unique_ptr<EntropyTerm> cross_ent2 =
-          panacea_pi.create(panacea_settings);
+        ifstream restart_in;
+        restart_in.open("weighted_cross_entropy_restart2.txt");
+        restart_file->read(cross_ent2.get(), restart_in);
+        restart_in.close();
+        double cross_ent_val2 =
+            cross_ent2->compute(*dwrapper, panacea_settings);
 
-      restart_file->read(cross_ent2.get(),
-                         "weighted_cross_entropy_restart.txt");
-      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
-
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
-    }
-    WHEN("provided with file stream") {
-
-      ofstream restart_out;
-      restart_out.open("weighted_cross_entropy_restart2.txt");
-      restart_file->write(cross_ent_shell.get(), restart_out);
-      restart_out.close();
-      std::unique_ptr<EntropyTerm> cross_ent2 =
-          panacea_pi.create(panacea_settings);
-
-      ifstream restart_in;
-      restart_in.open("weighted_cross_entropy_restart2.txt");
-      restart_file->read(cross_ent2.get(), restart_in);
-      restart_in.close();
-      double cross_ent_val2 = cross_ent2->compute(*dwrapper, panacea_settings);
-
-      REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+        REQUIRE(cross_ent_val == Approx(cross_ent_val2));
+      }
     }
   }
 }

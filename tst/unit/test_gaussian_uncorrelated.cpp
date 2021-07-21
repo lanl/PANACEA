@@ -206,8 +206,7 @@ TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad",
   } // End of for loop
 }
 
-TEST_CASE("Testing:compute of gaussian uncorrelated primitive grad with "
-          "normalization",
+TEST_CASE("Testing:compute of normalized gaussian uncorrelated primitive grad",
           "[unit,panacea]") {
 
   // Set of numbers to test the gradient at
