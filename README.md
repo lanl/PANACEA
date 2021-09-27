@@ -36,6 +36,14 @@ cmake --build build --target test
 cmake --build build --target install
 ```
 
+NOTE: By default python scripts are added to the test infrastructure, if you do
+not want to build with python tests the ENABLE_PYTHON_TESTS can be set to OFF
+when running the CMake configuration step. E.g. 
+
+```bash
+cmake -S. -B build -DENABLE_PYTHON_TESTS=OFF
+```
+
 Unit and integration tests can be run with:
 
 ```bash
