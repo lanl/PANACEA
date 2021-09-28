@@ -9,6 +9,7 @@
 
 // Standard includes
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <numeric>
 #include <unordered_set>
@@ -162,7 +163,7 @@ std::vector<int> detectIndependentRows_(Matrix &tmp,
   std::vector<int> independent_rows;
   for (int i = 0; i < tmp.rows(); ++i) {
     for (int k = 0; k < tmp.cols(); ++k) {
-      if (std::abs(tmp(i, k)) > threshold) {
+      if (std::fabs(tmp(i, k)) > threshold) {
         independent_rows.push_back(ind_rows.at(i));
         break;
       }

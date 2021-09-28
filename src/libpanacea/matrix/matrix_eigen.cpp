@@ -7,6 +7,7 @@
 
 // Standard includes
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <memory>
 
@@ -26,7 +27,7 @@ bool MatrixEigen::isZero(const double threshold) const noexcept {
   // Because it is symmetric only need to check one half
   for (int i = 0; i < matrix_->rows(); ++i) {
     for (int j = i; j < matrix_->cols(); ++j) {
-      if (std::abs(matrix_->operator()(i, j)) > threshold)
+      if (std::fabs(matrix_->operator()(i, j)) > threshold)
         return false;
     }
   }
