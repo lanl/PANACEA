@@ -13,6 +13,7 @@
 // Standard includes
 #include <any>
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <optional>
 #include <vector>
@@ -105,10 +106,10 @@ void checkForSymmetry(Matrix &matrix, const double threshold) {
   for (int i = 0; i < matrix.rows(); ++i) {
     for (int j = i + 1; j < matrix.rows(); ++j) {
       // Don't need to check the diagonal
-      if (std::abs(matrix(i, j)) > threshold) {
+      if (std::fabs(matrix(i, j)) > threshold) {
         // Only check values that are not too close to 0.0
-        const double diff = std::abs(matrix(i, j) - matrix(j, i));
-        const double avg = std::abs(matrix(i, j) + matrix(j, i)) / 2.0;
+        const double diff = std::fabs(matrix(i, j) - matrix(j, i));
+        const double avg = std::fabs(matrix(i, j) + matrix(j, i)) / 2.0;
         if (diff / avg > threshold) {
           PANACEA_FAIL("Covariance symmetry criteria not satisfied");
         }
@@ -132,7 +133,7 @@ void accountForZeroMatrix(const CovarianceOption opt, Matrix &matrix) {
 
 void accountForZeroOnDiagonal(const CovarianceOption opt, Matrix &matrix) {
   for (int dim1 = 0; dim1 < matrix.rows(); ++dim1) {
-    if (std::abs(matrix(dim1, dim1)) < 1E-9) {
+    if (std::fabs(matrix(dim1, dim1)) < 1E-9) {
       if (opt == CovarianceOption::Flexible) {
         matrix(dim1, dim1) = 1.0;
       } else {

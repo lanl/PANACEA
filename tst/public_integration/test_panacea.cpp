@@ -11,6 +11,7 @@
 #include <catch2/catch.hpp>
 
 // Standard includes
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -754,7 +755,7 @@ TEST_CASE("Testing:panacea cross entropy single median weighted",
 
   REQUIRE(val1 > 0.0);
   REQUIRE(val2 < 0.0);
-  REQUIRE(std::abs(val2) == Approx(val1));
+  REQUIRE(std::fabs(val2) == Approx(val1));
 
   delete[] desc_data[0];
   delete[] desc_data;

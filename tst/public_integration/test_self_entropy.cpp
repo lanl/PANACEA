@@ -11,6 +11,7 @@
 #include <catch2/catch.hpp>
 
 // Standard includes
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -164,7 +165,7 @@ TEST_CASE("Testing:panacea non trivial self entropy with strict alg",
     double negative_entropy = self_ent->compute(*dwrapper, panacea_settings);
 
     REQUIRE(negative_entropy < 0);
-    REQUIRE(std::abs(negative_entropy) == Approx(positive_entropy));
+    REQUIRE(std::fabs(negative_entropy) == Approx(positive_entropy));
   }
 }
 

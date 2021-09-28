@@ -6,6 +6,7 @@
 
 // Standard includes
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 
 namespace panacea {
@@ -17,7 +18,7 @@ bool makeElementNonZero_(const int i, const int m, Matrix &tmp,
 
   // Check to see if current column is 0 and if we
   // need to swap with a row that is lower down in the matrix
-  if (std::abs(tmp(i, m)) < threshold) {
+  if (std::fabs(tmp(i, m)) < threshold) {
     // This means current column is close to 0.0 we will start by going
     // ahead and rounding it to 0.0
     tmp(i, m) = 0.0;
@@ -27,7 +28,7 @@ bool makeElementNonZero_(const int i, const int m, Matrix &tmp,
       for (int j = i + 1; j < tmp.rows(); ++j) {
         // Find the first row j underneath row i that has a non 0
         // element in the same column (in column i).
-        if (std::abs(tmp(j, m)) > threshold) {
+        if (std::fabs(tmp(j, m)) > threshold) {
           // Swap the rows
           for (int k = m; k < tmp.cols(); ++k) {
             std::swap(tmp(i, k), tmp(j, k));
@@ -48,14 +49,14 @@ void scaleAllRowsUnderElement_(const int i, const int m, Matrix &tmp,
 
   for (int j = i + 1; j < tmp.rows(); ++j) {
     double scale;
-    if (std::abs(tmp(i, m)) < threshold) {
+    if (std::fabs(tmp(i, m)) < threshold) {
       scale = 0.0;
     } else {
       scale = tmp(j, m) / tmp(i, m);
     }
     for (int k = m; k < tmp.cols(); ++k) {
       tmp(j, k) = tmp(j, k) - scale * tmp(i, k);
-      if (std::abs(tmp(j, k)) < threshold) {
+      if (std::fabs(tmp(j, k)) < threshold) {
         // Just make it 0.0 if it is small
         tmp(j, k) = 0.0;
       }

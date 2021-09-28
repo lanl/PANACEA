@@ -20,6 +20,7 @@
 #include <catch2/catch.hpp>
 
 // Standard includes
+#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -99,11 +100,11 @@ TEST_CASE("Testing:self entropy", "[integration,panacea]") {
     double val2 = entropy_term->compute(dwrapper_init, settings);
     auto grad2 = entropy_term->compute_grad(dwrapper_init, 0, settings);
 
-    REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
+    REQUIRE(std::fabs(val1) == Approx(std::fabs(val2)));
     REQUIRE(val1 != Approx(val2));
 
     // Check that values are the same
-    REQUIRE(std::abs(grad1.at(0)) == Approx(std::abs(grad2.at(0))));
+    REQUIRE(std::fabs(grad1.at(0)) == Approx(std::fabs(grad2.at(0))));
     // Check that opposite in direction
     REQUIRE(grad1.at(0) == Approx(grad2.at(0) * -1.0));
   }
@@ -185,10 +186,10 @@ TEST_CASE("Testing:self entropy with Array Data2", "[integration,panacea]") {
       double val2 = entropy_term->compute(dwrapper_init, settings);
       auto grad2 = entropy_term->compute_grad(dwrapper_init, 0, settings);
 
-      REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
+      REQUIRE(std::fabs(val1) == Approx(std::fabs(val2)));
       REQUIRE(val1 != Approx(val2));
 
-      REQUIRE(std::abs(grad1.at(0)) == Approx(std::abs(grad2.at(0))));
+      REQUIRE(std::fabs(grad1.at(0)) == Approx(std::fabs(grad2.at(0))));
       REQUIRE(grad1.at(0) != Approx(grad2.at(0)));
     }
   }
@@ -254,10 +255,10 @@ TEST_CASE("Testing:self entropy with Array Data2", "[integration,panacea]") {
       double val2 = entropy_term->compute(dwrapper_init, settings);
       auto grad2 = entropy_term->compute_grad(dwrapper_init, 0, settings);
 
-      REQUIRE(std::abs(val1) == Approx(std::abs(val2)));
+      REQUIRE(std::fabs(val1) == Approx(std::fabs(val2)));
       REQUIRE(val1 != Approx(val2));
 
-      REQUIRE(std::abs(grad1.at(0)) == Approx(std::abs(grad2.at(0))));
+      REQUIRE(std::fabs(grad1.at(0)) == Approx(std::fabs(grad2.at(0))));
       REQUIRE(grad1.at(0) != Approx(grad2.at(0)));
     }
   }
