@@ -86,10 +86,10 @@ int main() {
           .set(KernelCorrelation::Correlated)
           .set(KernelCenterCalculation::Median);
 
-  auto cross_mean = panacea_pi.create(dwrapper.get(), settings_cross_mean);
-  auto cross_median = panacea_pi.create(dwrapper.get(), settings_cross_median);
+  auto cross_mean = panacea_pi.create(*dwrapper.get(), settings_cross_mean);
+  auto cross_median = panacea_pi.create(*dwrapper.get(), settings_cross_median);
   auto cross_median_log =
-      panacea_pi.create(dwrapper.get(), settings_cross_median_log);
+      panacea_pi.create(*dwrapper.get(), settings_cross_median_log);
 
   auto kern_dist_io =
       panacea_pi.create(settings::FileType::TXTKernelDistribution);
