@@ -8,6 +8,7 @@
 // Standard includes
 #include <algorithm>
 #include <any>
+#include <functional>
 #include <iostream>
 #include <typeindex>
 #include <vector>
@@ -177,9 +178,7 @@ io::ReadInstantiateVector Weight::read(const settings::FileType file_type,
         std::getline(is, line);
       }
 
-      // double weight;
       is >> ent_term.weight_;
-      // entropy_term_instance.set(settings::EntropyOption::Weight, weight);
 
     } catch (...) {
       std::string error_msg = "Problem casting from const EntropyTerm & to ";
