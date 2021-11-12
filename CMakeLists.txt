@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18.3)
 
 enable_language(CXX)
 
-project(panacea VERSION "0.0.0")
+project(panacea VERSION "0.0.1")
 
 set(SOVERSION 1)
 set(CMAKE_CXX_STANDARD 17)

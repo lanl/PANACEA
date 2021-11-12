@@ -10,6 +10,7 @@
 #include "private_settings.hpp"
 
 // Standard includes
+#include <functional>
 #include <iostream>
 #include <vector>
 
